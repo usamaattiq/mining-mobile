@@ -1,7 +1,6 @@
 import React from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -43,12 +42,7 @@ export function OnboardingLayout({
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      <LinearGradient
-        colors={[palette.gold, palette.lightGold]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={[styles.hero, { paddingTop: insets.top + spacing.md }]}
-      >
+      <View style={[styles.hero, { paddingTop: insets.top + spacing.md }]}>
         <View style={styles.topBar}>
           {onBack ? (
             <Pressable
@@ -68,7 +62,7 @@ export function OnboardingLayout({
         <OnboardingHeadline title={title} subtitle={subtitle} dark />
 
         <OnboardingStepper steps={steps} currentStep={currentStep} />
-      </LinearGradient>
+      </View>
 
       <View style={styles.sheet}>
         <KeyboardAwareScrollView
@@ -91,15 +85,10 @@ export function OnboardingLayout({
               accessibilityLabel={continueLabel}
               style={({ pressed }) => [styles.continuePressable, pressed && canContinue && styles.pressed]}
             >
-              <LinearGradient
-                colors={[palette.gold, palette.lightGold]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}
-              >
+              <View style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}>
                 <Text style={styles.continueLabel}>{continueLabel}</Text>
                 <Ionicons name="arrow-forward" size={18} color={palette.charcoal} />
-              </LinearGradient>
+              </View>
             </Pressable>
           </View>
         ) : null}
@@ -111,15 +100,13 @@ export function OnboardingLayout({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    // Matches the hero gradient's bottom color so the white sheet's rounded
-    // top corners blend into the seam instead of exposing a mismatched flat
-    // gold behind the cutout.
-    backgroundColor: palette.lightGold,
+    backgroundColor: palette.gold,
   },
   flex: {
     flex: 1,
   },
   hero: {
+    backgroundColor: palette.gold,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,
   },
@@ -179,6 +166,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   continueButton: {
+    backgroundColor: palette.gold,
     minHeight: 56,
     borderRadius: radius.pill,
     flexDirection: 'row',

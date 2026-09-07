@@ -89,17 +89,10 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => navigation.navigate('SignUpRole')}
-          style={styles.signUpButtonWrap}
+          style={[styles.signUpButtonWrap, styles.actionButton]}
         >
-          <LinearGradient
-            colors={[colors.gold, colors.goldDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.actionButton}
-          >
-            <Text style={styles.signUpLabel}>Sign Up</Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.charcoal} />
-          </LinearGradient>
+          <Text style={styles.signUpLabel}>Sign Up</Text>
+          <Ionicons name="arrow-forward" size={18} color={colors.charcoal} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -213,6 +206,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   signUpButtonWrap: {
+    backgroundColor: colors.gold,
     borderRadius: 28,
     shadowColor: colors.goldDark,
     shadowOpacity: 0.35,
