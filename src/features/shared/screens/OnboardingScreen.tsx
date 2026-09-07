@@ -33,7 +33,7 @@ const mainHomeImageHeight = screenWidth / mainHomeAspectRatio;
 // text, icon tile) — the gold/charcoal accents below all come from `palette`
 // so this screen stays visually in sync with the rest of the app.
 const colors = {
-  bg: '#F8EFDD',
+  bg: '#FFFFFF',
   charcoal: palette.charcoal,
   gold: palette.gold,
   goldDark: palette.goldDark,
@@ -48,7 +48,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
 
   return (
     <View style={styles.root}>
-      <View style={styles.imageClip}>
+      <View style={[styles.imageClip, { height: mainHomeImageHeight }]}>
         <Image
           source={mainHomeImage}
           style={[styles.image, { height: mainHomeImageHeight }]}
@@ -58,6 +58,11 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           colors={['rgba(0, 0, 0, 0.65)', 'rgba(0, 0, 0, 0.25)', 'transparent']}
           locations={[0, 0.45, 1]}
           style={styles.imageOverlay}
+        />
+        <LinearGradient
+          colors={['transparent', 'rgba(0, 0, 0, 0.35)', 'rgba(0, 0, 0, 0.72)']}
+          locations={[0, 0.5, 1]}
+          style={styles.bottomOverlay}
         />
       </View>
 
@@ -77,7 +82,9 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           </View>
           <LanguageSwitcher />
         </View>
+      </View>
 
+      <View style={[styles.actions, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
         <View style={styles.headline}>
           <AppText weight="bold" style={styles.headlineText}>
             {t('onboarding.headlineLine1')}
@@ -90,9 +97,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           </AppText>
           <AppText style={styles.subtext}>{t('onboarding.subtitle')}</AppText>
         </View>
-      </View>
 
-      <View style={[styles.actions, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => navigation.navigate('SignUpRole')}
@@ -141,7 +146,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
   },
   imageClip: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     overflow: 'hidden',
   },
   image: {
@@ -153,6 +161,9 @@ const styles = StyleSheet.create({
   imageOverlay: {
     ...StyleSheet.absoluteFill,
   },
+  bottomOverlay: {
+    ...StyleSheet.absoluteFill,
+  },
   content: {
     paddingHorizontal: spacing.lg,
   },
@@ -160,6 +171,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    marginTop: spacing.md,
   },
   logoRow: {
     flexDirection: 'row',
@@ -177,7 +189,7 @@ const styles = StyleSheet.create({
   },
   brandMine: {
     fontFamily: BRAND_FONT_BOLD,
-    color: colors.charcoal,
+    color: 'rgba(255, 255, 255, 0.82)',
   },
   brandMarket: {
     fontFamily: BRAND_FONT_BOLD,
@@ -186,17 +198,17 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 9,
     letterSpacing: 1.2,
-    color: colors.muted,
+    color: 'rgba(255, 255, 255, 0.82)',
     marginTop: 1,
   },
   headline: {
-    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
     gap: spacing.sm,
   },
   headlineText: {
     fontSize: 30,
     lineHeight: 36,
-    color: colors.charcoal,
+    color: 'rgba(255, 255, 255, 0.82)',
   },
   headlineAccent: {
     color: colors.gold,
@@ -204,7 +216,7 @@ const styles = StyleSheet.create({
   subtext: {
     fontSize: 13,
     lineHeight: 19,
-    color: colors.muted,
+    color: 'rgba(255, 255, 255, 0.82)',
     maxWidth: '92%',
   },
   actions: {
