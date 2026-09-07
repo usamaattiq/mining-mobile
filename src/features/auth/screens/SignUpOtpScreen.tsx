@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
+import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import type { RootStackParamList } from '@/navigation/types';
-import { AppTopBar } from '@/shared/components/AppTopBar';
-import { Button } from '@/shared/components/Button';
 import { CodeInput } from '@/shared/components/CodeInput';
 import { palette, spacing } from '@/shared/theme/tokens';
 
@@ -26,67 +26,34 @@ export function SignUpOtpScreen({ navigation, route }: Props): React.ReactElemen
   const isValid = otp.length === OTP_LENGTH;
 
   return (
-    <View style={styles.root}>
-      <AppTopBar left="back" title="Verification" onBackPress={() => navigation.goBack()} />
+    <OnboardingLayout
+      steps={SIGN_UP_STEPS}
+      currentStep={2}
+      title="Enter verification code"
+      subtitle={`We sent a ${OTP_LENGTH}-digit code to ${phone}`}
+      onBack={() => navigation.goBack()}
+      canContinue={isValid}
+      continueLabel="Verify"
+      onContinue={() => navigation.navigate('SignUpPersonalInfo', { role, phone })}
+    >
+      <View style={styles.form}>
+        <CodeInput length={OTP_LENGTH} value={otp} onChangeValue={setOtp} />
 
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Enter verification code</Text>
-          <Text style={styles.subtitle}>
-            We sent a {OTP_LENGTH}-digit code to {phone}
-          </Text>
-        </View>
-
-        <View style={styles.form}>
-          <CodeInput length={OTP_LENGTH} value={otp} onChangeValue={setOtp} />
-
-          <View style={styles.resendRow}>
-            {secondsLeft > 0 ? (
-              <Text style={styles.resendMuted}>Resend code in {secondsLeft}s</Text>
-            ) : (
-              <TouchableOpacity onPress={() => setSecondsLeft(RESEND_SECONDS)}>
-                <Text style={styles.resendLink}>Resend code</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.footer}>
-          <Button
-            label="Verify"
-            disabled={!isValid}
-            onPress={() => navigation.navigate('SignUpPersonalInfo', { role, phone })}
-          />
+        <View style={styles.resendRow}>
+          {secondsLeft > 0 ? (
+            <Text style={styles.resendMuted}>Resend code in {secondsLeft}s</Text>
+          ) : (
+            <TouchableOpacity onPress={() => setSecondsLeft(RESEND_SECONDS)}>
+              <Text style={styles.resendLink}>Resend code</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
-    </View>
+    </OnboardingLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.pureWhite,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-    justifyContent: 'space-between',
-  },
-  header: {
-    marginTop: spacing.md,
-    gap: spacing.xs,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: palette.charcoal,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: palette.muted,
-  },
   form: {
     gap: spacing.lg,
   },
@@ -102,5 +69,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: palette.gold,
   },
-  footer: {},
 });

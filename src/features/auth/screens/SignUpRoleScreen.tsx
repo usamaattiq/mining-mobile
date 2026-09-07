@@ -1,13 +1,17 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
+import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import type { RootStackParamList, UserRole } from '@/navigation/types';
-import { AppTopBar } from '@/shared/components/AppTopBar';
-import { Button } from '@/shared/components/Button';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SignUpRole'>;
+
+const CARD_GRADIENT = ['#FBF6EA', '#F1E4C4', '#E6D4A0'] as const;
+const ICON_GRADIENT = [palette.lightGold, palette.gold] as const;
 
 const ROLES: Array<{
   value: UserRole;
@@ -30,111 +34,81 @@ const ROLES: Array<{
 ];
 
 export function SignUpRoleScreen({ navigation }: Props): React.ReactElement {
-  const [role, setRole] = React.useState<UserRole | null>(null);
-
   return (
-    <View style={styles.root}>
-      <AppTopBar left="back" title="Account type" onBackPress={() => navigation.goBack()} />
-
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>How will you use MineMarket?</Text>
-          <Text style={styles.subtitle}>You can change this later in settings.</Text>
-        </View>
-
-        <View style={styles.options}>
-          {ROLES.map((option) => {
-            const selected = role === option.value;
-            return (
-              <TouchableOpacity
-                key={option.value}
-                activeOpacity={0.85}
-                style={[styles.card, selected && styles.cardSelected]}
-                onPress={() => setRole(option.value)}
+    <OnboardingLayout
+      steps={SIGN_UP_STEPS}
+      currentStep={0}
+      title="How will you use MineMarket?"
+      subtitle="Choose a role to get started. You can change this later in settings."
+      onBack={() => navigation.goBack()}
+      showFooter={false}
+    >
+      <View style={styles.roleList}>
+        {ROLES.map((option) => (
+          <Pressable
+            key={option.value}
+            onPress={() => navigation.navigate('SignUpPhone', { role: option.value })}
+            style={({ pressed }) => [styles.cardShadow, pressed && styles.pressed]}
+          >
+            <LinearGradient
+              colors={[...CARD_GRADIENT]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.card}
+            >
+              <LinearGradient
+                colors={[...ICON_GRADIENT]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.iconWrap}
               >
-                <View style={[styles.iconTile, selected && styles.iconTileSelected]}>
-                  <Ionicons
-                    name={option.icon}
-                    size={24}
-                    color={selected ? palette.charcoal : palette.gold}
-                  />
-                </View>
-                <View style={styles.cardText}>
-                  <Text style={styles.cardTitle}>{option.title}</Text>
-                  <Text style={styles.cardDescription}>{option.description}</Text>
-                </View>
-                <Ionicons
-                  name={selected ? 'radio-button-on' : 'radio-button-off'}
-                  size={22}
-                  color={selected ? palette.gold : palette.muted}
-                />
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <View style={styles.footer}>
-          <Button
-            label="Continue"
-            disabled={!role}
-            onPress={() => role && navigation.navigate('SignUpPhone', { role })}
-          />
-        </View>
+                <Ionicons name={option.icon} size={26} color={palette.pureWhite} />
+              </LinearGradient>
+              <View style={styles.cardText}>
+                <Text style={styles.cardTitle}>{option.title}</Text>
+                <Text style={styles.cardDescription}>{option.description}</Text>
+              </View>
+              <View style={styles.chevronWrap}>
+                <Ionicons name="chevron-forward" size={18} color={palette.gold} />
+              </View>
+            </LinearGradient>
+          </Pressable>
+        ))}
       </View>
-    </View>
+    </OnboardingLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.pureWhite,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-    justifyContent: 'space-between',
-  },
-  header: {
-    marginTop: spacing.md,
-    gap: spacing.xs,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: palette.charcoal,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: palette.muted,
-  },
-  options: {
+  roleList: {
     gap: spacing.md,
+  },
+  pressed: {
+    opacity: 0.9,
+  },
+  cardShadow: {
+    borderRadius: radius.lg,
+    shadowColor: palette.gold,
+    shadowOpacity: 0.18,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 14,
+    elevation: 3,
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    borderWidth: 1,
-    borderColor: palette.softGold,
     borderRadius: radius.lg,
     padding: spacing.md,
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(201, 162, 39, 0.22)',
   },
-  cardSelected: {
-    borderColor: palette.gold,
-    backgroundColor: palette.softGold,
-  },
-  iconTile: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: palette.softGold,
+  iconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconTileSelected: {
-    backgroundColor: palette.gold,
   },
   cardText: {
     flex: 1,
@@ -147,9 +121,15 @@ const styles = StyleSheet.create({
   },
   cardDescription: {
     fontSize: 12,
+    lineHeight: 17,
     color: palette.muted,
   },
-  footer: {
-    marginBottom: spacing.xl,
+  chevronWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

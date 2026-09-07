@@ -2,11 +2,12 @@ import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
+import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import type { RootStackParamList } from '@/navigation/types';
-import { AppTopBar } from '@/shared/components/AppTopBar';
 import { Button } from '@/shared/components/Button';
 import { CodeInput } from '@/shared/components/CodeInput';
-import { palette, spacing } from '@/shared/theme/tokens';
+import { palette, radius, spacing } from '@/shared/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SignUpSecurity'>;
 
@@ -78,84 +79,51 @@ export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement 
   };
 
   return (
-    <View style={styles.root}>
-      <AppTopBar left="back" title="Security setup" onBackPress={handleBack} />
+    <OnboardingLayout
+      steps={SIGN_UP_STEPS}
+      currentStep={4}
+      title={step === 'create' ? 'Set your MPIN' : 'Confirm your MPIN'}
+      subtitle={
+        step === 'create'
+          ? `Choose a ${MPIN_LENGTH}-digit PIN to secure your account.`
+          : 'Enter the same PIN again to confirm.'
+      }
+      onBack={handleBack}
+      canContinue={isMpinComplete}
+      continueLabel={step === 'create' ? 'Continue' : 'Finish'}
+      onContinue={handleContinue}
+    >
+      <View style={styles.form}>
+        <CodeInput
+          length={MPIN_LENGTH}
+          value={currentValue}
+          onChangeValue={handleMpinChange}
+          secure
+          autoFocus
+        />
 
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>
-            {step === 'create' ? 'Set your MPIN' : 'Confirm your MPIN'}
-          </Text>
-          <Text style={styles.subtitle}>
-            {step === 'create'
-              ? `Choose a ${MPIN_LENGTH}-digit PIN to secure your account.`
-              : 'Enter the same PIN again to confirm.'}
-          </Text>
-        </View>
-
-        <View style={styles.form}>
-          <CodeInput
-            length={MPIN_LENGTH}
-            value={currentValue}
-            onChangeValue={handleMpinChange}
-            secure
-            autoFocus
-          />
-
-          {step === 'create' && biometricAvailable ? (
-            <View style={styles.biometricRow}>
-              <View style={styles.biometricText}>
-                <Text style={styles.biometricTitle}>Enable Face ID / biometric unlock</Text>
-                <Text style={styles.biometricSubtitle}>
-                  Use your face or fingerprint for faster sign in. You can always use your MPIN.
-                </Text>
-              </View>
-              <Button
-                label={biometricEnabled ? 'Enabled' : 'Enable'}
-                variant={biometricEnabled ? 'secondary' : 'outline'}
-                disabled={biometricEnabled}
-                onPress={handleEnableBiometric}
-              />
+        {step === 'create' && biometricAvailable ? (
+          <View style={styles.biometricRow}>
+            <View style={styles.biometricText}>
+              <Text style={styles.biometricTitle}>Enable Face ID / biometric unlock</Text>
+              <Text style={styles.biometricSubtitle}>
+                Use your face or fingerprint for faster sign in. You can always use your MPIN.
+              </Text>
             </View>
-          ) : null}
-        </View>
-
-        <View style={styles.footer}>
-          <Button
-            label={step === 'create' ? 'Continue' : 'Finish'}
-            disabled={!isMpinComplete}
-            onPress={handleContinue}
-          />
-        </View>
+            <Button
+              label={biometricEnabled ? 'Enabled' : 'Enable'}
+              variant={biometricEnabled ? 'secondary' : 'outline'}
+              disabled={biometricEnabled}
+              onPress={handleEnableBiometric}
+            />
+          </View>
+        ) : null}
       </View>
-    </View>
+    </OnboardingLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.pureWhite,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-    justifyContent: 'space-between',
-  },
-  header: {
-    marginTop: spacing.md,
-    gap: spacing.xs,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: palette.charcoal,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: palette.muted,
-  },
   form: {
     gap: spacing.xl,
   },
@@ -165,7 +133,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     borderWidth: 1,
     borderColor: palette.softGold,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     padding: spacing.md,
   },
   biometricText: {
@@ -181,5 +149,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: palette.muted,
   },
-  footer: {},
 });

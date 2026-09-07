@@ -6,11 +6,17 @@ import { SplashScreen } from '@/shared/components/SplashScreen';
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { navigationRef } from '@/navigation/navigationRef';
 import { palette } from '@/shared/theme/tokens';
+import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
 
 const BOOTSTRAP_DELAY_MS = 800;
 
 export default function App() {
   const [isReady, setIsReady] = React.useState(false);
+
+  // Listens for foreground/tapped notifications for the whole app lifetime.
+  // Actual registration (permission + token + backend call) happens after
+  // login, once auth exists — see registerForPushNotifications().
+  usePushNotifications();
 
   React.useEffect(() => {
     const timer = setTimeout(() => setIsReady(true), BOOTSTRAP_DELAY_MS);

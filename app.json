@@ -9,14 +9,14 @@
     "scheme": "miningmobile",
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "bundleIdentifier": "com.silveraxis.miningmobile",
+      "bundleIdentifier": "com.silveraxis.mining",
       "buildNumber": "1",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Allow Mining Mobile to use Face ID to sign you in quickly and securely."
       }
     },
     "android": {
-      "package": "com.silveraxis.miningmobile",
+      "package": "com.silveraxis.mining",
       "versionCode": 1,
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
