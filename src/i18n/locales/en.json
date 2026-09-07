@@ -1,0 +1,94 @@
+{
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "done": "Done",
+    "close": "Close",
+    "continue": "Continue"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "Arabic",
+    "selectLanguage": "Select language"
+  },
+  "onboarding": {
+    "tagline": "EQUIP · SOURCE · BUILD TOGETHER",
+    "headlineLine1": "Powering",
+    "headlineLine2": "a Stronger",
+    "headlineAccent": "Mining Tomorrow",
+    "subtitle": "Your all-in-one marketplace for equipment, services, products and gold.",
+    "signUp": "Sign Up",
+    "logIn": "Log In",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms & Conditions"
+  },
+  "signUpRole": {
+    "title": "How will you use MineMarket?",
+    "subtitle": "Choose a role to get started. You can change this later in settings.",
+    "buyerTitle": "Buyer",
+    "buyerDescription": "Browse and order equipment, services, products and gold.",
+    "supplierTitle": "Supplier",
+    "supplierDescription": "List and sell your equipment, services, products and gold."
+  },
+  "signUpPhone": {
+    "title": "What's your number?",
+    "subtitle": "We'll send you a verification code by SMS.",
+    "label": "Phone number",
+    "placeholder": "555 000 0000",
+    "sendCode": "Send code",
+    "selectCountryCode": "Select country code",
+    "searchCountry": "Search country or code"
+  },
+  "signUpOtp": {
+    "title": "Enter verification code",
+    "subtitleTemplate": "We sent a {length}-digit code to {phone}",
+    "verify": "Verify",
+    "resendIn": "Resend code in {seconds}s",
+    "resend": "Resend code"
+  },
+  "signUpPersonalInfo": {
+    "title": "Tell us about you",
+    "subtitle": "This helps us personalize your account.",
+    "fullName": "Full name",
+    "email": "Email",
+    "addressOptional": "Address (optional)",
+    "address": "Address"
+  },
+  "signUpSecurity": {
+    "createTitle": "Set your MPIN",
+    "confirmTitle": "Confirm your MPIN",
+    "createSubtitleTemplate": "Choose a {length}-digit PIN to secure your account.",
+    "confirmSubtitle": "Enter the same PIN again to confirm.",
+    "continue": "Continue",
+    "finish": "Finish",
+    "biometricTitle": "Enable Face ID / biometric unlock",
+    "biometricSubtitle": "Use your face or fingerprint for faster sign in. You can always use your MPIN.",
+    "enable": "Enable",
+    "enabled": "Enabled",
+    "biometricPrompt": "Confirm to enable biometric unlock",
+    "mismatchTitle": "MPIN mismatch",
+    "mismatchMessage": "The MPIN you entered does not match. Please try again.",
+    "successTitle": "Account created",
+    "successMessage": "Your account has been set up successfully."
+  },
+  "login": {
+    "title": "Log in",
+    "welcomeBack": "Welcome back",
+    "subtitle": "Sign in to continue",
+    "email": "Email",
+    "password": "Password",
+    "logIn": "Log In",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign Up"
+  },
+  "steps": {
+    "role": "Role",
+    "phone": "Phone",
+    "verify": "Verify",
+    "profile": "Profile",
+    "security": "Security"
+  },
+  "legal": {
+    "updatedTemplate": "Effective {effective} · Last updated {updated}"
+  }
+}

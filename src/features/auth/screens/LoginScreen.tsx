@@ -1,8 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
+import { AppText } from '@/shared/components/AppText';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { Button } from '@/shared/components/Button';
 import { FormInput } from '@/shared/components/FormInput';
@@ -12,6 +15,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export function LoginScreen({ navigation }: Props): React.ReactElement {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation(undefined, { i18n: appI18n });
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -19,38 +23,42 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
     <View style={[styles.root, { paddingBottom: insets.bottom }]}>
       <AppTopBar
         left={navigation.canGoBack() ? 'back' : 'none'}
-        title="Log in"
+        title={t('login.title')}
         onBackPress={() => navigation.goBack()}
       />
 
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
+          <AppText weight="bold" style={styles.title}>
+            {t('login.welcomeBack')}
+          </AppText>
+          <AppText style={styles.subtitle}>{t('login.subtitle')}</AppText>
         </View>
 
         <View style={styles.form}>
           <FormInput
-            placeholder="Email"
+            placeholder={t('login.email')}
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
           />
           <FormInput
-            placeholder="Password"
+            placeholder={t('login.password')}
             secureTextEntry
             value={password}
             onChangeText={setPassword}
           />
 
-          <Button label="Log In" style={styles.primaryButton} />
+          <Button label={t('login.logIn')} style={styles.primaryButton} />
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don&apos;t have an account?</Text>
+          <AppText style={styles.footerText}>{t('login.noAccount')}</AppText>
           <TouchableOpacity onPress={() => navigation.navigate('SignUpRole')}>
-            <Text style={styles.footerLink}>Sign Up</Text>
+            <AppText weight="bold" style={styles.footerLink}>
+              {t('login.signUp')}
+            </AppText>
           </TouchableOpacity>
         </View>
       </View>
@@ -74,7 +82,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: '700',
     color: palette.charcoal,
   },
   subtitle: {
@@ -99,7 +106,6 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     fontSize: 14,
-    fontWeight: '700',
     color: palette.gold,
   },
 });

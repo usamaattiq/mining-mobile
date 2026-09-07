@@ -3,6 +3,9 @@ import { ActivityIndicator, StatusBar, StyleSheet, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette, spacing } from '@/shared/theme/tokens';
 
+// Plain RN Text on purpose: this screen renders before i18n/fonts finish
+// loading, so it can't depend on AppText (which needs the language context).
+
 type SplashScreenProps = {
   /** When true, show the loading spinner + label (bootstrap gate). */
   showLoader?: boolean;

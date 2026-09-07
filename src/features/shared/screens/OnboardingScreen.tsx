@@ -4,8 +4,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
+import { AppText } from '@/shared/components/AppText';
+import { LanguageSwitcher } from '@/shared/components/language-switcher';
+import { LegalDocumentSheet } from '@/shared/components/LegalDocumentSheet';
+import type { LegalDocumentKind } from '@/shared/constants/legalContent';
 import { palette, spacing } from '@/shared/theme/tokens';
+import { getFontFamily } from '@/shared/theme/typography';
+
+// The "MineMarket" brand wordmark stays in the Latin (Outfit) face
+// regardless of active language, like other brand names.
+const BRAND_FONT_BOLD = getFontFamily('en', 'bold');
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 
@@ -32,6 +43,8 @@ const colors = {
 
 export function OnboardingScreen({ navigation }: Props): React.ReactElement {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+  const [legalDoc, setLegalDoc] = React.useState<LegalDocumentKind | null>(null);
 
   return (
     <View style={styles.root}>
@@ -41,19 +54,12 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           style={[styles.image, { height: mainHomeImageHeight }]}
           resizeMode="contain"
         />
+        <LinearGradient
+          colors={['rgba(0, 0, 0, 0.65)', 'rgba(0, 0, 0, 0.25)', 'transparent']}
+          locations={[0, 0.45, 1]}
+          style={styles.imageOverlay}
+        />
       </View>
-
-      <LinearGradient
-        colors={[colors.bg, colors.bg, `${colors.bg}E6`, `${colors.bg}66`, 'transparent']}
-        locations={[0, 0.42, 0.58, 0.72, 0.85]}
-        style={styles.topFade}
-      />
-
-      <LinearGradient
-        colors={['transparent', 'rgba(18,14,9,0.4)', 'rgba(12,9,6,0.88)']}
-        locations={[0, 0.55, 1]}
-        style={styles.bottomFade}
-      />
 
       <View style={[styles.content, { paddingTop: Math.max(insets.top, spacing.md) }]}>
         <View style={styles.topBar}>
@@ -66,22 +72,23 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
                 <Text style={styles.brandMine}>Mine</Text>
                 <Text style={styles.brandMarket}>Market</Text>
               </Text>
-              <Text style={styles.tagline}>EQUIP · SOURCE · BUILD TOGETHER</Text>
+              <AppText style={styles.tagline}>{t('onboarding.tagline')}</AppText>
             </View>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')} hitSlop={8}>
-            <Text style={styles.skip}>Skip</Text>
-          </TouchableOpacity>
+          <LanguageSwitcher />
         </View>
 
         <View style={styles.headline}>
-          <Text style={styles.headlineText}>
-            Powering{'\n'}a Stronger{'\n'}
-            <Text style={styles.headlineAccent}>Mining Tomorrow</Text>
-          </Text>
-          <Text style={styles.subtext}>
-            Your all-in-one marketplace for equipment, services, products and gold.
-          </Text>
+          <AppText weight="bold" style={styles.headlineText}>
+            {t('onboarding.headlineLine1')}
+            {'\n'}
+            {t('onboarding.headlineLine2')}
+            {'\n'}
+            <AppText weight="bold" style={styles.headlineAccent}>
+              {t('onboarding.headlineAccent')}
+            </AppText>
+          </AppText>
+          <AppText style={styles.subtext}>{t('onboarding.subtitle')}</AppText>
         </View>
       </View>
 
@@ -91,7 +98,9 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           onPress={() => navigation.navigate('SignUpRole')}
           style={[styles.signUpButtonWrap, styles.actionButton]}
         >
-          <Text style={styles.signUpLabel}>Sign Up</Text>
+          <AppText weight="bold" style={styles.signUpLabel}>
+            {t('onboarding.signUp')}
+          </AppText>
           <Ionicons name="arrow-forward" size={18} color={colors.charcoal} />
         </TouchableOpacity>
 
@@ -100,10 +109,28 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           onPress={() => navigation.navigate('Login')}
           style={[styles.actionButton, styles.loginButton]}
         >
-          <Text style={styles.loginLabel}>Log In</Text>
+          <AppText weight="bold" style={styles.loginLabel}>
+            {t('onboarding.logIn')}
+          </AppText>
           <Ionicons name="arrow-forward" size={18} color={colors.gold} />
         </TouchableOpacity>
+
+        <View style={styles.legalRow}>
+          <TouchableOpacity onPress={() => setLegalDoc('privacy')} hitSlop={8}>
+            <AppText style={styles.legalLink}>{t('onboarding.privacyPolicy')}</AppText>
+          </TouchableOpacity>
+          <AppText style={styles.legalDivider}>|</AppText>
+          <TouchableOpacity onPress={() => setLegalDoc('terms')} hitSlop={8}>
+            <AppText style={styles.legalLink}>{t('onboarding.terms')}</AppText>
+          </TouchableOpacity>
+        </View>
       </View>
+
+      <LegalDocumentSheet
+        visible={legalDoc !== null}
+        doc={legalDoc}
+        onClose={() => setLegalDoc(null)}
+      />
     </View>
   );
 }
@@ -120,22 +147,11 @@ const styles = StyleSheet.create({
   image: {
     position: 'absolute',
     right: 0,
-    bottom: 0,
+    top: 0,
     width: '100%',
   },
-  topFade: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '60%',
-  },
-  bottomFade: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '38%',
+  imageOverlay: {
+    ...StyleSheet.absoluteFill,
   },
   content: {
     paddingHorizontal: spacing.lg,
@@ -160,11 +176,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   brandMine: {
-    fontWeight: '800',
+    fontFamily: BRAND_FONT_BOLD,
     color: colors.charcoal,
   },
   brandMarket: {
-    fontWeight: '800',
+    fontFamily: BRAND_FONT_BOLD,
     color: colors.gold,
   },
   tagline: {
@@ -173,11 +189,6 @@ const styles = StyleSheet.create({
     color: colors.muted,
     marginTop: 1,
   },
-  skip: {
-    fontSize: 14,
-    color: colors.muted,
-    marginTop: 6,
-  },
   headline: {
     marginTop: spacing.lg,
     gap: spacing.sm,
@@ -185,7 +196,6 @@ const styles = StyleSheet.create({
   headlineText: {
     fontSize: 30,
     lineHeight: 36,
-    fontWeight: '800',
     color: colors.charcoal,
   },
   headlineAccent: {
@@ -224,7 +234,6 @@ const styles = StyleSheet.create({
   },
   signUpLabel: {
     fontSize: 16,
-    fontWeight: '700',
     color: colors.charcoal,
   },
   loginButton: {
@@ -234,7 +243,21 @@ const styles = StyleSheet.create({
   },
   loginLabel: {
     fontSize: 16,
-    fontWeight: '700',
     color: colors.charcoal,
+  },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  legalLink: {
+    fontSize: 12,
+    color: colors.gold,
+  },
+  legalDivider: {
+    fontSize: 12,
+    color: colors.muted,
   },
 });

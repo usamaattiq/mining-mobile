@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AppText } from '@/shared/components/AppText';
 import { palette, spacing } from '@/shared/theme/tokens';
 import type { Country } from '@/shared/constants/countries';
 
@@ -20,8 +21,10 @@ export function CountryPickerTrigger({
       accessibilityRole="button"
       accessibilityLabel={`${country.name} ${country.dialCode}`}
     >
-      <Text style={styles.flag}>{country.flag}</Text>
-      <Text style={styles.dialCode}>{country.dialCode}</Text>
+      <AppText style={styles.flag}>{country.flag}</AppText>
+      <AppText weight="semibold" style={styles.dialCode}>
+        {country.dialCode}
+      </AppText>
       <Ionicons name="chevron-down" size={14} color={palette.muted} />
       <View style={styles.divider} />
     </Pressable>
@@ -42,7 +45,6 @@ const styles = StyleSheet.create({
   },
   dialCode: {
     fontSize: 18,
-    fontWeight: '600',
     color: palette.charcoal,
   },
   divider: {

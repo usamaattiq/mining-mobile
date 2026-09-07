@@ -1,46 +1,51 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
 import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import type { RootStackParamList, UserRole } from '@/navigation/types';
+import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SignUpRole'>;
 
-const ROLES: Array<{
-  value: UserRole;
-  title: string;
-  description: string;
-  icon: keyof typeof Ionicons.glyphMap;
-}> = [
-  {
-    value: 'buyer',
-    title: 'Buyer',
-    description: 'Browse and order equipment, services, products and gold.',
-    icon: 'cart-outline',
-  },
-  {
-    value: 'supplier',
-    title: 'Supplier',
-    description: 'List and sell your equipment, services, products and gold.',
-    icon: 'storefront-outline',
-  },
-];
-
 export function SignUpRoleScreen({ navigation }: Props): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+
+  const roles: Array<{
+    value: UserRole;
+    title: string;
+    description: string;
+    icon: keyof typeof Ionicons.glyphMap;
+  }> = [
+    {
+      value: 'buyer',
+      title: t('signUpRole.buyerTitle'),
+      description: t('signUpRole.buyerDescription'),
+      icon: 'cart-outline',
+    },
+    {
+      value: 'supplier',
+      title: t('signUpRole.supplierTitle'),
+      description: t('signUpRole.supplierDescription'),
+      icon: 'storefront-outline',
+    },
+  ];
+
   return (
     <OnboardingLayout
       steps={SIGN_UP_STEPS}
       currentStep={0}
-      title="How will you use MineMarket?"
-      subtitle="Choose a role to get started. You can change this later in settings."
+      title={t('signUpRole.title')}
+      subtitle={t('signUpRole.subtitle')}
       onBack={() => navigation.goBack()}
       showFooter={false}
     >
       <View style={styles.roleList}>
-        {ROLES.map((option) => (
+        {roles.map((option) => (
           <Pressable
             key={option.value}
             onPress={() => navigation.navigate('SignUpPhone', { role: option.value })}
@@ -51,8 +56,10 @@ export function SignUpRoleScreen({ navigation }: Props): React.ReactElement {
                 <Ionicons name={option.icon} size={26} color={palette.pureWhite} />
               </View>
               <View style={styles.cardText}>
-                <Text style={styles.cardTitle}>{option.title}</Text>
-                <Text style={styles.cardDescription}>{option.description}</Text>
+                <AppText weight="bold" style={styles.cardTitle}>
+                  {option.title}
+                </AppText>
+                <AppText style={styles.cardDescription}>{option.description}</AppText>
               </View>
               <View style={styles.chevronWrap}>
                 <Ionicons name="chevron-forward" size={18} color={palette.gold} />
@@ -104,7 +111,6 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '700',
     color: palette.charcoal,
   },
   cardDescription: {

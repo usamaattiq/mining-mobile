@@ -2,10 +2,10 @@ import React from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
-  Text,
   TouchableOpacity,
   type TouchableOpacityProps,
 } from 'react-native';
+import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
@@ -43,7 +43,8 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? palette.charcoal : palette.gold} />
       ) : (
-        <Text
+        <AppText
+          weight="bold"
           style={[
             styles.label,
             variant === 'primary' && styles.labelPrimary,
@@ -52,7 +53,7 @@ export function Button({
           ]}
         >
           {label}
-        </Text>
+        </AppText>
       )}
     </TouchableOpacity>
   );
@@ -84,7 +85,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 15,
-    fontWeight: '700',
   },
   labelPrimary: {
     color: palette.charcoal,

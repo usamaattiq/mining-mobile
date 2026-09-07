@@ -1,11 +1,12 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OnboardingHeadline } from '@/features/auth/components/OnboardingHeadline';
 import { OnboardingStepper, type OnboardingStep } from '@/features/auth/components/OnboardingStepper';
+import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
 type OnboardingLayoutProps = {
@@ -86,7 +87,9 @@ export function OnboardingLayout({
               style={({ pressed }) => [styles.continuePressable, pressed && canContinue && styles.pressed]}
             >
               <View style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}>
-                <Text style={styles.continueLabel}>{continueLabel}</Text>
+                <AppText weight="bold" style={styles.continueLabel}>
+                  {continueLabel}
+                </AppText>
                 <Ionicons name="arrow-forward" size={18} color={palette.charcoal} />
               </View>
             </Pressable>
@@ -180,7 +183,6 @@ const styles = StyleSheet.create({
   continueLabel: {
     color: palette.charcoal,
     fontSize: 16,
-    fontWeight: '700',
     letterSpacing: 0.3,
   },
 });

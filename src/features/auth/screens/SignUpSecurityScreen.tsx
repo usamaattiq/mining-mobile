@@ -1,10 +1,13 @@
 import React from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
 import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import type { RootStackParamList } from '@/navigation/types';
+import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { CodeInput } from '@/shared/components/CodeInput';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
@@ -16,6 +19,7 @@ const MPIN_LENGTH = 4;
 type Step = 'create' | 'confirm';
 
 export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
   const [step, setStep] = React.useState<Step>('create');
   const [mpin, setMpin] = React.useState('');
   const [confirmMpin, setConfirmMpin] = React.useState('');
@@ -47,7 +51,7 @@ export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement 
       return;
     }
     if (confirmMpin !== mpin) {
-      Alert.alert('MPIN mismatch', 'The MPIN you entered does not match. Please try again.');
+      Alert.alert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
       setConfirmMpin('');
       return;
     }
@@ -56,7 +60,7 @@ export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement 
 
   const handleEnableBiometric = async () => {
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: 'Confirm to enable biometric unlock',
+      promptMessage: t('signUpSecurity.biometricPrompt'),
     });
     if (result.success) {
       setBiometricEnabled(true);
@@ -64,8 +68,8 @@ export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement 
   };
 
   const finishSetup = () => {
-    Alert.alert('Account created', 'Your account has been set up successfully.', [
-      { text: 'Continue', onPress: () => navigation.replace('Login') },
+    Alert.alert(t('signUpSecurity.successTitle'), t('signUpSecurity.successMessage'), [
+      { text: t('common.continue'), onPress: () => navigation.replace('Login') },
     ]);
   };
 
@@ -82,15 +86,15 @@ export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement 
     <OnboardingLayout
       steps={SIGN_UP_STEPS}
       currentStep={4}
-      title={step === 'create' ? 'Set your MPIN' : 'Confirm your MPIN'}
+      title={step === 'create' ? t('signUpSecurity.createTitle') : t('signUpSecurity.confirmTitle')}
       subtitle={
         step === 'create'
-          ? `Choose a ${MPIN_LENGTH}-digit PIN to secure your account.`
-          : 'Enter the same PIN again to confirm.'
+          ? t('signUpSecurity.createSubtitleTemplate', { length: MPIN_LENGTH })
+          : t('signUpSecurity.confirmSubtitle')
       }
       onBack={handleBack}
       canContinue={isMpinComplete}
-      continueLabel={step === 'create' ? 'Continue' : 'Finish'}
+      continueLabel={step === 'create' ? t('signUpSecurity.continue') : t('signUpSecurity.finish')}
       onContinue={handleContinue}
     >
       <View style={styles.form}>
@@ -105,13 +109,15 @@ export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement 
         {step === 'create' && biometricAvailable ? (
           <View style={styles.biometricRow}>
             <View style={styles.biometricText}>
-              <Text style={styles.biometricTitle}>Enable Face ID / biometric unlock</Text>
-              <Text style={styles.biometricSubtitle}>
-                Use your face or fingerprint for faster sign in. You can always use your MPIN.
-              </Text>
+              <AppText weight="bold" style={styles.biometricTitle}>
+                {t('signUpSecurity.biometricTitle')}
+              </AppText>
+              <AppText style={styles.biometricSubtitle}>
+                {t('signUpSecurity.biometricSubtitle')}
+              </AppText>
             </View>
             <Button
-              label={biometricEnabled ? 'Enabled' : 'Enable'}
+              label={biometricEnabled ? t('signUpSecurity.enabled') : t('signUpSecurity.enable')}
               variant={biometricEnabled ? 'secondary' : 'outline'}
               disabled={biometricEnabled}
               onPress={handleEnableBiometric}
@@ -142,7 +148,6 @@ const styles = StyleSheet.create({
   },
   biometricTitle: {
     fontSize: 14,
-    fontWeight: '700',
     color: palette.charcoal,
   },
   biometricSubtitle: {

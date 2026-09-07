@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { AppText } from '@/shared/components/AppText';
 import { palette, spacing } from '@/shared/theme/tokens';
 
 type OnboardingHeadlineProps = {
@@ -18,9 +19,11 @@ export function OnboardingHeadline({
 }: OnboardingHeadlineProps): React.ReactElement {
   return (
     <View style={[styles.block, style]}>
-      <Text style={[styles.title, dark && styles.titleDark]}>{title}</Text>
+      <AppText weight="bold" style={[styles.title, dark && styles.titleDark]}>
+        {title}
+      </AppText>
       {subtitle ? (
-        <Text style={[styles.subtitle, dark && styles.subtitleDark]}>{subtitle}</Text>
+        <AppText style={[styles.subtitle, dark && styles.subtitleDark]}>{subtitle}</AppText>
       ) : null}
     </View>
   );
@@ -34,7 +37,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     lineHeight: 32,
-    fontWeight: '800',
     color: palette.charcoal,
   },
   titleDark: {

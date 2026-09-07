@@ -1,6 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
+import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
+import { getFontFamily } from '@/shared/theme/typography';
 
 type FormInputProps = TextInputProps & {
   label?: string;
@@ -15,14 +18,26 @@ export function FormInput({
   style,
   ...rest
 }: FormInputProps): React.ReactElement {
+  const { currentLanguage } = useLanguage();
+
   return (
     <View style={styles.container}>
-      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {label ? (
+        <AppText weight="semibold" style={styles.label}>
+          {label}
+        </AppText>
+      ) : null}
       <View style={[styles.inputRow, error ? styles.inputRowError : null]}>
         {leftAdornment}
-        <TextInput style={[styles.input, style]} placeholderTextColor={palette.muted} {...rest} />
+        <TextInput
+          style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }, style]}
+          placeholderTextColor={palette.muted}
+          {...rest}
+        />
       </View>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? (
+        <AppText style={styles.error}>{error}</AppText>
+      ) : null}
     </View>
   );
 }
@@ -33,7 +48,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    fontWeight: '600',
     color: palette.charcoal,
   },
   inputRow: {

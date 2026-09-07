@@ -4,13 +4,17 @@ import {
   Modal,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   useWindowDimensions,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
+import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
+import { getFontFamily } from '@/shared/theme/typography';
 import type { Country } from '@/shared/constants/countries';
 
 type CountryPickerSheetProps = {
@@ -32,11 +36,19 @@ function CountryRow({
 }): React.ReactElement {
   return (
     <Pressable onPress={onPress} style={[styles.row, selected && styles.rowSelected]}>
-      <Text style={styles.rowFlag}>{country.flag}</Text>
-      <Text style={[styles.rowName, selected && styles.rowTextSelected]}>{country.name}</Text>
-      <Text style={[styles.rowDialCode, selected && styles.rowTextSelected]}>
+      <AppText style={styles.rowFlag}>{country.flag}</AppText>
+      <AppText
+        weight={selected ? 'semibold' : 'regular'}
+        style={[styles.rowName, selected && styles.rowTextSelected]}
+      >
+        {country.name}
+      </AppText>
+      <AppText
+        weight={selected ? 'semibold' : 'regular'}
+        style={[styles.rowDialCode, selected && styles.rowTextSelected]}
+      >
         {country.dialCode}
-      </Text>
+      </AppText>
     </Pressable>
   );
 }
@@ -48,6 +60,8 @@ export function CountryPickerSheet({
   onSelect,
   onClose,
 }: CountryPickerSheetProps): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
   const { height } = useWindowDimensions();
   const [query, setQuery] = React.useState('');
   const sheetHeight = Math.round(height * 0.75);
@@ -73,9 +87,13 @@ export function CountryPickerSheet({
       <View style={[styles.sheet, { height: sheetHeight }]}>
         <View style={styles.header}>
           <View style={styles.headerSpacer} />
-          <Text style={styles.title}>Select country code</Text>
+          <AppText weight="bold" style={styles.title}>
+            {t('signUpPhone.selectCountryCode')}
+          </AppText>
           <Pressable onPress={onClose} hitSlop={8} style={styles.headerSpacer}>
-            <Text style={styles.doneLabel}>Done</Text>
+            <AppText weight="semibold" style={styles.doneLabel}>
+              {t('common.done')}
+            </AppText>
           </Pressable>
         </View>
 
@@ -84,9 +102,9 @@ export function CountryPickerSheet({
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Search country or code"
+            placeholder={t('signUpPhone.searchCountry')}
             placeholderTextColor={palette.muted}
-            style={styles.searchInput}
+            style={[styles.searchInput, { fontFamily: getFontFamily(currentLanguage) }]}
           />
         </View>
 
@@ -132,13 +150,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '700',
     color: palette.charcoal,
   },
   doneLabel: {
     color: palette.gold,
     fontSize: 15,
-    fontWeight: '600',
     textAlign: 'right',
   },
   searchRow: {

@@ -1,7 +1,8 @@
 import React, { type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
 export type AppTopBarProps = {
@@ -46,9 +47,9 @@ export function AppTopBar({
 
       {title ? (
         <View style={styles.titleBlock}>
-          <Text style={styles.title} numberOfLines={1}>
+          <AppText weight="bold" style={styles.title} numberOfLines={1}>
             {title}
-          </Text>
+          </AppText>
         </View>
       ) : (
         <View style={styles.titleSpacer} />
@@ -86,7 +87,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '700',
     textAlign: 'center',
     color: palette.charcoal,
   },
