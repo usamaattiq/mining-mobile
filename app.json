@@ -1,17 +1,12 @@
 {
   "expo": {
     "name": "Mining Mobile",
-    "slug": "mining-mobile",
+    "slug": "mining",
     "version": "1.0.0",
     "orientation": "default",
     "userInterfaceStyle": "light",
     "icon": "./assets/images/icon.png",
     "scheme": "miningmobile",
-    "splash": {
-      "image": "./assets/images/logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#222222"
-    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.silveraxis.miningmobile",
@@ -40,6 +35,23 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": ["expo-navigation-bar"]
+    "owner": "mycauses-organization",
+    "extra": {
+      "eas": {
+        "projectId": "6a8a7e38-8bcf-4186-91b8-6f503fdfb691"
+      }
+    },
+    "plugins": [
+      "expo-navigation-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 176,
+          "resizeMode": "contain",
+          "backgroundColor": "#222222"
+        }
+      ]
+    ]
   }
 }

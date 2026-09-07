@@ -2,9 +2,8 @@ import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '@/navigation/types';
-import { BackButton } from '@/shared/components/BackButton';
+import { AppTopBar } from '@/shared/components/AppTopBar';
 import { Button } from '@/shared/components/Button';
 import { CodeInput } from '@/shared/components/CodeInput';
 import { palette, spacing } from '@/shared/theme/tokens';
@@ -16,7 +15,6 @@ const MPIN_LENGTH = 4;
 type Step = 'create' | 'confirm';
 
 export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement {
-  const insets = useSafeAreaInsets();
   const [step, setStep] = React.useState<Step>('create');
   const [mpin, setMpin] = React.useState('');
   const [confirmMpin, setConfirmMpin] = React.useState('');
@@ -80,58 +78,55 @@ export function SignUpSecurityScreen({ navigation }: Props): React.ReactElement 
   };
 
   return (
-    <View
-      style={[
-        styles.root,
-        { paddingTop: Math.max(insets.top, spacing.lg), paddingBottom: insets.bottom },
-      ]}
-    >
-      <BackButton onPress={handleBack} />
+    <View style={styles.root}>
+      <AppTopBar left="back" title="Security setup" onBackPress={handleBack} />
 
-      <View style={styles.header}>
-        <Text style={styles.title}>
-          {step === 'create' ? 'Set your MPIN' : 'Confirm your MPIN'}
-        </Text>
-        <Text style={styles.subtitle}>
-          {step === 'create'
-            ? `Choose a ${MPIN_LENGTH}-digit PIN to secure your account.`
-            : 'Enter the same PIN again to confirm.'}
-        </Text>
-      </View>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            {step === 'create' ? 'Set your MPIN' : 'Confirm your MPIN'}
+          </Text>
+          <Text style={styles.subtitle}>
+            {step === 'create'
+              ? `Choose a ${MPIN_LENGTH}-digit PIN to secure your account.`
+              : 'Enter the same PIN again to confirm.'}
+          </Text>
+        </View>
 
-      <View style={styles.form}>
-        <CodeInput
-          length={MPIN_LENGTH}
-          value={currentValue}
-          onChangeValue={handleMpinChange}
-          secure
-          autoFocus
-        />
+        <View style={styles.form}>
+          <CodeInput
+            length={MPIN_LENGTH}
+            value={currentValue}
+            onChangeValue={handleMpinChange}
+            secure
+            autoFocus
+          />
 
-        {step === 'create' && biometricAvailable ? (
-          <View style={styles.biometricRow}>
-            <View style={styles.biometricText}>
-              <Text style={styles.biometricTitle}>Enable Face ID / biometric unlock</Text>
-              <Text style={styles.biometricSubtitle}>
-                Use your face or fingerprint for faster sign in. You can always use your MPIN.
-              </Text>
+          {step === 'create' && biometricAvailable ? (
+            <View style={styles.biometricRow}>
+              <View style={styles.biometricText}>
+                <Text style={styles.biometricTitle}>Enable Face ID / biometric unlock</Text>
+                <Text style={styles.biometricSubtitle}>
+                  Use your face or fingerprint for faster sign in. You can always use your MPIN.
+                </Text>
+              </View>
+              <Button
+                label={biometricEnabled ? 'Enabled' : 'Enable'}
+                variant={biometricEnabled ? 'secondary' : 'outline'}
+                disabled={biometricEnabled}
+                onPress={handleEnableBiometric}
+              />
             </View>
-            <Button
-              label={biometricEnabled ? 'Enabled' : 'Enable'}
-              variant={biometricEnabled ? 'secondary' : 'outline'}
-              disabled={biometricEnabled}
-              onPress={handleEnableBiometric}
-            />
-          </View>
-        ) : null}
-      </View>
+          ) : null}
+        </View>
 
-      <View style={styles.footer}>
-        <Button
-          label={step === 'create' ? 'Continue' : 'Finish'}
-          disabled={!isMpinComplete}
-          onPress={handleContinue}
-        />
+        <View style={styles.footer}>
+          <Button
+            label={step === 'create' ? 'Continue' : 'Finish'}
+            disabled={!isMpinComplete}
+            onPress={handleContinue}
+          />
+        </View>
       </View>
     </View>
   );
@@ -141,11 +136,15 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: palette.pureWhite,
+  },
+  content: {
+    flex: 1,
     paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
     justifyContent: 'space-between',
   },
   header: {
-    marginTop: spacing.xl,
+    marginTop: spacing.md,
     gap: spacing.xs,
   },
   title: {
@@ -182,7 +181,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: palette.muted,
   },
-  footer: {
-    marginBottom: spacing.xl,
-  },
+  footer: {},
 });

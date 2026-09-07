@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '@/navigation/types';
-import { BackButton } from '@/shared/components/BackButton';
+import { AppTopBar } from '@/shared/components/AppTopBar';
 import { Button } from '@/shared/components/Button';
 import { FormInput } from '@/shared/components/FormInput';
 import { palette, spacing } from '@/shared/theme/tokens';
@@ -22,15 +22,14 @@ export function SignUpPersonalInfoScreen({ navigation, route }: Props): React.Re
   const isValid = fullName.trim().length > 1 && EMAIL_REGEX.test(email.trim());
 
   return (
-    <View
-      style={[
-        styles.root,
-        { paddingTop: Math.max(insets.top, spacing.lg), paddingBottom: insets.bottom },
-      ]}
-    >
-      <BackButton onPress={() => navigation.goBack()} />
+    <View style={[styles.root, { paddingBottom: insets.bottom }]}>
+      <AppTopBar left="back" title="Personal information" onBackPress={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.header}>
           <Text style={styles.title}>Tell us about you</Text>
           <Text style={styles.subtitle}>This helps us personalize your account.</Text>
@@ -83,13 +82,15 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: palette.pureWhite,
+  },
+  content: {
     paddingHorizontal: spacing.lg,
   },
   scrollContent: {
     flexGrow: 1,
   },
   header: {
-    marginTop: spacing.xl,
+    marginTop: spacing.md,
     gap: spacing.xs,
   },
   title: {
@@ -106,7 +107,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   footer: {
-    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
 });
