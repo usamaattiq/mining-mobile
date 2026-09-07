@@ -46,7 +46,7 @@ export function OnboardingLayout({
       <LinearGradient
         colors={[palette.gold, palette.lightGold]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 0, y: 1 }}
         style={[styles.hero, { paddingTop: insets.top + spacing.md }]}
       >
         <View style={styles.topBar}>
@@ -111,7 +111,10 @@ export function OnboardingLayout({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: palette.gold,
+    // Matches the hero gradient's bottom color so the white sheet's rounded
+    // top corners blend into the seam instead of exposing a mismatched flat
+    // gold behind the cutout.
+    backgroundColor: palette.lightGold,
   },
   flex: {
     flex: 1,
