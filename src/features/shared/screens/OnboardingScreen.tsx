@@ -5,7 +5,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '@/navigation/types';
-import { spacing } from '@/shared/theme/tokens';
+import { palette, spacing } from '@/shared/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 
@@ -18,11 +18,14 @@ const mainHomeAspectRatio =
 const screenWidth = Dimensions.get('window').width;
 const mainHomeImageHeight = screenWidth / mainHomeAspectRatio;
 
+// Screen-local shades not part of the shared palette (background tint, muted
+// text, icon tile) — the gold/charcoal accents below all come from `palette`
+// so this screen stays visually in sync with the rest of the app.
 const colors = {
   bg: '#F8EFDD',
-  charcoal: '#26221D',
-  gold: '#D69A2D',
-  goldDark: '#B9822A',
+  charcoal: palette.charcoal,
+  gold: palette.gold,
+  goldDark: palette.goldDark,
   muted: '#8E877C',
   iconTile: '#F0E0BE',
 };

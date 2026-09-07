@@ -41,6 +41,7 @@ export function SignUpPhoneScreen({ navigation, route }: Props): React.ReactElem
           value={phone}
           onChangeText={setPhone}
           leftAdornment={<CountryPicker value={country} onChange={setCountry} />}
+          style={styles.phoneInput}
         />
       </View>
     </OnboardingLayout>
@@ -50,5 +51,10 @@ export function SignUpPhoneScreen({ navigation, route }: Props): React.ReactElem
 const styles = StyleSheet.create({
   form: {
     gap: spacing.md,
+  },
+  phoneInput: {
+    paddingVertical: spacing.md,
+    fontSize: 18,
+    fontWeight: '600',
   },
 });

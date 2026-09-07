@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   dialCode: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
     color: palette.charcoal,
   },
