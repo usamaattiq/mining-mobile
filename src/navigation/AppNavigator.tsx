@@ -1,7 +1,11 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
-import { SignUpScreen } from '@/features/auth/screens/SignUpScreen';
+import { SignUpRoleScreen } from '@/features/auth/screens/SignUpRoleScreen';
+import { SignUpPhoneScreen } from '@/features/auth/screens/SignUpPhoneScreen';
+import { SignUpOtpScreen } from '@/features/auth/screens/SignUpOtpScreen';
+import { SignUpPersonalInfoScreen } from '@/features/auth/screens/SignUpPersonalInfoScreen';
+import { SignUpSecurityScreen } from '@/features/auth/screens/SignUpSecurityScreen';
 import { OnboardingScreen } from '@/features/shared/screens/OnboardingScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/shared/theme/tokens';
@@ -27,7 +31,11 @@ export function AppNavigator(): React.ReactElement {
         options={{ animation: 'fade' }}
       />
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen name="SignUpRole" component={SignUpRoleScreen} />
+      <Stack.Screen name="SignUpPhone" component={SignUpPhoneScreen} />
+      <Stack.Screen name="SignUpOtp" component={SignUpOtpScreen} />
+      <Stack.Screen name="SignUpPersonalInfo" component={SignUpPersonalInfoScreen} />
+      <Stack.Screen name="SignUpSecurity" component={SignUpSecurityScreen} />
     </Stack.Navigator>
   );
 }

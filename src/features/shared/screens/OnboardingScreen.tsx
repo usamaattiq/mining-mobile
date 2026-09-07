@@ -66,7 +66,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
               <Text style={styles.tagline}>EQUIP · SOURCE · BUILD TOGETHER</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={() => navigation.replace('Login')} hitSlop={8}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')} hitSlop={8}>
             <Text style={styles.skip}>Skip</Text>
           </TouchableOpacity>
         </View>
@@ -85,7 +85,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
       <View style={[styles.actions, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={() => navigation.replace('SignUp')}
+          onPress={() => navigation.navigate('SignUpRole')}
           style={styles.signUpButtonWrap}
         >
           <LinearGradient
@@ -101,7 +101,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
 
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={() => navigation.replace('Login')}
+          onPress={() => navigation.navigate('Login')}
           style={[styles.actionButton, styles.loginButton]}
         >
           <Text style={styles.loginLabel}>Log In</Text>
