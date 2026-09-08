@@ -28,7 +28,10 @@ export function useMediaUpload() {
     error: null,
   });
 
-  const pickAndUpload = React.useCallback(async (): Promise<{ key: string } | null> => {
+  const pickImage = React.useCallback(async (): Promise<{
+    uri: string;
+    contentType: UploadableContentType;
+  } | null> => {
     setState({ uploading: false, progress: 'picking', error: null });
 
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -48,13 +51,18 @@ export function useMediaUpload() {
     }
 
     const asset = result.assets[0];
+    setState({ uploading: false, progress: 'idle', error: null });
+    return { uri: asset.uri, contentType: contentTypeFromAsset(asset) };
+  }, []);
+
+  const pickAndUpload = React.useCallback(async (): Promise<{ key: string } | null> => {
+    const picked = await pickImage();
+    if (!picked) return null;
+
     setState({ uploading: true, progress: 'uploading', error: null });
 
     try {
-      const { key } = await uploadMedia({
-        uri: asset.uri,
-        contentType: contentTypeFromAsset(asset),
-      });
+      const { key } = await uploadMedia(picked);
       setState({ uploading: false, progress: 'done', error: null });
       return { key };
     } catch (error) {
@@ -65,7 +73,7 @@ export function useMediaUpload() {
       });
       return null;
     }
-  }, []);
+  }, [pickImage]);
 
-  return { ...state, pickAndUpload };
+  return { ...state, pickImage, pickAndUpload };
 }

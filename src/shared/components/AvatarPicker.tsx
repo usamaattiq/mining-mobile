@@ -4,25 +4,47 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 import { useMediaUpload } from '@/shared/hooks/useMediaUpload';
-import { resolveMediaUrl } from '@/shared/services/media';
+import { resolveMediaUrl, type UploadableContentType } from '@/shared/services/media';
 
 type AvatarPickerProps = {
   label?: string;
   uri: string | null;
   onChangeKey: (key: string | null) => void;
-};
+} & (
+  | { deferUpload?: false; onPickLocal?: never }
+  | {
+      /** Skip the immediate upload (no auth token yet, e.g. during sign-up) and just preview
+       * the picked image locally; the caller uploads it later via onPickLocal's asset. */
+      deferUpload: true;
+      onPickLocal: (asset: { uri: string; contentType: UploadableContentType } | null) => void;
+    }
+);
 
-export function AvatarPicker({ label, uri, onChangeKey }: AvatarPickerProps): React.ReactElement {
-  const { uploading, pickAndUpload } = useMediaUpload();
+export function AvatarPicker({
+  label,
+  uri,
+  onChangeKey,
+  deferUpload,
+  onPickLocal,
+}: AvatarPickerProps): React.ReactElement {
+  const { uploading, error, pickImage, pickAndUpload } = useMediaUpload();
+  const [localUri, setLocalUri] = React.useState<string | null>(null);
 
   const handlePress = async () => {
+    if (deferUpload) {
+      const picked = await pickImage();
+      setLocalUri(picked?.uri ?? null);
+      onPickLocal(picked);
+      return;
+    }
+
     const result = await pickAndUpload();
     if (result) {
       onChangeKey(result.key);
     }
   };
 
-  const displayUri = uri ? resolveMediaUrl(uri) : null;
+  const displayUri = deferUpload ? localUri : uri ? resolveMediaUrl(uri) : null;
 
   return (
     <View style={styles.container}>
@@ -43,6 +65,9 @@ export function AvatarPicker({ label, uri, onChangeKey }: AvatarPickerProps): Re
           <Ionicons name="camera-outline" size={28} color={palette.muted} />
         )}
       </TouchableOpacity>
+      {error ? (
+        <AppText style={styles.error}>{error}</AppText>
+      ) : null}
     </View>
   );
 }
@@ -68,5 +93,10 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
+  },
+  error: {
+    fontSize: 12,
+    color: palette.danger,
+    textAlign: 'center',
   },
 });

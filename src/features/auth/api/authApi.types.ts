@@ -36,6 +36,17 @@ export interface AuthSignupResultDto {
   profile: UserProfileDto;
 }
 
+export interface UpdateProfilePayload {
+  fullName?: string;
+  accountType?: AccountType;
+  companyName?: string | null;
+  email?: string | null;
+  address?: string | null;
+  locationCoordinates?: { latitude: number; longitude: number } | null;
+  avatarUrl?: string | null;
+  biometricEnabled?: boolean;
+}
+
 export interface SignupSubmitPayload extends PhoneIdentity {
   fullName: string;
   accountType: AccountType;

@@ -5,6 +5,7 @@ import type {
   LoginOtpPurpose,
   PhoneIdentity,
   SignupSubmitPayload,
+  UpdateProfilePayload,
   UserProfileDto,
 } from './authApi.types';
 
@@ -52,6 +53,10 @@ export const authApi = {
 
   getMe(): Promise<UserProfileDto> {
     return apiFetch('/auth/me');
+  },
+
+  updateMe(payload: UpdateProfilePayload): Promise<UserProfileDto> {
+    return apiFetch('/auth/me', { method: 'PATCH', body: payload });
   },
 
   logout(deviceId?: string): Promise<{ loggedOut: boolean }> {
