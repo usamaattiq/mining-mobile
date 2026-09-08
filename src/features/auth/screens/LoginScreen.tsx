@@ -6,6 +6,8 @@ import { i18n as appI18n } from '@/i18n';
 import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { FORGOT_MPIN_STEPS, LOGIN_STEPS } from '@/features/auth/constants/onboardingSteps';
 import { authApi } from '@/features/auth/api/authApi';
+import { useBiometricLogin } from '@/features/auth/hooks/useBiometricLogin';
+import { useDeviceBiometric } from '@/shared/hooks/useDeviceBiometric';
 import type { RootStackParamList } from '@/navigation/types';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { useAuthStore } from '@/store/authStore';
@@ -60,6 +62,9 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
   const setLastPhone = useDevicePrefsStore((s) => s.setLastPhone);
   const clearLastPhone = useDevicePrefsStore((s) => s.clearLastPhone);
   const clearCachedMpin = useDevicePrefsStore((s) => s.clearCachedMpin);
+  const setCachedMpin = useDevicePrefsStore((s) => s.setCachedMpin);
+  const setDeviceBiometricEnabled = useDevicePrefsStore((s) => s.setBiometricEnabled);
+  const { kind: biometricKind } = useDeviceBiometric();
 
   const lastPhone = useDevicePrefsStore.getState().lastPhone;
   const lastPhoneCountry = lastPhone ? countryByIso2(lastPhone.countryCode) : undefined;
@@ -93,6 +98,13 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       countryCallingCode: country.dialCode.replace(/^\+/, ''),
       phoneDigits: phoneDigits.trim(),
     });
+
+  const { available: biometricLoginAvailable, promptNow: promptBiometricLogin } = useBiometricLogin(
+    {
+      enabled: step === 'mpin' && isReturningDeviceRef.current,
+      onAutoSubmit: (cachedMpin) => void handleLogIn(cachedMpin),
+    },
+  );
 
   React.useEffect(() => {
     if ((step !== 'otp' && step !== 'forgotOtp') || secondsLeft <= 0) return;
@@ -160,14 +172,19 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
     }
   };
 
-  const handleLogIn = async () => {
+  const handleLogIn = async (mpinOverride?: string) => {
+    const mpinValue = mpinOverride ?? mpin;
     setSubmitting(true);
     try {
       const deviceId = await getDeviceId();
-      const result = await authApi.loginWithMpin(phoneIdentity, mpin, deviceId);
+      const result = await authApi.loginWithMpin(phoneIdentity, mpinValue, deviceId);
       await setAuthenticated(result.accessToken);
       setProfile(result.profile);
       await rememberPhone();
+      if (result.profile.biometricEnabled) {
+        await setCachedMpin(mpinValue);
+      }
+      await setDeviceBiometricEnabled(result.profile.biometricEnabled);
       navigation.replace('Welcome');
     } catch (error) {
       setMpin('');
@@ -232,6 +249,13 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       await setAuthenticated(result.accessToken);
       setProfile(result.profile);
       await rememberPhone();
+      // The old cached MPIN (if any) is now stale — refresh or drop it.
+      if (result.profile.biometricEnabled) {
+        await setCachedMpin(newMpin);
+      } else {
+        await clearCachedMpin();
+      }
+      await setDeviceBiometricEnabled(result.profile.biometricEnabled);
       navigation.replace('Welcome');
     } catch (error) {
       Alert.alert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
@@ -376,6 +400,16 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
             <AppText style={styles.returningPhone}>{phone}</AppText>
           ) : null}
           <CodeInput length={MPIN_LENGTH} value={mpin} onChangeValue={setMpin} secure autoFocus />
+          {biometricLoginAvailable ? (
+            <Button
+              label={
+                biometricKind === 'face' ? t('loginMpin.useFaceId') : t('loginMpin.useFingerprint')
+              }
+              variant="outline"
+              icon={biometricKind === 'face' ? 'scan-outline' : 'finger-print-outline'}
+              onPress={promptBiometricLogin}
+            />
+          ) : null}
           <Button
             label={t('loginMpin.forgotMpin')}
             variant="link"

@@ -64,6 +64,8 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
   const setProfile = useProfileStore((s) => s.setProfile);
   const setLastPhone = useDevicePrefsStore((s) => s.setLastPhone);
+  const setCachedMpin = useDevicePrefsStore((s) => s.setCachedMpin);
+  const setDeviceBiometricEnabled = useDevicePrefsStore((s) => s.setBiometricEnabled);
 
   const [step, setStep] = React.useState<SignUpStep>('phone');
   const [country, setCountry] = React.useState<Country>(defaultCountry);
@@ -211,6 +213,10 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         countryCallingCode: country.dialCode.replace(/^\+/, ''),
         phoneDigits: phoneDigits.trim(),
       });
+      if (biometricEnabled) {
+        await setCachedMpin(mpin);
+      }
+      await setDeviceBiometricEnabled(biometricEnabled);
       navigation.replace('Welcome');
     } catch (error) {
       Alert.alert(t('common.error'), errorMessage(error, t('signUpSecurity.mismatchMessage')));

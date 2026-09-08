@@ -104,7 +104,10 @@
     "incorrectMessage": "الرمز السري الذي أدخلته غير صحيح. حاول مرة أخرى.",
     "loginFailed": "تعذّر تسجيل الدخول. حاول مرة أخرى.",
     "forgotMpin": "هل نسيت الرمز السري؟",
-    "useDifferentAccount": "استخدام حساب مختلف"
+    "useDifferentAccount": "استخدام حساب مختلف",
+    "biometricPrompt": "سجّل الدخول إلى حسابك",
+    "useFaceId": "استخدام Face ID",
+    "useFingerprint": "استخدام بصمة الإصبع"
   },
   "steps": {
     "role": "الدور",
@@ -119,6 +122,9 @@
   "welcome": {
     "title": "مرحبًا بك في MineMarket",
     "subtitle": "كل شيء جاهز. لنبدأ الآن.",
-    "continue": "متابعة"
+    "continue": "متابعة",
+    "logout": "تسجيل الخروج",
+    "logoutConfirmTitle": "تسجيل الخروج؟",
+    "logoutConfirmMessage": "ستحتاج إلى التحقق من رقم هاتفك أو إدخال الرمز السري لتسجيل الدخول مرة أخرى."
   }
 }
