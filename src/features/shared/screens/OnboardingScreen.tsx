@@ -84,7 +84,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
         </View>
       </View>
 
-      <View style={[styles.actions, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+      <View style={styles.actions}>
         <View style={styles.headline}>
           <AppText weight="bold" style={styles.headlineText}>
             {t('onboarding.headlineLine1')}
@@ -106,7 +106,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           <AppText weight="bold" style={styles.signUpLabel}>
             {t('onboarding.signUp')}
           </AppText>
-          <Ionicons name="arrow-forward" size={18} color={colors.charcoal} />
+          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -119,16 +119,16 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           </AppText>
           <Ionicons name="arrow-forward" size={18} color={colors.gold} />
         </TouchableOpacity>
+      </View>
 
-        <View style={styles.legalRow}>
-          <TouchableOpacity onPress={() => setLegalDoc('privacy')} hitSlop={8}>
-            <AppText style={styles.legalLink}>{t('onboarding.privacyPolicy')}</AppText>
-          </TouchableOpacity>
-          <AppText style={styles.legalDivider}>|</AppText>
-          <TouchableOpacity onPress={() => setLegalDoc('terms')} hitSlop={8}>
-            <AppText style={styles.legalLink}>{t('onboarding.terms')}</AppText>
-          </TouchableOpacity>
-        </View>
+      <View style={[styles.legalRow, { bottom: Math.max(insets.bottom, spacing.sm) }]}>
+        <TouchableOpacity onPress={() => setLegalDoc('privacy')} hitSlop={8}>
+          <AppText style={styles.legalLink}>{t('onboarding.privacyPolicy')}</AppText>
+        </TouchableOpacity>
+        <AppText style={styles.legalDivider}>|</AppText>
+        <TouchableOpacity onPress={() => setLegalDoc('terms')} hitSlop={8}>
+          <AppText style={styles.legalLink}>{t('onboarding.terms')}</AppText>
+        </TouchableOpacity>
       </View>
 
       <LegalDocumentSheet
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   headline: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
     gap: spacing.sm,
   },
   headlineText: {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 56,
     left: 0,
     right: 0,
     paddingHorizontal: spacing.lg,
@@ -246,23 +246,26 @@ const styles = StyleSheet.create({
   },
   signUpLabel: {
     fontSize: 16,
-    color: colors.charcoal,
+    color: '#FFFFFF',
   },
   loginButton: {
+    marginTop: spacing.sm,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: colors.gold,
   },
   loginLabel: {
     fontSize: 16,
-    color: colors.charcoal,
+    color: colors.gold,
   },
   legalRow: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    marginTop: spacing.xs,
   },
   legalLink: {
     fontSize: 12,
