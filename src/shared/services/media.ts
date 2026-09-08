@@ -1,13 +1,16 @@
+import { env } from '@/shared/config/env';
 import { apiFetch } from './api';
 
 export type UploadableContentType = 'image/jpeg' | 'image/png' | 'image/webp' | 'application/pdf';
 
 type PresignUploadResult = { uploadUrl: string; key: string; expiresIn: number };
-type PresignViewResult = { url: string; expiresIn: number };
 
-/** Backend keeps the bucket private — every view goes through a fresh signed URL. */
-export function resolveMediaUrl(key: string): Promise<PresignViewResult> {
-  return apiFetch(`/uploads/presign-view?key=${encodeURIComponent(key)}`);
+/** Builds a directly-accessible URL for an S3 object key stored via mining-api. */
+export function resolveMediaUrl(key: string | null | undefined): string | null {
+  if (!key?.trim()) return null;
+  const base = env.s3PublicBaseUrl;
+  if (!base) return null;
+  return `${base.replace(/\/$/, '')}/${key.replace(/^\//, '')}`;
 }
 
 async function presignUpload(contentType: UploadableContentType): Promise<PresignUploadResult> {

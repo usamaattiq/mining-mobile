@@ -6,6 +6,8 @@ if (!apiUrl) {
 
 export const env = {
   API_URL: apiUrl ?? 'http://localhost:4000/api',
+  /** Must match mining-api's AWS_S3_PUBLIC_BASE_URL so uploaded keys resolve in the app. */
+  s3PublicBaseUrl: process.env.EXPO_PUBLIC_S3_PUBLIC_BASE_URL,
 };
 
 const legacyMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
