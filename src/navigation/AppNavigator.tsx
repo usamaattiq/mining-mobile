@@ -14,20 +14,16 @@ export function AppNavigator(): React.ReactElement {
       initialRouteName="Onboarding"
       screenOptions={{
         headerShown: false,
-        animation: 'slide_from_right',
-        animationDuration: 320,
-        gestureEnabled: true,
-        fullScreenGestureEnabled: true,
         contentStyle: { backgroundColor: palette.pureWhite },
       }}
     >
-      <Stack.Screen
-        name="Onboarding"
-        component={OnboardingScreen}
-        options={{ animation: 'fade' }}
-      />
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="SignUpFlow" component={SignUpFlowScreen} />
+      <Stack.Screen
+        name="SignUpFlow"
+        component={SignUpFlowScreen}
+        options={{ contentStyle: { backgroundColor: palette.gold } }}
+      />
     </Stack.Navigator>
   );
 }

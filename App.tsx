@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,6 +12,14 @@ import { palette } from '@/shared/theme/tokens';
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
 
 const BOOTSTRAP_DELAY_MS = 800;
+
+const navigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: palette.warmWhite,
+  },
+};
 
 export default function App() {
   const [isI18nReady, setIsI18nReady] = React.useState(false);
@@ -48,7 +56,7 @@ export default function App() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <View style={styles.root}>
-        <NavigationContainer ref={navigationRef}>
+        <NavigationContainer ref={navigationRef} theme={navigationTheme}>
           <AppNavigator />
         </NavigationContainer>
       </View>
