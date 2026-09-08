@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Mining Mobile",
+    "name": "Dahabi",
     "slug": "mining",
     "version": "1.0.0",
     "orientation": "default",
@@ -12,7 +12,7 @@
       "bundleIdentifier": "com.silveraxis.mining",
       "buildNumber": "1",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "Allow Mining Mobile to use Face ID to sign you in quickly and securely."
+        "NSFaceIDUsageDescription": "Allow Dahabi to use Face ID to sign you in quickly and securely."
       }
     },
     "android": {

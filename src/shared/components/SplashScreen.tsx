@@ -20,9 +20,9 @@ export function SplashScreen({ showLoader = true }: SplashScreenProps): React.Re
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <View style={[styles.brandBlock, { paddingTop: Math.max(insets.top, spacing.lg) }]}>
         <View style={styles.logoCircle}>
-          <Text style={styles.logoLetter}>M</Text>
+          <Text style={styles.logoLetter}>D</Text>
         </View>
-        <Text style={styles.title}>MINING MOBILE</Text>
+        <Text style={styles.title}>DAHABI</Text>
       </View>
 
       {showLoader ? (

@@ -16,7 +16,7 @@ type LegalDocument = {
   sections: LegalSection[];
 };
 
-const BRAND_EN = 'Mining Marketplace';
+const BRAND_EN = 'Dahabi';
 const BRAND_AR = 'سوق التعدين';
 const SUPPORT_EMAIL = 'support@miningmarketplace.com';
 const EFFECTIVE_DATE_EN = 'July 26, 2026';
