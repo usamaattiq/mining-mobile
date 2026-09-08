@@ -214,7 +214,10 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
                 key={type}
                 label={t(`signUpPersonalInfo.${type}`)}
                 variant={accountType === type ? 'primary' : 'outline'}
-                style={styles.accountTypeOption}
+                style={[
+                  styles.accountTypeOption,
+                  accountType !== type && styles.accountTypeOptionInactive,
+                ]}
                 onPress={() => setAccountType(type)}
               />
             ))}
@@ -306,14 +309,17 @@ const styles = StyleSheet.create({
   },
   accountTypeRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
     backgroundColor: palette.softGold,
-    borderRadius: radius.lg,
-    padding: 4,
+    borderRadius: radius.pill,
+    // padding: 4,
   },
   accountTypeOption: {
     flex: 1,
-    paddingVertical: spacing.sm,
+    paddingVertical: 12,
+    borderRadius: radius.pill,
+  },
+  accountTypeOptionInactive: {
+    borderWidth: 0,
   },
   phoneInput: {
     paddingVertical: spacing.md,
