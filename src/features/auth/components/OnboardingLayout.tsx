@@ -5,8 +5,10 @@ import { StatusBar } from 'expo-status-bar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OnboardingHeadline } from '@/features/auth/components/OnboardingHeadline';
-import { OnboardingStepper, type OnboardingStep } from '@/features/auth/components/OnboardingStepper';
+import { OnboardingProgressBar } from '@/features/auth/components/OnboardingProgressBar';
+import type { OnboardingStep } from '@/features/auth/components/OnboardingStepper';
 import { AppText } from '@/shared/components/AppText';
+import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
 type OnboardingLayoutProps = {
@@ -58,11 +60,12 @@ export function OnboardingLayout({
           ) : (
             <View style={styles.backSpacer} />
           )}
+          <LanguageSwitcher />
         </View>
 
-        <OnboardingHeadline title={title} subtitle={subtitle} dark />
+        <OnboardingProgressBar totalSteps={steps.length} currentStep={currentStep} />
 
-        <OnboardingStepper steps={steps} currentStep={currentStep} />
+        <OnboardingHeadline title={title} subtitle={subtitle} dark />
       </View>
 
       <View style={styles.sheet}>
@@ -116,6 +119,7 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
   backButton: {

@@ -55,7 +55,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
 
         <View style={styles.footer}>
           <AppText style={styles.footerText}>{t('login.noAccount')}</AppText>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUpRole')}>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUpFlow')}>
             <AppText weight="bold" style={styles.footerLink}>
               {t('login.signUp')}
             </AppText>

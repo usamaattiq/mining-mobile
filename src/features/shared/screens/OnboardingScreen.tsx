@@ -100,7 +100,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
 
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={() => navigation.navigate('SignUpRole')}
+          onPress={() => navigation.navigate('SignUpFlow')}
           style={[styles.signUpButtonWrap, styles.actionButton]}
         >
           <AppText weight="bold" style={styles.signUpLabel}>
