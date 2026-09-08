@@ -74,7 +74,7 @@ export function AvatarPicker({
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: spacing.xs,
   },
   label: {
@@ -97,6 +97,5 @@ const styles = StyleSheet.create({
   error: {
     fontSize: 12,
     color: palette.danger,
-    textAlign: 'center',
   },
 });

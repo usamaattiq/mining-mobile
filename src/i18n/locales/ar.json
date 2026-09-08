@@ -59,6 +59,8 @@
     "selectOnMap": "اختر من الخريطة",
     "confirmLocation": "تأكيد الموقع",
     "panToSelect": "حرّك الخريطة لاختيار الموقع",
+    "mapSearchPlaceholder": "ابحث عن مكان",
+    "mapNoResults": "لم يتم العثور على أماكن",
     "mapUnavailable": "الخريطة غير متاحة حاليًا. يرجى كتابة عنوانك أعلاه.",
     "locationFailed": "تعذّر تحديد موقعك. حاول مرة أخرى أو اختره من الخريطة."
   },

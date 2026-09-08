@@ -93,7 +93,11 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const [biometricEnabled, setBiometricEnabled] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
-    useLocationMapPicker();
+    useLocationMapPicker(
+      phoneDigits.trim()
+        ? { dialCode: country.dialCode.replace(/^\+/, ''), phoneNumber: phoneDigits.trim() }
+        : undefined,
+    );
 
   const phoneIdentity = {
     countryCallingCode: country.dialCode.replace(/^\+/, ''),
@@ -346,14 +350,6 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
 
       {step === 'personal' ? (
         <View style={styles.form}>
-          <AvatarPicker
-            label={t('signUpPersonalInfo.profileImage')}
-            uri={null}
-            onChangeKey={() => {}}
-            deferUpload
-            onPickLocal={setAvatarAsset}
-          />
-
           <View style={styles.accountTypeRow}>
             {(['individual', 'company'] as AccountType[]).map((type) => (
               <Button
@@ -368,6 +364,14 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               />
             ))}
           </View>
+
+          <AvatarPicker
+            label={t('signUpPersonalInfo.profileImage')}
+            uri={null}
+            onChangeKey={() => {}}
+            deferUpload
+            onPickLocal={setAvatarAsset}
+          />
 
           <FormInput
             label={t('signUpPersonalInfo.fullName')}

@@ -59,6 +59,8 @@
     "selectOnMap": "Select on map",
     "confirmLocation": "Confirm location",
     "panToSelect": "Move the map to select a location",
+    "mapSearchPlaceholder": "Search for a place",
+    "mapNoResults": "No places found",
     "mapUnavailable": "Map is unavailable right now. Please type your address above.",
     "locationFailed": "Couldn't get your location. Please try again or select on the map."
   },
