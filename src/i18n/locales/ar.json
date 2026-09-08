@@ -46,6 +46,7 @@
   "signUpPersonalInfo": {
     "title": "أخبرنا عن نفسك",
     "subtitle": "يساعدنا هذا على تخصيص حسابك.",
+    "profileImage": "الصورة الشخصية",
     "individual": "فرد",
     "company": "شركة",
     "fullName": "الاسم الكامل",

@@ -46,6 +46,7 @@
   "signUpPersonalInfo": {
     "title": "Tell us about you",
     "subtitle": "This helps us personalize your account.",
+    "profileImage": "Profile photo",
     "individual": "Individual",
     "company": "Company",
     "fullName": "Full name",

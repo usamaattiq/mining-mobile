@@ -9,6 +9,7 @@ import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import { authApi } from '@/features/auth/api/authApi';
 import { useLocationMapPicker } from '@/features/auth/hooks/useLocationMapPicker';
 import { SignupLocationField } from '@/features/auth/components/SignupLocationField';
+import { AvatarPicker } from '@/shared/components/AvatarPicker';
 import {
   formatPhoneDisplay,
   placeholderForDigitLength,
@@ -73,6 +74,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const [otp, setOtp] = React.useState('');
   const [secondsLeft, setSecondsLeft] = React.useState(RESEND_SECONDS);
   const [accountType, setAccountType] = React.useState<AccountType>('individual');
+  const [avatarKey, setAvatarKey] = React.useState<string | null>(null);
   const [fullName, setFullName] = React.useState('');
   const [companyName, setCompanyName] = React.useState('');
   const [email, setEmail] = React.useState('');
@@ -204,6 +206,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         email: email.trim() || undefined,
         address: location.trim() || undefined,
         locationCoordinates: locationCoords,
+        avatarUrl: avatarKey,
         mpin,
         biometricEnabled,
         deviceId,
@@ -329,6 +332,12 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
 
       {step === 'personal' ? (
         <View style={styles.form}>
+          <AvatarPicker
+            label={t('signUpPersonalInfo.profileImage')}
+            uri={avatarKey}
+            onChangeKey={setAvatarKey}
+          />
+
           <View style={styles.accountTypeRow}>
             {(['individual', 'company'] as AccountType[]).map((type) => (
               <Button
@@ -344,6 +353,14 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
             ))}
           </View>
 
+          <FormInput
+            label={t('signUpPersonalInfo.fullName')}
+            required
+            placeholder={t('signUpPersonalInfo.fullName')}
+            autoCapitalize="words"
+            value={fullName}
+            onChangeText={setFullName}
+          />
           {accountType === 'company' ? (
             <FormInput
               label={t('signUpPersonalInfo.companyName')}
@@ -354,14 +371,6 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               onChangeText={setCompanyName}
             />
           ) : null}
-          <FormInput
-            label={t('signUpPersonalInfo.fullName')}
-            required
-            placeholder={t('signUpPersonalInfo.fullName')}
-            autoCapitalize="words"
-            value={fullName}
-            onChangeText={setFullName}
-          />
           <FormInput
             label={t('signUpPersonalInfo.emailOptional')}
             placeholder={t('signUpPersonalInfo.emailOptional')}
