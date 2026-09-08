@@ -2,6 +2,7 @@ import React from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { SplashScreen } from '@/shared/components/SplashScreen';
 import { AppNavigator } from '@/navigation/AppNavigator';
@@ -46,21 +47,25 @@ export default function App() {
 
   if (!isReady) {
     return (
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <SplashScreen showLoader />
-      </SafeAreaProvider>
+      <KeyboardProvider>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <SplashScreen showLoader />
+        </SafeAreaProvider>
+      </KeyboardProvider>
     );
   }
 
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      <View style={styles.root}>
-        <NavigationContainer ref={navigationRef} theme={navigationTheme}>
-          <AppNavigator />
-        </NavigationContainer>
-      </View>
-    </SafeAreaProvider>
+    <KeyboardProvider>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+        <View style={styles.root}>
+          <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+            <AppNavigator />
+          </NavigationContainer>
+        </View>
+      </SafeAreaProvider>
+    </KeyboardProvider>
   );
 }
 
