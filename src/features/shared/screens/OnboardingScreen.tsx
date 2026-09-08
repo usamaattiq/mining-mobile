@@ -84,7 +84,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
         </View>
       </View>
 
-      <View style={styles.actions}>
+      <View style={[styles.actions, { bottom: Math.max(insets.bottom, spacing.sm) + 40 }]}>
         <View style={styles.headline}>
           <AppText weight="bold" style={styles.headlineText}>
             {t('onboarding.headlineLine1')}
@@ -221,7 +221,6 @@ const styles = StyleSheet.create({
   },
   actions: {
     position: 'absolute',
-    bottom: 56,
     left: 0,
     right: 0,
     paddingHorizontal: spacing.lg,
