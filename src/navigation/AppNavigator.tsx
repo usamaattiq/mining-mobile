@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
 import { SignUpFlowScreen } from '@/features/auth/screens/SignUpFlowScreen';
 import { OnboardingScreen } from '@/features/shared/screens/OnboardingScreen';
+import { WelcomeScreen } from '@/features/shared/screens/WelcomeScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/shared/theme/tokens';
 
@@ -28,6 +29,7 @@ export function AppNavigator(): React.ReactElement {
         component={SignUpFlowScreen}
         options={{ contentStyle: { backgroundColor: palette.gold } }}
       />
+      <Stack.Screen name="Welcome" component={WelcomeScreen} />
     </Stack.Navigator>
   );
 }

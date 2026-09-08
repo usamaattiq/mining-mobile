@@ -99,5 +99,10 @@
   },
   "legal": {
     "updatedTemplate": "Effective {effective} · Last updated {updated}"
+  },
+  "welcome": {
+    "title": "Welcome to MineMarket",
+    "subtitle": "You're all set. Let's get you started.",
+    "continue": "Continue"
   }
 }

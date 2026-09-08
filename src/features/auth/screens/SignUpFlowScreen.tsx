@@ -97,9 +97,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   };
 
   const finishSetup = () => {
-    Alert.alert(t('signUpSecurity.successTitle'), t('signUpSecurity.successMessage'), [
-      { text: t('common.continue'), onPress: () => navigation.replace('Login') },
-    ]);
+    navigation.replace('Welcome');
   };
 
   const handleSecurityContinue = () => {

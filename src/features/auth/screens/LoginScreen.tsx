@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -64,7 +64,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
 
   const handleLogIn = () => {
     // Placeholder until backend auth is wired up.
-    Alert.alert(t('loginMpin.logIn'), '');
+    navigation.replace('Welcome');
   };
 
   const isPhoneValid = phoneDigits.trim().length >= 6;
