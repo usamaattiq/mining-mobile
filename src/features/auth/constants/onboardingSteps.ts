@@ -12,3 +12,9 @@ export const LOGIN_STEPS: OnboardingStep[] = [
   { key: 'otp', label: 'Verify' },
   { key: 'mpin', label: 'MPIN' },
 ];
+
+export const FORGOT_MPIN_STEPS: OnboardingStep[] = [
+  { key: 'otp', label: 'Verify' },
+  { key: 'newMpin', label: 'New MPIN' },
+  { key: 'confirmMpin', label: 'Confirm' },
+];

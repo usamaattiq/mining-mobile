@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   type TouchableOpacityProps,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
@@ -14,17 +15,21 @@ type ButtonProps = TouchableOpacityProps & {
   label: string;
   variant?: ButtonVariant;
   loading?: boolean;
+  icon?: keyof typeof Ionicons.glyphMap;
 };
 
 export function Button({
   label,
   variant = 'primary',
   loading = false,
+  icon,
   disabled,
   style,
   ...rest
 }: ButtonProps): React.ReactElement {
   const isDisabled = disabled || loading;
+  const iconColor =
+    variant === 'primary' || variant === 'secondary' ? palette.pureWhite : palette.gold;
 
   return (
     <TouchableOpacity
@@ -44,18 +49,21 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? palette.pureWhite : palette.gold} />
       ) : (
-        <AppText
-          weight="bold"
-          style={[
-            styles.label,
-            variant === 'primary' && styles.labelPrimary,
-            variant === 'secondary' && styles.labelSecondary,
-            variant === 'outline' && styles.labelOutline,
-            variant === 'link' && styles.labelLink,
-          ]}
-        >
-          {label}
-        </AppText>
+        <>
+          {icon ? <Ionicons name={icon} size={16} color={iconColor} /> : null}
+          <AppText
+            weight="bold"
+            style={[
+              styles.label,
+              variant === 'primary' && styles.labelPrimary,
+              variant === 'secondary' && styles.labelSecondary,
+              variant === 'outline' && styles.labelOutline,
+              variant === 'link' && styles.labelLink,
+            ]}
+          >
+            {label}
+          </AppText>
+        </>
       )}
     </TouchableOpacity>
   );

@@ -8,16 +8,27 @@ export function setAuthTokenProvider(provider: () => string | null): void {
   authTokenProvider = provider;
 }
 
+let sessionRevokedHandler: (() => void) | null = null;
+
+export function setSessionRevokedHandler(handler: () => void): void {
+  sessionRevokedHandler = handler;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
+    public readonly code: string | undefined,
     public readonly body: unknown,
   ) {
     super(message);
     this.name = 'ApiError';
   }
 }
+
+type ApiEnvelope<T> =
+  | { success: true; data: T }
+  | { success: false; error: { code: string; message: string; details?: unknown } };
 
 export async function apiFetch<T>(
   path: string,
@@ -35,11 +46,22 @@ export async function apiFetch<T>(
   });
 
   const text = await res.text();
-  const data = text ? JSON.parse(text) : undefined;
+  const payload = text ? (JSON.parse(text) as ApiEnvelope<T>) : undefined;
 
-  if (!res.ok) {
-    throw new ApiError(`Request failed: ${options.method ?? 'GET'} ${path}`, res.status, data);
+  if (!res.ok || !payload || payload.success === false) {
+    const errorPayload = payload && payload.success === false ? payload.error : undefined;
+
+    if (res.status === 401 && errorPayload?.code === 'UNAUTHORIZED') {
+      sessionRevokedHandler?.();
+    }
+
+    throw new ApiError(
+      errorPayload?.message ?? `Request failed: ${options.method ?? 'GET'} ${path}`,
+      res.status,
+      errorPayload?.code,
+      errorPayload?.details ?? payload,
+    );
   }
 
-  return data as T;
+  return payload.data;
 }

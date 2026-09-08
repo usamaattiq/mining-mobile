@@ -11,6 +11,8 @@ import { initializeI18n } from '@/i18n';
 import { appFontAssets } from '@/shared/theme/typography';
 import { palette } from '@/shared/theme/tokens';
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
+import { useAuthStore } from '@/store/authStore';
+import { useDevicePrefsStore } from '@/store/devicePrefsStore';
 
 const BOOTSTRAP_DELAY_MS = 800;
 
@@ -24,8 +26,16 @@ const navigationTheme = {
 
 export default function App() {
   const [isI18nReady, setIsI18nReady] = React.useState(false);
+  const [isStoresReady, setIsStoresReady] = React.useState(false);
   const [fontsLoaded, fontError] = useFonts(appFontAssets);
-  const isReady = isI18nReady && (fontsLoaded || Boolean(fontError));
+  const isReady = isI18nReady && isStoresReady && (fontsLoaded || Boolean(fontError));
+
+  React.useEffect(() => {
+    void Promise.all([
+      useAuthStore.getState().hydrate(),
+      useDevicePrefsStore.getState().hydrate(),
+    ]).then(() => setIsStoresReady(true));
+  }, []);
 
   // Listens for foreground/tapped notifications for the whole app lifetime.
   // Actual registration (permission + token + backend call) happens after

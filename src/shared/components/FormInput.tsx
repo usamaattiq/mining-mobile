@@ -7,12 +7,14 @@ import { getFontFamily } from '@/shared/theme/typography';
 
 type FormInputProps = TextInputProps & {
   label?: string;
+  required?: boolean;
   error?: string;
   leftAdornment?: React.ReactNode;
 };
 
 export function FormInput({
   label,
+  required,
   error,
   leftAdornment,
   style,
@@ -25,6 +27,7 @@ export function FormInput({
       {label ? (
         <AppText weight="semibold" style={styles.label}>
           {label}
+          {required ? <AppText style={styles.required}> *</AppText> : null}
         </AppText>
       ) : null}
       <View style={[styles.inputRow, error ? styles.inputRowError : null]}>
@@ -49,6 +52,10 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     color: palette.charcoal,
+  },
+  required: {
+    fontSize: 13,
+    color: palette.danger,
   },
   inputRow: {
     flexDirection: 'row',

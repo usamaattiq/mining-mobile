@@ -4,7 +4,8 @@
     "cancel": "Cancel",
     "done": "Done",
     "close": "Close",
-    "continue": "Continue"
+    "continue": "Continue",
+    "error": "Something went wrong"
   },
   "language": {
     "english": "English",
@@ -30,14 +31,16 @@
     "placeholder": "555 000 0000",
     "sendCode": "Send code",
     "selectCountryCode": "Select country code",
-    "searchCountry": "Search country or code"
+    "searchCountry": "Search country or code",
+    "sendFailed": "Couldn't send the code. Please try again."
   },
   "signUpOtp": {
     "title": "Enter verification code",
     "subtitleTemplate": "We sent a {length}-digit code to {phone}",
     "verify": "Verify",
     "resendIn": "Resend code in {seconds}s",
-    "resend": "Resend code"
+    "resend": "Resend code",
+    "verifyFailed": "That code didn't work. Please try again."
   },
   "signUpPersonalInfo": {
     "title": "Tell us about you",
@@ -47,7 +50,15 @@
     "fullName": "Full name",
     "companyName": "Company name",
     "emailOptional": "Email (optional)",
-    "location": "Location"
+    "location": "Location",
+    "locationPlaceholder": "No location selected yet",
+    "addressLinePlaceholder": "Street, building, area",
+    "useCurrentLocation": "Use current location",
+    "selectOnMap": "Select on map",
+    "confirmLocation": "Confirm location",
+    "panToSelect": "Move the map to select a location",
+    "mapUnavailable": "Map is unavailable right now. Please type your address above.",
+    "locationFailed": "Couldn't get your location. Please try again or select on the map."
   },
   "signUpSecurity": {
     "title": "Set your MPIN",
@@ -74,21 +85,26 @@
     "subtitle": "Enter your phone number to log in.",
     "label": "Phone number",
     "placeholder": "555 000 0000",
-    "sendCode": "Send code"
+    "sendCode": "Send code",
+    "sendFailed": "Couldn't send the code. Please try again."
   },
   "loginOtp": {
     "title": "Enter verification code",
     "subtitleTemplate": "We sent a {length}-digit code to {phone}",
     "verify": "Verify",
     "resendIn": "Resend code in {seconds}s",
-    "resend": "Resend code"
+    "resend": "Resend code",
+    "verifyFailed": "That code didn't work. Please try again."
   },
   "loginMpin": {
     "title": "Enter your MPIN",
     "subtitleTemplate": "Enter your {length}-digit PIN to continue.",
     "logIn": "Log In",
     "incorrectTitle": "Incorrect MPIN",
-    "incorrectMessage": "The MPIN you entered is incorrect. Please try again."
+    "incorrectMessage": "The MPIN you entered is incorrect. Please try again.",
+    "loginFailed": "We couldn't log you in. Please try again.",
+    "forgotMpin": "Forgot MPIN?",
+    "useDifferentAccount": "Use a different account"
   },
   "steps": {
     "role": "Role",

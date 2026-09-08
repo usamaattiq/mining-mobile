@@ -4,7 +4,8 @@
     "cancel": "إلغاء",
     "done": "تم",
     "close": "إغلاق",
-    "continue": "متابعة"
+    "continue": "متابعة",
+    "error": "حدث خطأ ما"
   },
   "language": {
     "english": "الإنجليزية",
@@ -30,14 +31,16 @@
     "placeholder": "555 000 0000",
     "sendCode": "إرسال الرمز",
     "selectCountryCode": "اختر رمز الدولة",
-    "searchCountry": "ابحث عن الدولة أو الرمز"
+    "searchCountry": "ابحث عن الدولة أو الرمز",
+    "sendFailed": "تعذّر إرسال الرمز. حاول مرة أخرى."
   },
   "signUpOtp": {
     "title": "أدخل رمز التحقق",
     "subtitleTemplate": "أرسلنا رمزًا مكوّنًا من {length} أرقام إلى {phone}",
     "verify": "تحقق",
     "resendIn": "إعادة الإرسال خلال {seconds} ثانية",
-    "resend": "إعادة إرسال الرمز"
+    "resend": "إعادة إرسال الرمز",
+    "verifyFailed": "هذا الرمز غير صحيح. حاول مرة أخرى."
   },
   "signUpPersonalInfo": {
     "title": "أخبرنا عن نفسك",
@@ -47,7 +50,15 @@
     "fullName": "الاسم الكامل",
     "companyName": "اسم الشركة",
     "emailOptional": "البريد الإلكتروني (اختياري)",
-    "location": "الموقع"
+    "location": "الموقع",
+    "locationPlaceholder": "لم يتم اختيار موقع بعد",
+    "addressLinePlaceholder": "الشارع، المبنى، المنطقة",
+    "useCurrentLocation": "استخدام الموقع الحالي",
+    "selectOnMap": "اختر من الخريطة",
+    "confirmLocation": "تأكيد الموقع",
+    "panToSelect": "حرّك الخريطة لاختيار الموقع",
+    "mapUnavailable": "الخريطة غير متاحة حاليًا. يرجى كتابة عنوانك أعلاه.",
+    "locationFailed": "تعذّر تحديد موقعك. حاول مرة أخرى أو اختره من الخريطة."
   },
   "signUpSecurity": {
     "title": "تعيين الرمز السري",
@@ -74,21 +85,26 @@
     "subtitle": "أدخل رقم هاتفك لتسجيل الدخول.",
     "label": "رقم الهاتف",
     "placeholder": "555 000 0000",
-    "sendCode": "إرسال الرمز"
+    "sendCode": "إرسال الرمز",
+    "sendFailed": "تعذّر إرسال الرمز. حاول مرة أخرى."
   },
   "loginOtp": {
     "title": "أدخل رمز التحقق",
     "subtitleTemplate": "أرسلنا رمزًا مكوّنًا من {length} أرقام إلى {phone}",
     "verify": "تحقق",
     "resendIn": "إعادة الإرسال خلال {seconds} ثانية",
-    "resend": "إعادة إرسال الرمز"
+    "resend": "إعادة إرسال الرمز",
+    "verifyFailed": "هذا الرمز غير صحيح. حاول مرة أخرى."
   },
   "loginMpin": {
     "title": "أدخل الرمز السري",
     "subtitleTemplate": "أدخل رمزك السري المكوّن من {length} أرقام للمتابعة.",
     "logIn": "تسجيل الدخول",
     "incorrectTitle": "رمز سري غير صحيح",
-    "incorrectMessage": "الرمز السري الذي أدخلته غير صحيح. حاول مرة أخرى."
+    "incorrectMessage": "الرمز السري الذي أدخلته غير صحيح. حاول مرة أخرى.",
+    "loginFailed": "تعذّر تسجيل الدخول. حاول مرة أخرى.",
+    "forgotMpin": "هل نسيت الرمز السري؟",
+    "useDifferentAccount": "استخدام حساب مختلف"
   },
   "steps": {
     "role": "الدور",

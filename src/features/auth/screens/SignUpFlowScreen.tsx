@@ -6,8 +6,21 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
+import { authApi } from '@/features/auth/api/authApi';
+import { useLocationMapPicker } from '@/features/auth/hooks/useLocationMapPicker';
+import { SignupLocationField } from '@/features/auth/components/SignupLocationField';
+import {
+  formatPhoneDisplay,
+  placeholderForDigitLength,
+  sanitizePhoneDigits,
+} from '@/features/auth/utils/phoneInput';
 import type { RootStackParamList } from '@/navigation/types';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
+import { useAuthStore } from '@/store/authStore';
+import { useDevicePrefsStore } from '@/store/devicePrefsStore';
+import { useProfileStore } from '@/store/profileStore';
+import { getDeviceId } from '@/shared/utils/deviceId';
+import { ApiError } from '@/shared/services/api';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { CodeInput } from '@/shared/components/CodeInput';
@@ -16,6 +29,11 @@ import { defaultCountry, type Country } from '@/shared/constants/countries';
 import { FormInput } from '@/shared/components/FormInput';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 import { getFontFamily } from '@/shared/theme/typography';
+
+function errorMessage(error: unknown, fallback: string): string {
+  if (error instanceof ApiError) return error.message;
+  return fallback;
+}
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SignUpFlow'>;
 
@@ -43,6 +61,9 @@ type AccountType = 'individual' | 'company';
 export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
+  const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
+  const setProfile = useProfileStore((s) => s.setProfile);
+  const setLastPhone = useDevicePrefsStore((s) => s.setLastPhone);
 
   const [step, setStep] = React.useState<SignUpStep>('phone');
   const [country, setCountry] = React.useState<Country>(defaultCountry);
@@ -54,11 +75,23 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const [companyName, setCompanyName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [location, setLocation] = React.useState('');
+  const [locationCoords, setLocationCoords] = React.useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [mpin, setMpin] = React.useState('');
   const [confirmMpin, setConfirmMpin] = React.useState('');
   const [biometricAvailable, setBiometricAvailable] = React.useState(false);
   const [biometricEnabled, setBiometricEnabled] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
+    useLocationMapPicker();
 
+  const phoneIdentity = {
+    countryCallingCode: country.dialCode.replace(/^\+/, ''),
+    phoneDigits: phoneDigits.trim(),
+    countryCode: country.iso2,
+  };
   const phone = `${country.dialCode}${phoneDigits.trim()}`;
 
   React.useEffect(() => {
@@ -87,6 +120,23 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     navigation.goBack();
   };
 
+  const handleUseCurrentLocation = async () => {
+    const selection = await getCurrentLocation();
+    if (!selection) {
+      Alert.alert(t('common.error'), t('signUpPersonalInfo.locationFailed'));
+      return;
+    }
+    setLocation(selection.label);
+    setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+  };
+
+  const handleSelectOnMap = () => {
+    openMapPickerForSelection((selection) => {
+      setLocation(selection.label);
+      setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+    }, locationCoords);
+  };
+
   const handleEnableBiometric = async () => {
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: t('signUpSecurity.biometricPrompt'),
@@ -96,23 +146,84 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     }
   };
 
-  const finishSetup = () => {
-    navigation.replace('Welcome');
+  const handleSendSignupOtp = async () => {
+    setSubmitting(true);
+    try {
+      await authApi.sendSignupOtp(phoneIdentity);
+      setOtp('');
+      setSecondsLeft(RESEND_SECONDS);
+      goToStep('otp');
+    } catch (error) {
+      Alert.alert(t('common.error'), errorMessage(error, t('signUpPhone.sendFailed')));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleSecurityContinue = () => {
+  const handleVerifySignupOtp = async () => {
+    setSubmitting(true);
+    try {
+      await authApi.verifySignupOtp(phoneIdentity, otp);
+      goToStep('personal');
+    } catch (error) {
+      Alert.alert(t('common.error'), errorMessage(error, t('signUpOtp.verifyFailed')));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleResendSignupOtp = async () => {
+    setSubmitting(true);
+    try {
+      await authApi.sendSignupOtp(phoneIdentity);
+      setSecondsLeft(RESEND_SECONDS);
+    } catch (error) {
+      Alert.alert(t('common.error'), errorMessage(error, t('signUpPhone.sendFailed')));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSecurityContinue = async () => {
     if (confirmMpin !== mpin) {
       Alert.alert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
       setConfirmMpin('');
       return;
     }
-    finishSetup();
+
+    setSubmitting(true);
+    try {
+      const deviceId = await getDeviceId();
+      const result = await authApi.submitSignup({
+        ...phoneIdentity,
+        fullName: fullName.trim(),
+        email: email.trim() || undefined,
+        address: location.trim() || undefined,
+        locationCoordinates: locationCoords,
+        mpin,
+        biometricEnabled,
+        deviceId,
+      });
+      await setAuthenticated(result.accessToken);
+      setProfile(result.profile);
+      await setLastPhone({
+        countryCode: country.iso2,
+        countryCallingCode: country.dialCode.replace(/^\+/, ''),
+        phoneDigits: phoneDigits.trim(),
+      });
+      navigation.replace('Welcome');
+    } catch (error) {
+      Alert.alert(t('common.error'), errorMessage(error, t('signUpSecurity.mismatchMessage')));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const isPhoneValid = phoneDigits.trim().length >= 6;
+  const isPhoneValid = phoneDigits.trim().length === country.phoneDigitLength;
   const isOtpValid = otp.length === OTP_LENGTH;
   const isPersonalValid =
-    (accountType === 'individual' ? fullName.trim().length > 1 : companyName.trim().length > 1) &&
+    fullName.trim().length > 1 &&
+    (accountType === 'individual' || companyName.trim().length > 1) &&
     location.trim().length > 1 &&
     (email.trim().length === 0 || EMAIL_REGEX.test(email.trim()));
   const isMpinComplete = mpin.length === MPIN_LENGTH && confirmMpin.length === MPIN_LENGTH;
@@ -140,13 +251,13 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       subtitle={header.subtitle}
       onBack={goToPreviousStep}
       canContinue={
-        step === 'phone'
+        (step === 'phone'
           ? isPhoneValid
           : step === 'otp'
             ? isOtpValid
             : step === 'personal'
               ? isPersonalValid
-              : isMpinComplete
+              : isMpinComplete) && !submitting
       }
       continueLabel={
         step === 'phone'
@@ -158,14 +269,15 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               : t('signUpSecurity.finish')
       }
       onContinue={() => {
+        if (submitting) return;
         if (step === 'phone') {
-          goToStep('otp');
+          void handleSendSignupOtp();
         } else if (step === 'otp') {
-          goToStep('personal');
+          void handleVerifySignupOtp();
         } else if (step === 'personal') {
           goToStep('security');
         } else if (step === 'security') {
-          handleSecurityContinue();
+          void handleSecurityContinue();
         }
       }}
     >
@@ -173,13 +285,16 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         <View style={styles.form}>
           <FormInput
             label={t('signUpPhone.label')}
-            placeholder={t('signUpPhone.placeholder')}
+            required
+            placeholder={placeholderForDigitLength(country.phoneDigitLength)}
             keyboardType="phone-pad"
             autoFocus
-            value={phoneDigits}
-            onChangeText={setPhoneDigits}
+            value={formatPhoneDisplay(phoneDigits)}
+            onChangeText={(text) =>
+              setPhoneDigits(sanitizePhoneDigits(text, country.phoneDigitLength))
+            }
             leftAdornment={<CountryPicker value={country} onChange={setCountry} />}
-            style={[styles.phoneInput, { fontFamily: getFontFamily(currentLanguage, 'semibold') }]}
+            style={[styles.phoneInput, { fontFamily: getFontFamily(currentLanguage, 'regular') }]}
           />
         </View>
       ) : null}
@@ -197,7 +312,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               <Button
                 label={t('signUpOtp.resend')}
                 variant="link"
-                onPress={() => setSecondsLeft(RESEND_SECONDS)}
+                onPress={() => void handleResendSignupOtp()}
               />
             )}
           </View>
@@ -221,23 +336,24 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
             ))}
           </View>
 
-          {accountType === 'individual' ? (
-            <FormInput
-              label={t('signUpPersonalInfo.fullName')}
-              placeholder={t('signUpPersonalInfo.fullName')}
-              autoCapitalize="words"
-              value={fullName}
-              onChangeText={setFullName}
-            />
-          ) : (
+          {accountType === 'company' ? (
             <FormInput
               label={t('signUpPersonalInfo.companyName')}
+              required
               placeholder={t('signUpPersonalInfo.companyName')}
               autoCapitalize="words"
               value={companyName}
               onChangeText={setCompanyName}
             />
-          )}
+          ) : null}
+          <FormInput
+            label={t('signUpPersonalInfo.fullName')}
+            required
+            placeholder={t('signUpPersonalInfo.fullName')}
+            autoCapitalize="words"
+            value={fullName}
+            onChangeText={setFullName}
+          />
           <FormInput
             label={t('signUpPersonalInfo.emailOptional')}
             placeholder={t('signUpPersonalInfo.emailOptional')}
@@ -246,11 +362,14 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
             value={email}
             onChangeText={setEmail}
           />
-          <FormInput
+          <SignupLocationField
             label={t('signUpPersonalInfo.location')}
-            placeholder={t('signUpPersonalInfo.location')}
+            required
             value={location}
+            loading={locationLoading}
             onChangeText={setLocation}
+            onUseCurrentLocation={() => void handleUseCurrentLocation()}
+            onSelectOnMap={handleSelectOnMap}
           />
         </View>
       ) : null}
@@ -297,6 +416,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           ) : null}
         </View>
       ) : null}
+      {mapPickerSheet}
     </OnboardingLayout>
   );
 }
@@ -321,7 +441,7 @@ const styles = StyleSheet.create({
   },
   phoneInput: {
     paddingVertical: spacing.md,
-    fontSize: 18,
+    fontSize: 16,
   },
   resendRow: {
     alignItems: 'center',
