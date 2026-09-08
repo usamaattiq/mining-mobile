@@ -156,6 +156,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
           <Button
             label={t('login.signUp')}
             variant="link"
+            style={styles.footerButton}
             onPress={() => navigation.navigate('SignUpFlow')}
           />
         </View>
@@ -181,6 +182,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
     marginTop: spacing.xl,
@@ -188,5 +191,8 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 14,
     color: palette.muted,
+  },
+  footerButton: {
+    flexShrink: 0,
   },
 });
