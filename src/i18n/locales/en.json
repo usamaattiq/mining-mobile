@@ -23,14 +23,6 @@
     "privacyPolicy": "Privacy Policy",
     "terms": "Terms & Conditions"
   },
-  "signUpRole": {
-    "title": "How will you use MineMarket?",
-    "subtitle": "Choose a role to get started. You can change this later in settings.",
-    "buyerTitle": "Buyer",
-    "buyerDescription": "Browse and order equipment, services, products and gold.",
-    "supplierTitle": "Supplier",
-    "supplierDescription": "List and sell your equipment, services, products and gold."
-  },
   "signUpPhone": {
     "title": "What's your number?",
     "subtitle": "We'll send you a verification code by SMS.",
@@ -50,17 +42,18 @@
   "signUpPersonalInfo": {
     "title": "Tell us about you",
     "subtitle": "This helps us personalize your account.",
+    "individual": "Individual",
+    "company": "Company",
     "fullName": "Full name",
-    "email": "Email",
-    "addressOptional": "Address (optional)",
-    "address": "Address"
+    "companyName": "Company name",
+    "emailOptional": "Email (optional)",
+    "location": "Location"
   },
   "signUpSecurity": {
-    "createTitle": "Set your MPIN",
-    "confirmTitle": "Confirm your MPIN",
-    "createSubtitleTemplate": "Choose a {length}-digit PIN to secure your account.",
-    "confirmSubtitle": "Enter the same PIN again to confirm.",
-    "continue": "Continue",
+    "title": "Set your MPIN",
+    "subtitleTemplate": "Choose a {length}-digit PIN to secure your account.",
+    "createLabel": "Set MPIN",
+    "confirmLabel": "Confirm MPIN",
     "finish": "Finish",
     "biometricTitle": "Enable Face ID / biometric unlock",
     "biometricSubtitle": "Use your face or fingerprint for faster sign in. You can always use your MPIN.",
@@ -73,14 +66,29 @@
     "successMessage": "Your account has been set up successfully."
   },
   "login": {
-    "title": "Log in",
-    "welcomeBack": "Welcome back",
-    "subtitle": "Sign in to continue",
-    "email": "Email",
-    "password": "Password",
-    "logIn": "Log In",
     "noAccount": "Don't have an account?",
     "signUp": "Sign Up"
+  },
+  "loginPhone": {
+    "title": "Welcome back",
+    "subtitle": "Enter your phone number to log in.",
+    "label": "Phone number",
+    "placeholder": "555 000 0000",
+    "sendCode": "Send code"
+  },
+  "loginOtp": {
+    "title": "Enter verification code",
+    "subtitleTemplate": "We sent a {length}-digit code to {phone}",
+    "verify": "Verify",
+    "resendIn": "Resend code in {seconds}s",
+    "resend": "Resend code"
+  },
+  "loginMpin": {
+    "title": "Enter your MPIN",
+    "subtitleTemplate": "Enter your {length}-digit PIN to continue.",
+    "logIn": "Log In",
+    "incorrectTitle": "Incorrect MPIN",
+    "incorrectMessage": "The MPIN you entered is incorrect. Please try again."
   },
   "steps": {
     "role": "Role",

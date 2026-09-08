@@ -93,7 +93,7 @@ export function OnboardingLayout({
                 <AppText weight="bold" style={styles.continueLabel}>
                   {continueLabel}
                 </AppText>
-                <Ionicons name="arrow-forward" size={18} color={palette.charcoal} />
+                <Ionicons name="arrow-forward" size={18} color={palette.pureWhite} />
               </View>
             </Pressable>
           </View>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   continueLabel: {
-    color: palette.charcoal,
+    color: palette.pureWhite,
     fontSize: 16,
     letterSpacing: 0.3,
   },

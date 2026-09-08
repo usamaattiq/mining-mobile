@@ -8,7 +8,7 @@ import {
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'link';
 
 type ButtonProps = TouchableOpacityProps & {
   label: string;
@@ -35,13 +35,14 @@ export function Button({
         variant === 'primary' && styles.primary,
         variant === 'secondary' && styles.secondary,
         variant === 'outline' && styles.outline,
+        variant === 'link' && styles.link,
         isDisabled && styles.disabled,
         style,
       ]}
       {...rest}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? palette.charcoal : palette.gold} />
+        <ActivityIndicator color={variant === 'primary' ? palette.pureWhite : palette.gold} />
       ) : (
         <AppText
           weight="bold"
@@ -50,6 +51,7 @@ export function Button({
             variant === 'primary' && styles.labelPrimary,
             variant === 'secondary' && styles.labelSecondary,
             variant === 'outline' && styles.labelOutline,
+            variant === 'link' && styles.labelLink,
           ]}
         >
           {label}
@@ -80,6 +82,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.gold,
   },
+  link: {
+    backgroundColor: 'transparent',
+    paddingVertical: spacing.xs,
+    paddingHorizontal: 0,
+  },
   disabled: {
     opacity: 0.5,
   },
@@ -87,12 +94,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   labelPrimary: {
-    color: palette.charcoal,
+    color: palette.pureWhite,
   },
   labelSecondary: {
     color: palette.pureWhite,
   },
   labelOutline: {
     color: palette.gold,
+  },
+  labelLink: {
+    color: palette.gold,
+    fontSize: 13,
   },
 });

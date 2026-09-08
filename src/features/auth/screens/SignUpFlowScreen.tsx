@@ -1,13 +1,12 @@
 import React from 'react';
-import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
-import type { RootStackParamList, UserRole } from '@/navigation/types';
+import type { RootStackParamList } from '@/navigation/types';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
@@ -25,19 +24,18 @@ const RESEND_SECONDS = 30;
 const MPIN_LENGTH = 4;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type SignUpStep = 'role' | 'phone' | 'otp' | 'personal' | 'security';
+type SignUpStep = 'phone' | 'otp' | 'personal' | 'security';
 
-const STEP_ORDER: SignUpStep[] = ['role', 'phone', 'otp', 'personal', 'security'];
+const STEP_ORDER: SignUpStep[] = ['phone', 'otp', 'personal', 'security'];
 
 const STEP_INDEX: Record<SignUpStep, number> = {
-  role: 0,
-  phone: 1,
-  otp: 2,
-  personal: 3,
-  security: 4,
+  phone: 0,
+  otp: 1,
+  personal: 2,
+  security: 3,
 };
 
-type SecuritySubStep = 'create' | 'confirm';
+type AccountType = 'individual' | 'company';
 
 /**
  * One persistent OnboardingLayout; only step content swaps (avoids remount jerk).
@@ -46,16 +44,16 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
 
-  const [step, setStep] = React.useState<SignUpStep>('role');
-  const [, setRole] = React.useState<UserRole | null>(null);
+  const [step, setStep] = React.useState<SignUpStep>('phone');
   const [country, setCountry] = React.useState<Country>(defaultCountry);
   const [phoneDigits, setPhoneDigits] = React.useState('');
   const [otp, setOtp] = React.useState('');
   const [secondsLeft, setSecondsLeft] = React.useState(RESEND_SECONDS);
+  const [accountType, setAccountType] = React.useState<AccountType>('individual');
   const [fullName, setFullName] = React.useState('');
+  const [companyName, setCompanyName] = React.useState('');
   const [email, setEmail] = React.useState('');
-  const [address, setAddress] = React.useState('');
-  const [securityStep, setSecurityStep] = React.useState<SecuritySubStep>('create');
+  const [location, setLocation] = React.useState('');
   const [mpin, setMpin] = React.useState('');
   const [confirmMpin, setConfirmMpin] = React.useState('');
   const [biometricAvailable, setBiometricAvailable] = React.useState(false);
@@ -105,10 +103,6 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   };
 
   const handleSecurityContinue = () => {
-    if (securityStep === 'create') {
-      setSecurityStep('confirm');
-      return;
-    }
     if (confirmMpin !== mpin) {
       Alert.alert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
       setConfirmMpin('');
@@ -117,65 +111,28 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     finishSetup();
   };
 
-  const handleSecurityBack = () => {
-    if (securityStep === 'confirm') {
-      setConfirmMpin('');
-      setSecurityStep('create');
-      return;
-    }
-    goToPreviousStep();
-  };
-
   const isPhoneValid = phoneDigits.trim().length >= 6;
   const isOtpValid = otp.length === OTP_LENGTH;
-  const isPersonalValid = fullName.trim().length > 1 && EMAIL_REGEX.test(email.trim());
-  const currentMpinValue = securityStep === 'create' ? mpin : confirmMpin;
-  const isMpinComplete = currentMpinValue.length === MPIN_LENGTH;
-
-  const roles: Array<{
-    value: UserRole;
-    title: string;
-    description: string;
-    icon: keyof typeof Ionicons.glyphMap;
-  }> = [
-    {
-      value: 'buyer',
-      title: t('signUpRole.buyerTitle'),
-      description: t('signUpRole.buyerDescription'),
-      icon: 'cart-outline',
-    },
-    {
-      value: 'supplier',
-      title: t('signUpRole.supplierTitle'),
-      description: t('signUpRole.supplierDescription'),
-      icon: 'storefront-outline',
-    },
-  ];
+  const isPersonalValid =
+    (accountType === 'individual' ? fullName.trim().length > 1 : companyName.trim().length > 1) &&
+    location.trim().length > 1 &&
+    (email.trim().length === 0 || EMAIL_REGEX.test(email.trim()));
+  const isMpinComplete = mpin.length === MPIN_LENGTH && confirmMpin.length === MPIN_LENGTH;
 
   const header =
-    step === 'role'
-      ? { title: t('signUpRole.title'), subtitle: t('signUpRole.subtitle') }
-      : step === 'phone'
-        ? { title: t('signUpPhone.title'), subtitle: t('signUpPhone.subtitle') }
-        : step === 'otp'
-          ? {
-              title: t('signUpOtp.title'),
-              subtitle: t('signUpOtp.subtitleTemplate', { length: OTP_LENGTH, phone }),
-            }
-          : step === 'personal'
-            ? { title: t('signUpPersonalInfo.title'), subtitle: t('signUpPersonalInfo.subtitle') }
-            : {
-                title:
-                  securityStep === 'create'
-                    ? t('signUpSecurity.createTitle')
-                    : t('signUpSecurity.confirmTitle'),
-                subtitle:
-                  securityStep === 'create'
-                    ? t('signUpSecurity.createSubtitleTemplate', { length: MPIN_LENGTH })
-                    : t('signUpSecurity.confirmSubtitle'),
-              };
-
-  const onBack = step === 'security' ? handleSecurityBack : goToPreviousStep;
+    step === 'phone'
+      ? { title: t('signUpPhone.title'), subtitle: t('signUpPhone.subtitle') }
+      : step === 'otp'
+        ? {
+            title: t('signUpOtp.title'),
+            subtitle: t('signUpOtp.subtitleTemplate', { length: OTP_LENGTH, phone }),
+          }
+        : step === 'personal'
+          ? { title: t('signUpPersonalInfo.title'), subtitle: t('signUpPersonalInfo.subtitle') }
+          : {
+              title: t('signUpSecurity.title'),
+              subtitle: t('signUpSecurity.subtitleTemplate', { length: MPIN_LENGTH }),
+            };
 
   return (
     <OnboardingLayout
@@ -183,8 +140,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       currentStep={STEP_INDEX[step]}
       title={header.title}
       subtitle={header.subtitle}
-      onBack={onBack}
-      showFooter={step !== 'role'}
+      onBack={goToPreviousStep}
       canContinue={
         step === 'phone'
           ? isPhoneValid
@@ -192,9 +148,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
             ? isOtpValid
             : step === 'personal'
               ? isPersonalValid
-              : step === 'security'
-                ? isMpinComplete
-                : true
+              : isMpinComplete
       }
       continueLabel={
         step === 'phone'
@@ -203,9 +157,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
             ? t('signUpOtp.verify')
             : step === 'personal'
               ? t('common.continue')
-              : securityStep === 'create'
-                ? t('signUpSecurity.continue')
-                : t('signUpSecurity.finish')
+              : t('signUpSecurity.finish')
       }
       onContinue={() => {
         if (step === 'phone') {
@@ -219,37 +171,6 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         }
       }}
     >
-      {step === 'role' ? (
-        <View style={styles.roleList}>
-          {roles.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              activeOpacity={0.9}
-              onPress={() => {
-                setRole(option.value);
-                goToStep('phone');
-              }}
-              style={styles.cardShadow}
-            >
-              <View style={styles.card}>
-                <View style={styles.iconWrap}>
-                  <Ionicons name={option.icon} size={26} color={palette.pureWhite} />
-                </View>
-                <View style={styles.cardText}>
-                  <AppText weight="bold" style={styles.cardTitle}>
-                    {option.title}
-                  </AppText>
-                  <AppText style={styles.cardDescription}>{option.description}</AppText>
-                </View>
-                <View style={styles.chevronWrap}>
-                  <Ionicons name="chevron-forward" size={18} color={palette.gold} />
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-      ) : null}
-
       {step === 'phone' ? (
         <View style={styles.form}>
           <FormInput
@@ -275,11 +196,11 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
                 {t('signUpOtp.resendIn', { seconds: secondsLeft })}
               </AppText>
             ) : (
-              <TouchableOpacity onPress={() => setSecondsLeft(RESEND_SECONDS)}>
-                <AppText weight="bold" style={styles.resendLink}>
-                  {t('signUpOtp.resend')}
-                </AppText>
-              </TouchableOpacity>
+              <Button
+                label={t('signUpOtp.resend')}
+                variant="link"
+                onPress={() => setSecondsLeft(RESEND_SECONDS)}
+              />
             )}
           </View>
         </View>
@@ -287,41 +208,75 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
 
       {step === 'personal' ? (
         <View style={styles.form}>
+          <View style={styles.accountTypeRow}>
+            {(['individual', 'company'] as AccountType[]).map((type) => (
+              <Button
+                key={type}
+                label={t(`signUpPersonalInfo.${type}`)}
+                variant={accountType === type ? 'primary' : 'outline'}
+                style={styles.accountTypeOption}
+                onPress={() => setAccountType(type)}
+              />
+            ))}
+          </View>
+
+          {accountType === 'individual' ? (
+            <FormInput
+              label={t('signUpPersonalInfo.fullName')}
+              placeholder={t('signUpPersonalInfo.fullName')}
+              autoCapitalize="words"
+              value={fullName}
+              onChangeText={setFullName}
+            />
+          ) : (
+            <FormInput
+              label={t('signUpPersonalInfo.companyName')}
+              placeholder={t('signUpPersonalInfo.companyName')}
+              autoCapitalize="words"
+              value={companyName}
+              onChangeText={setCompanyName}
+            />
+          )}
           <FormInput
-            label={t('signUpPersonalInfo.fullName')}
-            placeholder={t('signUpPersonalInfo.fullName')}
-            autoCapitalize="words"
-            value={fullName}
-            onChangeText={setFullName}
-          />
-          <FormInput
-            label={t('signUpPersonalInfo.email')}
-            placeholder={t('signUpPersonalInfo.email')}
+            label={t('signUpPersonalInfo.emailOptional')}
+            placeholder={t('signUpPersonalInfo.emailOptional')}
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
           />
           <FormInput
-            label={t('signUpPersonalInfo.addressOptional')}
-            placeholder={t('signUpPersonalInfo.address')}
-            value={address}
-            onChangeText={setAddress}
+            label={t('signUpPersonalInfo.location')}
+            placeholder={t('signUpPersonalInfo.location')}
+            value={location}
+            onChangeText={setLocation}
           />
         </View>
       ) : null}
 
       {step === 'security' ? (
         <View style={styles.securityForm}>
-          <CodeInput
-            length={MPIN_LENGTH}
-            value={currentMpinValue}
-            onChangeValue={securityStep === 'create' ? setMpin : setConfirmMpin}
-            secure
-            autoFocus
-          />
+          <View style={styles.mpinGroup}>
+            <AppText weight="semibold" style={styles.mpinLabel}>
+              {t('signUpSecurity.createLabel')}
+            </AppText>
+            <CodeInput length={MPIN_LENGTH} value={mpin} onChangeValue={setMpin} secure autoFocus />
+          </View>
 
-          {securityStep === 'create' && biometricAvailable ? (
+          <View style={styles.mpinGroup}>
+            <AppText weight="semibold" style={styles.mpinLabel}>
+              {t('signUpSecurity.confirmLabel')}
+            </AppText>
+            <CodeInput
+              length={MPIN_LENGTH}
+              value={confirmMpin}
+              onChangeValue={setConfirmMpin}
+              secure
+              autoFocus={false}
+            />
+          </View>
+
+          {biometricAvailable ? (
             <View style={styles.biometricRow}>
               <View style={styles.biometricText}>
                 <AppText weight="bold" style={styles.biometricTitle}>
@@ -346,58 +301,19 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
 }
 
 const styles = StyleSheet.create({
-  roleList: {
-    gap: spacing.md,
-  },
-  cardShadow: {
-    borderRadius: radius.lg,
-    shadowColor: palette.gold,
-    shadowOpacity: 0.18,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 14,
-    elevation: 3,
-  },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(201, 162, 39, 0.22)',
-    backgroundColor: palette.softGold,
-  },
-  iconWrap: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: palette.gold,
-  },
-  cardText: {
-    flex: 1,
-    gap: 2,
-  },
-  cardTitle: {
-    fontSize: 16,
-    color: palette.charcoal,
-  },
-  cardDescription: {
-    fontSize: 12,
-    lineHeight: 17,
-    color: palette.muted,
-  },
-  chevronWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   form: {
     gap: spacing.md,
+  },
+  accountTypeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    backgroundColor: palette.softGold,
+    borderRadius: radius.lg,
+    padding: 4,
+  },
+  accountTypeOption: {
+    flex: 1,
+    paddingVertical: spacing.sm,
   },
   phoneInput: {
     paddingVertical: spacing.md,
@@ -410,12 +326,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: palette.muted,
   },
-  resendLink: {
-    fontSize: 13,
-    color: palette.gold,
-  },
   securityForm: {
     gap: spacing.xl,
+  },
+  mpinGroup: {
+    gap: spacing.sm,
+  },
+  mpinLabel: {
+    fontSize: 13,
+    color: palette.charcoal,
   },
   biometricRow: {
     flexDirection: 'row',

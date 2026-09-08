@@ -18,7 +18,11 @@ export function AppNavigator(): React.ReactElement {
       }}
     >
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ contentStyle: { backgroundColor: palette.gold } }}
+      />
       <Stack.Screen
         name="SignUpFlow"
         component={SignUpFlowScreen}

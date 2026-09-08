@@ -23,14 +23,6 @@
     "privacyPolicy": "سياسة الخصوصية",
     "terms": "الشروط والأحكام"
   },
-  "signUpRole": {
-    "title": "كيف ستستخدم ماين ماركت؟",
-    "subtitle": "اختر دورًا للبدء. يمكنك تغيير هذا لاحقًا من الإعدادات.",
-    "buyerTitle": "مشترٍ",
-    "buyerDescription": "تصفح واطلب المعدات والخدمات والمنتجات والذهب.",
-    "supplierTitle": "مورّد",
-    "supplierDescription": "اعرض وبِع معداتك وخدماتك ومنتجاتك وذهبك."
-  },
   "signUpPhone": {
     "title": "ما هو رقم هاتفك؟",
     "subtitle": "سنرسل لك رمز تحقق عبر رسالة نصية.",
@@ -50,17 +42,18 @@
   "signUpPersonalInfo": {
     "title": "أخبرنا عن نفسك",
     "subtitle": "يساعدنا هذا على تخصيص حسابك.",
+    "individual": "فرد",
+    "company": "شركة",
     "fullName": "الاسم الكامل",
-    "email": "البريد الإلكتروني",
-    "addressOptional": "العنوان (اختياري)",
-    "address": "العنوان"
+    "companyName": "اسم الشركة",
+    "emailOptional": "البريد الإلكتروني (اختياري)",
+    "location": "الموقع"
   },
   "signUpSecurity": {
-    "createTitle": "تعيين الرمز السري",
-    "confirmTitle": "تأكيد الرمز السري",
-    "createSubtitleTemplate": "اختر رمزًا سريًا مكوّنًا من {length} أرقام لتأمين حسابك.",
-    "confirmSubtitle": "أدخل نفس الرمز مرة أخرى للتأكيد.",
-    "continue": "متابعة",
+    "title": "تعيين الرمز السري",
+    "subtitleTemplate": "اختر رمزًا سريًا مكوّنًا من {length} أرقام لتأمين حسابك.",
+    "createLabel": "تعيين الرمز السري",
+    "confirmLabel": "تأكيد الرمز السري",
     "finish": "إنهاء",
     "biometricTitle": "تفعيل بصمة الوجه / البصمة الحيوية",
     "biometricSubtitle": "استخدم وجهك أو بصمتك لتسجيل دخول أسرع. يمكنك دائمًا استخدام الرمز السري.",
@@ -73,14 +66,29 @@
     "successMessage": "تم إعداد حسابك بنجاح."
   },
   "login": {
-    "title": "تسجيل الدخول",
-    "welcomeBack": "مرحبًا بعودتك",
-    "subtitle": "سجّل الدخول للمتابعة",
-    "email": "البريد الإلكتروني",
-    "password": "كلمة المرور",
-    "logIn": "تسجيل الدخول",
     "noAccount": "ليس لديك حساب؟",
     "signUp": "إنشاء حساب"
+  },
+  "loginPhone": {
+    "title": "مرحبًا بعودتك",
+    "subtitle": "أدخل رقم هاتفك لتسجيل الدخول.",
+    "label": "رقم الهاتف",
+    "placeholder": "555 000 0000",
+    "sendCode": "إرسال الرمز"
+  },
+  "loginOtp": {
+    "title": "أدخل رمز التحقق",
+    "subtitleTemplate": "أرسلنا رمزًا مكوّنًا من {length} أرقام إلى {phone}",
+    "verify": "تحقق",
+    "resendIn": "إعادة الإرسال خلال {seconds} ثانية",
+    "resend": "إعادة إرسال الرمز"
+  },
+  "loginMpin": {
+    "title": "أدخل الرمز السري",
+    "subtitleTemplate": "أدخل رمزك السري المكوّن من {length} أرقام للمتابعة.",
+    "logIn": "تسجيل الدخول",
+    "incorrectTitle": "رمز سري غير صحيح",
+    "incorrectMessage": "الرمز السري الذي أدخلته غير صحيح. حاول مرة أخرى."
   },
   "steps": {
     "role": "الدور",
