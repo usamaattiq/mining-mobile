@@ -199,6 +199,8 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       const result = await authApi.submitSignup({
         ...phoneIdentity,
         fullName: fullName.trim(),
+        accountType,
+        companyName: accountType === 'company' ? companyName.trim() : undefined,
         email: email.trim() || undefined,
         address: location.trim() || undefined,
         locationCoordinates: locationCoords,

@@ -5,6 +5,7 @@ export interface PhoneIdentity {
 }
 
 export type LoginOtpPurpose = 'login' | 'mpin_reset';
+export type AccountType = 'individual' | 'company';
 
 export interface UserProfileDto {
   id: string;
@@ -17,6 +18,8 @@ export interface UserProfileDto {
   latitude: number | null;
   longitude: number | null;
   avatarUrl: string | null;
+  accountType: AccountType;
+  companyName: string | null;
   biometricEnabled: boolean;
   isVerified: boolean;
   hasMpin: boolean;
@@ -35,6 +38,8 @@ export interface AuthSignupResultDto {
 
 export interface SignupSubmitPayload extends PhoneIdentity {
   fullName: string;
+  accountType: AccountType;
+  companyName?: string;
   email?: string;
   address?: string;
   locationCoordinates?: { latitude: number; longitude: number } | null;

@@ -13,6 +13,8 @@ import { palette } from '@/shared/theme/tokens';
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
 import { useAuthStore } from '@/store/authStore';
 import { useDevicePrefsStore } from '@/store/devicePrefsStore';
+import { useProfileStore } from '@/store/profileStore';
+import { authApi } from '@/features/auth/api/authApi';
 
 const BOOTSTRAP_DELAY_MS = 800;
 
@@ -31,10 +33,20 @@ export default function App() {
   const isReady = isI18nReady && isStoresReady && (fontsLoaded || Boolean(fontError));
 
   React.useEffect(() => {
-    void Promise.all([
-      useAuthStore.getState().hydrate(),
-      useDevicePrefsStore.getState().hydrate(),
-    ]).then(() => setIsStoresReady(true));
+    void Promise.all([useAuthStore.getState().hydrate(), useDevicePrefsStore.getState().hydrate()])
+      .then(async () => {
+        // A persisted token alone isn't enough to trust the session — confirm it
+        // against the server and load the profile, or drop it if it's stale/revoked.
+        if (useAuthStore.getState().status === 'authenticated') {
+          try {
+            const profile = await authApi.getMe();
+            useProfileStore.getState().setProfile(profile);
+          } catch {
+            await useAuthStore.getState().clear();
+          }
+        }
+      })
+      .then(() => setIsStoresReady(true));
   }, []);
 
   // Listens for foreground/tapped notifications for the whole app lifetime.

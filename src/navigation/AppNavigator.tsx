@@ -6,13 +6,21 @@ import { OnboardingScreen } from '@/features/shared/screens/OnboardingScreen';
 import { WelcomeScreen } from '@/features/shared/screens/WelcomeScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/shared/theme/tokens';
+import { useAuthStore } from '@/store/authStore';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator(): React.ReactElement {
+  // Computed once at mount — App.tsx already confirms/hydrates the session
+  // before this navigator ever renders, so a restored 'authenticated' status
+  // here means a verified, non-stale session.
+  const [initialRouteName] = React.useState<keyof RootStackParamList>(() =>
+    useAuthStore.getState().status === 'authenticated' ? 'Welcome' : 'Onboarding',
+  );
+
   return (
     <Stack.Navigator
-      initialRouteName="Onboarding"
+      initialRouteName={initialRouteName}
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: palette.pureWhite },
