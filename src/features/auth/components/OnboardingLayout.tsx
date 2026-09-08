@@ -38,8 +38,6 @@ export function OnboardingLayout({
   children,
 }: OnboardingLayoutProps): React.ReactElement {
   const insets = useSafeAreaInsets();
-  const footerInset = Math.max(insets.bottom, spacing.md);
-  const footerOffset = showFooter ? 56 + spacing.md + footerInset : spacing.md;
 
   return (
     <View style={styles.root}>
@@ -71,23 +69,27 @@ export function OnboardingLayout({
       <View style={styles.sheet}>
         <KeyboardAwareScrollView
           style={styles.flex}
-          contentContainerStyle={[styles.sheetContent, { paddingBottom: footerOffset }]}
+          contentContainerStyle={[
+            styles.sheetContent,
+            { paddingBottom: Math.max(insets.bottom, spacing.lg) },
+          ]}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
           bottomOffset={spacing.md}
         >
           {children}
-        </KeyboardAwareScrollView>
 
-        {showFooter ? (
-          <View pointerEvents="box-none" style={[styles.footer, { paddingBottom: footerInset }]}>
+          {showFooter ? (
             <Pressable
               disabled={!canContinue}
               onPress={onContinue}
               accessibilityRole="button"
               accessibilityLabel={continueLabel}
-              style={({ pressed }) => [styles.continuePressable, pressed && canContinue && styles.pressed]}
+              style={({ pressed }) => [
+                styles.continuePressable,
+                pressed && canContinue && styles.pressed,
+              ]}
             >
               <View style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}>
                 <AppText weight="bold" style={styles.continueLabel}>
@@ -96,8 +98,8 @@ export function OnboardingLayout({
                 <Ionicons name="arrow-forward" size={18} color={palette.pureWhite} />
               </View>
             </Pressable>
-          </View>
-        ) : null}
+          ) : null}
+        </KeyboardAwareScrollView>
       </View>
     </View>
   );
@@ -159,17 +161,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xl,
   },
-  footer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    backgroundColor: palette.pureWhite,
-  },
   continuePressable: {
     width: '100%',
+    marginTop: spacing.xl,
     borderRadius: radius.pill,
   },
   continueButton: {
