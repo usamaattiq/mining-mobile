@@ -5,7 +5,8 @@
     "done": "تم",
     "close": "إغلاق",
     "continue": "متابعة",
-    "error": "حدث خطأ ما"
+    "error": "حدث خطأ ما",
+    "stepOfTotal": "الخطوة {current} من {total}"
   },
   "language": {
     "english": "الإنجليزية",

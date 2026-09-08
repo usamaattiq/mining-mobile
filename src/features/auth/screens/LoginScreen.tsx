@@ -350,9 +350,10 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
     <OnboardingLayout
       steps={isForgotFlow ? FORGOT_MPIN_STEPS : LOGIN_STEPS}
       currentStep={STEP_INDEX[step]}
+      showProgress={false}
       title={header.title}
       subtitle={header.subtitle}
-      onBack={goToPreviousStep}
+      onBack={step === 'phone' ? goToPreviousStep : undefined}
       canContinue={canContinue && !submitting}
       continueLabel={continueLabel}
       onContinue={handleContinue}

@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
 import { OnboardingHeadline } from '@/features/auth/components/OnboardingHeadline';
 import { OnboardingProgressBar } from '@/features/auth/components/OnboardingProgressBar';
 import type { OnboardingStep } from '@/features/auth/components/OnboardingStepper';
@@ -22,6 +24,8 @@ type OnboardingLayoutProps = {
   continueLabel?: string;
   /** Hide the footer continue button (e.g. role-selection cards navigate on their own). */
   showFooter?: boolean;
+  /** Hide the "Step X of Y" label and progress bar (e.g. login, which isn't a linear wizard). */
+  showProgress?: boolean;
   children: React.ReactNode;
 };
 
@@ -35,9 +39,12 @@ export function OnboardingLayout({
   canContinue = true,
   continueLabel = 'Continue',
   showFooter = true,
+  showProgress = true,
   children,
 }: OnboardingLayoutProps): React.ReactElement {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+  const currentStepNumber = Math.min(Math.max(currentStep + 1, 1), steps.length);
 
   return (
     <View style={styles.root}>
@@ -61,7 +68,15 @@ export function OnboardingLayout({
           <LanguageSwitcher />
         </View>
 
-        <OnboardingProgressBar totalSteps={steps.length} currentStep={currentStep} />
+        {showProgress ? (
+          <>
+            <AppText weight="semibold" style={styles.stepLabel}>
+              {t('common.stepOfTotal', { current: currentStepNumber, total: steps.length })}
+            </AppText>
+
+            <OnboardingProgressBar totalSteps={steps.length} currentStep={currentStep} />
+          </>
+        ) : null}
 
         <OnboardingHeadline title={title} subtitle={subtitle} dark />
       </View>
@@ -138,6 +153,12 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.85,
+  },
+  stepLabel: {
+    marginTop: spacing.sm,
+    fontSize: 12,
+    letterSpacing: 0.3,
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   sheet: {
     flex: 1,

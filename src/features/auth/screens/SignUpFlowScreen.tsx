@@ -257,7 +257,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       currentStep={STEP_INDEX[step]}
       title={header.title}
       subtitle={header.subtitle}
-      onBack={goToPreviousStep}
+      onBack={step === 'phone' ? goToPreviousStep : undefined}
       canContinue={
         (step === 'phone'
           ? isPhoneValid

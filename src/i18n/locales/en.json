@@ -5,7 +5,8 @@
     "done": "Done",
     "close": "Close",
     "continue": "Continue",
-    "error": "Something went wrong"
+    "error": "Something went wrong",
+    "stepOfTotal": "Step {current} of {total}"
   },
   "language": {
     "english": "English",
