@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   headlineText: {
     fontSize: 30,
-    lineHeight: 36,
+    lineHeight: 40,
     color: 'rgba(255, 255, 255, 0.82)',
   },
   headlineAccent: {
