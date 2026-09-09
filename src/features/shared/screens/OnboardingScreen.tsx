@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -26,8 +26,6 @@ const mainHomeAspectRatio =
   mainHomeImageSize.width && mainHomeImageSize.height
     ? mainHomeImageSize.width / mainHomeImageSize.height
     : 1;
-const screenWidth = Dimensions.get('window').width;
-const mainHomeImageHeight = screenWidth / mainHomeAspectRatio;
 
 // Screen-local shades not part of the shared palette (background tint, muted
 // text, icon tile) — the gold/charcoal accents below all come from `palette`
@@ -43,6 +41,8 @@ const colors = {
 
 export function OnboardingScreen({ navigation }: Props): React.ReactElement {
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
+  const mainHomeImageHeight = screenWidth / mainHomeAspectRatio;
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [legalDoc, setLegalDoc] = React.useState<LegalDocumentKind | null>(null);
 

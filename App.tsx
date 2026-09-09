@@ -1,7 +1,6 @@
 import React from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { StyleSheet, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -77,8 +76,8 @@ export default function App() {
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <StatusBar style="light" />
-      <KeyboardProvider>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <KeyboardProvider statusBarTranslucent>
         <View style={styles.root}>
           <NavigationContainer ref={navigationRef} theme={navigationTheme}>
             <AppNavigator />

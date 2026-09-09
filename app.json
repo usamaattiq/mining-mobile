@@ -18,7 +18,6 @@
     "android": {
       "package": "com.silveraxis.mining",
       "versionCode": 1,
-      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#222222"
@@ -41,6 +40,6 @@
         "projectId": "6a8a7e38-8bcf-4186-91b8-6f503fdfb691"
       }
     },
-    "plugins": ["expo-navigation-bar"]
+    "plugins": ["expo-navigation-bar", "react-native-edge-to-edge"]
   }
 }
