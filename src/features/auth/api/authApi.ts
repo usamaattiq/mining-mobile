@@ -22,6 +22,10 @@ export const authApi = {
     return apiFetch('/auth/signup/submit', { method: 'POST', body: payload });
   },
 
+  checkSignupEmailAvailable(email: string): Promise<{ available: boolean }> {
+    return apiFetch('/auth/signup/email/check', { method: 'POST', body: { email } });
+  },
+
   sendLoginOtp(
     phone: PhoneIdentity,
     purpose: LoginOtpPurpose = 'login',

@@ -52,6 +52,7 @@
     "fullName": "الاسم الكامل",
     "companyName": "اسم الشركة",
     "emailOptional": "البريد الإلكتروني (اختياري)",
+    "emailAlreadyExists": "هذا البريد الإلكتروني مستخدم بالفعل",
     "location": "الموقع",
     "locationPlaceholder": "لم يتم اختيار موقع بعد",
     "addressLinePlaceholder": "الشارع، المبنى، المنطقة",

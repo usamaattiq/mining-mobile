@@ -83,6 +83,8 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const [fullName, setFullName] = React.useState('');
   const [companyName, setCompanyName] = React.useState('');
   const [email, setEmail] = React.useState('');
+  const [emailError, setEmailError] = React.useState<string | null>(null);
+  const [checkingEmail, setCheckingEmail] = React.useState(false);
   const [location, setLocation] = React.useState('');
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
@@ -112,6 +114,38 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearTimeout(timer);
   }, [step, secondsLeft]);
+
+  React.useEffect(() => {
+    if (step !== 'personal') return;
+    const trimmed = email.trim();
+    if (trimmed.length === 0 || !EMAIL_REGEX.test(trimmed)) {
+      setEmailError(null);
+      setCheckingEmail(false);
+      return;
+    }
+
+    setCheckingEmail(true);
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      authApi
+        .checkSignupEmailAvailable(trimmed)
+        .then(({ available }) => {
+          if (cancelled) return;
+          setEmailError(available ? null : t('signUpPersonalInfo.emailAlreadyExists'));
+        })
+        .catch(() => {
+          if (!cancelled) setEmailError(null);
+        })
+        .finally(() => {
+          if (!cancelled) setCheckingEmail(false);
+        });
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [step, email, t]);
 
   React.useEffect(() => {
     if (step !== 'security') return;
@@ -244,6 +278,11 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       await setDeviceBiometricEnabled(biometricEnabled);
       navigation.replace('Welcome');
     } catch (error) {
+      if (error instanceof ApiError && error.status === 409 && /email/i.test(error.message)) {
+        setEmailError(t('signUpPersonalInfo.emailAlreadyExists'));
+        goToStep('personal');
+        return;
+      }
       Alert.alert(t('common.error'), errorMessage(error, t('signUpSecurity.mismatchMessage')));
     } finally {
       setSubmitting(false);
@@ -256,7 +295,9 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     fullName.trim().length > 1 &&
     (accountType === 'individual' || companyName.trim().length > 1) &&
     location.trim().length > 1 &&
-    (email.trim().length === 0 || EMAIL_REGEX.test(email.trim()));
+    (email.trim().length === 0 || EMAIL_REGEX.test(email.trim())) &&
+    !emailError &&
+    !checkingEmail;
   const isMpinComplete = mpin.length === MPIN_LENGTH && confirmMpin.length === MPIN_LENGTH;
 
   const header =
@@ -406,10 +447,14 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           <FormInput
             label={t('signUpPersonalInfo.emailOptional')}
             placeholder={t('signUpPersonalInfo.emailOptional')}
+            error={emailError ?? undefined}
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text);
+              setEmailError(null);
+            }}
           />
           <SignupLocationField
             label={t('signUpPersonalInfo.location')}

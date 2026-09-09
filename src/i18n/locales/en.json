@@ -52,6 +52,7 @@
     "fullName": "Full name",
     "companyName": "Company name",
     "emailOptional": "Email (optional)",
+    "emailAlreadyExists": "This email already exists",
     "location": "Location",
     "locationPlaceholder": "No location selected yet",
     "addressLinePlaceholder": "Street, building, area",
