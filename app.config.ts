@@ -3,13 +3,11 @@ import appJson from './app.json';
 
 const baseExpo = appJson.expo as ExpoConfig;
 
-const legacyMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
-const androidMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID?.trim() || legacyMapsKey;
-const iosMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS?.trim() || legacyMapsKey;
+const googleMapsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? '';
 
-if (process.env.NODE_ENV === 'production' && !androidMapsKey && !iosMapsKey) {
+if (process.env.NODE_ENV === 'production' && !googleMapsApiKey) {
   console.warn(
-    '[app.config] Google Maps API keys are missing — set EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID and EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS on EAS.',
+    '[app.config] Google Maps API key is missing — set EXPO_PUBLIC_GOOGLE_MAPS_API_KEY on EAS.',
   );
 }
 
@@ -69,7 +67,7 @@ const config: ExpoConfig = {
     ],
     config: {
       ...baseExpo.android?.config,
-      googleMaps: { apiKey: androidMapsKey },
+      googleMaps: { apiKey: googleMapsApiKey },
     },
   },
   ios: {
@@ -81,7 +79,7 @@ const config: ExpoConfig = {
     },
     config: {
       ...baseExpo.ios?.config,
-      googleMapsApiKey: iosMapsKey,
+      googleMapsApiKey,
     },
   },
 };

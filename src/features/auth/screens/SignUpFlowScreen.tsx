@@ -94,11 +94,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const [biometricEnabled, setBiometricEnabled] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
-    useLocationMapPicker(
-      phoneDigits.trim()
-        ? { dialCode: country.dialCode.replace(/^\+/, ''), phoneNumber: phoneDigits.trim() }
-        : undefined,
-    );
+    useLocationMapPicker();
 
   const phoneIdentity = {
     countryCallingCode: country.dialCode.replace(/^\+/, ''),

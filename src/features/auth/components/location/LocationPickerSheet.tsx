@@ -1,6 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import MapView, { PROVIDER_GOOGLE, type Region } from 'react-native-maps';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -8,16 +8,15 @@ import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { palette, radius, spacing } from '@/shared/theme/tokens';
-import { hasGoogleMapsApiKey } from '@/shared/config/env';
+import { googleMapsJsApiKey, hasGoogleMapsApiKey } from '@/shared/config/env';
 import { resolveAddressLabel } from '@/shared/services/geocodedAddressLabel';
 import { ensureLocationPermission } from '@/shared/services/locationPermission';
 import { readDeviceCoordinates } from '@/shared/services/readDeviceCoordinates';
+import { buildLocationMapPickerHtml } from '@/features/auth/utils/location-map-picker-html';
 import {
-  createPlacesSessionToken,
-  locationsApi,
-  type CallerIdentity,
-  type PlacePrediction,
-} from '@/shared/services/locationsApi';
+  searchMapLocations,
+  type MapSearchResult,
+} from '@/features/auth/utils/location-map-geocode';
 
 export interface LocationSelection {
   label: string;
@@ -30,15 +29,11 @@ type LocationPickerSheetProps = {
   initial: { latitude: number; longitude: number } | null;
   onCancel: () => void;
   onConfirm: (selection: LocationSelection) => void;
-  /** Lets /locations/* authenticate an unauthenticated (pre-account) sign-up caller. */
-  caller?: CallerIdentity;
 };
 
-const DEFAULT_REGION: Region = {
+const DEFAULT_CENTER = {
   latitude: 33.6844,
   longitude: 73.0479,
-  latitudeDelta: 0.05,
-  longitudeDelta: 0.05,
 };
 
 export function LocationPickerSheet({
@@ -46,11 +41,9 @@ export function LocationPickerSheet({
   initial,
   onCancel,
   onConfirm,
-  caller,
 }: LocationPickerSheetProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
-  const mapRef = React.useRef<MapView>(null);
-  const sessionTokenRef = React.useRef(createPlacesSessionToken());
+  const mapWebViewRef = React.useRef<WebView>(null);
   const skipSearchRef = React.useRef(false);
 
   const [pin, setPin] = React.useState<{
@@ -61,18 +54,24 @@ export function LocationPickerSheet({
   const [resolving, setResolving] = React.useState(false);
   const [locating, setLocating] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [searchResults, setSearchResults] = React.useState<PlacePrediction[]>([]);
+  const [searchResults, setSearchResults] = React.useState<MapSearchResult[]>([]);
   const [searchLoading, setSearchLoading] = React.useState(false);
   const [searchShowEmpty, setSearchShowEmpty] = React.useState(false);
   const [mapInstanceKey, setMapInstanceKey] = React.useState(0);
 
+  const mapCenter = initial ?? DEFAULT_CENTER;
+
+  const mapPickerHtml = React.useMemo(() => {
+    if (!hasGoogleMapsApiKey()) return '';
+    return buildLocationMapPickerHtml(googleMapsJsApiKey, mapCenter);
+    // HTML is rebuilt when the WebView remounts (mapInstanceKey); center is captured then.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
+  }, [mapInstanceKey]);
+
   React.useEffect(() => {
     if (!visible) return;
-    // Force a fresh MapView mount each time the sheet opens — on Android, reusing a MapView
-    // that first mounted while the sheet was still animating in (zero/undefined size) leaves
-    // its SurfaceView stuck black even after the sheet reaches full size.
+    // Fresh WebView each open — sizing inside the bottom sheet is unreliable if reused.
     setMapInstanceKey((key) => key + 1);
-    sessionTokenRef.current = createPlacesSessionToken();
     setPin(initial ? { ...initial, label: '' } : null);
     setSearchQuery('');
     setSearchResults([]);
@@ -80,17 +79,39 @@ export function LocationPickerSheet({
     setSearchShowEmpty(false);
   }, [visible, initial]);
 
-  const resolveForRegion = React.useCallback(async (region: Region) => {
+  const panMapTo = React.useCallback((latitude: number, longitude: number) => {
+    mapWebViewRef.current?.injectJavaScript(
+      `window.__MINING_SET_LOCATION && window.__MINING_SET_LOCATION(${latitude}, ${longitude}); true;`,
+    );
+  }, []);
+
+  const resolveForCoords = React.useCallback(async (latitude: number, longitude: number) => {
     setResolving(true);
     try {
-      const label = await resolveAddressLabel(region.latitude, region.longitude);
-      setPin({ latitude: region.latitude, longitude: region.longitude, label });
+      const label = await resolveAddressLabel(latitude, longitude);
+      setPin({ latitude, longitude, label });
     } catch {
-      setPin({ latitude: region.latitude, longitude: region.longitude, label: '' });
+      setPin({ latitude, longitude, label: '' });
     } finally {
       setResolving(false);
     }
   }, []);
+
+  const handleMapMessage = React.useCallback(
+    (event: { nativeEvent: { data: string } }) => {
+      try {
+        const payload = JSON.parse(event.nativeEvent.data) as {
+          latitude?: number;
+          longitude?: number;
+        };
+        if (typeof payload.latitude !== 'number' || typeof payload.longitude !== 'number') return;
+        void resolveForCoords(payload.latitude, payload.longitude);
+      } catch {
+        // Ignore malformed WebView messages.
+      }
+    },
+    [resolveForCoords],
+  );
 
   const handleUseMyLocation = async () => {
     setLocating(true);
@@ -99,11 +120,7 @@ export function LocationPickerSheet({
       if (!granted) return;
 
       const coords = await readDeviceCoordinates();
-      mapRef.current?.animateToRegion(
-        { ...coords, latitudeDelta: 0.01, longitudeDelta: 0.01 },
-        400,
-      );
-      await resolveForRegion({ ...coords, latitudeDelta: 0.01, longitudeDelta: 0.01 });
+      panMapTo(coords.latitude, coords.longitude);
     } catch {
       // Silently ignore — user can still pan the map manually.
     } finally {
@@ -111,36 +128,16 @@ export function LocationPickerSheet({
     }
   };
 
-  const handleSelectSearchResult = async (result: PlacePrediction) => {
+  const handleSelectSearchResult = (result: MapSearchResult) => {
     skipSearchRef.current = true;
-    setSearchQuery(result.description);
+    setSearchQuery(result.label);
     setSearchResults([]);
-
-    try {
-      const resolved = await locationsApi.placeDetails(
-        result.placeId,
-        sessionTokenRef.current,
-        caller,
-      );
-      if (!resolved) return;
-      sessionTokenRef.current = createPlacesSessionToken();
-      setPin({
-        latitude: resolved.latitude,
-        longitude: resolved.longitude,
-        label: resolved.address,
-      });
-      mapRef.current?.animateToRegion(
-        {
-          latitude: resolved.latitude,
-          longitude: resolved.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        400,
-      );
-    } catch {
-      // Leave the map as-is — user can still pan manually.
-    }
+    setPin({
+      latitude: result.latitude,
+      longitude: result.longitude,
+      label: result.label,
+    });
+    panMapTo(result.latitude, result.longitude);
   };
 
   React.useEffect(() => {
@@ -157,11 +154,16 @@ export function LocationPickerSheet({
       return;
     }
 
+    if (!googleMapsJsApiKey) {
+      setSearchResults([]);
+      setSearchShowEmpty(true);
+      return;
+    }
+
     setSearchLoading(true);
     setSearchShowEmpty(false);
     const id = setTimeout(() => {
-      void locationsApi
-        .autocomplete(query, sessionTokenRef.current, caller)
+      void searchMapLocations(query, googleMapsJsApiKey)
         .then((results) => {
           setSearchResults(results);
           setSearchShowEmpty(results.length === 0);
@@ -174,16 +176,12 @@ export function LocationPickerSheet({
     }, 400);
 
     return () => clearTimeout(id);
-  }, [searchQuery, visible, caller]);
+  }, [searchQuery, visible]);
 
   const handleConfirm = () => {
     if (!pin) return;
     onConfirm({ latitude: pin.latitude, longitude: pin.longitude, label: pin.label });
   };
-
-  const initialRegion: Region = initial
-    ? { ...initial, latitudeDelta: 0.01, longitudeDelta: 0.01 }
-    : DEFAULT_REGION;
 
   return (
     <AppBottomSheet
@@ -222,20 +220,20 @@ export function LocationPickerSheet({
             <View style={styles.searchResults}>
               {searchResults.map((result, index) => (
                 <Pressable
-                  key={result.placeId}
+                  key={result.id}
                   style={({ pressed }) => [
                     styles.searchResultRow,
                     index === searchResults.length - 1 && styles.searchResultRowLast,
                     pressed && styles.searchResultRowPressed,
                   ]}
-                  onPress={() => void handleSelectSearchResult(result)}
+                  onPress={() => handleSelectSearchResult(result)}
                   accessibilityRole="button"
                 >
                   <View style={styles.resultIconWrap}>
                     <Ionicons name="location" size={12} color={palette.gold} />
                   </View>
                   <AppText style={styles.searchResultText} numberOfLines={2}>
-                    {result.description}
+                    {result.label}
                   </AppText>
                 </Pressable>
               ))}
@@ -254,18 +252,17 @@ export function LocationPickerSheet({
 
       {hasGoogleMapsApiKey() ? (
         <View style={styles.mapContainer}>
-          <MapView
+          <WebView
             key={mapInstanceKey}
-            ref={mapRef}
+            ref={mapWebViewRef}
             style={StyleSheet.absoluteFill}
-            provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-            initialRegion={initialRegion}
-            onRegionChangeComplete={(region) => void resolveForRegion(region)}
+            originWhitelist={['*']}
+            source={{ html: mapPickerHtml }}
+            onMessage={handleMapMessage}
+            javaScriptEnabled
+            domStorageEnabled
+            setSupportMultipleWindows={false}
           />
-          <View pointerEvents="none" style={styles.pinWrap}>
-            <Ionicons name="location" size={40} color={palette.gold} />
-            <View style={styles.pinShadow} />
-          </View>
 
           {resolving ? (
             <View style={styles.resolvingBadge}>
@@ -409,21 +406,6 @@ const styles = StyleSheet.create({
   mapContainer: {
     flex: 1,
     overflow: 'hidden',
-  },
-  pinWrap: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginLeft: -20,
-    marginTop: -40,
-    alignItems: 'center',
-  },
-  pinShadow: {
-    width: 10,
-    height: 4,
-    borderRadius: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    marginTop: -2,
   },
   resolvingBadge: {
     position: 'absolute',

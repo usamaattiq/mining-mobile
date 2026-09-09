@@ -10,10 +10,9 @@ export const env = {
   s3PublicBaseUrl: process.env.EXPO_PUBLIC_S3_PUBLIC_BASE_URL,
 };
 
-const legacyMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
-const androidMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID?.trim() || legacyMapsKey;
-const iosMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS?.trim() || legacyMapsKey;
+/** Single client Maps key (WebView Maps JS + Geocoding search). */
+export const googleMapsJsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? '';
 
 export function hasGoogleMapsApiKey(): boolean {
-  return Boolean(androidMapsKey || iosMapsKey);
+  return Boolean(googleMapsJsApiKey);
 }

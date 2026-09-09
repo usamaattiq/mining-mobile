@@ -43,11 +43,7 @@ loadDotEnv();
 const eas = require(path.join(__dirname, '..', 'eas.json'));
 const env = { ...(eas.build?.[environment]?.env ?? {}) };
 
-for (const name of [
-  'EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID',
-  'EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS',
-  'EXPO_PUBLIC_GOOGLE_MAPS_API_KEY',
-]) {
+for (const name of ['EXPO_PUBLIC_GOOGLE_MAPS_API_KEY']) {
   const value = process.env[name]?.trim();
   if (value) env[name] = value;
 }
@@ -58,9 +54,9 @@ if (entries.length === 0) {
   process.exit(1);
 }
 
-if (!env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID && !env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS) {
+if (!env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY) {
   console.warn(
-    'Warning: platform Maps keys not set in process env or .env — Android/iOS Maps keys will not be updated on EAS.',
+    'Warning: EXPO_PUBLIC_GOOGLE_MAPS_API_KEY not set in process env or .env — Maps key will not be updated on EAS.',
   );
 }
 
