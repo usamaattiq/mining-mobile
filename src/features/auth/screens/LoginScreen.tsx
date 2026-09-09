@@ -349,7 +349,9 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       showProgress={false}
       title={header.title}
       subtitle={header.subtitle}
-      onBack={step === 'phone' || step === 'otp' || step === 'forgotOtp' ? goToPreviousStep : undefined}
+      onBack={
+        step === 'phone' || step === 'otp' || step === 'forgotOtp' ? goToPreviousStep : undefined
+      }
       canContinue={canContinue && !submitting}
       continueLabel={continueLabel}
       onContinue={handleContinue}
