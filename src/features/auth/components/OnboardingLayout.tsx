@@ -68,6 +68,8 @@ export function OnboardingLayout({
           <LanguageSwitcher />
         </View>
 
+        <OnboardingHeadline title={title} subtitle={subtitle} dark />
+
         {showProgress ? (
           <>
             <AppText weight="semibold" style={styles.stepLabel}>
@@ -77,8 +79,6 @@ export function OnboardingLayout({
             <OnboardingProgressBar totalSteps={steps.length} currentStep={currentStep} />
           </>
         ) : null}
-
-        <OnboardingHeadline title={title} subtitle={subtitle} dark />
       </View>
 
       <View style={styles.sheet}>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   stepLabel: {
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
     fontSize: 12,
     letterSpacing: 0.3,
     color: 'rgba(255, 255, 255, 0.85)',
