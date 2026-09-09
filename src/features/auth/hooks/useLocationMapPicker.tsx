@@ -6,11 +6,10 @@ import {
 import { resolveAddressLabel } from '@/shared/services/geocodedAddressLabel';
 import { ensureLocationPermission } from '@/shared/services/locationPermission';
 import { readDeviceCoordinates } from '@/shared/services/readDeviceCoordinates';
-import type { CallerIdentity } from '@/shared/services/locationsApi';
 
 export type { LocationSelection };
 
-export function useLocationMapPicker(caller?: CallerIdentity): {
+export function useLocationMapPicker(): {
   locationLoading: boolean;
   getCurrentLocation: () => Promise<LocationSelection | null>;
   openMapPickerForSelection: (
@@ -72,7 +71,6 @@ export function useLocationMapPicker(caller?: CallerIdentity): {
       initial={sheetInitial}
       onCancel={handleCancel}
       onConfirm={handleConfirm}
-      caller={caller}
     />
   );
 
