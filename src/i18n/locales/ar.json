@@ -107,6 +107,7 @@
     "incorrectTitle": "رمز سري غير صحيح",
     "incorrectMessage": "الرمز السري الذي أدخلته غير صحيح. حاول مرة أخرى.",
     "loginFailed": "تعذّر تسجيل الدخول. حاول مرة أخرى.",
+    "loggingInAs": "تسجيل الدخول باسم",
     "forgotMpin": "هل نسيت الرمز السري؟",
     "useDifferentAccount": "استخدام حساب مختلف",
     "biometricPrompt": "سجّل الدخول إلى حسابك",

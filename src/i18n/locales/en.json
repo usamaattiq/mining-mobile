@@ -107,6 +107,7 @@
     "incorrectTitle": "Incorrect MPIN",
     "incorrectMessage": "The MPIN you entered is incorrect. Please try again.",
     "loginFailed": "We couldn't log you in. Please try again.",
+    "loggingInAs": "Logging in as",
     "forgotMpin": "Forgot MPIN?",
     "useDifferentAccount": "Use a different account",
     "biometricPrompt": "Log in to your account",

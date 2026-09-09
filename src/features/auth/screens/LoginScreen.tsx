@@ -7,7 +7,6 @@ import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { FORGOT_MPIN_STEPS, LOGIN_STEPS } from '@/features/auth/constants/onboardingSteps';
 import { authApi } from '@/features/auth/api/authApi';
 import { useBiometricLogin } from '@/features/auth/hooks/useBiometricLogin';
-import { useDeviceBiometric } from '@/shared/hooks/useDeviceBiometric';
 import type { RootStackParamList } from '@/navigation/types';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { useAuthStore } from '@/store/authStore';
@@ -64,7 +63,6 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
   const clearCachedMpin = useDevicePrefsStore((s) => s.clearCachedMpin);
   const setCachedMpin = useDevicePrefsStore((s) => s.setCachedMpin);
   const setDeviceBiometricEnabled = useDevicePrefsStore((s) => s.setBiometricEnabled);
-  const { kind: biometricKind } = useDeviceBiometric();
 
   const lastPhone = useDevicePrefsStore.getState().lastPhone;
   const lastPhoneCountry = lastPhone ? countryByIso2(lastPhone.countryCode) : undefined;
@@ -99,12 +97,10 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       phoneDigits: phoneDigits.trim(),
     });
 
-  const { available: biometricLoginAvailable, promptNow: promptBiometricLogin } = useBiometricLogin(
-    {
-      enabled: step === 'mpin' && isReturningDeviceRef.current,
-      onAutoSubmit: (cachedMpin) => void handleLogIn(cachedMpin),
-    },
-  );
+  useBiometricLogin({
+    enabled: step === 'mpin' && isReturningDeviceRef.current,
+    onAutoSubmit: (cachedMpin) => void handleLogIn(cachedMpin),
+  });
 
   React.useEffect(() => {
     if ((step !== 'otp' && step !== 'forgotOtp') || secondsLeft <= 0) return;
@@ -398,19 +394,11 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       {step === 'mpin' ? (
         <View style={styles.form}>
           {isReturningDeviceRef.current ? (
-            <AppText style={styles.returningPhone}>{phone}</AppText>
+            <AppText style={styles.returningPhone}>
+              {t('loginMpin.loggingInAs')} {phone}
+            </AppText>
           ) : null}
           <CodeInput length={MPIN_LENGTH} value={mpin} onChangeValue={setMpin} secure autoFocus />
-          {biometricLoginAvailable ? (
-            <Button
-              label={
-                biometricKind === 'face' ? t('loginMpin.useFaceId') : t('loginMpin.useFingerprint')
-              }
-              variant="outline"
-              icon={biometricKind === 'face' ? 'scan-outline' : 'finger-print-outline'}
-              onPress={promptBiometricLogin}
-            />
-          ) : null}
           <Button
             label={t('loginMpin.forgotMpin')}
             variant="link"
