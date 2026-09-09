@@ -124,7 +124,11 @@ export function LocationPickerSheet({
       );
       if (!resolved) return;
       sessionTokenRef.current = createPlacesSessionToken();
-      setPin({ latitude: resolved.latitude, longitude: resolved.longitude, label: resolved.address });
+      setPin({
+        latitude: resolved.latitude,
+        longitude: resolved.longitude,
+        label: resolved.address,
+      });
       mapRef.current?.animateToRegion(
         {
           latitude: resolved.latitude,
@@ -182,7 +186,12 @@ export function LocationPickerSheet({
     : DEFAULT_REGION;
 
   return (
-    <AppBottomSheet visible={visible} onClose={onCancel} heightRatio={0.85} sheetStyle={styles.sheet}>
+    <AppBottomSheet
+      visible={visible}
+      onClose={onCancel}
+      heightRatio={0.85}
+      sheetStyle={styles.sheet}
+    >
       <View style={styles.grabber} />
 
       <View style={styles.header}>
@@ -278,9 +287,7 @@ export function LocationPickerSheet({
         </View>
       ) : (
         <View style={styles.unavailable}>
-          <AppText style={styles.unavailableText}>
-            {t('signUpPersonalInfo.mapUnavailable')}
-          </AppText>
+          <AppText style={styles.unavailableText}>{t('signUpPersonalInfo.mapUnavailable')}</AppText>
         </View>
       )}
 

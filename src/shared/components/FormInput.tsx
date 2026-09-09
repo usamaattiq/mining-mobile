@@ -38,9 +38,7 @@ export function FormInput({
           {...rest}
         />
       </View>
-      {error ? (
-        <AppText style={styles.error}>{error}</AppText>
-      ) : null}
+      {error ? <AppText style={styles.error}>{error}</AppText> : null}
     </View>
   );
 }

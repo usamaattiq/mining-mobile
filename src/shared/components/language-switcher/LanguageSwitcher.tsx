@@ -27,7 +27,10 @@ export function LanguageSwitcher(): React.ReactElement {
 
   return (
     <>
-      <LanguageSwitcherTrigger language={selectedLanguage} onPress={() => setIsModalVisible(true)} />
+      <LanguageSwitcherTrigger
+        language={selectedLanguage}
+        onPress={() => setIsModalVisible(true)}
+      />
       <LanguageSwitcherModal
         visible={isModalVisible}
         currentLanguage={currentLanguage}

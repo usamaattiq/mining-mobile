@@ -62,12 +62,7 @@ function BottomSheetFrame({
   const lastWidthRef = React.useRef(width);
   const clampedRatio = Math.min(0.95, Math.max(0.22, heightRatio));
   const fallbackBottom = initialWindowMetrics?.insets.bottom ?? 0;
-  const closedPaddingBottom = Math.max(
-    insets.bottom,
-    fallbackBottom,
-    MIN_BOTTOM_INSET,
-    spacing.sm,
-  );
+  const closedPaddingBottom = Math.max(insets.bottom, fallbackBottom, MIN_BOTTOM_INSET, spacing.sm);
   const topReserve = Math.max(insets.top, spacing.md);
 
   React.useEffect(() => {
@@ -117,7 +112,10 @@ function BottomSheetFrame({
     const fullH = layoutHeight.value;
     // Shrink the sheet into the remaining space so the inner content keeps
     // a real height and can scroll; do not let the sheet overflow under the IME.
-    const maxHeight = Math.min(fullH * clampedRatio, Math.max(fullH - lift - topReserve, fullH * 0.32));
+    const maxHeight = Math.min(
+      fullH * clampedRatio,
+      Math.max(fullH - lift - topReserve, fullH * 0.32),
+    );
     return {
       marginBottom: lift,
       height: maxHeight,

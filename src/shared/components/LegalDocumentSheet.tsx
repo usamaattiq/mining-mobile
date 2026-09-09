@@ -26,7 +26,12 @@ export function LegalDocumentSheet({
   const document = legalDocuments[currentLanguage][doc ?? 'privacy'];
 
   return (
-    <Modal visible={visible && doc !== null} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible && doc !== null}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <Pressable style={styles.backdrop} onPress={onClose} />
       <View style={[styles.sheet, { height: sheetHeight }]}>
         <View style={styles.handle} />

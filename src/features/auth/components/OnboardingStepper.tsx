@@ -34,10 +34,7 @@ export function OnboardingStepper({
 
   return (
     <View style={styles.root}>
-      <View
-        style={styles.trackWrap}
-        onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
-      >
+      <View style={styles.trackWrap} onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}>
         <View style={styles.track} />
         <Animated.View
           style={[
@@ -59,11 +56,7 @@ export function OnboardingStepper({
             return (
               <View
                 key={step.key}
-                style={[
-                  styles.dot,
-                  filled && styles.dotFilled,
-                  isActive && styles.dotActive,
-                ]}
+                style={[styles.dot, filled && styles.dotFilled, isActive && styles.dotActive]}
               >
                 {isCompleted ? (
                   <Ionicons name="checkmark" size={14} color={palette.pureWhite} />

@@ -65,9 +65,7 @@ export function AvatarPicker({
           <Ionicons name="camera-outline" size={28} color={palette.muted} />
         )}
       </TouchableOpacity>
-      {error ? (
-        <AppText style={styles.error}>{error}</AppText>
-      ) : null}
+      {error ? <AppText style={styles.error}>{error}</AppText> : null}
     </View>
   );
 }

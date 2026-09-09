@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import type * as ExpoNotifications from 'expo-notifications';
 import { apiFetch } from '@/shared/services/api';
 
 // Explicit projectId is required for getExpoPushTokenAsync in EAS builds —
@@ -14,7 +15,7 @@ const EAS_PROJECT_ID = Constants.expoConfig?.extra?.eas?.projectId;
 // and only when not running in Expo Go.
 export const isPushAvailable = Constants.appOwnership !== 'expo';
 
-type NotificationsModule = typeof import('expo-notifications');
+type NotificationsModule = typeof ExpoNotifications;
 
 let notificationsModulePromise: Promise<NotificationsModule> | null = null;
 
