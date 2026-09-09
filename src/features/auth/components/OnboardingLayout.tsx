@@ -7,7 +7,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { OnboardingHeadline } from '@/features/auth/components/OnboardingHeadline';
-import { OnboardingProgressBar } from '@/features/auth/components/OnboardingProgressBar';
 import type { OnboardingStep } from '@/features/auth/components/OnboardingStepper';
 import { AppText } from '@/shared/components/AppText';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
@@ -71,13 +70,9 @@ export function OnboardingLayout({
         <OnboardingHeadline title={title} subtitle={subtitle} dark />
 
         {showProgress ? (
-          <>
-            <AppText weight="semibold" style={styles.stepLabel}>
-              {t('common.stepOfTotal', { current: currentStepNumber, total: steps.length })}
-            </AppText>
-
-            <OnboardingProgressBar totalSteps={steps.length} currentStep={currentStep} />
-          </>
+          <AppText weight="semibold" style={styles.stepLabel}>
+            {t('common.stepOfTotal', { current: currentStepNumber, total: steps.length })}
+          </AppText>
         ) : null}
       </View>
 

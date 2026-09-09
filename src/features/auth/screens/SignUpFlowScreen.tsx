@@ -441,7 +441,8 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               value={confirmMpin}
               onChangeValue={setConfirmMpin}
               secure
-              autoFocus={false}
+              autoFocus={mpin.length === MPIN_LENGTH}
+              disabled={mpin.length < MPIN_LENGTH}
             />
           </View>
 
