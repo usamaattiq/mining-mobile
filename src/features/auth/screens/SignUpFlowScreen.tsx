@@ -72,6 +72,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const [step, setStep] = React.useState<SignUpStep>('phone');
   const [country, setCountry] = React.useState<Country>(defaultCountry);
   const [phoneDigits, setPhoneDigits] = React.useState('');
+  const [phoneError, setPhoneError] = React.useState<string | null>(null);
   const [otp, setOtp] = React.useState('');
   const [secondsLeft, setSecondsLeft] = React.useState(RESEND_SECONDS);
   const [accountType, setAccountType] = React.useState<AccountType>('individual');
@@ -160,13 +161,14 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
 
   const handleSendSignupOtp = async () => {
     setSubmitting(true);
+    setPhoneError(null);
     try {
       await authApi.sendSignupOtp(phoneIdentity);
       setOtp('');
       setSecondsLeft(RESEND_SECONDS);
       goToStep('otp');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('signUpPhone.sendFailed')));
+      setPhoneError(errorMessage(error, t('signUpPhone.sendFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -315,14 +317,24 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           <FormInput
             label={t('signUpPhone.label')}
             required
+            error={phoneError ?? undefined}
             placeholder={placeholderForDigitLength(country.phoneDigitLength)}
             keyboardType="phone-pad"
             autoFocus
             value={formatPhoneDisplay(phoneDigits)}
-            onChangeText={(text) =>
-              setPhoneDigits(sanitizePhoneDigits(text, country.phoneDigitLength))
+            onChangeText={(text) => {
+              setPhoneDigits(sanitizePhoneDigits(text, country.phoneDigitLength));
+              setPhoneError(null);
+            }}
+            leftAdornment={
+              <CountryPicker
+                value={country}
+                onChange={(next) => {
+                  setCountry(next);
+                  setPhoneError(null);
+                }}
+              />
             }
-            leftAdornment={<CountryPicker value={country} onChange={setCountry} />}
             style={[styles.phoneInput, { fontFamily: getFontFamily(currentLanguage, 'regular') }]}
           />
         </View>

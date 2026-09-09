@@ -26,8 +26,8 @@
     "terms": "Terms & Conditions"
   },
   "signUpPhone": {
-    "title": "What's your number?",
-    "subtitle": "We'll send you a verification code by SMS.",
+    "title": "Enter Number",
+    "subtitle": "We'll send you a verification code by WhatsApp.",
     "label": "Phone number",
     "placeholder": "555 000 0000",
     "sendCode": "Send code",
