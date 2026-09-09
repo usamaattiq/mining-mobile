@@ -72,13 +72,10 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
             <View style={styles.logoMark}>
               <MaterialCommunityIcons name="triangle-outline" size={22} color={colors.gold} />
             </View>
-            <View>
-              <Text style={styles.brand}>
-                <Text style={styles.brandMine}>Da</Text>
-                <Text style={styles.brandMarket}>habi</Text>
-              </Text>
-              {/* <AppText style={styles.tagline}>{t('onboarding.tagline')}</AppText> */}
-            </View>
+            <Text style={styles.brand}>
+              <Text style={styles.brandMine}>Da</Text>
+              <Text style={styles.brandMarket}>habi</Text>
+            </Text>
           </View>
           <LanguageSwitcher />
         </View>
@@ -186,6 +183,7 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 20,
+    lineHeight: 30,
   },
   brandMine: {
     fontFamily: BRAND_FONT_BOLD,
