@@ -3,9 +3,9 @@ import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
-import { SplashScreen } from '@/shared/components/SplashScreen';
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { navigationRef } from '@/navigation/navigationRef';
 import { initializeI18n } from '@/i18n';
@@ -17,7 +17,7 @@ import { useDevicePrefsStore } from '@/store/devicePrefsStore';
 import { useProfileStore } from '@/store/profileStore';
 import { authApi } from '@/features/auth/api/authApi';
 
-const BOOTSTRAP_DELAY_MS = 800;
+void SplashScreen.preventAutoHideAsync();
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -57,32 +57,28 @@ export default function App() {
 
   React.useEffect(() => {
     let cancelled = false;
-    const timer = setTimeout(() => {
-      void initializeI18n().then(() => {
-        if (!cancelled) setIsI18nReady(true);
-      });
-    }, BOOTSTRAP_DELAY_MS);
+    void initializeI18n().then(() => {
+      if (!cancelled) setIsI18nReady(true);
+    });
     return () => {
       cancelled = true;
-      clearTimeout(timer);
     };
   }, []);
 
+  React.useEffect(() => {
+    if (isReady) {
+      void SplashScreen.hideAsync();
+    }
+  }, [isReady]);
+
   if (!isReady) {
-    return (
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <KeyboardProvider>
-          <SplashScreen showLoader />
-        </KeyboardProvider>
-      </SafeAreaProvider>
-    );
+    return null;
   }
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <StatusBar style="light" />
       <KeyboardProvider>
-        <StatusBar style="dark" />
-
         <View style={styles.root}>
           <NavigationContainer ref={navigationRef} theme={navigationTheme}>
             <AppNavigator />
@@ -96,6 +92,6 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#e40c0c00',
+    backgroundColor: palette.warmWhite,
   },
 });

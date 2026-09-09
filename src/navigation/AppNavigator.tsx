@@ -24,6 +24,8 @@ export function AppNavigator(): React.ReactElement {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: palette.pureWhite },
+        statusBarTranslucent: true,
+        statusBarBackgroundColor: 'transparent',
       }}
     >
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
