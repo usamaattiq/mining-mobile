@@ -127,9 +127,26 @@
   "welcome": {
     "title": "مرحبًا بك في Dahabi",
     "subtitle": "كل شيء جاهز. لنبدأ الآن.",
-    "continue": "متابعة",
+    "continue": "الانتقال إلى لوحة التحكم",
     "logout": "تسجيل الخروج",
     "logoutConfirmTitle": "تسجيل الخروج؟",
     "logoutConfirmMessage": "ستحتاج إلى التحقق من رقم هاتفك أو إدخال الرمز السري لتسجيل الدخول مرة أخرى."
+  },
+  "tabs": {
+    "home": "الرئيسية",
+    "about": "حول",
+    "settings": "الإعدادات"
+  },
+  "dashboardHome": {
+    "title": "الرئيسية",
+    "subtitle": "ستظهر نظرة عامة على لوحتك هنا."
+  },
+  "dashboardAbout": {
+    "title": "حول",
+    "subtitle": "تعرّف على المزيد حول Dahabi."
+  },
+  "dashboardSettings": {
+    "title": "الإعدادات",
+    "subtitle": "إدارة حسابك وتفضيلاتك."
   }
 }

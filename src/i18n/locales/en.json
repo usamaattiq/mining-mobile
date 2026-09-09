@@ -127,9 +127,26 @@
   "welcome": {
     "title": "Welcome to Dahabi",
     "subtitle": "You're all set. Let's get you started.",
-    "continue": "Continue",
+    "continue": "Move to Dashboard",
     "logout": "Log out",
     "logoutConfirmTitle": "Log out?",
     "logoutConfirmMessage": "You'll need to verify your phone number or enter your MPIN to log back in."
+  },
+  "tabs": {
+    "home": "Home",
+    "about": "About",
+    "settings": "Settings"
+  },
+  "dashboardHome": {
+    "title": "Home",
+    "subtitle": "Your dashboard overview will show up here."
+  },
+  "dashboardAbout": {
+    "title": "About",
+    "subtitle": "Learn more about Dahabi."
+  },
+  "dashboardSettings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences."
   }
 }
