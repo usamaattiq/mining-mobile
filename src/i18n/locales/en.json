@@ -44,7 +44,7 @@
     "verifyFailed": "That code didn't work. Please try again."
   },
   "signUpPersonalInfo": {
-    "title": "Tell us about you",
+    "title": "Tell us about yourself",
     "subtitle": "This helps us personalize your account.",
     "profileImage": "Profile photo",
     "individual": "Individual",

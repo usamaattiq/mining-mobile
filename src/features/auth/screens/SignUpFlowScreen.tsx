@@ -280,7 +280,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       currentStep={STEP_INDEX[step]}
       title={header.title}
       subtitle={header.subtitle}
-      onBack={step === 'phone' ? goToPreviousStep : undefined}
+      onBack={step === 'phone' || step === 'otp' ? goToPreviousStep : undefined}
       canContinue={
         (step === 'phone'
           ? isPhoneValid
