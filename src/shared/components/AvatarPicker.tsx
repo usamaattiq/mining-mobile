@@ -46,6 +46,15 @@ export function AvatarPicker({
 
   const displayUri = deferUpload ? localUri : uri ? resolveMediaUrl(uri) : null;
 
+  const handleRemove = () => {
+    if (deferUpload) {
+      setLocalUri(null);
+      onPickLocal(null);
+      return;
+    }
+    onChangeKey(null);
+  };
+
   return (
     <View style={styles.container}>
       {label ? (
@@ -53,18 +62,30 @@ export function AvatarPicker({
           {label}
         </AppText>
       ) : null}
-      <TouchableOpacity
-        style={styles.circle}
-        onPress={() => void handlePress()}
-        disabled={uploading}
-        activeOpacity={0.8}
-      >
+      <View style={styles.avatarWrap}>
+        <TouchableOpacity
+          style={styles.circle}
+          onPress={() => void handlePress()}
+          disabled={uploading}
+          activeOpacity={0.8}
+        >
+          {displayUri ? (
+            <Image source={{ uri: displayUri }} style={styles.image} />
+          ) : (
+            <Ionicons name="camera-outline" size={28} color={palette.muted} />
+          )}
+        </TouchableOpacity>
         {displayUri ? (
-          <Image source={{ uri: displayUri }} style={styles.image} />
-        ) : (
-          <Ionicons name="camera-outline" size={28} color={palette.muted} />
-        )}
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={handleRemove}
+            hitSlop={8}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="close" size={14} color={palette.warmWhite} />
+          </TouchableOpacity>
+        ) : null}
+      </View>
       {error ? <AppText style={styles.error}>{error}</AppText> : null}
     </View>
   );
@@ -79,6 +100,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: palette.charcoal,
   },
+  avatarWrap: {
+    width: 88,
+    height: 88,
+  },
   circle: {
     width: 88,
     height: 88,
@@ -87,6 +112,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 22,
+    height: 22,
+    borderRadius: radius.pill,
+    backgroundColor: palette.charcoal,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: palette.warmWhite,
   },
   image: {
     width: '100%',
