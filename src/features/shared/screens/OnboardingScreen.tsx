@@ -14,7 +14,7 @@ import type { LegalDocumentKind } from '@/shared/constants/legalContent';
 import { palette, spacing } from '@/shared/theme/tokens';
 import { getFontFamily } from '@/shared/theme/typography';
 
-// The "MineMarket" brand wordmark stays in the Latin (Outfit) face
+// The "Dahabi" brand wordmark stays in the Latin (Outfit) face
 // regardless of active language, like other brand names.
 const BRAND_FONT_BOLD = getFontFamily('en', 'bold');
 
@@ -74,10 +74,10 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
             </View>
             <View>
               <Text style={styles.brand}>
-                <Text style={styles.brandMine}>Mine</Text>
-                <Text style={styles.brandMarket}>Market</Text>
+                <Text style={styles.brandMine}>Da</Text>
+                <Text style={styles.brandMarket}>habi</Text>
               </Text>
-              <AppText style={styles.tagline}>{t('onboarding.tagline')}</AppText>
+              {/* <AppText style={styles.tagline}>{t('onboarding.tagline')}</AppText> */}
             </View>
           </View>
           <LanguageSwitcher />
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   brand: {
-    fontSize: 18,
+    fontSize: 20,
   },
   brandMine: {
     fontFamily: BRAND_FONT_BOLD,
@@ -195,14 +195,9 @@ const styles = StyleSheet.create({
     fontFamily: BRAND_FONT_BOLD,
     color: colors.gold,
   },
-  tagline: {
-    fontSize: 9,
-    letterSpacing: 1.2,
-    color: 'rgba(255, 255, 255, 0.82)',
-    marginTop: 1,
-  },
+
   headline: {
-    marginBottom: spacing.xl,
+    marginBottom: 44,
     gap: spacing.sm,
   },
   headlineText: {
