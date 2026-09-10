@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
+import { cardBackShadow } from '@/theme/cardShadow';
 
 type DeliveryAvailableBannerProps = {
   /** e.g. "Free" or "Per KM · 5" — shown under the main label when provided. */
@@ -18,7 +19,7 @@ export function DeliveryAvailableBanner({
   const { t } = useTranslation(undefined, { i18n: appI18n });
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, cardBackShadow]}>
       <View style={styles.iconWrap}>
         <Ionicons name="car-outline" size={22} color={palette.gold} />
       </View>

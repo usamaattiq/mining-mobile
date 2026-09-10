@@ -9,7 +9,7 @@ export const cardBackShadow = Platform.select({
     shadowRadius: 18,
   },
   android: {
-    elevation: 12,
+    elevation: 4,
   },
   default: {},
 }) as object;

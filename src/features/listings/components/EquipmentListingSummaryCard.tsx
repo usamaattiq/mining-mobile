@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
+import { cardBackShadow } from '@/theme/cardShadow';
 import type { EquipmentListingSummaryCardProps } from '@/features/listings/types/equipmentListingSummaryCard.types';
 
 /** Details + media summary card, shared by the review step and the published listing detail screen. */
@@ -31,7 +32,7 @@ export function EquipmentListingSummaryCard({
             </Pressable>
           ) : null}
         </View>
-        <View style={styles.card}>
+        <View style={[styles.card, cardBackShadow]}>
           {detailRows.map((row, index) => (
             <View
               key={row.label}
