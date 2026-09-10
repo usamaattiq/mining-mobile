@@ -1,8 +1,9 @@
-import type { EquipmentListingMode } from '@/navigation/types';
+import type { EquipmentListingMode, ListingCategory } from '@/navigation/types';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 
 export type EquipmentListing = {
   id: string;
+  category: ListingCategory;
   mode: EquipmentListingMode;
   equipmentTypeLabel: string;
   title: string;

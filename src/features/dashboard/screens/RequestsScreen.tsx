@@ -5,8 +5,13 @@ import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import type { DashboardTabParamList, RootStackParamList } from '@/navigation/types';
+import type {
+  DashboardTabParamList,
+  ListingCategory,
+  RootStackParamList,
+} from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
+import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { AppText } from '@/shared/components/AppText';
 import { EquipmentListingCard } from '@/features/listings/components/EquipmentListingCard';
@@ -21,6 +26,15 @@ type Props = CompositeScreenProps<
 export function RequestsScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const listings = useListingsStore((state) => state.listings);
+  const [category, setCategory] = React.useState<ListingCategory>('equipment');
+
+  const categoryOptions = [
+    { key: 'equipment' as const, label: t('requests.categoryEquipment') },
+    { key: 'services' as const, label: t('requests.categoryServices') },
+    { key: 'gold' as const, label: t('requests.categoryGold') },
+  ];
+
+  const visibleListings = listings.filter((listing) => listing.category === category);
 
   return (
     <View style={styles.root}>
@@ -31,8 +45,12 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
         titleSize="lg"
         style={styles.header}
       />
+      <View style={styles.switcherWrap}>
+        <SegmentedSwitcher value={category} onChange={setCategory} options={categoryOptions} />
+      </View>
+
       <CurvedSheetScrollView>
-        {listings.length === 0 ? (
+        {visibleListings.length === 0 ? (
           <View style={styles.empty}>
             <AppText weight="semibold" style={styles.emptyTitle}>
               {t('requests.emptyTitle')}
@@ -40,7 +58,7 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
             <AppText style={styles.emptySubtitle}>{t('requests.emptySubtitle')}</AppText>
           </View>
         ) : (
-          listings.map((listing) => (
+          visibleListings.map((listing) => (
             <EquipmentListingCard
               key={listing.id}
               listing={listing}
@@ -59,7 +77,12 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
   },
   header: {
+    paddingBottom: spacing.lg,
+  },
+  switcherWrap: {
+    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
+    backgroundColor: palette.gold,
   },
   empty: {
     paddingVertical: spacing.xxl,

@@ -1,5 +1,8 @@
 export type EquipmentListingMode = 'rent' | 'sell';
 
+/** Top-level Requests-tab category — switchable, mirrors the Home action cards. */
+export type ListingCategory = 'equipment' | 'services' | 'gold';
+
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;

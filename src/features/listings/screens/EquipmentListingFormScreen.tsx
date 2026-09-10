@@ -108,6 +108,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setPublishing(true);
     addListing({
       id: `listing_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+      category: 'equipment',
       mode,
       equipmentTypeLabel: equipmentTypeLabel ?? '',
       title,

@@ -144,6 +144,9 @@
   },
   "requests": {
     "title": "Requests",
+    "categoryEquipment": "Equipment",
+    "categoryServices": "Services",
+    "categoryGold": "Gold",
     "emptyTitle": "No listings yet",
     "emptySubtitle": "Equipment you list will show up here.",
     "notFound": "This listing is no longer available."

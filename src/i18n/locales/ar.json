@@ -144,6 +144,9 @@
   },
   "requests": {
     "title": "الطلبات",
+    "categoryEquipment": "المعدات",
+    "categoryServices": "الخدمات",
+    "categoryGold": "الذهب",
     "emptyTitle": "لا توجد إعلانات بعد",
     "emptySubtitle": "ستظهر هنا المعدات التي تقوم بعرضها.",
     "notFound": "هذا الإعلان لم يعد متاحًا."

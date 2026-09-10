@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
   },
   header: {
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.xl,
   },
   notFound: {
     fontSize: 14,
