@@ -1,4 +1,4 @@
-export type SignupLocationFieldProps = {
+export type LocationFieldProps = {
   label: string;
   value?: string;
   required?: boolean;

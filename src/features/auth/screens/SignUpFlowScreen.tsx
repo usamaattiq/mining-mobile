@@ -7,8 +7,8 @@ import { i18n as appI18n } from '@/i18n';
 import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import { authApi } from '@/features/auth/api/authApi';
-import { useLocationMapPicker } from '@/features/auth/hooks/useLocationMapPicker';
-import { SignupLocationField } from '@/features/auth/components/SignupLocationField';
+import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
+import { LocationField } from '@/shared/components/LocationField';
 import { AvatarPicker } from '@/shared/components/AvatarPicker';
 import { uploadMedia, type UploadableContentType } from '@/shared/services/media';
 import {
@@ -25,6 +25,8 @@ import { getDeviceId } from '@/shared/utils/deviceId';
 import { ApiError } from '@/shared/services/api';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
+import { BiometricToggleRow } from '@/shared/components/BiometricToggleRow';
+import { useDeviceBiometric } from '@/shared/hooks/useDeviceBiometric';
 import { CodeInput } from '@/shared/components/CodeInput';
 import { CountryPicker } from '@/shared/components/country-picker';
 import { defaultCountry, type Country } from '@/shared/constants/countries';
@@ -92,11 +94,11 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   } | null>(null);
   const [mpin, setMpin] = React.useState('');
   const [confirmMpin, setConfirmMpin] = React.useState('');
-  const [biometricAvailable, setBiometricAvailable] = React.useState(false);
   const [biometricEnabled, setBiometricEnabled] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
     useLocationMapPicker();
+  const { available: biometricAvailable, kind: biometricKind } = useDeviceBiometric();
 
   const phoneIdentity = {
     countryCallingCode: country.dialCode.replace(/^\+/, ''),
@@ -143,15 +145,6 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     };
   }, [step, email, t]);
 
-  React.useEffect(() => {
-    if (step !== 'security') return;
-    (async () => {
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      setBiometricAvailable(hasHardware && isEnrolled);
-    })();
-  }, [step]);
-
   const goToStep = (next: SignUpStep) => setStep(next);
 
   const goToPreviousStep = () => {
@@ -166,7 +159,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();
     if (!selection) {
-      Alert.alert(t('common.error'), t('signUpPersonalInfo.locationFailed'));
+      Alert.alert(t('common.error'), t('location.locationFailed'));
       return;
     }
     setLocation(selection.label);
@@ -180,7 +173,11 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     }, locationCoords);
   };
 
-  const handleEnableBiometric = async () => {
+  const handleToggleBiometric = async (enabled: boolean) => {
+    if (!enabled) {
+      setBiometricEnabled(false);
+      return;
+    }
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: t('signUpSecurity.biometricPrompt'),
     });
@@ -452,7 +449,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               setEmailError(null);
             }}
           />
-          <SignupLocationField
+          <LocationField
             label={t('signUpPersonalInfo.location')}
             required
             value={location}
@@ -488,22 +485,14 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           </View>
 
           {biometricAvailable ? (
-            <View style={styles.biometricRow}>
-              <View style={styles.biometricText}>
-                <AppText weight="bold" style={styles.biometricTitle}>
-                  {t('signUpSecurity.biometricTitle')}
-                </AppText>
-                <AppText style={styles.biometricSubtitle}>
-                  {t('signUpSecurity.biometricSubtitle')}
-                </AppText>
-              </View>
-              <Button
-                label={biometricEnabled ? t('signUpSecurity.enabled') : t('signUpSecurity.enable')}
-                variant={biometricEnabled ? 'secondary' : 'outline'}
-                disabled={biometricEnabled}
-                onPress={handleEnableBiometric}
-              />
-            </View>
+            <BiometricToggleRow
+              enabled={biometricEnabled}
+              onToggle={(enabled) => void handleToggleBiometric(enabled)}
+              available={biometricAvailable}
+              kind={biometricKind}
+              title={t('signUpSecurity.biometricTitle')}
+              subtitle={t('signUpSecurity.biometricSubtitle')}
+            />
           ) : null}
         </View>
       ) : null}
@@ -550,26 +539,5 @@ const styles = StyleSheet.create({
   mpinLabel: {
     fontSize: 13,
     color: palette.charcoal,
-  },
-  biometricRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    borderWidth: 1,
-    borderColor: palette.softGold,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-  },
-  biometricText: {
-    flex: 1,
-    gap: 2,
-  },
-  biometricTitle: {
-    fontSize: 14,
-    color: palette.charcoal,
-  },
-  biometricSubtitle: {
-    fontSize: 12,
-    color: palette.muted,
   },
 });

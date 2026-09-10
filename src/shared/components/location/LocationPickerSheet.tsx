@@ -12,12 +12,9 @@ import { googleMapsJsApiKey, hasGoogleMapsApiKey } from '@/shared/config/env';
 import { resolveAddressLabel } from '@/shared/services/geocodedAddressLabel';
 import { ensureLocationPermission } from '@/shared/services/locationPermission';
 import { readDeviceCoordinates } from '@/shared/services/readDeviceCoordinates';
-import { buildLocationMapPickerHtml } from '@/features/auth/utils/location-map-picker-html';
-import {
-  searchMapLocations,
-  type MapSearchResult,
-} from '@/features/auth/utils/location-map-geocode';
-import type { LocationPickerSheetProps } from '@/features/auth/types/locationPickerSheet.types';
+import { buildLocationMapPickerHtml } from '@/shared/utils/location-map-picker-html';
+import { searchMapLocations, type MapSearchResult } from '@/shared/utils/location-map-geocode';
+import type { LocationPickerSheetProps } from '@/shared/types/locationPickerSheet.types';
 
 const DEFAULT_CENTER = {
   latitude: 33.6844,
@@ -185,7 +182,7 @@ export function LocationPickerSheet({
           <Ionicons name="location" size={15} color={palette.gold} />
         </View>
         <AppText weight="bold" style={styles.headerTitle}>
-          {t('signUpPersonalInfo.selectOnMap')}
+          {t('location.selectOnMap')}
         </AppText>
       </View>
 
@@ -196,7 +193,7 @@ export function LocationPickerSheet({
             <TextInput
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholder={t('signUpPersonalInfo.mapSearchPlaceholder')}
+              placeholder={t('location.mapSearchPlaceholder')}
               placeholderTextColor={palette.muted}
               style={styles.searchInput}
               returnKeyType="search"
@@ -230,9 +227,7 @@ export function LocationPickerSheet({
 
           {!searchLoading && searchShowEmpty ? (
             <View style={styles.searchResults}>
-              <AppText style={styles.searchEmptyText}>
-                {t('signUpPersonalInfo.mapNoResults')}
-              </AppText>
+              <AppText style={styles.searchEmptyText}>{t('location.mapNoResults')}</AppText>
             </View>
           ) : null}
         </View>
@@ -272,13 +267,13 @@ export function LocationPickerSheet({
         </View>
       ) : (
         <View style={styles.unavailable}>
-          <AppText style={styles.unavailableText}>{t('signUpPersonalInfo.mapUnavailable')}</AppText>
+          <AppText style={styles.unavailableText}>{t('location.mapUnavailable')}</AppText>
         </View>
       )}
 
       <View style={styles.footer}>
         <Button
-          label={t('signUpPersonalInfo.confirmLocation')}
+          label={t('location.confirmLocation')}
           onPress={handleConfirm}
           disabled={!pin || resolving}
         />

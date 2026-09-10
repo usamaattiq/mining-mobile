@@ -6,10 +6,11 @@ import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing, getFontFamily } from '@/theme';
-import { combineLocationLabel, splitLocationLabel } from '@/features/auth/utils/locationLabel';
-import type { SignupLocationFieldProps } from '@/features/auth/types/signupLocationField.types';
+import { combineLocationLabel, splitLocationLabel } from '@/shared/utils/locationLabel';
+import type { LocationFieldProps } from '@/shared/types/locationField.types';
 
-export function SignupLocationField({
+/** Location field with "use current location" / "select on map" actions — shared by sign-up and listing forms. */
+export function LocationField({
   label,
   value,
   required = false,
@@ -17,7 +18,7 @@ export function SignupLocationField({
   onChangeText,
   onUseCurrentLocation,
   onSelectOnMap,
-}: SignupLocationFieldProps): React.ReactElement {
+}: LocationFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const hasValue = Boolean(value?.trim());
@@ -38,7 +39,7 @@ export function SignupLocationField({
             <TextInput
               value={addressLine}
               onChangeText={(text) => onChangeText(combineLocationLabel(text, city, country))}
-              placeholder={t('signUpPersonalInfo.addressLinePlaceholder')}
+              placeholder={t('location.addressLinePlaceholder')}
               placeholderTextColor={palette.muted}
               style={[styles.valueInput, { fontFamily: getFontFamily(currentLanguage, 'regular') }]}
             />
@@ -50,7 +51,7 @@ export function SignupLocationField({
           </View>
         </View>
       ) : (
-        <AppText style={styles.placeholder}>{t('signUpPersonalInfo.locationPlaceholder')}</AppText>
+        <AppText style={styles.placeholder}>{t('location.locationPlaceholder')}</AppText>
       )}
 
       <View style={styles.actionsRow}>
@@ -66,7 +67,7 @@ export function SignupLocationField({
             <Ionicons name="navigate-outline" size={14} color={palette.gold} />
           )}
           <AppText weight="semibold" style={styles.actionText} numberOfLines={1}>
-            {t('signUpPersonalInfo.useCurrentLocation')}
+            {t('location.useCurrentLocation')}
           </AppText>
         </Pressable>
 
@@ -77,7 +78,7 @@ export function SignupLocationField({
         >
           <Ionicons name="map-outline" size={14} color={palette.gold} />
           <AppText weight="semibold" style={styles.actionText} numberOfLines={1}>
-            {t('signUpPersonalInfo.selectOnMap')}
+            {t('location.selectOnMap')}
           </AppText>
         </Pressable>
       </View>

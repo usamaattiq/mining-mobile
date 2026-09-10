@@ -10,6 +10,8 @@ import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { CounterField } from '@/shared/components/CounterField';
+import { LocationField } from '@/shared/components/LocationField';
+import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { ToggleRow } from '@/shared/components/ToggleRow';
 import { Button } from '@/shared/components/Button';
 import { ListingStepper } from '@/features/listings/components/ListingStepper';
@@ -73,8 +75,29 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [weeklyRental, setWeeklyRental] = React.useState('');
   const [salePrice, setSalePrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
+  const [location, setLocation] = React.useState('');
+  const [locationCoords, setLocationCoords] = React.useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [media, setMedia] = React.useState<EquipmentMediaAsset[]>([]);
   const [deliveryAvailable, setDeliveryAvailable] = React.useState(false);
+  const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
+    useLocationMapPicker();
+
+  const handleUseCurrentLocation = async () => {
+    const selection = await getCurrentLocation();
+    if (!selection) return;
+    setLocation(selection.label);
+    setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+  };
+
+  const handleSelectOnMap = () => {
+    openMapPickerForSelection((selection) => {
+      setLocation(selection.label);
+      setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+    }, locationCoords);
+  };
 
   const detailsValid = Boolean(
     equipmentType &&
@@ -84,7 +107,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       ? hourlyRental.trim() || monthlyRental.trim() || weeklyRental.trim()
       : salePrice.trim()),
   );
-  const mediaValid = media.length > 0;
+  const mediaValid = media.length > 0 && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -118,6 +141,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       weeklyRental,
       salePrice,
       units,
+      location,
       media,
       deliveryAvailable,
       createdAt: Date.now(),
@@ -137,6 +161,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         ]
       : [{ label: t('equipmentListing.salePrice'), value: salePrice }]),
     { label: t('equipmentListing.units'), value: String(units) },
+    { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
   return (
@@ -245,6 +270,15 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         {step === 1 ? (
           <View style={styles.stepBlock}>
             <EquipmentMediaUploader media={media} onChange={setMedia} />
+            <LocationField
+              label={t('equipmentListing.location')}
+              value={location}
+              required
+              loading={locationLoading}
+              onChangeText={setLocation}
+              onUseCurrentLocation={() => void handleUseCurrentLocation()}
+              onSelectOnMap={handleSelectOnMap}
+            />
             <ToggleRow
               title={t('equipmentListing.deliveryAvailable')}
               subtitle={t('equipmentListing.deliveryAvailableSubtitle')}
@@ -275,6 +309,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           />
         ) : null}
       </KeyboardAwareScrollView>
+
+      {mapPickerSheet}
     </View>
   );
 }

@@ -13,6 +13,7 @@ export type EquipmentListing = {
   weeklyRental: string;
   salePrice: string;
   units: number;
+  location: string;
   media: EquipmentMediaAsset[];
   deliveryAvailable: boolean;
   createdAt: number;

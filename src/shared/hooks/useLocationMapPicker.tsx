@@ -1,12 +1,13 @@
 import React from 'react';
-import { LocationPickerSheet } from '@/features/auth/components/location/LocationPickerSheet';
-import type { LocationSelection } from '@/features/auth/types/locationPickerSheet.types';
+import { LocationPickerSheet } from '@/shared/components/location/LocationPickerSheet';
+import type { LocationSelection } from '@/shared/types/locationPickerSheet.types';
 import { resolveAddressLabel } from '@/shared/services/geocodedAddressLabel';
 import { ensureLocationPermission } from '@/shared/services/locationPermission';
 import { readDeviceCoordinates } from '@/shared/services/readDeviceCoordinates';
 
 export type { LocationSelection };
 
+/** Current-location + map-picker plumbing behind LocationField — shared by sign-up and listing forms. */
 export function useLocationMapPicker(): {
   locationLoading: boolean;
   getCurrentLocation: () => Promise<LocationSelection | null>;
