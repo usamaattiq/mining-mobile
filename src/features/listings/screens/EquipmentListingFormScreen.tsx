@@ -70,7 +70,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [description, setDescription] = React.useState('');
   const [hourlyRental, setHourlyRental] = React.useState('');
   const [monthlyRental, setMonthlyRental] = React.useState('');
-  const [yearlyRental, setYearlyRental] = React.useState('');
+  const [weeklyRental, setWeeklyRental] = React.useState('');
   const [salePrice, setSalePrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
   const [media, setMedia] = React.useState<EquipmentMediaAsset[]>([]);
@@ -81,7 +81,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     title.trim() &&
     units > 0 &&
     (isRent
-      ? hourlyRental.trim() || monthlyRental.trim() || yearlyRental.trim()
+      ? hourlyRental.trim() || monthlyRental.trim() || weeklyRental.trim()
       : salePrice.trim()),
   );
   const mediaValid = media.length > 0;
@@ -115,7 +115,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       description,
       hourlyRental,
       monthlyRental,
-      yearlyRental,
+      weeklyRental,
       salePrice,
       units,
       media,
@@ -132,8 +132,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     ...(isRent
       ? [
           { label: t('equipmentListing.hourlyRental'), value: hourlyRental },
+          { label: t('equipmentListing.weeklyRental'), value: weeklyRental },
           { label: t('equipmentListing.monthlyRental'), value: monthlyRental },
-          { label: t('equipmentListing.yearlyRental'), value: yearlyRental },
         ]
       : [{ label: t('equipmentListing.salePrice'), value: salePrice }]),
     { label: t('equipmentListing.units'), value: String(units) },
@@ -205,17 +205,17 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 </View>
                 <View style={styles.priceInput}>
                   <FormInput
-                    label={t('equipmentListing.monthlyRental')}
-                    value={monthlyRental}
-                    onChangeText={setMonthlyRental}
+                    label={t('equipmentListing.weeklyRental')}
+                    value={weeklyRental}
+                    onChangeText={setWeeklyRental}
                     keyboardType="numeric"
                   />
                 </View>
                 <View style={styles.priceInput}>
                   <FormInput
-                    label={t('equipmentListing.yearlyRental')}
-                    value={yearlyRental}
-                    onChangeText={setYearlyRental}
+                    label={t('equipmentListing.monthlyRental')}
+                    value={monthlyRental}
+                    onChangeText={setMonthlyRental}
                     keyboardType="numeric"
                   />
                 </View>

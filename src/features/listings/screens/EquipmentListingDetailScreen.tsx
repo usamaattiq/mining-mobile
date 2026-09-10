@@ -46,8 +46,8 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
     ...(isRent
       ? [
           { label: t('equipmentListing.hourlyRental'), value: listing.hourlyRental },
+          { label: t('equipmentListing.weeklyRental'), value: listing.weeklyRental },
           { label: t('equipmentListing.monthlyRental'), value: listing.monthlyRental },
-          { label: t('equipmentListing.yearlyRental'), value: listing.yearlyRental },
         ]
       : [{ label: t('equipmentListing.salePrice'), value: listing.salePrice }]),
     { label: t('equipmentListing.units'), value: String(listing.units) },
