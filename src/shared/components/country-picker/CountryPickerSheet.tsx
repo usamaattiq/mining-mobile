@@ -13,17 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
+import { palette, radius, spacing, getFontFamily } from '@/theme';
 import type { Country } from '@/shared/constants/countries';
-
-type CountryPickerSheetProps = {
-  visible: boolean;
-  countries: Country[];
-  selected: Country;
-  onSelect: (country: Country) => void;
-  onClose: () => void;
-};
+import type { CountryPickerSheetProps } from '@/shared/types/countryPicker.types';
 
 function CountryRow({
   country,

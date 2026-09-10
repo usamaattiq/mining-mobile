@@ -2,23 +2,10 @@ import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
+import { palette, radius, spacing } from '@/theme';
 import { useMediaUpload } from '@/shared/hooks/useMediaUpload';
-import { resolveMediaUrl, type UploadableContentType } from '@/shared/services/media';
-
-type AvatarPickerProps = {
-  label?: string;
-  uri: string | null;
-  onChangeKey: (key: string | null) => void;
-} & (
-  | { deferUpload?: false; onPickLocal?: never }
-  | {
-      /** Skip the immediate upload (no auth token yet, e.g. during sign-up) and just preview
-       * the picked image locally; the caller uploads it later via onPickLocal's asset. */
-      deferUpload: true;
-      onPickLocal: (asset: { uri: string; contentType: UploadableContentType } | null) => void;
-    }
-);
+import { resolveMediaUrl } from '@/shared/services/media';
+import type { AvatarPickerProps } from '@/shared/types/avatarPicker.types';
 
 export function AvatarPicker({
   label,

@@ -2,13 +2,8 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
-import { palette, spacing } from '@/shared/theme/tokens';
-import type { Country } from '@/shared/constants/countries';
-
-type CountryPickerTriggerProps = {
-  country: Country;
-  onPress: () => void;
-};
+import { palette, spacing } from '@/theme';
+import type { CountryPickerTriggerProps } from '@/shared/types/countryPicker.types';
 
 export function CountryPickerTrigger({
   country,

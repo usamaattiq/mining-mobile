@@ -1,15 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { AppText } from '@/shared/components/AppText';
-import { palette, spacing } from '@/shared/theme/tokens';
-
-type OnboardingHeadlineProps = {
-  title: string;
-  subtitle?: string;
-  /** Gold-on-dark styling for the gradient hero header. */
-  dark?: boolean;
-  style?: StyleProp<ViewStyle>;
-};
+import { palette, spacing } from '@/theme';
+import type { OnboardingHeadlineProps } from '@/features/auth/types/onboardingHeadline.types';
 
 export function OnboardingHeadline({
   title,

@@ -4,8 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
+import { palette, radius, spacing } from '@/theme';
+import { getFontFamily } from '@/theme';
 import type { LanguageOption, LanguageSwitcherModalProps } from './types/language-switcher.types';
 
 // EN/AR short codes stay in the Latin face regardless of active language.

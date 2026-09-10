@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
-import { palette, spacing } from '@/shared/theme/tokens';
+import { palette, spacing } from '@/theme';
 
 export function AboutScreen(): React.ReactElement {
   const insets = useSafeAreaInsets();

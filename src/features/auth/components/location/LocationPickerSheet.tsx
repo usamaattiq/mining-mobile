@@ -7,7 +7,7 @@ import { i18n as appI18n } from '@/i18n';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
+import { palette, radius, spacing } from '@/theme';
 import { googleMapsJsApiKey, hasGoogleMapsApiKey } from '@/shared/config/env';
 import { resolveAddressLabel } from '@/shared/services/geocodedAddressLabel';
 import { ensureLocationPermission } from '@/shared/services/locationPermission';
@@ -17,19 +17,7 @@ import {
   searchMapLocations,
   type MapSearchResult,
 } from '@/features/auth/utils/location-map-geocode';
-
-export interface LocationSelection {
-  label: string;
-  latitude: number;
-  longitude: number;
-}
-
-type LocationPickerSheetProps = {
-  visible: boolean;
-  initial: { latitude: number; longitude: number } | null;
-  onCancel: () => void;
-  onConfirm: (selection: LocationSelection) => void;
-};
+import type { LocationPickerSheetProps } from '@/features/auth/types/locationPickerSheet.types';
 
 const DEFAULT_CENTER = {
   latitude: 33.6844,

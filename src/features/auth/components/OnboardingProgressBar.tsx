@@ -1,13 +1,7 @@
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-
-type OnboardingProgressBarProps = {
-  /** Total number of steps in the flow. */
-  totalSteps: number;
-  /** 0-based index of the current step. */
-  currentStep: number;
-};
+import { palette, radius, spacing } from '@/theme';
+import type { OnboardingProgressBarProps } from '@/features/auth/types/onboardingProgressBar.types';
 
 export function OnboardingProgressBar({
   totalSteps,

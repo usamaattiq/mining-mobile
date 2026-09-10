@@ -1,4 +1,4 @@
-import type { OnboardingStep } from '@/features/auth/components/OnboardingStepper';
+import type { OnboardingStep } from '@/features/auth/types/onboardingStepper.types';
 
 export const SIGN_UP_STEPS: OnboardingStep[] = [
   { key: 'phone', label: 'Phone' },

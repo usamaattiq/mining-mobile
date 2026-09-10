@@ -1,13 +1,9 @@
 import React from 'react';
 import { countries } from '@/shared/constants/countries';
 import type { Country } from '@/shared/constants/countries';
+import type { CountryPickerProps } from '@/shared/types/countryPicker.types';
 import { CountryPickerSheet } from './CountryPickerSheet';
 import { CountryPickerTrigger } from './CountryPickerTrigger';
-
-type CountryPickerProps = {
-  value: Country;
-  onChange: (country: Country) => void;
-};
 
 export function CountryPicker({ value, onChange }: CountryPickerProps): React.ReactElement {
   const [isSheetVisible, setIsSheetVisible] = React.useState(false);

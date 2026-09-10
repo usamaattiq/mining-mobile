@@ -19,19 +19,11 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import { palette, spacing } from '@/shared/theme/tokens';
+import { palette, spacing } from '@/theme';
+import type { AppBottomSheetProps } from '@/shared/types/appBottomSheet.types';
 
 /** Floor so 3-button / gesture nav never sits under sheet content when insets lag. */
 const MIN_BOTTOM_INSET = 24;
-
-export type AppBottomSheetProps = {
-  visible: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  /** Sheet height as a fraction of the window (0-1). Default 0.8. */
-  heightRatio?: number;
-  sheetStyle?: StyleProp<ViewStyle>;
-};
 
 /**
  * Distance from the top of the IME to the bottom of the physical screen.

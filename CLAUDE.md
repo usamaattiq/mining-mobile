@@ -4,7 +4,9 @@
 
 - Never create a new Button, TextInput/input field, or other common UI primitive scoped to a single screen/feature file.
 - Before adding any such component, check `src/shared/components/` first. If something close already exists, update/extend it (add a prop/variant) instead of creating a new one.
-- If nothing suitable exists, add the new primitive to `src/shared/components/` so every feature can reuse it, rather than duplicating it per screen.
+- If nothing suitable exists and it's a generic cross-app primitive, add it to `src/shared/components/`. If it's a composite specific to one feature's screens (e.g. a settings/profile menu row, a feature-specific header card), put it in that feature's `components/` folder instead (mirrors stride-mobile: `SettingsProfileHeader`/`SettingsMenuSectionCard` live in `features/dashboard/components`, not `shared/components`).
+- Component files: named-export `function ComponentName(props): React.ReactElement`, explicit return type, no `interface`, no default exports, styles via `StyleSheet.create` at the file bottom — matches stride-mobile's convention.
+- Prop types don't live inline in a component file, app-wide. `src/shared/components/*` types go in `src/shared/types/<componentName>.types.ts`; a feature's own `features/<feature>/components/*` types go in `features/<feature>/types/<componentName>.types.ts` (camelCase file name matching the component, e.g. `MenuRow.tsx` → `menuRow.types.ts`). Import the type back into the component. Exception: a screen's own react-navigation `Props` type (`type Props = NativeStackScreenProps<...>` etc.) stays inline in the screen file — it's single-use, route-specific wiring, not a reusable prop shape.
 
 ## Screen header
 
@@ -12,7 +14,7 @@
 
 ## Theme
 
-- Colors live in `src/shared/theme/tokens.ts` (`palette`) — always reference `palette.*` / `spacing.*` / `radius.*` from there instead of hardcoding hex values in screens.
+- Theme lives in `src/theme/` (mirrors stride-mobile's `src/theme/` location), split into `colors.ts` (`palette`), `spacing.ts`, `radius.ts`, `typography.ts`, and `cardShadow.ts` (`cardBackShadow`), all re-exported from `src/theme/index.ts`. Import via `@/theme` — always reference `palette.*` / `spacing.*` / `radius.*` from there instead of hardcoding hex values in screens.
 - Primary color: `palette.gold` (`#C9A227`), with `palette.lightGold` (`#E4C766`) as a lighter accent.
 - Secondary/text color: `palette.charcoal` (`#222222`).
 - Background: `palette.warmWhite` (`#FCFBF8`) / `palette.softGold` (`#F5EBCF`).

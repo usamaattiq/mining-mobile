@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
+import { palette, radius, spacing } from '@/theme';
 
 const TAB_FOCUS_TIMING = { duration: 200 };
 

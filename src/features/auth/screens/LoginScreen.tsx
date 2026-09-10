@@ -20,8 +20,8 @@ import { CodeInput } from '@/shared/components/CodeInput';
 import { CountryPicker } from '@/shared/components/country-picker';
 import { countryByIso2, defaultCountry, type Country } from '@/shared/constants/countries';
 import { FormInput } from '@/shared/components/FormInput';
-import { palette, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
+import { palette, spacing } from '@/theme';
+import { getFontFamily } from '@/theme';
 import {
   formatPhoneDisplay,
   placeholderForDigitLength,

@@ -1,5 +1,5 @@
 import type { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
-import { palette } from '@/shared/theme/tokens';
+import { palette } from '@/theme';
 
 /** Instant tab switch — no cross-fade or slide (avoids ghosting / transparency glitches). */
 export const tabNavigatorScreenOptions: BottomTabNavigationOptions = {

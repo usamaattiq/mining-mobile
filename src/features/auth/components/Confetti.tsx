@@ -8,7 +8,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import { palette } from '@/shared/theme/tokens';
+import { palette } from '@/theme';
 
 const COLORS = [
   palette.gold,

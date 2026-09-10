@@ -29,8 +29,8 @@ import { CodeInput } from '@/shared/components/CodeInput';
 import { CountryPicker } from '@/shared/components/country-picker';
 import { defaultCountry, type Country } from '@/shared/constants/countries';
 import { FormInput } from '@/shared/components/FormInput';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
+import { palette, radius, spacing } from '@/theme';
+import { getFontFamily } from '@/theme';
 
 function errorMessage(error: unknown, fallback: string): string {
   if (error instanceof ApiError) return error.message;

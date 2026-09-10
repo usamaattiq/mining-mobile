@@ -1,22 +1,9 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  type TouchableOpacityProps,
-} from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'link';
-
-type ButtonProps = TouchableOpacityProps & {
-  label: string;
-  variant?: ButtonVariant;
-  loading?: boolean;
-  icon?: keyof typeof Ionicons.glyphMap;
-};
+import { palette, radius, spacing } from '@/theme';
+import type { ButtonProps } from '@/shared/types/button.types';
 
 export function Button({
   label,

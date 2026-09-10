@@ -1,17 +1,8 @@
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-
-export type OnboardingStep = {
-  key: string;
-  label: string;
-};
-
-type OnboardingStepperProps = {
-  steps: OnboardingStep[];
-  currentStep: number;
-};
+import { palette, radius, spacing } from '@/theme';
+import type { OnboardingStepperProps } from '@/features/auth/types/onboardingStepper.types';
 
 const DOT_SIZE = 26;
 

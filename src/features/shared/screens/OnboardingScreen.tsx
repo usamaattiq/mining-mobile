@@ -11,8 +11,8 @@ import { AppText } from '@/shared/components/AppText';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { LegalDocumentSheet } from '@/shared/components/LegalDocumentSheet';
 import type { LegalDocumentKind } from '@/shared/constants/legalContent';
-import { palette, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
+import { palette, spacing } from '@/theme';
+import { getFontFamily } from '@/theme';
 
 // The "Dahabi" brand wordmark stays in the Latin (Outfit) face
 // regardless of active language, like other brand names.

@@ -5,19 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
+import { palette, radius, spacing, getFontFamily } from '@/theme';
 import { combineLocationLabel, splitLocationLabel } from '@/features/auth/utils/locationLabel';
-
-type SignupLocationFieldProps = {
-  label: string;
-  value?: string;
-  required?: boolean;
-  loading?: boolean;
-  onChangeText: (value: string) => void;
-  onUseCurrentLocation: () => void;
-  onSelectOnMap: () => void;
-};
+import type { SignupLocationFieldProps } from '@/features/auth/types/signupLocationField.types';
 
 export function SignupLocationField({
   label,

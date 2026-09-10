@@ -1,15 +1,7 @@
 import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-
-type CodeInputProps = {
-  length: number;
-  value: string;
-  onChangeValue: (value: string) => void;
-  secure?: boolean;
-  autoFocus?: boolean;
-  disabled?: boolean;
-};
+import { palette, radius, spacing } from '@/theme';
+import type { CodeInputProps } from '@/shared/types/codeInput.types';
 
 /** Shared digit-box input, used for both OTP verification and MPIN entry. */
 export function CodeInput({

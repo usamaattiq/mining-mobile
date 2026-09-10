@@ -1,21 +1,10 @@
-import React, { type ReactNode } from 'react';
-import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-
-export type AppTopBarProps = {
-  /** Left side content mode. */
-  left?: 'back' | 'none';
-  title?: string;
-  onBackPress?: () => void;
-  /** Optional extra actions on the right. */
-  rightSlot?: ReactNode;
-  /** Skip top safe-area padding when the parent already applies it. */
-  includeSafeArea?: boolean;
-  style?: ViewStyle;
-};
+import { palette, radius, spacing } from '@/theme';
+import type { AppTopBarProps } from '@/shared/types/appTopBar.types';
 
 export function AppTopBar({
   left = 'none',

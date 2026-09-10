@@ -8,8 +8,7 @@ import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-c
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { navigationRef } from '@/navigation/navigationRef';
 import { initializeI18n } from '@/i18n';
-import { appFontAssets } from '@/shared/theme/typography';
-import { palette } from '@/shared/theme/tokens';
+import { appFontAssets, palette } from '@/theme';
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
 import { useAuthStore } from '@/store/authStore';
 import { useDevicePrefsStore } from '@/store/devicePrefsStore';

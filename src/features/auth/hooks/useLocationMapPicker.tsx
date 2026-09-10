@@ -1,8 +1,6 @@
 import React from 'react';
-import {
-  LocationPickerSheet,
-  type LocationSelection,
-} from '@/features/auth/components/location/LocationPickerSheet';
+import { LocationPickerSheet } from '@/features/auth/components/location/LocationPickerSheet';
+import type { LocationSelection } from '@/features/auth/types/locationPickerSheet.types';
 import { resolveAddressLabel } from '@/shared/services/geocodedAddressLabel';
 import { ensureLocationPermission } from '@/shared/services/locationPermission';
 import { readDeviceCoordinates } from '@/shared/services/readDeviceCoordinates';

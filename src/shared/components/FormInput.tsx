@@ -1,16 +1,9 @@
 import React from 'react';
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
-
-type FormInputProps = TextInputProps & {
-  label?: string;
-  required?: boolean;
-  error?: string;
-  leftAdornment?: React.ReactNode;
-};
+import { palette, radius, spacing, getFontFamily } from '@/theme';
+import type { FormInputProps } from '@/shared/types/formInput.types';
 
 export function FormInput({
   label,

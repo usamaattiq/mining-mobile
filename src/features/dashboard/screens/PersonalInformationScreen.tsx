@@ -9,7 +9,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { Button } from '@/shared/components/Button';
-import { palette, spacing } from '@/shared/theme/tokens';
+import { palette, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PersonalInformation'>;
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-import { getFontFamily } from '@/shared/theme/typography';
+import { palette, radius, spacing } from '@/theme';
+import { getFontFamily } from '@/theme';
 import type { LanguageSwitcherTriggerProps } from './types/language-switcher.types';
 
 // The short code (EN/AR) is always Latin — keep it in the Latin (Outfit)

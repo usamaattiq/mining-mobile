@@ -14,7 +14,7 @@ import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { Confetti } from '@/features/auth/components/Confetti';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
+import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 

@@ -7,7 +7,7 @@ import { WelcomeScreen } from '@/features/shared/screens/WelcomeScreen';
 import { DashboardTabNavigator } from '@/navigation/DashboardTabNavigator';
 import { PersonalInformationScreen } from '@/features/dashboard/screens/PersonalInformationScreen';
 import type { RootStackParamList } from '@/navigation/types';
-import { palette } from '@/shared/theme/tokens';
+import { palette } from '@/theme';
 import { useAuthStore } from '@/store/authStore';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

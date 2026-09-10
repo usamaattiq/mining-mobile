@@ -7,26 +7,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { OnboardingHeadline } from '@/features/auth/components/OnboardingHeadline';
-import type { OnboardingStep } from '@/features/auth/components/OnboardingStepper';
 import { AppText } from '@/shared/components/AppText';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
-import { palette, radius, spacing } from '@/shared/theme/tokens';
-
-type OnboardingLayoutProps = {
-  steps: OnboardingStep[];
-  currentStep: number;
-  title: string;
-  subtitle?: string;
-  onBack?: () => void;
-  onContinue?: () => void;
-  canContinue?: boolean;
-  continueLabel?: string;
-  /** Hide the footer continue button (e.g. role-selection cards navigate on their own). */
-  showFooter?: boolean;
-  /** Hide the "Step X of Y" label and progress bar (e.g. login, which isn't a linear wizard). */
-  showProgress?: boolean;
-  children: React.ReactNode;
-};
+import { palette, radius, spacing } from '@/theme';
+import type { OnboardingLayoutProps } from '@/features/auth/types/onboardingLayout.types';
 
 export function OnboardingLayout({
   steps,
