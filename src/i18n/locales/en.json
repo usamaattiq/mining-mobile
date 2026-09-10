@@ -5,6 +5,8 @@
     "done": "Done",
     "close": "Close",
     "continue": "Continue",
+    "change": "Change",
+    "search": "Search",
     "save": "Save",
     "error": "Something went wrong",
     "stepOfTotal": "Step {current} of {total}"
@@ -136,8 +138,15 @@
   },
   "tabs": {
     "home": "Home",
+    "requests": "Requests",
     "about": "About",
     "profile": "Profile"
+  },
+  "requests": {
+    "title": "Requests",
+    "emptyTitle": "No listings yet",
+    "emptySubtitle": "Equipment you list will show up here.",
+    "notFound": "This listing is no longer available."
   },
   "dashboardHome": {
     "title": "Home",
@@ -152,6 +161,51 @@
   "dashboardAbout": {
     "title": "About",
     "subtitle": "Learn more about Dahabi."
+  },
+  "equipmentListing": {
+    "modeTitle": "List Equipment",
+    "rent": "Rent",
+    "rentSubtitle": "Rent out your equipment to buyers",
+    "sell": "Sell",
+    "sellSubtitle": "Sell your equipment outright",
+    "rentFormTitle": "Rent Equipment",
+    "sellFormTitle": "Sell Equipment",
+    "detailsStep": "Details",
+    "mediaStep": "Media",
+    "reviewStep": "Review",
+    "stepLabel": "Step {current} of {total}",
+    "equipmentType": "Equipment type",
+    "equipmentTypePlaceholder": "Choose equipment type",
+    "searchTypes": "Search equipment types",
+    "type": {
+      "excavator": "Excavator",
+      "bulldozer": "Bulldozer",
+      "drillRig": "Drill Rig",
+      "loader": "Loader",
+      "crusher": "Crusher",
+      "other": "Other"
+    },
+    "title": "Title",
+    "titlePlaceholder": "e.g. CAT 320 Excavator, well maintained",
+    "description": "Description",
+    "descriptionPlaceholder": "Add details about condition, specs, and usage history",
+    "hourlyRental": "Hourly Rental",
+    "monthlyRental": "Monthly Rental",
+    "yearlyRental": "Yearly Rental",
+    "salePrice": "Sale price",
+    "units": "Number of units",
+    "mediaTitle": "Photos & video",
+    "mediaSubtitle": "Add up to {photos} photos and {videos} video",
+    "mediaSubtitlePhotosOnly": "Add up to {photos} photos",
+    "addPhoto": "Add photo",
+    "addVideo": "Add video",
+    "takePhoto": "Take photo",
+    "recordVideo": "Record video",
+    "chooseFromGallery": "Choose from gallery",
+    "deliveryAvailable": "Delivery available",
+    "deliveryAvailableSubtitle": "Offer delivery to the buyer's site",
+    "deliveryReadOnlySubtitle": "Set on the media step",
+    "publish": "Publish listing"
   },
   "profile": {
     "edit": "Edit profile",

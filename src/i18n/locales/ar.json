@@ -5,6 +5,8 @@
     "done": "تم",
     "close": "إغلاق",
     "continue": "متابعة",
+    "change": "تغيير",
+    "search": "بحث",
     "save": "حفظ",
     "error": "حدث خطأ ما",
     "stepOfTotal": "الخطوة {current} من {total}"
@@ -136,8 +138,15 @@
   },
   "tabs": {
     "home": "الرئيسية",
+    "requests": "الطلبات",
     "about": "حول",
     "profile": "الملف الشخصي"
+  },
+  "requests": {
+    "title": "الطلبات",
+    "emptyTitle": "لا توجد إعلانات بعد",
+    "emptySubtitle": "ستظهر هنا المعدات التي تقوم بعرضها.",
+    "notFound": "هذا الإعلان لم يعد متاحًا."
   },
   "dashboardHome": {
     "title": "الرئيسية",
@@ -148,6 +157,51 @@
     "listServiceSubtitle": "قدّم خدمات التعدين الخاصة بك للمشترين",
     "auctionGold": "مزاد الذهب",
     "auctionGoldSubtitle": "ابدأ مزادًا مباشرًا للذهب"
+  },
+  "equipmentListing": {
+    "modeTitle": "عرض معدات",
+    "rent": "إيجار",
+    "rentSubtitle": "أجّر معداتك للمشترين",
+    "sell": "بيع",
+    "sellSubtitle": "بِع معداتك بالكامل",
+    "rentFormTitle": "تأجير معدات",
+    "sellFormTitle": "بيع معدات",
+    "detailsStep": "التفاصيل",
+    "mediaStep": "الوسائط",
+    "reviewStep": "المراجعة",
+    "stepLabel": "الخطوة {current} من {total}",
+    "equipmentType": "نوع المعدة",
+    "equipmentTypePlaceholder": "اختر نوع المعدة",
+    "searchTypes": "ابحث عن نوع المعدة",
+    "type": {
+      "excavator": "حفارة",
+      "bulldozer": "جرافة",
+      "drillRig": "منصة حفر",
+      "loader": "لودر",
+      "crusher": "كسّارة",
+      "other": "أخرى"
+    },
+    "title": "العنوان",
+    "titlePlaceholder": "مثال: حفارة CAT 320 بحالة ممتازة",
+    "description": "الوصف",
+    "descriptionPlaceholder": "أضف تفاصيل عن الحالة والمواصفات وسجل الاستخدام",
+    "hourlyRental": "الإيجار بالساعة",
+    "monthlyRental": "الإيجار الشهري",
+    "yearlyRental": "الإيجار السنوي",
+    "salePrice": "سعر البيع",
+    "units": "عدد الوحدات",
+    "mediaTitle": "الصور والفيديو",
+    "mediaSubtitle": "أضف حتى {photos} صور وفيديو واحد",
+    "mediaSubtitlePhotosOnly": "أضف حتى {photos} صور",
+    "addPhoto": "إضافة صورة",
+    "addVideo": "إضافة فيديو",
+    "takePhoto": "التقاط صورة",
+    "recordVideo": "تسجيل فيديو",
+    "chooseFromGallery": "اختيار من المعرض",
+    "deliveryAvailable": "التوصيل متاح",
+    "deliveryAvailableSubtitle": "قدّم التوصيل إلى موقع المشتري",
+    "deliveryReadOnlySubtitle": "تم تحديده في خطوة الوسائط",
+    "publish": "نشر الإعلان"
   },
   "dashboardAbout": {
     "title": "حول",

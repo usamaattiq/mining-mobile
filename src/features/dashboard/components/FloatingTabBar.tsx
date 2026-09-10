@@ -23,6 +23,11 @@ const TAB_VISUALS: Record<string, TabVisual> = {
     icon: 'home-outline',
     iconFocused: 'home',
   },
+  Requests: {
+    labelKey: 'tabs.requests',
+    icon: 'document-text-outline',
+    iconFocused: 'document-text',
+  },
   About: {
     labelKey: 'tabs.about',
     icon: 'information-circle-outline',

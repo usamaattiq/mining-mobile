@@ -1,14 +1,23 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
+import type { DashboardTabParamList, RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { HomeActionCard } from '@/features/dashboard/components/HomeActionCard';
 import { palette, radius, spacing } from '@/theme';
 
-export function HomeScreen(): React.ReactElement {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<DashboardTabParamList, 'HomeTab'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+export function HomeScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
 
   const actions = [
@@ -16,7 +25,7 @@ export function HomeScreen(): React.ReactElement {
       icon: 'construct-outline' as const,
       title: t('dashboardHome.listEquipment'),
       subtitle: t('dashboardHome.listEquipmentSubtitle'),
-      onPress: () => {},
+      onPress: () => navigation.navigate('EquipmentListingMode'),
     },
     {
       icon: 'briefcase-outline' as const,

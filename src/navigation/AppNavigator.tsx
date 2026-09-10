@@ -7,6 +7,9 @@ import { WelcomeScreen } from '@/features/shared/screens/WelcomeScreen';
 import { DashboardTabNavigator } from '@/navigation/DashboardTabNavigator';
 import { PersonalInformationScreen } from '@/features/dashboard/screens/PersonalInformationScreen';
 import { SecuritySettingsScreen } from '@/features/dashboard/screens/SecuritySettingsScreen';
+import { EquipmentListingModeScreen } from '@/features/listings/screens/EquipmentListingModeScreen';
+import { EquipmentListingFormScreen } from '@/features/listings/screens/EquipmentListingFormScreen';
+import { EquipmentListingDetailScreen } from '@/features/listings/screens/EquipmentListingDetailScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme';
 import { useAuthStore } from '@/store/authStore';
@@ -46,6 +49,9 @@ export function AppNavigator(): React.ReactElement {
       <Stack.Screen name="Dashboard" component={DashboardTabNavigator} />
       <Stack.Screen name="PersonalInformation" component={PersonalInformationScreen} />
       <Stack.Screen name="SecuritySettings" component={SecuritySettingsScreen} />
+      <Stack.Screen name="EquipmentListingMode" component={EquipmentListingModeScreen} />
+      <Stack.Screen name="EquipmentListingForm" component={EquipmentListingFormScreen} />
+      <Stack.Screen name="EquipmentListingDetail" component={EquipmentListingDetailScreen} />
     </Stack.Navigator>
   );
 }
