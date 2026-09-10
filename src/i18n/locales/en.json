@@ -165,5 +165,18 @@
     "termsSubtitle": "The rules for using Dahabi",
     "logout": "Log out",
     "logoutSubtitle": "You'll need to verify to log back in"
+  },
+  "securitySettings": {
+    "title": "Security settings",
+    "biometricTitle": "Face ID / biometric unlock",
+    "biometricSubtitle": "Use your face or fingerprint for faster sign in.",
+    "biometricToggleFailed": "Couldn't update biometric unlock. Please try again.",
+    "mpinTitle": "MPIN",
+    "mpinSubtitle": "Change the PIN you use to log in.",
+    "changeMpin": "Change MPIN",
+    "newMpinTitle": "Set a new MPIN",
+    "mpinSavedTitle": "MPIN updated",
+    "mpinSavedMessage": "Your MPIN has been changed successfully.",
+    "mpinSaveFailed": "Couldn't update your MPIN. Please try again."
   }
 }

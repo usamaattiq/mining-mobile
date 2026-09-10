@@ -85,7 +85,7 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
       label: t('profile.security'),
       subtitle: t('profile.securitySubtitle'),
       icon: 'shield-checkmark-outline',
-      onPress: () => {},
+      onPress: () => navigation.navigate('SecuritySettings'),
     },
     {
       label: t('profile.privacy'),

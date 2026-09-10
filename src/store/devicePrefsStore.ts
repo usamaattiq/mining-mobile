@@ -84,7 +84,10 @@ export const useDevicePrefsStore = create<DevicePrefsState>((set) => ({
   },
 
   setBiometricEnabled: async (enabled: boolean) => {
-    await AsyncStorage.setItem(BIOMETRIC_ENABLED_KEY, String(enabled));
+    // Update state first — the Switch bound to this value is controlled, so
+    // awaiting the storage write before `set()` makes it lag behind the native
+    // toggle gesture and visibly snap back/forward once the write resolves.
     set({ biometricEnabled: enabled });
+    await AsyncStorage.setItem(BIOMETRIC_ENABLED_KEY, String(enabled));
   },
 }));

@@ -12,13 +12,20 @@ export function AppTopBar({
   onBackPress,
   rightSlot,
   includeSafeArea = true,
+  variant = 'light',
   style,
 }: AppTopBarProps): React.ReactElement {
   const insets = useSafeAreaInsets();
+  const isGold = variant === 'gold';
 
   return (
     <View
-      style={[styles.container, includeSafeArea && { paddingTop: insets.top + spacing.sm }, style]}
+      style={[
+        styles.container,
+        isGold && styles.containerGold,
+        includeSafeArea && { paddingTop: insets.top + spacing.sm },
+        style,
+      ]}
     >
       <View style={styles.side}>
         {left === 'back' ? (
@@ -27,16 +34,28 @@ export function AppTopBar({
             accessibilityLabel="Go back"
             onPress={onBackPress}
             hitSlop={12}
-            style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.backButton,
+              isGold && styles.backButtonGold,
+              pressed && styles.pressed,
+            ]}
           >
-            <Ionicons name="chevron-back" size={20} color={palette.charcoal} />
+            <Ionicons
+              name="chevron-back"
+              size={20}
+              color={isGold ? palette.pureWhite : palette.charcoal}
+            />
           </Pressable>
         ) : null}
       </View>
 
       {title ? (
         <View style={styles.titleBlock}>
-          <AppText weight="bold" style={styles.title} numberOfLines={1}>
+          <AppText
+            weight="bold"
+            style={[styles.title, isGold && styles.titleGold]}
+            numberOfLines={1}
+          >
             {title}
           </AppText>
         </View>
@@ -59,6 +78,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.sm,
   },
+  containerGold: {
+    backgroundColor: palette.gold,
+  },
   side: {
     minWidth: 36,
     flexDirection: 'row',
@@ -79,6 +101,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: palette.charcoal,
   },
+  titleGold: {
+    color: palette.pureWhite,
+  },
   backButton: {
     width: 36,
     height: 36,
@@ -86,6 +111,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.softGold,
+  },
+  backButtonGold: {
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
   },
   pressed: {
     opacity: 0.75,

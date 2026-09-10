@@ -165,5 +165,18 @@
     "termsSubtitle": "قواعد استخدام Dahabi",
     "logout": "تسجيل الخروج",
     "logoutSubtitle": "ستحتاج إلى التحقق لتسجيل الدخول مرة أخرى"
+  },
+  "securitySettings": {
+    "title": "إعدادات الأمان",
+    "biometricTitle": "بصمة الوجه / الفتح البيومتري",
+    "biometricSubtitle": "استخدم وجهك أو بصمتك لتسجيل دخول أسرع.",
+    "biometricToggleFailed": "تعذّر تحديث الفتح البيومتري. حاول مرة أخرى.",
+    "mpinTitle": "الرمز السري",
+    "mpinSubtitle": "غيّر الرمز السري الذي تستخدمه لتسجيل الدخول.",
+    "changeMpin": "تغيير الرمز السري",
+    "newMpinTitle": "تعيين رمز سري جديد",
+    "mpinSavedTitle": "تم تحديث الرمز السري",
+    "mpinSavedMessage": "تم تغيير رمزك السري بنجاح.",
+    "mpinSaveFailed": "تعذّر تحديث رمزك السري. حاول مرة أخرى."
   }
 }

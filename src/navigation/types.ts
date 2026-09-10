@@ -5,6 +5,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   Dashboard: undefined;
   PersonalInformation: undefined;
+  SecuritySettings: undefined;
 };
 
 export type DashboardTabParamList = {

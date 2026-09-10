@@ -10,5 +10,7 @@ export type AppTopBarProps = {
   rightSlot?: ReactNode;
   /** Skip top safe-area padding when the parent already applies it. */
   includeSafeArea?: boolean;
+  /** 'gold' renders on a gold background with white text/icons — for use atop a CurvedSheetScrollView. */
+  variant?: 'light' | 'gold';
   style?: ViewStyle;
 };
