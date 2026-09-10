@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { palette, radius, spacing } from '@/theme';
 import type { EquipmentImageCarouselProps } from '@/features/listings/types/equipmentImageCarousel.types';
 
-const CAROUSEL_HEIGHT = 240;
+const CAROUSEL_HEIGHT = 280;
 
 /** Swipeable photo carousel sized to its container (not the full screen width) — tap a slide to open it full screen. */
 export function EquipmentImageCarousel({
