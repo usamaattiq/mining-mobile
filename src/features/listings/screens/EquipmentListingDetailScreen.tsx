@@ -70,7 +70,11 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
       />
 
       <CurvedSheetScrollView>
-        <EquipmentImageCarousel media={listing.media} onPressImage={setViewerIndex} />
+        <EquipmentImageCarousel
+          media={listing.media}
+          onPressImage={setViewerIndex}
+          style={styles.carousel}
+        />
 
         <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} hideMedia />
 
@@ -94,6 +98,11 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingBottom: spacing.xl,
+  },
+  carousel: {
+    marginTop: -spacing.md,
+    marginHorizontal: -spacing.sm,
+    borderRadius: spacing.lg,
   },
   notFound: {
     fontSize: 14,

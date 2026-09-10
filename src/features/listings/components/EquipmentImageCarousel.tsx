@@ -19,6 +19,7 @@ const CAROUSEL_HEIGHT = 240;
 export function EquipmentImageCarousel({
   media,
   onPressImage,
+  style,
 }: EquipmentImageCarouselProps): React.ReactElement {
   const [containerWidth, setContainerWidth] = React.useState(0);
   const [activeIndex, setActiveIndex] = React.useState(0);
@@ -35,7 +36,7 @@ export function EquipmentImageCarousel({
   };
 
   return (
-    <View style={[styles.root, { height: CAROUSEL_HEIGHT }]} onLayout={handleLayout}>
+    <View style={[styles.root, { height: CAROUSEL_HEIGHT }, style]} onLayout={handleLayout}>
       {hasMedia && containerWidth > 0 ? (
         <ScrollView
           horizontal
@@ -73,7 +74,7 @@ export function EquipmentImageCarousel({
 
 const styles = StyleSheet.create({
   root: {
-    width: '100%',
+    alignSelf: 'stretch',
     borderRadius: radius.lg,
     overflow: 'hidden',
     backgroundColor: palette.softGold,
