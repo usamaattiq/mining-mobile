@@ -1,13 +1,13 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
-import { AppTopBar } from '@/shared/components/AppTopBar';
 import { AppText } from '@/shared/components/AppText';
-import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
@@ -20,6 +20,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingDetail'
 
 export function EquipmentListingDetailScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const insets = useSafeAreaInsets();
   const currency = useCurrency();
   const listing = useListingsStore((state) =>
     state.listings.find((item) => item.id === route.params.id),
@@ -29,19 +30,26 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
     'hourly' | 'weekly' | 'monthly' | null
   >(null);
 
+  const backButton = (
+    <Pressable
+      onPress={navigation.goBack}
+      hitSlop={12}
+      style={[styles.backButton, { top: insets.top + spacing.sm }]}
+      accessibilityRole="button"
+      accessibilityLabel={t('common.back')}
+    >
+      <Ionicons name="chevron-back" size={20} color={palette.pureWhite} />
+    </Pressable>
+  );
+
   if (!listing) {
     return (
       <View style={styles.root}>
-        <StatusBar style="light" />
-        <AppTopBar
-          left="back"
-          variant="gold"
-          onBackPress={navigation.goBack}
-          style={styles.header}
-        />
-        <CurvedSheetScrollView>
+        <StatusBar style="dark" />
+        {backButton}
+        <View style={styles.notFoundWrap}>
           <AppText style={styles.notFound}>{t('requests.notFound')}</AppText>
-        </CurvedSheetScrollView>
+        </View>
       </View>
     );
   }
@@ -108,58 +116,56 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      <AppTopBar
-        left="back"
-        variant="gold"
-        title={listing.title}
-        onBackPress={navigation.goBack}
-        style={styles.header}
-      />
-
-      <CurvedSheetScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <EquipmentImageCarousel
           media={listing.media}
           onPressImage={setViewerIndex}
           style={styles.carousel}
         />
 
-        {price ? (
-          <View style={styles.priceRow}>
-            <View style={styles.priceValueRow}>
-              <AppText weight="bold" style={styles.priceAmount}>
-                {currency.symbol} {price.amount}
-              </AppText>
-              {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
-            </View>
-
-            {durationOptions.length > 1 ? (
-              <View style={styles.durationRow}>
-                {durationOptions.map((option) => {
-                  const selected = option.key === activeDuration?.key;
-                  return (
-                    <Pressable
-                      key={option.key}
-                      onPress={() => setSelectedDuration(option.key)}
-                      style={[styles.durationButton, selected && styles.durationButtonSelected]}
-                    >
-                      <AppText
-                        weight="semibold"
-                        style={[styles.durationText, selected && styles.durationTextSelected]}
-                      >
-                        {option.label}
-                      </AppText>
-                    </Pressable>
-                  );
-                })}
+        <View style={styles.content}>
+          {price ? (
+            <View style={styles.priceRow}>
+              <View style={styles.priceValueRow}>
+                <AppText weight="bold" style={styles.priceAmount}>
+                  {currency.symbol} {price.amount}
+                </AppText>
+                {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
               </View>
-            ) : null}
-          </View>
-        ) : null}
 
-        <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} hideMedia />
+              {durationOptions.length > 1 ? (
+                <View style={styles.durationRow}>
+                  {durationOptions.map((option) => {
+                    const selected = option.key === activeDuration?.key;
+                    return (
+                      <Pressable
+                        key={option.key}
+                        onPress={() => setSelectedDuration(option.key)}
+                        style={[styles.durationButton, selected && styles.durationButtonSelected]}
+                      >
+                        <AppText
+                          weight="semibold"
+                          style={[styles.durationText, selected && styles.durationTextSelected]}
+                        >
+                          {option.label}
+                        </AppText>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              ) : null}
+            </View>
+          ) : null}
 
-        {listing.deliveryAvailable ? <DeliveryAvailableBanner subtitle={deliverySubtitle} /> : null}
-      </CurvedSheetScrollView>
+          <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} hideMedia />
+
+          {listing.deliveryAvailable ? (
+            <DeliveryAvailableBanner subtitle={deliverySubtitle} />
+          ) : null}
+        </View>
+      </ScrollView>
+
+      {backButton}
 
       <EquipmentImageViewerModal
         visible={viewerIndex !== null}
@@ -174,15 +180,24 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: palette.gold,
+    backgroundColor: palette.warmWhite,
   },
-  header: {
-    paddingBottom: spacing.xl,
+  content: {
+    padding: spacing.lg,
+    gap: spacing.lg,
   },
   carousel: {
-    marginTop: -spacing.md,
-    marginHorizontal: -spacing.sm,
-    borderRadius: spacing.lg,
+    borderRadius: 0,
+  },
+  backButton: {
+    position: 'absolute',
+    left: spacing.md,
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   priceRow: {
     flexDirection: 'row',
@@ -225,10 +240,15 @@ const styles = StyleSheet.create({
   durationTextSelected: {
     color: palette.pureWhite,
   },
+  notFoundWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   notFound: {
     fontSize: 14,
     color: palette.muted,
     textAlign: 'center',
-    marginTop: spacing.xxl,
   },
 });
