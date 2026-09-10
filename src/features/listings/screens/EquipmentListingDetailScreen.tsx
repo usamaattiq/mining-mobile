@@ -8,8 +8,10 @@ import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { AppText } from '@/shared/components/AppText';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
+import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
+import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
-import { ToggleRow } from '@/shared/components/ToggleRow';
+import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { useListingsStore } from '@/store/listingsStore';
 import { palette, spacing } from '@/theme';
 
@@ -20,10 +22,12 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
   const listing = useListingsStore((state) =>
     state.listings.find((item) => item.id === route.params.id),
   );
+  const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
 
   if (!listing) {
     return (
       <View style={styles.root}>
+        <StatusBar style="light" />
         <AppTopBar
           left="back"
           variant="gold"
@@ -66,16 +70,19 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
       />
 
       <CurvedSheetScrollView>
-        <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} />
+        <EquipmentImageCarousel media={listing.media} onPressImage={setViewerIndex} />
 
-        <ToggleRow
-          title={t('equipmentListing.deliveryAvailable')}
-          subtitle={t('equipmentListing.deliveryReadOnlySubtitle')}
-          enabled={listing.deliveryAvailable}
-          onToggle={() => {}}
-          disabled
-        />
+        <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} hideMedia />
+
+        {listing.deliveryAvailable ? <DeliveryAvailableBanner /> : null}
       </CurvedSheetScrollView>
+
+      <EquipmentImageViewerModal
+        visible={viewerIndex !== null}
+        media={listing.media}
+        initialIndex={viewerIndex ?? 0}
+        onClose={() => setViewerIndex(null)}
+      />
     </View>
   );
 }

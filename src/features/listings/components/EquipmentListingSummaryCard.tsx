@@ -12,6 +12,7 @@ export function EquipmentListingSummaryCard({
   media,
   onChangeDetails,
   onChangeMedia,
+  hideMedia,
 }: EquipmentListingSummaryCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
 
@@ -45,7 +46,7 @@ export function EquipmentListingSummaryCard({
         </View>
       </View>
 
-      {media.length > 0 ? (
+      {!hideMedia && media.length > 0 ? (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <AppText weight="bold" style={styles.sectionTitle}>

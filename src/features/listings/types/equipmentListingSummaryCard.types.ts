@@ -8,4 +8,6 @@ export type EquipmentListingSummaryCardProps = {
   onChangeDetails?: () => void;
   /** Shows a "Change" link on the media section when provided. */
   onChangeMedia?: () => void;
+  /** Skips the media section entirely — use when the caller already shows the photos elsewhere (e.g. a carousel). */
+  hideMedia?: boolean;
 };
