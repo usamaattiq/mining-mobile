@@ -51,7 +51,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
         ]
       : [{ label: t('equipmentListing.salePrice'), value: listing.salePrice }]),
     { label: t('equipmentListing.units'), value: String(listing.units) },
-  ].filter((row) => row.value.trim().length > 0);
+  ].filter((row) => (row.value ?? '').trim().length > 0);
 
   return (
     <View style={styles.root}>

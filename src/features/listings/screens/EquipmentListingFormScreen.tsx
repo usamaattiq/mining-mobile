@@ -137,7 +137,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         ]
       : [{ label: t('equipmentListing.salePrice'), value: salePrice }]),
     { label: t('equipmentListing.units'), value: String(units) },
-  ].filter((row) => row.value.trim().length > 0);
+  ].filter((row) => (row.value ?? '').trim().length > 0);
 
   return (
     <View style={styles.root}>

@@ -10,7 +10,7 @@ import type { EquipmentListingCardProps } from '@/features/listings/types/equipm
 
 const LISTING_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const COUNTDOWN_TICK_MS = 60 * 1000;
-const IMAGE_SIZE = 96;
+const IMAGE_SIZE = 112;
 
 function useRemainingTime(createdAt: number): string {
   const [now, setNow] = React.useState(() => Date.now());
@@ -91,30 +91,29 @@ export function EquipmentListingCard({
               {t('equipmentListing.unitsCount', { count: listing.units })}
             </AppText>
           </View>
-        </View>
-      </View>
 
-      <View style={styles.bottomRow}>
-        <View style={styles.badgeRow}>
-          <View style={styles.modeBadge}>
-            <AppText weight="semibold" style={styles.modeBadgeText}>
-              {modeBadgeLabel}
-            </AppText>
+          <View style={styles.badgeRow}>
+            {durationBadges.map((label) => (
+              <View key={label} style={styles.durationBadge}>
+                <AppText weight="semibold" style={styles.durationBadgeText}>
+                  {label}
+                </AppText>
+              </View>
+            ))}
           </View>
-          {durationBadges.map((label) => (
-            <View key={label} style={styles.durationBadge}>
-              <AppText weight="semibold" style={styles.durationBadgeText}>
-                {label}
+          <View style={styles.modeBadgeRow}>
+            <View style={styles.modeBadge}>
+              <AppText weight="semibold" style={styles.modeBadgeText}>
+                {modeBadgeLabel}
               </AppText>
             </View>
-          ))}
-        </View>
-
-        <View style={styles.timerBadge}>
-          <Ionicons name="time-outline" size={11} color={palette.gold} />
-          <AppText weight="semibold" style={styles.timerText}>
-            {timeLeft}
-          </AppText>
+            <View style={styles.timerBadge}>
+              <Ionicons name="time-outline" size={11} color={palette.gold} />
+              <AppText weight="semibold" style={styles.timerText}>
+                {timeLeft}
+              </AppText>
+            </View>
+          </View>
         </View>
       </View>
     </Pressable>
@@ -153,7 +152,7 @@ const styles = StyleSheet.create({
   copy: {
     flex: 1,
     justifyContent: 'center',
-    gap: 4,
+    gap: spacing.xs,
   },
   title: {
     fontSize: 15,
@@ -178,14 +177,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: palette.muted,
   },
-  bottomRow: {
+  modeBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   badgeRow: {
-    flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.xs,
