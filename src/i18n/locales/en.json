@@ -5,6 +5,7 @@
     "done": "Done",
     "close": "Close",
     "continue": "Continue",
+    "save": "Save",
     "error": "Something went wrong",
     "stepOfTotal": "Step {current} of {total}"
   },
@@ -136,7 +137,7 @@
   "tabs": {
     "home": "Home",
     "about": "About",
-    "settings": "Settings"
+    "profile": "Profile"
   },
   "dashboardHome": {
     "title": "Home",
@@ -146,8 +147,23 @@
     "title": "About",
     "subtitle": "Learn more about Dahabi."
   },
-  "dashboardSettings": {
-    "title": "Settings",
-    "subtitle": "Manage your account and preferences."
+  "profile": {
+    "edit": "Edit profile",
+    "personalInformation": "Personal information",
+    "personalInformationSubtitle": "Name, email, phone and address",
+    "language": "Language",
+    "fullName": "Full name",
+    "address": "Address",
+    "saveError": "Couldn't save your changes. Please try again.",
+    "email": "Email",
+    "phone": "Phone",
+    "security": "Security settings",
+    "securitySubtitle": "MPIN, biometrics, and device sessions",
+    "privacy": "Privacy policy",
+    "privacySubtitle": "How we handle your data",
+    "terms": "Terms of service",
+    "termsSubtitle": "The rules for using Dahabi",
+    "logout": "Log out",
+    "logoutSubtitle": "You'll need to verify to log back in"
   }
 }

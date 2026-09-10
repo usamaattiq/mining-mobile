@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FloatingTabBar } from '@/features/dashboard/components/FloatingTabBar';
 import { AboutScreen } from '@/features/dashboard/screens/AboutScreen';
 import { HomeScreen } from '@/features/dashboard/screens/HomeScreen';
-import { SettingsScreen } from '@/features/dashboard/screens/SettingsScreen';
+import { ProfileScreen } from '@/features/dashboard/screens/ProfileScreen';
 import { tabNavigatorScreenOptions } from '@/navigation/tabScreenOptions';
 import type { DashboardTabParamList } from '@/navigation/types';
 
@@ -18,7 +18,7 @@ export function DashboardTabNavigator(): React.ReactElement {
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} />
       <Tab.Screen name="About" component={AboutScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

@@ -5,6 +5,7 @@
     "done": "تم",
     "close": "إغلاق",
     "continue": "متابعة",
+    "save": "حفظ",
     "error": "حدث خطأ ما",
     "stepOfTotal": "الخطوة {current} من {total}"
   },
@@ -136,7 +137,7 @@
   "tabs": {
     "home": "الرئيسية",
     "about": "حول",
-    "settings": "الإعدادات"
+    "profile": "الملف الشخصي"
   },
   "dashboardHome": {
     "title": "الرئيسية",
@@ -146,8 +147,23 @@
     "title": "حول",
     "subtitle": "تعرّف على المزيد حول Dahabi."
   },
-  "dashboardSettings": {
-    "title": "الإعدادات",
-    "subtitle": "إدارة حسابك وتفضيلاتك."
+  "profile": {
+    "edit": "تعديل الملف الشخصي",
+    "personalInformation": "المعلومات الشخصية",
+    "personalInformationSubtitle": "الاسم والبريد الإلكتروني والهاتف والعنوان",
+    "language": "اللغة",
+    "fullName": "الاسم الكامل",
+    "address": "العنوان",
+    "saveError": "تعذّر حفظ التغييرات. حاول مرة أخرى.",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "security": "إعدادات الأمان",
+    "securitySubtitle": "رمز الدخول، البصمة، وجلسات الأجهزة",
+    "privacy": "سياسة الخصوصية",
+    "privacySubtitle": "كيف نتعامل مع بياناتك",
+    "terms": "شروط الخدمة",
+    "termsSubtitle": "قواعد استخدام Dahabi",
+    "logout": "تسجيل الخروج",
+    "logoutSubtitle": "ستحتاج إلى التحقق لتسجيل الدخول مرة أخرى"
   }
 }

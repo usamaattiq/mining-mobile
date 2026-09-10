@@ -4,10 +4,11 @@ export type RootStackParamList = {
   SignUpFlow: undefined;
   Welcome: undefined;
   Dashboard: undefined;
+  PersonalInformation: undefined;
 };
 
 export type DashboardTabParamList = {
   HomeTab: undefined;
   About: undefined;
-  Settings: undefined;
+  Profile: undefined;
 };

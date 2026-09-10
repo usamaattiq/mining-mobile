@@ -5,6 +5,7 @@ import { SignUpFlowScreen } from '@/features/auth/screens/SignUpFlowScreen';
 import { OnboardingScreen } from '@/features/shared/screens/OnboardingScreen';
 import { WelcomeScreen } from '@/features/shared/screens/WelcomeScreen';
 import { DashboardTabNavigator } from '@/navigation/DashboardTabNavigator';
+import { PersonalInformationScreen } from '@/features/dashboard/screens/PersonalInformationScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/shared/theme/tokens';
 import { useAuthStore } from '@/store/authStore';
@@ -42,6 +43,7 @@ export function AppNavigator(): React.ReactElement {
       />
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Dashboard" component={DashboardTabNavigator} />
+      <Stack.Screen name="PersonalInformation" component={PersonalInformationScreen} />
     </Stack.Navigator>
   );
 }

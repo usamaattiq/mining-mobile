@@ -28,10 +28,10 @@ const TAB_VISUALS: Record<string, TabVisual> = {
     icon: 'information-circle-outline',
     iconFocused: 'information-circle',
   },
-  Settings: {
-    labelKey: 'tabs.settings',
-    icon: 'settings-outline',
-    iconFocused: 'settings',
+  Profile: {
+    labelKey: 'tabs.profile',
+    icon: 'person-outline',
+    iconFocused: 'person',
   },
 };
 
