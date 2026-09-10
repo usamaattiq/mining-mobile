@@ -141,7 +141,13 @@
   },
   "dashboardHome": {
     "title": "الرئيسية",
-    "subtitle": "ستظهر نظرة عامة على لوحتك هنا."
+    "subtitle": "ستظهر نظرة عامة على لوحتك هنا.",
+    "listEquipment": "عرض معدات",
+    "listEquipmentSubtitle": "انشر معدات التعدين للبيع أو الإيجار",
+    "listService": "عرض خدمة",
+    "listServiceSubtitle": "قدّم خدمات التعدين الخاصة بك للمشترين",
+    "auctionGold": "مزاد الذهب",
+    "auctionGoldSubtitle": "ابدأ مزادًا مباشرًا للذهب"
   },
   "dashboardAbout": {
     "title": "حول",

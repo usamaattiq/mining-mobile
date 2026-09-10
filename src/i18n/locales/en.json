@@ -141,7 +141,13 @@
   },
   "dashboardHome": {
     "title": "Home",
-    "subtitle": "Your dashboard overview will show up here."
+    "subtitle": "Your dashboard overview will show up here.",
+    "listEquipment": "List Equipment",
+    "listEquipmentSubtitle": "Post mining equipment for sale or rent",
+    "listService": "List Service",
+    "listServiceSubtitle": "Offer your mining services to buyers",
+    "auctionGold": "Auction Gold",
+    "auctionGoldSubtitle": "Start a live gold auction"
   },
   "dashboardAbout": {
     "title": "About",

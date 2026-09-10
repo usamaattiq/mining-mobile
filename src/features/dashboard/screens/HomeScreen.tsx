@@ -5,10 +5,32 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
+import { HomeActionCard } from '@/features/dashboard/components/HomeActionCard';
 import { palette, radius, spacing } from '@/theme';
 
 export function HomeScreen(): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+
+  const actions = [
+    {
+      icon: 'construct-outline' as const,
+      title: t('dashboardHome.listEquipment'),
+      subtitle: t('dashboardHome.listEquipmentSubtitle'),
+      onPress: () => {},
+    },
+    {
+      icon: 'briefcase-outline' as const,
+      title: t('dashboardHome.listService'),
+      subtitle: t('dashboardHome.listServiceSubtitle'),
+      onPress: () => {},
+    },
+    {
+      icon: 'hammer-outline' as const,
+      title: t('dashboardHome.auctionGold'),
+      subtitle: t('dashboardHome.auctionGoldSubtitle'),
+      onPress: () => {},
+    },
+  ];
 
   return (
     <View style={styles.root}>
@@ -29,7 +51,11 @@ export function HomeScreen(): React.ReactElement {
           </Pressable>
         }
       />
-      <CurvedSheetScrollView />
+      <CurvedSheetScrollView>
+        {actions.map((action) => (
+          <HomeActionCard key={action.title} {...action} />
+        ))}
+      </CurvedSheetScrollView>
     </View>
   );
 }
