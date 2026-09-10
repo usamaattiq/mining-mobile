@@ -13,6 +13,7 @@ import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { ToggleRow } from '@/shared/components/ToggleRow';
+import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { Button } from '@/shared/components/Button';
 import { ListingStepper } from '@/features/listings/components/ListingStepper';
 import { EquipmentMediaUploader } from '@/features/listings/components/EquipmentMediaUploader';
@@ -20,6 +21,7 @@ import { EquipmentListingReview } from '@/features/listings/components/Equipment
 import { palette, radius, spacing } from '@/theme';
 import { useListingsStore } from '@/store/listingsStore';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
+import type { DeliveryType } from '@/features/listings/types/equipmentListing.types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingForm'>;
 
@@ -82,6 +84,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   } | null>(null);
   const [media, setMedia] = React.useState<EquipmentMediaAsset[]>([]);
   const [deliveryAvailable, setDeliveryAvailable] = React.useState(false);
+  const [deliveryType, setDeliveryType] = React.useState<DeliveryType>('free');
+  const [deliveryPricePerKm, setDeliveryPricePerKm] = React.useState('');
   const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
     useLocationMapPicker();
 
@@ -107,7 +111,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       ? hourlyRental.trim() || monthlyRental.trim() || weeklyRental.trim()
       : salePrice.trim()),
   );
-  const mediaValid = media.length > 0 && location.trim().length > 0;
+  const deliveryValid =
+    !deliveryAvailable || deliveryType === 'free' || deliveryPricePerKm.trim().length > 0;
+  const mediaValid = media.length > 0 && location.trim().length > 0 && deliveryValid;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -144,6 +150,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       location,
       media,
       deliveryAvailable,
+      deliveryType,
+      deliveryPricePerKm,
       createdAt: Date.now(),
     });
     navigation.popToTop();
@@ -163,6 +171,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     { label: t('equipmentListing.units'), value: String(units) },
     { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
+
+  const deliverySubtitle = deliveryAvailable
+    ? deliveryType === 'free'
+      ? t('equipmentListing.deliveryFree')
+      : `${t('equipmentListing.deliveryPerKm')} · ${deliveryPricePerKm}`
+    : undefined;
 
   return (
     <View style={styles.root}>
@@ -285,6 +299,30 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               enabled={deliveryAvailable}
               onToggle={setDeliveryAvailable}
             />
+
+            {deliveryAvailable ? (
+              <View style={styles.deliveryTypeBlock}>
+                <SegmentedSwitcher
+                  value={deliveryType}
+                  onChange={setDeliveryType}
+                  options={[
+                    { key: 'free', label: t('equipmentListing.deliveryFree') },
+                    { key: 'perKm', label: t('equipmentListing.deliveryPerKm') },
+                  ]}
+                />
+
+                {deliveryType === 'perKm' ? (
+                  <FormInput
+                    label={t('equipmentListing.deliveryPricePerKm')}
+                    value={deliveryPricePerKm}
+                    onChangeText={setDeliveryPricePerKm}
+                    placeholder={t('equipmentListing.deliveryPricePerKmPlaceholder')}
+                    keyboardType="numeric"
+                    required
+                  />
+                ) : null}
+              </View>
+            ) : null}
           </View>
         ) : null}
 
@@ -293,6 +331,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             detailRows={detailRows}
             media={media}
             deliveryAvailable={deliveryAvailable}
+            deliverySubtitle={deliverySubtitle}
             onChangeDetails={() => setStep(0)}
             onChangeMedia={() => setStep(1)}
             onPublish={handlePublish}
@@ -357,6 +396,9 @@ const styles = StyleSheet.create({
   },
   unitsField: {
     width: '50%',
+  },
+  deliveryTypeBlock: {
+    gap: spacing.md,
   },
   continueButton: {
     marginTop: spacing.sm,

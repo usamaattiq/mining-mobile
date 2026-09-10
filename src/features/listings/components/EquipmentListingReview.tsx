@@ -3,9 +3,9 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { Button } from '@/shared/components/Button';
-import { ToggleRow } from '@/shared/components/ToggleRow';
 import { spacing } from '@/theme';
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
+import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import type { EquipmentListingReviewProps } from '@/features/listings/types/equipmentListingReview.types';
 
 /** Read-only summary of the details + media steps, with edit shortcuts and the final publish action. */
@@ -13,6 +13,7 @@ export function EquipmentListingReview({
   detailRows,
   media,
   deliveryAvailable,
+  deliverySubtitle,
   onChangeDetails,
   onChangeMedia,
   onPublish,
@@ -29,13 +30,7 @@ export function EquipmentListingReview({
         onChangeMedia={onChangeMedia}
       />
 
-      <ToggleRow
-        title={t('equipmentListing.deliveryAvailable')}
-        subtitle={t('equipmentListing.deliveryReadOnlySubtitle')}
-        enabled={deliveryAvailable}
-        onToggle={() => {}}
-        disabled
-      />
+      {deliveryAvailable ? <DeliveryAvailableBanner subtitle={deliverySubtitle} /> : null}
 
       <Button
         label={t('equipmentListing.publish')}

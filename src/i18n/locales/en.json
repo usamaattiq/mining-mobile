@@ -214,7 +214,11 @@
     "deliveryAvailable": "Delivery Available",
     "deliveryBadge": "Delivery",
     "deliveryAvailableSubtitle": "Offer delivery to the buyer's site",
-    "deliveryReadOnlySubtitle": "Set on the media step",
+    "deliveryType": "Delivery type",
+    "deliveryFree": "Free",
+    "deliveryPerKm": "Per KM",
+    "deliveryPricePerKm": "Price per KM",
+    "deliveryPricePerKmPlaceholder": "e.g. 5",
     "publish": "Publish listing"
   },
   "profile": {

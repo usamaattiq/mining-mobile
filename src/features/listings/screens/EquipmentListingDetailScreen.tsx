@@ -58,6 +58,12 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
     { label: t('equipmentListing.location'), value: listing.location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
+  const deliverySubtitle = listing.deliveryAvailable
+    ? listing.deliveryType === 'free'
+      ? t('equipmentListing.deliveryFree')
+      : `${t('equipmentListing.deliveryPerKm')} · ${listing.deliveryPricePerKm}`
+    : undefined;
+
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
@@ -79,7 +85,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
 
         <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} hideMedia />
 
-        {listing.deliveryAvailable ? <DeliveryAvailableBanner /> : null}
+        {listing.deliveryAvailable ? <DeliveryAvailableBanner subtitle={deliverySubtitle} /> : null}
       </CurvedSheetScrollView>
 
       <EquipmentImageViewerModal

@@ -210,7 +210,11 @@
     "deliveryAvailable": "التوصيل متاح",
     "deliveryBadge": "توصيل",
     "deliveryAvailableSubtitle": "قدّم التوصيل إلى موقع المشتري",
-    "deliveryReadOnlySubtitle": "تم تحديده في خطوة الوسائط",
+    "deliveryType": "نوع التوصيل",
+    "deliveryFree": "مجاني",
+    "deliveryPerKm": "لكل كم",
+    "deliveryPricePerKm": "السعر لكل كم",
+    "deliveryPricePerKmPlaceholder": "مثال: 5",
     "publish": "نشر الإعلان"
   },
   "dashboardAbout": {

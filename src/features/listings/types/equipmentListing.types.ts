@@ -1,6 +1,8 @@
 import type { EquipmentListingMode, ListingCategory } from '@/navigation/types';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 
+export type DeliveryType = 'free' | 'perKm';
+
 export type EquipmentListing = {
   id: string;
   category: ListingCategory;
@@ -16,5 +18,7 @@ export type EquipmentListing = {
   location: string;
   media: EquipmentMediaAsset[];
   deliveryAvailable: boolean;
+  deliveryType: DeliveryType;
+  deliveryPricePerKm: string;
   createdAt: number;
 };
