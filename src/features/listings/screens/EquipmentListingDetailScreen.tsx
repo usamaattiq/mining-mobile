@@ -13,12 +13,14 @@ import { EquipmentImageViewerModal } from '@/features/listings/components/Equipm
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
 import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { useListingsStore } from '@/store/listingsStore';
+import { useCurrency } from '@/shared/hooks/useCurrency';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingDetail'>;
 
 export function EquipmentListingDetailScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const currency = useCurrency();
   const listing = useListingsStore((state) =>
     state.listings.find((item) => item.id === route.params.id),
   );
@@ -99,7 +101,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
   const deliverySubtitle = listing.deliveryAvailable
     ? listing.deliveryType === 'free'
       ? t('equipmentListing.deliveryFree')
-      : `${t('equipmentListing.deliveryPerKm')} · ${listing.deliveryPricePerKm}`
+      : `${t('equipmentListing.deliveryPerKm')} · ${currency.symbol} ${listing.deliveryPricePerKm}`
     : undefined;
 
   return (
@@ -125,7 +127,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
           <View style={styles.priceRow}>
             <View style={styles.priceValueRow}>
               <AppText weight="bold" style={styles.priceAmount}>
-                {price.amount}
+                {currency.symbol} {price.amount}
               </AppText>
               {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
             </View>

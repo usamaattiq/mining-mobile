@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
+import { AppText } from '@/shared/components/AppText';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { CounterField } from '@/shared/components/CounterField';
@@ -20,6 +21,7 @@ import { EquipmentMediaUploader } from '@/features/listings/components/Equipment
 import { EquipmentListingReview } from '@/features/listings/components/EquipmentListingReview';
 import { palette, radius, spacing } from '@/theme';
 import { useListingsStore } from '@/store/listingsStore';
+import { useCurrency } from '@/shared/hooks/useCurrency';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { DeliveryType } from '@/features/listings/types/equipmentListing.types';
 
@@ -28,6 +30,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingForm'>;
 export function EquipmentListingFormScreen({ navigation, route }: Props): React.ReactElement {
   const { mode } = route.params;
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const currency = useCurrency();
+  const currencyAdornment = (
+    <AppText weight="semibold" style={styles.currencyAdornment}>
+      {currency.symbol}
+    </AppText>
+  );
   const isRent = mode === 'rent';
 
   const steps = [
@@ -163,11 +171,25 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     { label: t('equipmentListing.description'), value: description },
     ...(isRent
       ? [
-          { label: t('equipmentListing.hourlyRental'), value: hourlyRental },
-          { label: t('equipmentListing.weeklyRental'), value: weeklyRental },
-          { label: t('equipmentListing.monthlyRental'), value: monthlyRental },
+          {
+            label: t('equipmentListing.hourlyRental'),
+            value: hourlyRental ? `${currency.symbol} ${hourlyRental}` : '',
+          },
+          {
+            label: t('equipmentListing.weeklyRental'),
+            value: weeklyRental ? `${currency.symbol} ${weeklyRental}` : '',
+          },
+          {
+            label: t('equipmentListing.monthlyRental'),
+            value: monthlyRental ? `${currency.symbol} ${monthlyRental}` : '',
+          },
         ]
-      : [{ label: t('equipmentListing.salePrice'), value: salePrice }]),
+      : [
+          {
+            label: t('equipmentListing.salePrice'),
+            value: salePrice ? `${currency.symbol} ${salePrice}` : '',
+          },
+        ]),
     { label: t('equipmentListing.units'), value: String(units) },
     { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -175,7 +197,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const deliverySubtitle = deliveryAvailable
     ? deliveryType === 'free'
       ? t('equipmentListing.deliveryFree')
-      : `${t('equipmentListing.deliveryPerKm')} · ${deliveryPricePerKm}`
+      : `${t('equipmentListing.deliveryPerKm')} · ${currency.symbol} ${deliveryPricePerKm}`
     : undefined;
 
   return (
@@ -240,6 +262,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     value={hourlyRental}
                     onChangeText={setHourlyRental}
                     keyboardType="numeric"
+                    leftAdornment={currencyAdornment}
                   />
                 </View>
                 <View style={styles.priceInput}>
@@ -248,6 +271,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     value={weeklyRental}
                     onChangeText={setWeeklyRental}
                     keyboardType="numeric"
+                    leftAdornment={currencyAdornment}
                   />
                 </View>
                 <View style={styles.priceInput}>
@@ -256,6 +280,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     value={monthlyRental}
                     onChangeText={setMonthlyRental}
                     keyboardType="numeric"
+                    leftAdornment={currencyAdornment}
                   />
                 </View>
               </View>
@@ -265,6 +290,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 value={salePrice}
                 onChangeText={setSalePrice}
                 keyboardType="numeric"
+                leftAdornment={currencyAdornment}
                 required
               />
             )}
@@ -318,6 +344,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     onChangeText={setDeliveryPricePerKm}
                     placeholder={t('equipmentListing.deliveryPricePerKmPlaceholder')}
                     keyboardType="numeric"
+                    leftAdornment={currencyAdornment}
                     required
                   />
                 ) : null}
@@ -393,6 +420,10 @@ const styles = StyleSheet.create({
   },
   priceInput: {
     flex: 1,
+  },
+  currencyAdornment: {
+    fontSize: 15,
+    color: palette.muted,
   },
   unitsField: {
     width: '50%',
