@@ -242,6 +242,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
                 value={confirmMpin}
                 onChangeValue={setConfirmMpin}
                 secure
+                autoFocus={false}
               />
               <View style={styles.stepActionsRow}>
                 <Button label={t('common.cancel')} variant="outline" onPress={resetMpinFlow} />

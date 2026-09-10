@@ -13,6 +13,7 @@ export function CodeInput({
   disabled = false,
 }: CodeInputProps): React.ReactElement {
   const inputRef = React.useRef<TextInput>(null);
+  const [focused, setFocused] = React.useState(false);
   const digits = Array.from({ length }, (_, index) => value[index] ?? '');
 
   return (
@@ -20,7 +21,7 @@ export function CodeInput({
       {digits.map((digit, index) => (
         <View
           key={index}
-          style={[styles.box, index === value.length && !disabled && styles.boxActive]}
+          style={[styles.box, focused && index === value.length && !disabled && styles.boxActive]}
         >
           <TextInput style={styles.hiddenInput} editable={false} value="" />
           <View pointerEvents="none" style={styles.digitWrap}>
@@ -42,6 +43,8 @@ export function CodeInput({
         autoFocus={autoFocus && !disabled}
         editable={!disabled}
         caretHidden
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       />
     </View>
   );
