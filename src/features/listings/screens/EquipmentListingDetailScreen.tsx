@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +14,7 @@ import { EquipmentListingSummaryCard } from '@/features/listings/components/Equi
 import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { useListingsStore } from '@/store/listingsStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
+import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingDetail'>;
@@ -58,11 +59,17 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
 
   const detailRows = [
     { label: t('equipmentListing.equipmentType'), value: listing.equipmentTypeLabel },
-    { label: t('equipmentListing.title'), value: listing.title },
     { label: t('equipmentListing.description'), value: listing.description },
     { label: t('equipmentListing.units'), value: String(listing.units) },
-    { label: t('equipmentListing.location'), value: listing.location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
+
+  const locationLabel = listing.location ?? '';
+
+  const handleOpenLocation = () => {
+    if (!locationLabel.trim()) return;
+    const query = encodeURIComponent(locationLabel);
+    void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
+  };
 
   const durationOptions = isRent
     ? (
@@ -109,7 +116,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
   const deliverySubtitle = listing.deliveryAvailable
     ? listing.deliveryType === 'free'
       ? t('equipmentListing.deliveryFree')
-      : `${t('equipmentListing.deliveryPerKm')} · ${currency.symbol} ${listing.deliveryPricePerKm}`
+      : `${t('equipmentListing.deliveryPerKm')} · ${currency.symbol} ${formatAmountWithCommas(listing.deliveryPricePerKm)}`
     : undefined;
 
   return (
@@ -124,38 +131,64 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
         />
 
         <View style={styles.content}>
-          {price ? (
-            <View style={styles.priceRow}>
-              <View style={styles.priceValueRow}>
-                <AppText weight="bold" style={styles.priceAmount}>
-                  {currency.symbol} {price.amount}
-                </AppText>
-                {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
-              </View>
-
-              {durationOptions.length > 1 ? (
-                <View style={styles.durationRow}>
-                  {durationOptions.map((option) => {
-                    const selected = option.key === activeDuration?.key;
-                    return (
-                      <Pressable
-                        key={option.key}
-                        onPress={() => setSelectedDuration(option.key)}
-                        style={[styles.durationButton, selected && styles.durationButtonSelected]}
-                      >
-                        <AppText
-                          weight="semibold"
-                          style={[styles.durationText, selected && styles.durationTextSelected]}
-                        >
-                          {option.label}
-                        </AppText>
-                      </Pressable>
-                    );
-                  })}
+          <View style={styles.headerBlock}>
+            {price ? (
+              <View style={styles.priceRow}>
+                <View style={styles.priceValueRow}>
+                  <AppText weight="bold" style={styles.priceAmount}>
+                    {currency.symbol} {formatAmountWithCommas(price.amount)}
+                  </AppText>
+                  {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
                 </View>
+
+                {durationOptions.length > 1 ? (
+                  <View style={styles.durationRow}>
+                    {durationOptions.map((option) => {
+                      const selected = option.key === activeDuration?.key;
+                      return (
+                        <Pressable
+                          key={option.key}
+                          onPress={() => setSelectedDuration(option.key)}
+                          style={[styles.durationButton, selected && styles.durationButtonSelected]}
+                        >
+                          <AppText
+                            weight="semibold"
+                            style={[styles.durationText, selected && styles.durationTextSelected]}
+                          >
+                            {option.label}
+                          </AppText>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+
+            <View style={styles.titleBlock}>
+              <AppText weight="bold" style={styles.title}>
+                {listing.title}
+              </AppText>
+
+              {locationLabel.trim() ? (
+                <Pressable
+                  onPress={handleOpenLocation}
+                  style={({ pressed }) => [
+                    styles.locationRow,
+                    pressed && styles.locationRowPressed,
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={locationLabel}
+                >
+                  <Ionicons name="location-outline" size={16} color={palette.gold} />
+                  <AppText style={styles.locationText} numberOfLines={1}>
+                    {locationLabel}
+                  </AppText>
+                  <Ionicons name="open-outline" size={14} color={palette.muted} />
+                </Pressable>
               ) : null}
             </View>
-          ) : null}
+          </View>
 
           <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} hideMedia />
 
@@ -185,6 +218,9 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     gap: spacing.lg,
+  },
+  headerBlock: {
+    gap: spacing.xs,
   },
   carousel: {
     borderRadius: 0,
@@ -239,6 +275,27 @@ const styles = StyleSheet.create({
   },
   durationTextSelected: {
     color: palette.pureWhite,
+  },
+  titleBlock: {
+    gap: spacing.xs,
+  },
+  title: {
+    fontSize: 18,
+    color: palette.charcoal,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    alignSelf: 'flex-start',
+  },
+  locationRowPressed: {
+    opacity: 0.7,
+  },
+  locationText: {
+    fontSize: 14,
+    color: palette.gold,
+    textDecorationLine: 'underline',
   },
   notFoundWrap: {
     flex: 1,
