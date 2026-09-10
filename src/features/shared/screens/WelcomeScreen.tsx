@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +14,7 @@ import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { Confetti } from '@/features/auth/components/Confetti';
 import { AppText } from '@/shared/components/AppText';
+import { Button } from '@/shared/components/Button';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
@@ -59,18 +60,14 @@ export function WelcomeScreen({ navigation }: Props): React.ReactElement {
         </AppText>
         <AppText style={styles.subtitle}>{t('welcome.subtitle')}</AppText>
 
-        <Pressable
-          style={styles.continueButton}
+        <Button
+          label={t('welcome.continue')}
           onPress={handleContinue}
           disabled={continuing}
-          accessibilityRole="button"
-          accessibilityLabel={t('welcome.continue')}
-        >
-          <Animated.View style={[styles.continueProgress, progressBarStyle]} />
-          <AppText weight="bold" style={styles.continueLabel}>
-            {t('welcome.continue')}
-          </AppText>
-        </Pressable>
+          size="lg"
+          style={styles.continueButton}
+          overlay={<Animated.View style={[styles.continueProgress, progressBarStyle]} />}
+        />
       </View>
     </View>
   );
@@ -115,12 +112,6 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     alignSelf: 'stretch',
-    height: 52,
-    borderRadius: radius.pill,
-    backgroundColor: palette.gold,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
   },
   continueProgress: {
     position: 'absolute',
@@ -128,9 +119,5 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: palette.goldDark,
-  },
-  continueLabel: {
-    fontSize: 15,
-    color: palette.pureWhite,
   },
 });

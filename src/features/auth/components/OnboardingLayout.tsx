@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { OnboardingHeadline } from '@/features/auth/components/OnboardingHeadline';
 import { AppText } from '@/shared/components/AppText';
+import { Button } from '@/shared/components/Button';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { palette, radius, spacing } from '@/theme';
 import type { OnboardingLayoutProps } from '@/features/auth/types/onboardingLayout.types';
@@ -75,23 +76,15 @@ export function OnboardingLayout({
           {children}
 
           {showFooter ? (
-            <Pressable
-              disabled={!canContinue}
+            <Button
+              label={continueLabel}
               onPress={onContinue}
-              accessibilityRole="button"
-              accessibilityLabel={continueLabel}
-              style={({ pressed }) => [
-                styles.continuePressable,
-                pressed && canContinue && styles.pressed,
-              ]}
-            >
-              <View style={[styles.continueButton, !canContinue && styles.continueButtonDisabled]}>
-                <AppText weight="bold" style={styles.continueLabel}>
-                  {continueLabel}
-                </AppText>
-                <Ionicons name="arrow-forward" size={18} color={palette.pureWhite} />
-              </View>
-            </Pressable>
+              disabled={!canContinue}
+              size="lg"
+              icon="arrow-forward"
+              iconPosition="right"
+              style={styles.continueButton}
+            />
           ) : null}
         </KeyboardAwareScrollView>
       </View>
@@ -161,26 +154,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xl,
   },
-  continuePressable: {
+  continueButton: {
     width: '100%',
     marginTop: spacing.xl,
-    borderRadius: radius.pill,
-  },
-  continueButton: {
-    backgroundColor: palette.gold,
-    minHeight: 56,
-    borderRadius: radius.pill,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  continueButtonDisabled: {
-    opacity: 0.5,
-  },
-  continueLabel: {
-    color: palette.pureWhite,
-    fontSize: 16,
-    letterSpacing: 0.3,
   },
 });

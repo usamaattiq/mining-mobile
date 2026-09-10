@@ -8,8 +8,11 @@ import type { ButtonProps } from '@/shared/types/button.types';
 export function Button({
   label,
   variant = 'primary',
+  size = 'md',
   loading = false,
   icon,
+  iconPosition = 'left',
+  overlay,
   disabled,
   style,
   ...rest
@@ -17,6 +20,7 @@ export function Button({
   const isDisabled = disabled || loading;
   const iconColor =
     variant === 'primary' || variant === 'secondary' ? palette.pureWhite : palette.gold;
+  const iconElement = icon ? <Ionicons name={icon} size={16} color={iconColor} /> : null;
 
   return (
     <TouchableOpacity
@@ -24,24 +28,28 @@ export function Button({
       disabled={isDisabled}
       style={[
         styles.base,
+        size === 'lg' && styles.lg,
         variant === 'primary' && styles.primary,
         variant === 'secondary' && styles.secondary,
         variant === 'outline' && styles.outline,
         variant === 'link' && styles.link,
+        overlay ? styles.clip : null,
         isDisabled && styles.disabled,
         style,
       ]}
       {...rest}
     >
+      {overlay}
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? palette.pureWhite : palette.gold} />
       ) : (
         <>
-          {icon ? <Ionicons name={icon} size={16} color={iconColor} /> : null}
+          {iconPosition === 'left' ? iconElement : null}
           <AppText
             weight="bold"
             style={[
               styles.label,
+              size === 'lg' && styles.labelLg,
               variant === 'primary' && styles.labelPrimary,
               variant === 'secondary' && styles.labelSecondary,
               variant === 'outline' && styles.labelOutline,
@@ -50,6 +58,7 @@ export function Button({
           >
             {label}
           </AppText>
+          {iconPosition === 'right' ? iconElement : null}
         </>
       )}
     </TouchableOpacity>
@@ -65,6 +74,13 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingVertical: spacing.sm + 6,
     paddingHorizontal: spacing.lg,
+  },
+  lg: {
+    minHeight: 56,
+    borderRadius: radius.pill,
+  },
+  clip: {
+    overflow: 'hidden',
   },
   primary: {
     backgroundColor: palette.gold,
@@ -87,6 +103,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 15,
+  },
+  labelLg: {
+    fontSize: 16,
+    letterSpacing: 0.3,
   },
   labelPrimary: {
     color: palette.pureWhite,

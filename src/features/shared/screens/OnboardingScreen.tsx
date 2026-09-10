@@ -1,13 +1,14 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppText } from '@/shared/components/AppText';
+import { Button } from '@/shared/components/Button';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { LegalDocumentSheet } from '@/shared/components/LegalDocumentSheet';
 import type { LegalDocumentKind } from '@/shared/constants/legalContent';
@@ -95,27 +96,24 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
           <AppText style={styles.subtext}>{t('onboarding.subtitle')}</AppText>
         </View>
 
-        <TouchableOpacity
-          activeOpacity={0.85}
+        <Button
+          label={t('onboarding.signUp')}
           onPress={() => navigation.navigate('SignUpFlow')}
-          style={[styles.signUpButtonWrap, styles.actionButton]}
-        >
-          <AppText weight="bold" style={styles.signUpLabel}>
-            {t('onboarding.signUp')}
-          </AppText>
-          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-        </TouchableOpacity>
+          size="lg"
+          icon="arrow-forward"
+          iconPosition="right"
+          style={styles.signUpButtonWrap}
+        />
 
-        <TouchableOpacity
-          activeOpacity={0.85}
+        <Button
+          label={t('onboarding.logIn')}
           onPress={() => navigation.navigate('Login')}
-          style={[styles.actionButton, styles.loginButton]}
-        >
-          <AppText weight="bold" style={styles.loginLabel}>
-            {t('onboarding.logIn')}
-          </AppText>
-          <Ionicons name="arrow-forward" size={18} color={colors.gold} />
-        </TouchableOpacity>
+          variant="outline"
+          size="lg"
+          icon="arrow-forward"
+          iconPosition="right"
+          style={styles.loginButton}
+        />
       </View>
 
       <View style={[styles.legalRow, { bottom: Math.max(insets.bottom, spacing.sm) }]}>
@@ -220,7 +218,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   signUpButtonWrap: {
-    backgroundColor: colors.gold,
     borderRadius: 28,
     shadowColor: colors.goldDark,
     shadowOpacity: 0.35,
@@ -228,27 +225,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 4,
   },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    height: 56,
-    borderRadius: 28,
-  },
-  signUpLabel: {
-    fontSize: 16,
-    color: '#FFFFFF',
-  },
   loginButton: {
     marginTop: spacing.sm,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: colors.gold,
-  },
-  loginLabel: {
-    fontSize: 16,
-    color: colors.gold,
+    borderRadius: 28,
   },
   legalRow: {
     position: 'absolute',
