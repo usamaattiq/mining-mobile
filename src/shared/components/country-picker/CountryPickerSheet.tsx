@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',

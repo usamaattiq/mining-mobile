@@ -13,10 +13,13 @@ export function AppTopBar({
   rightSlot,
   includeSafeArea = true,
   variant = 'light',
+  titleAlign = 'center',
+  titleSize = 'md',
   style,
 }: AppTopBarProps): React.ReactElement {
   const insets = useSafeAreaInsets();
   const isGold = variant === 'gold';
+  const showLeftSide = left === 'back' || titleAlign === 'center';
 
   return (
     <View
@@ -27,33 +30,40 @@ export function AppTopBar({
         style,
       ]}
     >
-      <View style={styles.side}>
-        {left === 'back' ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            onPress={onBackPress}
-            hitSlop={12}
-            style={({ pressed }) => [
-              styles.backButton,
-              isGold && styles.backButtonGold,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={20}
-              color={isGold ? palette.pureWhite : palette.charcoal}
-            />
-          </Pressable>
-        ) : null}
-      </View>
+      {showLeftSide ? (
+        <View style={styles.side}>
+          {left === 'back' ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              onPress={onBackPress}
+              hitSlop={12}
+              style={({ pressed }) => [
+                styles.backButton,
+                isGold && styles.backButtonGold,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={20}
+                color={isGold ? palette.pureWhite : palette.charcoal}
+              />
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
 
       {title ? (
-        <View style={styles.titleBlock}>
+        <View style={[styles.titleBlock, titleAlign === 'left' && styles.titleBlockLeft]}>
           <AppText
             weight="bold"
-            style={[styles.title, isGold && styles.titleGold]}
+            style={[
+              styles.title,
+              titleSize === 'lg' && styles.titleLg,
+              titleAlign === 'left' && styles.titleLeft,
+              isGold && styles.titleGold,
+            ]}
             numberOfLines={1}
           >
             {title}
@@ -96,10 +106,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  titleBlockLeft: {
+    alignItems: 'flex-start',
+  },
   title: {
     fontSize: 16,
     textAlign: 'center',
     color: palette.charcoal,
+  },
+  titleLg: {
+    fontSize: 24,
+  },
+  titleLeft: {
+    textAlign: 'left',
   },
   titleGold: {
     color: palette.pureWhite,

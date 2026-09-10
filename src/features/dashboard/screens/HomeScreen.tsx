@@ -1,21 +1,35 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import { AppText } from '@/shared/components/AppText';
-import { palette, spacing } from '@/theme';
+import { AppTopBar } from '@/shared/components/AppTopBar';
+import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
+import { palette, radius, spacing } from '@/theme';
 
 export function HomeScreen(): React.ReactElement {
-  const insets = useSafeAreaInsets();
   const { t } = useTranslation(undefined, { i18n: appI18n });
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + spacing.xl }]}>
-      <AppText weight="bold" style={styles.title}>
-        {t('dashboardHome.title')}
-      </AppText>
-      <AppText style={styles.subtitle}>{t('dashboardHome.subtitle')}</AppText>
+    <View style={styles.root}>
+      <AppTopBar
+        variant="gold"
+        title={t('dashboardHome.title')}
+        titleAlign="left"
+        titleSize="lg"
+        style={styles.header}
+        rightSlot={
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Notifications"
+            hitSlop={12}
+            style={({ pressed }) => [styles.notificationButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="notifications-outline" size={20} color={palette.pureWhite} />
+          </Pressable>
+        }
+      />
+      <CurvedSheetScrollView />
     </View>
   );
 }
@@ -23,16 +37,20 @@ export function HomeScreen(): React.ReactElement {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: palette.warmWhite,
-    paddingHorizontal: spacing.lg,
+    backgroundColor: palette.gold,
   },
-  title: {
-    fontSize: 22,
-    color: palette.charcoal,
+  notificationButton: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
   },
-  subtitle: {
-    marginTop: spacing.xs,
-    fontSize: 14,
-    color: palette.muted,
+  pressed: {
+    opacity: 0.75,
+  },
+  header: {
+    paddingBottom: spacing.xl,
   },
 });

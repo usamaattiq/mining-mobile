@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   name: {
-    fontSize: 20,
-    lineHeight: 26,
+    fontSize: 24,
+    lineHeight: 30,
     color: palette.pureWhite,
   },
   metaRow: {

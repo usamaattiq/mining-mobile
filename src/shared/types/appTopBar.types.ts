@@ -12,5 +12,9 @@ export type AppTopBarProps = {
   includeSafeArea?: boolean;
   /** 'gold' renders on a gold background with white text/icons — for use atop a CurvedSheetScrollView. */
   variant?: 'light' | 'gold';
+  /** Title text alignment. Defaults to 'center'; use 'left' for main dashboard tab screens. */
+  titleAlign?: 'center' | 'left';
+  /** Title text size. Defaults to 'md'; use 'lg' for main dashboard tab screens. */
+  titleSize?: 'md' | 'lg';
   style?: ViewStyle;
 };
