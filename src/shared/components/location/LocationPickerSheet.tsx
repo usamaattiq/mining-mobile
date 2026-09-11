@@ -4,6 +4,8 @@ import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
+import { getFontFamily } from '@/theme';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
@@ -28,6 +30,7 @@ export function LocationPickerSheet({
   onConfirm,
 }: LocationPickerSheetProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
   const mapWebViewRef = React.useRef<WebView>(null);
   const skipSearchRef = React.useRef(false);
 
@@ -48,7 +51,7 @@ export function LocationPickerSheet({
 
   const mapPickerHtml = React.useMemo(() => {
     if (!hasGoogleMapsApiKey()) return '';
-    return buildLocationMapPickerHtml(googleMapsJsApiKey, mapCenter);
+    return buildLocationMapPickerHtml(googleMapsJsApiKey, mapCenter, currentLanguage);
     // HTML is rebuilt when the WebView remounts (mapInstanceKey); center is captured then.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
   }, [mapInstanceKey]);
@@ -148,7 +151,7 @@ export function LocationPickerSheet({
     setSearchLoading(true);
     setSearchShowEmpty(false);
     const id = setTimeout(() => {
-      void searchMapLocations(query, googleMapsJsApiKey)
+      void searchMapLocations(query, googleMapsJsApiKey, currentLanguage)
         .then((results) => {
           setSearchResults(results);
           setSearchShowEmpty(results.length === 0);
@@ -161,7 +164,7 @@ export function LocationPickerSheet({
     }, 400);
 
     return () => clearTimeout(id);
-  }, [searchQuery, visible]);
+  }, [searchQuery, visible, currentLanguage]);
 
   const handleConfirm = () => {
     if (!pin) return;
@@ -195,7 +198,7 @@ export function LocationPickerSheet({
               onChangeText={setSearchQuery}
               placeholder={t('location.mapSearchPlaceholder')}
               placeholderTextColor={palette.muted}
-              style={styles.searchInput}
+              style={[styles.searchInput, { fontFamily: getFontFamily(currentLanguage) }]}
               returnKeyType="search"
             />
             {searchLoading ? <ActivityIndicator size="small" color={palette.muted} /> : null}
@@ -344,6 +347,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.charcoal,
     paddingVertical: 0,
+    textAlignVertical: 'center',
   },
   searchResults: {
     borderTopWidth: 1,

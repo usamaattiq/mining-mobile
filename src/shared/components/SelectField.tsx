@@ -3,9 +3,10 @@ import { Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
-import { palette, radius, spacing } from '@/theme';
+import { palette, radius, spacing, getFontFamily } from '@/theme';
 import type { SelectFieldProps } from '@/shared/types/selectField.types';
 
 /**
@@ -27,6 +28,7 @@ export function SelectField({
   dropdown,
 }: SelectFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const [anchor, setAnchor] = React.useState<{
@@ -161,7 +163,7 @@ export function SelectField({
                 onChangeText={setQuery}
                 placeholder={searchPlaceholder ?? t('common.search')}
                 placeholderTextColor={palette.muted}
-                style={styles.searchInput}
+                style={[styles.searchInput, { fontFamily: getFontFamily(currentLanguage) }]}
               />
               {query ? (
                 <Pressable onPress={() => setQuery('')} hitSlop={8}>
@@ -255,6 +257,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm + 4,
     fontSize: 15,
     color: palette.charcoal,
+    textAlignVertical: 'center',
   },
   option: {
     minHeight: 52,

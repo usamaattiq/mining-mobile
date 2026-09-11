@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm + 4,
     fontSize: 15,
     color: palette.charcoal,
+    textAlignVertical: 'center',
   },
   error: {
     fontSize: 12,

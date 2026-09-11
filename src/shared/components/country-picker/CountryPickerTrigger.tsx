@@ -17,7 +17,7 @@ export function CountryPickerTrigger({
       accessibilityLabel={`${country.name} ${country.dialCode}`}
     >
       <AppText style={styles.flag}>{country.flag}</AppText>
-      <AppText weight="semibold" style={styles.dialCode}>
+      <AppText weight="regular" style={styles.dialCode}>
         {country.dialCode}
       </AppText>
       <Ionicons name="chevron-down" size={14} color={palette.muted} />
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   dialCode: {
-    fontSize: 18,
+    fontSize: 15,
     color: palette.charcoal,
   },
   divider: {

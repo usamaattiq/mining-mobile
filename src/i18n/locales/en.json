@@ -246,6 +246,7 @@
     "stepLabel": "Step {current} of {total}",
     "serviceCategory": "Service Type",
     "serviceCategoryPlaceholder": "Choose service type",
+    "searchServiceTypes": "Search service types",
     "type": "Type",
     "category": {
       "consulting": "Consulting",

@@ -40,16 +40,41 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const isOnsite = serviceType === 'onsite';
 
   const serviceCategoryOptions = [
-    { value: 'consulting', label: t('serviceListing.category.consulting') },
-    { value: 'drilling', label: t('serviceListing.category.drilling') },
-    { value: 'assayTesting', label: t('serviceListing.category.assayTesting') },
-    { value: 'transportLogistics', label: t('serviceListing.category.transportLogistics') },
-    { value: 'equipmentRepair', label: t('serviceListing.category.equipmentRepair') },
+    {
+      value: 'consulting',
+      label: t('serviceListing.category.consulting'),
+      icon: 'bulb-outline' as const,
+    },
+    {
+      value: 'drilling',
+      label: t('serviceListing.category.drilling'),
+      icon: 'construct-outline' as const,
+    },
+    {
+      value: 'assayTesting',
+      label: t('serviceListing.category.assayTesting'),
+      icon: 'flask-outline' as const,
+    },
+    {
+      value: 'transportLogistics',
+      label: t('serviceListing.category.transportLogistics'),
+      icon: 'car-outline' as const,
+    },
+    {
+      value: 'equipmentRepair',
+      label: t('serviceListing.category.equipmentRepair'),
+      icon: 'build-outline' as const,
+    },
     {
       value: 'environmentalPermitting',
       label: t('serviceListing.category.environmentalPermitting'),
+      icon: 'leaf-outline' as const,
     },
-    { value: 'other', label: t('serviceListing.category.other') },
+    {
+      value: 'other',
+      label: t('serviceListing.category.other'),
+      icon: 'ellipsis-horizontal-outline' as const,
+    },
   ];
 
   const steps = [
@@ -197,6 +222,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               value={serviceCategory}
               onChange={setServiceCategory}
               required
+              searchable
+              searchPlaceholder={t('serviceListing.searchServiceTypes')}
             />
 
             <FormInput

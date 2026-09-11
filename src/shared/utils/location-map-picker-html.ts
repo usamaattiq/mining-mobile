@@ -7,6 +7,7 @@
 export function buildLocationMapPickerHtml(
   apiKey: string,
   initialPin: { latitude: number; longitude: number },
+  language?: string,
 ): string {
   return `<!doctype html>
 <html>
@@ -89,7 +90,7 @@ export function buildLocationMapPickerHtml(
         map.addListener('idle', schedulePublishMapCenter);
       }
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap${language ? `&language=${language}` : ''}"></script>
   </body>
 </html>`;
 }

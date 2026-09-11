@@ -242,6 +242,7 @@
     "stepLabel": "الخطوة {current} من {total}",
     "serviceCategory": "نوع الخدمة",
     "serviceCategoryPlaceholder": "اختر نوع الخدمة",
+    "searchServiceTypes": "ابحث عن نوع الخدمة",
     "type": "النوع",
     "category": {
       "consulting": "استشارات",

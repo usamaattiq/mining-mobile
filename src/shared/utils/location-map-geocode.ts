@@ -30,13 +30,15 @@ type PlacesTextSearchApiResponse = {
 export async function searchMapLocations(
   query: string,
   apiKey: string,
+  language?: string,
 ): Promise<MapSearchResult[]> {
   const trimmed = query.trim();
   if (!trimmed || !apiKey) return [];
 
   const url =
     `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(trimmed)}` +
-    `&key=${encodeURIComponent(apiKey)}`;
+    `&key=${encodeURIComponent(apiKey)}` +
+    (language ? `&language=${encodeURIComponent(language)}` : '');
 
   const response = await fetch(url);
   if (!response.ok) return [];
