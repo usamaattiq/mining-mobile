@@ -46,3 +46,35 @@ export async function uploadMedia(file: {
 
   return { key, url: publicUrl };
 }
+
+/**
+ * Uploads a document (e.g. a PDF from expo-document-picker) to S3 via a presigned PUT.
+ *
+ * Unlike `uploadMedia`, this reads the file with fetch()'s arrayBuffer() rather than
+ * expo-file-system's native uploadAsync. expo-document-picker's cached copy goes through
+ * Android's Storage Access Framework and isn't readable by expo-file-system's native
+ * module in some environments (notably Expo Go) — fetch reads the file at the JS layer
+ * instead, sidestepping that. arrayBuffer() (not blob()) keeps the bytes raw with no
+ * base64 round-trip, so this doesn't carry the corruption risk noted on `uploadMedia`.
+ */
+export async function uploadDocument(file: {
+  uri: string;
+  contentType: 'application/pdf';
+}): Promise<{ key: string; url: string }> {
+  const { uploadUrl, key, publicUrl } = await presignUpload(file.contentType);
+
+  const fileResponse = await fetch(file.uri);
+  const bytes = await fileResponse.arrayBuffer();
+
+  const uploadResponse = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.contentType },
+    body: bytes,
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error(`Upload failed: ${uploadResponse.status}`);
+  }
+
+  return { key, url: publicUrl };
+}

@@ -10,6 +10,7 @@ export function FormInput({
   required,
   error,
   leftAdornment,
+  rightAdornment,
   style,
   ...rest
 }: FormInputProps): React.ReactElement {
@@ -30,6 +31,7 @@ export function FormInput({
           placeholderTextColor={palette.muted}
           {...rest}
         />
+        {rightAdornment}
       </View>
       {error ? <AppText style={styles.error}>{error}</AppText> : null}
     </View>

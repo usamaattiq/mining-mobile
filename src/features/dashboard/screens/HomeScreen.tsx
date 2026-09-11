@@ -31,13 +31,13 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       icon: 'briefcase-outline' as const,
       title: t('dashboardHome.listService'),
       subtitle: t('dashboardHome.listServiceSubtitle'),
-      onPress: () => {},
+      onPress: () => navigation.navigate('ServiceListingMode'),
     },
     {
       icon: 'hammer-outline' as const,
       title: t('dashboardHome.auctionGold'),
       subtitle: t('dashboardHome.auctionGoldSubtitle'),
-      onPress: () => {},
+      onPress: () => navigation.navigate('GoldListingForm'),
     },
   ];
 

@@ -14,8 +14,13 @@ import { AppTopBar } from '@/shared/components/AppTopBar';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { AppText } from '@/shared/components/AppText';
-import { EquipmentListingCard } from '@/features/listings/components/EquipmentListingCard';
+import { ListingCard } from '@/features/listings/components/ListingCard';
+import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
 import { useListingsStore } from '@/store/listingsStore';
+import { useServiceListingsStore } from '@/store/serviceListingsStore';
+import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useCurrency } from '@/shared/hooks/useCurrency';
+import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { palette, spacing } from '@/theme';
 
 type Props = CompositeScreenProps<
@@ -25,7 +30,10 @@ type Props = CompositeScreenProps<
 
 export function RequestsScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
-  const listings = useListingsStore((state) => state.listings);
+  const currency = useCurrency();
+  const equipmentListings = useListingsStore((state) => state.listings);
+  const serviceListings = useServiceListingsStore((state) => state.listings);
+  const goldListings = useGoldListingsStore((state) => state.listings);
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
 
   const categoryOptions = [
@@ -34,7 +42,72 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
     { key: 'gold' as const, label: t('requests.categoryGold') },
   ];
 
-  const visibleListings = listings.filter((listing) => listing.category === category);
+  const priceText = (amount: string) =>
+    amount ? `${currency.code} ${formatAmountWithCommas(amount)}` : undefined;
+
+  const cards: (ListingCardProps & { id: string })[] =
+    category === 'equipment'
+      ? equipmentListings.map((listing) => {
+          const isRent = listing.mode === 'rent';
+          const durationBadges = isRent
+            ? [
+                listing.hourlyRental ? t('equipmentListing.hourlyBadge') : null,
+                listing.weeklyRental ? t('equipmentListing.weeklyBadge') : null,
+                listing.monthlyRental ? t('equipmentListing.monthlyBadge') : null,
+              ].filter((label): label is string => Boolean(label))
+            : [t('equipmentListing.saleBadge')];
+
+          return {
+            id: listing.id,
+            title: listing.title,
+            thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
+            placeholderIcon: 'construct-outline',
+            subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.units })}`,
+            primaryBadge: {
+              key: 'mode',
+              label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
+            },
+            secondaryBadges: durationBadges.map((label) => ({ key: label, label })),
+            cornerBadge: listing.deliveryAvailable
+              ? { key: 'delivery', label: t('equipmentListing.deliveryBadge'), icon: 'car-outline' }
+              : undefined,
+            createdAt: listing.createdAt,
+            onPress: () => navigation.navigate('EquipmentListingDetail', { id: listing.id }),
+          };
+        })
+      : category === 'services'
+        ? serviceListings.map((listing) => ({
+            id: listing.id,
+            title: listing.title,
+            thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
+            placeholderIcon: 'briefcase-outline',
+            subtitle: listing.serviceCategoryLabel,
+            primaryBadge: {
+              key: 'serviceType',
+              label: t(
+                listing.serviceType === 'onsite'
+                  ? 'serviceListing.onsite'
+                  : 'serviceListing.online',
+              ),
+              icon: listing.serviceType === 'onsite' ? 'location-outline' : 'globe-outline',
+            },
+            priceText: priceText(listing.price),
+            onPress: () => navigation.navigate('ServiceListingDetail', { id: listing.id }),
+          }))
+        : goldListings.map((listing) => ({
+            id: listing.id,
+            title: listing.title,
+            thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
+            placeholderIcon: 'diamond-outline',
+            secondaryBadges: [
+              listing.purityLabel ? { key: 'purity', label: listing.purityLabel } : null,
+              listing.weight
+                ? { key: 'weight', label: t('goldListing.weightValue', { weight: listing.weight }) }
+                : null,
+            ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
+            priceText: priceText(listing.price),
+            onPress: () => navigation.navigate('GoldListingDetail', { id: listing.id }),
+          }));
 
   return (
     <View style={styles.root}>
@@ -50,7 +123,7 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
       </View>
 
       <CurvedSheetScrollView>
-        {visibleListings.length === 0 ? (
+        {cards.length === 0 ? (
           <View style={styles.empty}>
             <AppText weight="semibold" style={styles.emptyTitle}>
               {t('requests.emptyTitle')}
@@ -58,13 +131,7 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
             <AppText style={styles.emptySubtitle}>{t('requests.emptySubtitle')}</AppText>
           </View>
         ) : (
-          visibleListings.map((listing) => (
-            <EquipmentListingCard
-              key={listing.id}
-              listing={listing}
-              onPress={() => navigation.navigate('EquipmentListingDetail', { id: listing.id })}
-            />
-          ))
+          cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
         )}
       </CurvedSheetScrollView>
     </View>

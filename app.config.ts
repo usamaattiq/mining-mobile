@@ -39,6 +39,7 @@ const config: ExpoConfig = {
       },
     ],
     '@react-native-community/datetimepicker',
+    'expo-sharing',
     'expo-video',
     [
       'expo-location',

@@ -34,7 +34,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const currency = useCurrency();
   const currencyAdornment = (
     <AppText weight="semibold" style={styles.currencyAdornment}>
-      {currency.symbol}
+      {currency.code}
     </AppText>
   );
   const isRent = mode === 'rent';
@@ -174,23 +174,21 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       ? [
           {
             label: t('equipmentListing.hourlyRental'),
-            value: hourlyRental ? `${currency.symbol} ${formatAmountWithCommas(hourlyRental)}` : '',
+            value: hourlyRental ? `${currency.code} ${formatAmountWithCommas(hourlyRental)}` : '',
           },
           {
             label: t('equipmentListing.weeklyRental'),
-            value: weeklyRental ? `${currency.symbol} ${formatAmountWithCommas(weeklyRental)}` : '',
+            value: weeklyRental ? `${currency.code} ${formatAmountWithCommas(weeklyRental)}` : '',
           },
           {
             label: t('equipmentListing.monthlyRental'),
-            value: monthlyRental
-              ? `${currency.symbol} ${formatAmountWithCommas(monthlyRental)}`
-              : '',
+            value: monthlyRental ? `${currency.code} ${formatAmountWithCommas(monthlyRental)}` : '',
           },
         ]
       : [
           {
             label: t('equipmentListing.salePrice'),
-            value: salePrice ? `${currency.symbol} ${formatAmountWithCommas(salePrice)}` : '',
+            value: salePrice ? `${currency.code} ${formatAmountWithCommas(salePrice)}` : '',
           },
         ]),
     { label: t('equipmentListing.units'), value: String(units) },
@@ -200,7 +198,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const deliverySubtitle = deliveryAvailable
     ? deliveryType === 'free'
       ? t('equipmentListing.deliveryFree')
-      : `${t('equipmentListing.deliveryPerKm')} · ${currency.symbol} ${formatAmountWithCommas(deliveryPricePerKm)}`
+      : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(deliveryPricePerKm)}`
     : undefined;
 
   return (

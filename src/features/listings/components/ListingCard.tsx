@@ -1,12 +1,10 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from 'react-i18next';
-import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
-import type { EquipmentListingCardProps } from '@/features/listings/types/equipmentListingCard.types';
+import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
 
 const LISTING_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const COUNTDOWN_TICK_MS = 60 * 1000;
@@ -26,40 +24,38 @@ function useRemainingTime(createdAt: number): string {
   return `${hours}h ${minutes}m`;
 }
 
-/** Requests-tab list card: square photo on the left with title/type/units beside it, badges + timer row below. */
-export function EquipmentListingCard({
-  listing,
+/**
+ * Requests-tab list card, shared by every listing category (equipment, service, gold auction):
+ * square photo, title/subtitle, badge rows, price, and an optional countdown timer.
+ */
+export function ListingCard({
+  title,
+  thumbnail,
+  placeholderIcon,
+  subtitle,
+  primaryBadge,
+  secondaryBadges,
+  cornerBadge,
+  priceText,
+  createdAt,
   onPress,
-}: EquipmentListingCardProps): React.ReactElement {
-  const { t } = useTranslation(undefined, { i18n: appI18n });
-  const thumbnail = listing.media[0]?.uri;
-  const timeLeft = useRemainingTime(listing.createdAt);
-
-  const modeBadgeLabel = t(
-    listing.mode === 'rent' ? 'equipmentListing.rent' : 'equipmentListing.sell',
-  );
-
-  const durationBadges =
-    listing.mode === 'rent'
-      ? [
-          listing.hourlyRental ? t('equipmentListing.hourlyBadge') : null,
-          listing.weeklyRental ? t('equipmentListing.weeklyBadge') : null,
-          listing.monthlyRental ? t('equipmentListing.monthlyBadge') : null,
-        ].filter((label): label is string => Boolean(label))
-      : [t('equipmentListing.saleBadge')];
+}: ListingCardProps): React.ReactElement {
+  const timeLeft = useRemainingTime(createdAt ?? 0);
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={listing.title}
+      accessibilityLabel={title}
       style={({ pressed }) => [styles.card, cardBackShadow, pressed && styles.pressed]}
     >
-      {listing.deliveryAvailable ? (
-        <View style={styles.deliveryBadge}>
-          <Ionicons name="car-outline" size={12} color={palette.pureWhite} />
-          <AppText weight="semibold" style={styles.deliveryBadgeText}>
-            {t('equipmentListing.deliveryBadge')}
+      {cornerBadge ? (
+        <View style={styles.cornerBadge}>
+          {cornerBadge.icon ? (
+            <Ionicons name={cornerBadge.icon} size={12} color={palette.pureWhite} />
+          ) : null}
+          <AppText weight="semibold" style={styles.cornerBadgeText}>
+            {cornerBadge.label}
           </AppText>
         </View>
       ) : null}
@@ -70,49 +66,57 @@ export function EquipmentListingCard({
             <Image source={{ uri: thumbnail }} style={styles.image} />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
-              <Ionicons name="image-outline" size={24} color={palette.muted} />
+              <Ionicons name={placeholderIcon} size={24} color={palette.muted} />
             </View>
           )}
         </View>
 
         <View style={styles.copy}>
           <AppText weight="bold" style={styles.title} numberOfLines={1}>
-            {listing.title}
+            {title}
           </AppText>
-          <View style={styles.typeRow}>
-            <Ionicons name="construct-outline" size={13} color={palette.gold} />
-            <AppText style={styles.type} numberOfLines={1}>
-              {listing.equipmentTypeLabel}
+          {subtitle ? (
+            <AppText style={styles.subtitle} numberOfLines={1}>
+              {subtitle}
             </AppText>
-          </View>
-          <View style={styles.unitsRow}>
-            <Ionicons name="cube-outline" size={12} color={palette.muted} />
-            <AppText style={styles.units}>
-              {t('equipmentListing.unitsCount', { count: listing.units })}
-            </AppText>
-          </View>
+          ) : null}
 
-          <View style={styles.badgeRow}>
-            {durationBadges.map((label) => (
-              <View key={label} style={styles.durationBadge}>
-                <AppText weight="semibold" style={styles.durationBadgeText}>
-                  {label}
+          {secondaryBadges && secondaryBadges.length > 0 ? (
+            <View style={styles.badgeRow}>
+              {secondaryBadges.map((badge) => (
+                <View key={badge.key} style={styles.secondaryBadge}>
+                  <AppText weight="semibold" style={styles.secondaryBadgeText}>
+                    {badge.label}
+                  </AppText>
+                </View>
+              ))}
+            </View>
+          ) : null}
+
+          <View style={styles.bottomRow}>
+            {primaryBadge ? (
+              <View style={styles.primaryBadge}>
+                {primaryBadge.icon ? (
+                  <Ionicons name={primaryBadge.icon} size={11} color={palette.pureWhite} />
+                ) : null}
+                <AppText weight="semibold" style={styles.primaryBadgeText}>
+                  {primaryBadge.label}
                 </AppText>
               </View>
-            ))}
-          </View>
-          <View style={styles.modeBadgeRow}>
-            <View style={styles.modeBadge}>
-              <AppText weight="semibold" style={styles.modeBadgeText}>
-                {modeBadgeLabel}
+            ) : null}
+            {priceText ? (
+              <AppText weight="bold" style={styles.price} numberOfLines={1}>
+                {priceText}
               </AppText>
-            </View>
-            <View style={styles.timerBadge}>
-              <Ionicons name="time-outline" size={11} color={palette.gold} />
-              <AppText weight="semibold" style={styles.timerText}>
-                {timeLeft}
-              </AppText>
-            </View>
+            ) : null}
+            {createdAt ? (
+              <View style={styles.timerBadge}>
+                <Ionicons name="time-outline" size={11} color={palette.gold} />
+                <AppText weight="semibold" style={styles.timerText}>
+                  {timeLeft}
+                </AppText>
+              </View>
+            ) : null}
           </View>
         </View>
       </View>
@@ -159,56 +163,49 @@ const styles = StyleSheet.create({
     color: palette.charcoal,
     paddingRight: 84,
   },
-  typeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  type: {
+  subtitle: {
     fontSize: 13,
     color: palette.muted,
-  },
-  unitsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  units: {
-    fontSize: 12,
-    color: palette.muted,
-  },
-  modeBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.xs,
   },
   badgeRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.xs,
   },
-  modeBadge: {
-    backgroundColor: palette.gold,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
-  modeBadgeText: {
-    fontSize: 11,
-    color: palette.pureWhite,
-  },
-  durationBadge: {
+  secondaryBadge: {
     backgroundColor: palette.softGold,
     borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
   },
-  durationBadgeText: {
+  secondaryBadgeText: {
     fontSize: 11,
     color: palette.gold,
   },
-  deliveryBadge: {
+  bottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.xs,
+  },
+  primaryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: palette.gold,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
+  primaryBadgeText: {
+    fontSize: 11,
+    color: palette.pureWhite,
+  },
+  price: {
+    fontSize: 13,
+    color: palette.charcoal,
+  },
+  cornerBadge: {
     position: 'absolute',
     top: 6,
     right: spacing.sm,
@@ -221,7 +218,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     zIndex: 1,
   },
-  deliveryBadgeText: {
+  cornerBadgeText: {
     fontSize: 11,
     color: palette.pureWhite,
   },

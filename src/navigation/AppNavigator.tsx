@@ -10,6 +10,11 @@ import { SecuritySettingsScreen } from '@/features/dashboard/screens/SecuritySet
 import { EquipmentListingModeScreen } from '@/features/listings/screens/EquipmentListingModeScreen';
 import { EquipmentListingFormScreen } from '@/features/listings/screens/EquipmentListingFormScreen';
 import { EquipmentListingDetailScreen } from '@/features/listings/screens/EquipmentListingDetailScreen';
+import { ServiceListingModeScreen } from '@/features/listings/screens/ServiceListingModeScreen';
+import { ServiceListingFormScreen } from '@/features/listings/screens/ServiceListingFormScreen';
+import { ServiceListingDetailScreen } from '@/features/listings/screens/ServiceListingDetailScreen';
+import { GoldListingFormScreen } from '@/features/listings/screens/GoldListingFormScreen';
+import { GoldListingDetailScreen } from '@/features/listings/screens/GoldListingDetailScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme';
 import { useAuthStore } from '@/store/authStore';
@@ -52,6 +57,11 @@ export function AppNavigator(): React.ReactElement {
       <Stack.Screen name="EquipmentListingMode" component={EquipmentListingModeScreen} />
       <Stack.Screen name="EquipmentListingForm" component={EquipmentListingFormScreen} />
       <Stack.Screen name="EquipmentListingDetail" component={EquipmentListingDetailScreen} />
+      <Stack.Screen name="ServiceListingMode" component={ServiceListingModeScreen} />
+      <Stack.Screen name="ServiceListingForm" component={ServiceListingFormScreen} />
+      <Stack.Screen name="ServiceListingDetail" component={ServiceListingDetailScreen} />
+      <Stack.Screen name="GoldListingForm" component={GoldListingFormScreen} />
+      <Stack.Screen name="GoldListingDetail" component={GoldListingDetailScreen} />
     </Stack.Navigator>
   );
 }

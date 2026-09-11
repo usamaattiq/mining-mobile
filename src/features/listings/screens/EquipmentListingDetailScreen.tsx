@@ -119,7 +119,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
   const deliverySubtitle = listing.deliveryAvailable
     ? listing.deliveryType === 'free'
       ? t('equipmentListing.deliveryFree')
-      : `${t('equipmentListing.deliveryPerKm')} · ${currency.symbol} ${formatAmountWithCommas(listing.deliveryPricePerKm)}`
+      : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(listing.deliveryPricePerKm)}`
     : undefined;
 
   return (
@@ -139,7 +139,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
               <View style={styles.priceRow}>
                 <View style={styles.priceValueRow}>
                   <AppText weight="bold" style={styles.priceAmount}>
-                    {currency.symbol} {formatAmountWithCommas(price.amount)}
+                    {currency.code} {formatAmountWithCommas(price.amount)}
                   </AppText>
                   {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
                 </View>

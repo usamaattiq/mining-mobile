@@ -6,4 +6,5 @@ export type FormInputProps = TextInputProps & {
   required?: boolean;
   error?: string;
   leftAdornment?: ReactNode;
+  rightAdornment?: ReactNode;
 };

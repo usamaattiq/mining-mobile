@@ -1,0 +1,350 @@
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
+import type { RootStackParamList } from '@/navigation/types';
+import { AppTopBar } from '@/shared/components/AppTopBar';
+import { AppText } from '@/shared/components/AppText';
+import { FormInput } from '@/shared/components/FormInput';
+import { SelectField } from '@/shared/components/SelectField';
+import { DateTimeField } from '@/shared/components/DateTimeField';
+import { LocationField } from '@/shared/components/LocationField';
+import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
+import { Button } from '@/shared/components/Button';
+import { ListingStepper } from '@/features/listings/components/ListingStepper';
+import { ServiceMediaUploader } from '@/features/listings/components/ServiceMediaUploader';
+import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
+import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
+import { palette, radius, spacing } from '@/theme';
+import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useCurrency } from '@/shared/hooks/useCurrency';
+import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'GoldListingForm'>;
+
+export function GoldListingFormScreen({ navigation }: Props): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
+  const currency = useCurrency();
+  const currencyAdornment = (
+    <AppText weight="semibold" style={styles.currencyAdornment}>
+      {currency.code}
+    </AppText>
+  );
+  const weightAdornment = (
+    <AppText weight="semibold" style={styles.weightAdornment}>
+      {t('goldListing.weightUnit')}
+    </AppText>
+  );
+
+  const purityOptions = [
+    ...Array.from({ length: 24 - 10 + 1 }, (_, index) => 24 - index).map((karat) => ({
+      value: `${karat}k`,
+      label: t('goldListing.karatValue', { karat }),
+    })),
+    { value: 'other', label: t('goldListing.purityOptions.other') },
+  ];
+
+  const steps = [
+    { key: 'details', label: t('goldListing.detailsStep') },
+    { key: 'media', label: t('goldListing.mediaStep') },
+    { key: 'review', label: t('goldListing.reviewStep') },
+  ];
+  const lastStep = steps.length - 1;
+  const [step, setStep] = React.useState(0);
+  const [publishing, setPublishing] = React.useState(false);
+  const addListing = useGoldListingsStore((state) => state.addListing);
+
+  const [title, setTitle] = React.useState('');
+  const [description, setDescription] = React.useState('');
+  const [weight, setWeight] = React.useState('');
+  const [purity, setPurity] = React.useState<string | null>(null);
+  const [price, setPrice] = React.useState('');
+  const [auctionEndDate, setAuctionEndDate] = React.useState<Date | null>(null);
+  const [location, setLocation] = React.useState('');
+  const [locationCoords, setLocationCoords] = React.useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [media, setMedia] = React.useState<ServiceMediaAsset[]>([]);
+  const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
+    useLocationMapPicker();
+
+  const handleUseCurrentLocation = async () => {
+    const selection = await getCurrentLocation();
+    if (!selection) return;
+    setLocation(selection.label);
+    setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+  };
+
+  const handleSelectOnMap = () => {
+    openMapPickerForSelection((selection) => {
+      setLocation(selection.label);
+      setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+    }, locationCoords);
+  };
+
+  const detailsValid = Boolean(
+    title.trim() && description.trim() && weight.trim() && purity && price.trim(),
+  );
+  const mediaValid = media.length > 0 && Boolean(auctionEndDate) && location.trim().length > 0;
+  const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
+
+  const handleBack = () => {
+    if (step > 0) {
+      setStep((s) => s - 1);
+      return;
+    }
+    navigation.goBack();
+  };
+
+  const handleNext = () => {
+    if (step < lastStep) setStep((s) => s + 1);
+  };
+
+  const purityLabel = purityOptions.find((option) => option.value === purity)?.label;
+
+  const handlePublish = () => {
+    if (publishing) return;
+    setPublishing(true);
+    addListing({
+      id: `gold_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+      category: 'gold',
+      title,
+      description,
+      weight,
+      purityLabel: purityLabel ?? '',
+      price,
+      auctionEndDate: auctionEndDate ? auctionEndDate.getTime() : null,
+      location,
+      media,
+      createdAt: Date.now(),
+    });
+    navigation.popToTop();
+  };
+
+  const detailRows = [
+    { label: t('goldListing.title'), value: title },
+    { label: t('goldListing.description'), value: description },
+    {
+      label: t('goldListing.weight'),
+      value: weight ? t('goldListing.weightValue', { weight }) : '',
+    },
+    { label: t('goldListing.purity'), value: purityLabel ?? '' },
+    {
+      label: t('goldListing.price'),
+      value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
+    },
+    {
+      label: t('goldListing.auctionEndDate'),
+      value: auctionEndDate
+        ? new Intl.DateTimeFormat(currentLanguage, {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(auctionEndDate)
+        : '',
+    },
+    { label: t('goldListing.location'), value: location },
+  ].filter((row) => (row.value ?? '').trim().length > 0);
+
+  const photoMedia = media
+    .filter((item) => item.kind === 'photo')
+    .map((item) => ({ id: item.id, uri: item.uri, kind: 'photo' as const }));
+  const documents = media.filter((item) => item.kind === 'document');
+
+  return (
+    <View style={styles.root}>
+      <StatusBar style="light" />
+
+      <AppTopBar
+        left="back"
+        variant="gold"
+        title={t('goldListing.formTitle')}
+        onBackPress={handleBack}
+        style={styles.header}
+      />
+      <View style={styles.stepperWrap}>
+        <ListingStepper steps={steps} currentStep={step} />
+      </View>
+
+      <KeyboardAwareScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bottomOffset={100}
+      >
+        {step === 0 ? (
+          <View style={styles.stepBlock}>
+            <FormInput
+              label={t('goldListing.title')}
+              value={title}
+              onChangeText={setTitle}
+              placeholder={t('goldListing.titlePlaceholder')}
+              required
+            />
+
+            <FormInput
+              label={t('goldListing.description')}
+              value={description}
+              onChangeText={setDescription}
+              placeholder={t('goldListing.descriptionPlaceholder')}
+              multiline
+              numberOfLines={4}
+              style={styles.descriptionInput}
+              required
+            />
+
+            <View style={styles.rowFields}>
+              <View style={styles.rowField}>
+                <FormInput
+                  label={t('goldListing.weight')}
+                  value={weight}
+                  onChangeText={setWeight}
+                  placeholder={t('goldListing.weightPlaceholder')}
+                  keyboardType="numeric"
+                  rightAdornment={weightAdornment}
+                  required
+                />
+              </View>
+              <View style={styles.rowField}>
+                <SelectField
+                  label={t('goldListing.purity')}
+                  placeholder={t('goldListing.purityPlaceholder')}
+                  sheetTitle={t('goldListing.purity')}
+                  options={purityOptions}
+                  value={purity}
+                  onChange={setPurity}
+                  required
+                />
+              </View>
+            </View>
+
+            <FormInput
+              label={t('goldListing.price')}
+              value={price}
+              onChangeText={setPrice}
+              keyboardType="numeric"
+              leftAdornment={currencyAdornment}
+              required
+            />
+          </View>
+        ) : null}
+
+        {step === 1 ? (
+          <View style={styles.stepBlock}>
+            <ServiceMediaUploader media={media} onChange={setMedia} />
+
+            <DateTimeField
+              label={t('goldListing.auctionEndDate')}
+              value={auctionEndDate}
+              required
+              placeholder={t('goldListing.auctionEndDatePlaceholder')}
+              onChange={setAuctionEndDate}
+            />
+
+            <LocationField
+              label={t('goldListing.location')}
+              value={location}
+              required
+              loading={locationLoading}
+              onChangeText={setLocation}
+              onUseCurrentLocation={() => void handleUseCurrentLocation()}
+              onSelectOnMap={handleSelectOnMap}
+            />
+          </View>
+        ) : null}
+
+        {step === 2 ? (
+          <View style={styles.stepBlock}>
+            <EquipmentListingSummaryCard
+              detailRows={detailRows}
+              media={photoMedia}
+              onChangeDetails={() => setStep(0)}
+              onChangeMedia={() => setStep(1)}
+            />
+            <AttachmentsSection documents={documents} downloadable={false} />
+            <Button
+              label={t('goldListing.publish')}
+              onPress={handlePublish}
+              loading={publishing}
+              style={styles.publishButton}
+            />
+          </View>
+        ) : null}
+
+        {step !== lastStep ? (
+          <Button
+            label={t('common.continue')}
+            onPress={handleNext}
+            disabled={!canGoNext}
+            style={styles.continueButton}
+          />
+        ) : null}
+      </KeyboardAwareScrollView>
+
+      {mapPickerSheet}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: palette.gold,
+  },
+  header: {
+    paddingBottom: spacing.md,
+  },
+  stepperWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    backgroundColor: palette.gold,
+  },
+  scroll: {
+    flex: 1,
+    backgroundColor: palette.pureWhite,
+    borderTopLeftRadius: radius.lg + 4,
+    borderTopRightRadius: radius.lg + 4,
+    marginTop: -(radius.lg + 4),
+  },
+  content: {
+    padding: spacing.lg,
+    gap: spacing.lg,
+    paddingBottom: spacing.xxl,
+  },
+  stepBlock: {
+    gap: spacing.lg,
+  },
+  descriptionInput: {
+    minHeight: 96,
+    paddingTop: spacing.sm,
+    textAlignVertical: 'top',
+  },
+  rowFields: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  rowField: {
+    flex: 1,
+  },
+  currencyAdornment: {
+    fontSize: 15,
+    color: palette.muted,
+  },
+  weightAdornment: {
+    fontSize: 15,
+    color: palette.muted,
+  },
+  continueButton: {
+    marginTop: spacing.sm,
+  },
+  publishButton: {
+    marginTop: spacing.sm,
+  },
+});
