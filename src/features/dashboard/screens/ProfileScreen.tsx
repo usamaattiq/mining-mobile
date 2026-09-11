@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ import { LanguageSwitcherModal } from '@/shared/components/language-switcher/Lan
 import { getLanguageOptions } from '@/shared/components/language-switcher';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { LegalDocumentSheet } from '@/shared/components/LegalDocumentSheet';
+import { showAppAlert } from '@/shared/services/appAlert';
 import type { LegalDocumentKind } from '@/shared/constants/legalContent';
 import { palette } from '@/theme';
 
@@ -40,7 +41,7 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
   const [languageModalVisible, setLanguageModalVisible] = React.useState(false);
 
   const handleLogout = () => {
-    Alert.alert(t('welcome.logoutConfirmTitle'), t('welcome.logoutConfirmMessage'), [
+    showAppAlert(t('welcome.logoutConfirmTitle'), t('welcome.logoutConfirmMessage'), [
       { text: t('common.cancel'), style: 'cancel' },
       {
         text: t('welcome.logout'),

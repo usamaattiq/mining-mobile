@@ -1,5 +1,6 @@
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { showAppAlert } from '@/shared/services/appAlert';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -150,7 +151,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       setSecondsLeft(RESEND_SECONDS);
       goToStep('otp');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -162,7 +163,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       await authApi.verifyLoginOtp(phoneIdentity, otp, 'login');
       goToStep('mpin');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginOtp.verifyFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginOtp.verifyFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -199,7 +200,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
         return;
       }
 
-      Alert.alert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -213,7 +214,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       setSecondsLeft(RESEND_SECONDS);
       goToStep('forgotOtp');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -225,7 +226,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       await authApi.verifyLoginOtp(phoneIdentity, otp, 'mpin_reset');
       goToStep('forgotNewMpin');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginOtp.verifyFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginOtp.verifyFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -233,7 +234,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
 
   const handleResetMpin = async () => {
     if (confirmNewMpin !== newMpin) {
-      Alert.alert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
+      showAppAlert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
       setConfirmNewMpin('');
       return;
     }
@@ -254,7 +255,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       await setDeviceBiometricEnabled(result.profile.biometricEnabled);
       navigation.replace('Welcome');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
       setConfirmNewMpin('');
     } finally {
       setSubmitting(false);
@@ -267,7 +268,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       await authApi.sendLoginOtp(phoneIdentity, step === 'forgotOtp' ? 'mpin_reset' : 'login');
       setSecondsLeft(RESEND_SECONDS);
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
     } finally {
       setSubmitting(false);
     }

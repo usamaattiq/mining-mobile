@@ -1,5 +1,6 @@
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { showAppAlert } from '@/shared/services/appAlert';
 import * as LocalAuthentication from 'expo-local-authentication';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -159,7 +160,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();
     if (!selection) {
-      Alert.alert(t('common.error'), t('location.locationFailed'));
+      showAppAlert(t('common.error'), t('location.locationFailed'));
       return;
     }
     setLocation(selection.label);
@@ -207,7 +208,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       await authApi.verifySignupOtp(phoneIdentity, otp);
       goToStep('personal');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('signUpOtp.verifyFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('signUpOtp.verifyFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -219,7 +220,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       await authApi.sendSignupOtp(phoneIdentity);
       setSecondsLeft(RESEND_SECONDS);
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('signUpPhone.sendFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('signUpPhone.sendFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -227,7 +228,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
 
   const handleSecurityContinue = async () => {
     if (confirmMpin !== mpin) {
-      Alert.alert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
+      showAppAlert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
       setConfirmMpin('');
       return;
     }
@@ -276,7 +277,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         goToStep('personal');
         return;
       }
-      Alert.alert(t('common.error'), errorMessage(error, t('signUpSecurity.mismatchMessage')));
+      showAppAlert(t('common.error'), errorMessage(error, t('signUpSecurity.mismatchMessage')));
     } finally {
       setSubmitting(false);
     }

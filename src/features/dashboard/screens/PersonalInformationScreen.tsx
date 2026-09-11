@@ -1,5 +1,6 @@
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { showAppAlert } from '@/shared/services/appAlert';
 import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -56,7 +57,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();
     if (!selection) {
-      Alert.alert(t('common.error'), t('location.locationFailed'));
+      showAppAlert(t('common.error'), t('location.locationFailed'));
       return;
     }
     setAddress(selection.label);
@@ -107,7 +108,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
         return;
       }
       const message = error instanceof ApiError ? error.message : t('profile.saveError');
-      Alert.alert(t('common.error'), message);
+      showAppAlert(t('common.error'), message);
     } finally {
       setSaving(false);
     }

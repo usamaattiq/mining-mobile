@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from '@/navigation/AppNavigator';
+import { AppAlertHost } from '@/shared/components/AppAlertHost';
 import { navigationRef } from '@/navigation/navigationRef';
 import { initializeI18n } from '@/i18n';
 import { appFontAssets, palette } from '@/theme';
@@ -81,6 +82,7 @@ export default function App() {
           <NavigationContainer ref={navigationRef} theme={navigationTheme}>
             <AppNavigator />
           </NavigationContainer>
+          <AppAlertHost />
         </View>
       </KeyboardProvider>
     </SafeAreaProvider>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { showAppAlert } from '@/shared/services/appAlert';
 import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +79,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
       await setDeviceBiometricEnabled(enabled);
       if (!enabled) await clearCachedMpin();
     } catch {
-      Alert.alert(t('common.error'), t('securitySettings.biometricToggleFailed'));
+      showAppAlert(t('common.error'), t('securitySettings.biometricToggleFailed'));
     }
   };
 
@@ -91,7 +92,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
       setSecondsLeft(RESEND_SECONDS);
       setStep('otp');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -104,7 +105,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
       await authApi.sendLoginOtp(phoneIdentity, 'mpin_reset');
       setSecondsLeft(RESEND_SECONDS);
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginPhone.sendFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -117,7 +118,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
       await authApi.verifyLoginOtp(phoneIdentity, otp, 'mpin_reset');
       setStep('newMpin');
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('loginOtp.verifyFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('loginOtp.verifyFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -126,7 +127,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
   const handleSaveMpin = async () => {
     if (!phoneIdentity) return;
     if (confirmMpin !== newMpin) {
-      Alert.alert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
+      showAppAlert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
       setConfirmMpin('');
       return;
     }
@@ -144,9 +145,9 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
       }
       await setDeviceBiometricEnabled(result.profile.biometricEnabled);
       resetMpinFlow();
-      Alert.alert(t('securitySettings.mpinSavedTitle'), t('securitySettings.mpinSavedMessage'));
+      showAppAlert(t('securitySettings.mpinSavedTitle'), t('securitySettings.mpinSavedMessage'));
     } catch (error) {
-      Alert.alert(t('common.error'), errorMessage(error, t('securitySettings.mpinSaveFailed')));
+      showAppAlert(t('common.error'), errorMessage(error, t('securitySettings.mpinSaveFailed')));
       setConfirmMpin('');
     } finally {
       setSubmitting(false);
