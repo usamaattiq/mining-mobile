@@ -1,12 +1,13 @@
 import React from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
+import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { legalDocuments } from '@/shared/constants/legalContent';
-import { palette, radius, spacing } from '@/theme';
+import { palette, spacing } from '@/theme';
 import type { LegalDocumentSheetProps } from '@/shared/types/legalDocumentSheet.types';
 
 export function LegalDocumentSheet({
@@ -16,95 +17,63 @@ export function LegalDocumentSheet({
 }: LegalDocumentSheetProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
-  const { height } = useWindowDimensions();
-  const sheetHeight = Math.round(height * 0.78);
   const document = legalDocuments[currentLanguage][doc ?? 'privacy'];
 
   return (
-    <Modal
-      visible={visible && doc !== null}
-      animationType="slide"
-      transparent
-      onRequestClose={onClose}
-    >
-      <Pressable style={styles.backdrop} onPress={onClose} />
-      <View style={[styles.sheet, { height: sheetHeight }]}>
-        <View style={styles.handle} />
-
-        <View style={styles.header}>
-          <View style={styles.headerSpacer} />
-          <AppText weight="bold" style={styles.title}>
-            {document.title}
-          </AppText>
-          <Pressable
-            onPress={onClose}
-            hitSlop={8}
-            style={styles.closeButton}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close')}
-          >
-            <Ionicons name="close" size={22} color={palette.muted} />
-          </Pressable>
-        </View>
-
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
+    <AppBottomSheet visible={visible && doc !== null} onClose={onClose} heightRatio={0.78}>
+      <View style={styles.header}>
+        <View style={styles.headerSpacer} />
+        <AppText weight="bold" style={styles.title}>
+          {document.title}
+        </AppText>
+        <Pressable
+          onPress={onClose}
+          hitSlop={8}
+          style={styles.closeButton}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.close')}
         >
-          <AppText style={styles.updated}>
-            {t('legal.updatedTemplate', {
-              effective: document.effectiveDate,
-              updated: document.lastUpdated,
-            })}
-          </AppText>
-          <AppText style={styles.intro}>{document.intro}</AppText>
-
-          {document.sections.map((section) => (
-            <View key={section.heading} style={styles.section}>
-              <AppText weight="semibold" style={styles.sectionTitle}>
-                {section.heading}
-              </AppText>
-              {section.paragraphs?.map((paragraph) => (
-                <AppText key={paragraph} style={styles.sectionBody}>
-                  {paragraph}
-                </AppText>
-              ))}
-              {section.bullets?.map((bullet) => (
-                <View key={bullet} style={styles.bulletRow}>
-                  <AppText style={styles.bulletDot}>{'•'}</AppText>
-                  <AppText style={styles.sectionBody}>{bullet}</AppText>
-                </View>
-              ))}
-            </View>
-          ))}
-        </ScrollView>
+          <Ionicons name="close" size={22} color={palette.muted} />
+        </Pressable>
       </View>
-    </Modal>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <AppText style={styles.updated}>
+          {t('legal.updatedTemplate', {
+            effective: document.effectiveDate,
+            updated: document.lastUpdated,
+          })}
+        </AppText>
+        <AppText style={styles.intro}>{document.intro}</AppText>
+
+        {document.sections.map((section) => (
+          <View key={section.heading} style={styles.section}>
+            <AppText weight="semibold" style={styles.sectionTitle}>
+              {section.heading}
+            </AppText>
+            {section.paragraphs?.map((paragraph) => (
+              <AppText key={paragraph} style={styles.sectionBody}>
+                {paragraph}
+              </AppText>
+            ))}
+            {section.bullets?.map((bullet) => (
+              <View key={bullet} style={styles.bulletRow}>
+                <AppText style={styles.bulletDot}>{'•'}</AppText>
+                <AppText style={styles.sectionBody}>{bullet}</AppText>
+              </View>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+    </AppBottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(34, 34, 34, 0.4)',
-  },
-  sheet: {
-    backgroundColor: palette.pureWhite,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    overflow: 'hidden',
-  },
-  handle: {
-    alignSelf: 'center',
-    width: 40,
-    height: 4,
-    borderRadius: radius.sm,
-    backgroundColor: palette.softGold,
-    marginBottom: spacing.sm,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
