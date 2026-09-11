@@ -29,9 +29,12 @@ export function SelectField({
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
-  const [anchor, setAnchor] = React.useState<{ x: number; y: number; width: number; height: number } | null>(
-    null,
-  );
+  const [anchor, setAnchor] = React.useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
   const triggerRef = React.useRef<View>(null);
   const selectedOption = options.find((option) => option.value === value);
 
@@ -74,7 +77,10 @@ export function SelectField({
             <Ionicons name={option.icon} size={18} color={palette.gold} />
           </View>
         ) : null}
-        <AppText weight="medium" style={[styles.optionLabel, dropdown && styles.optionLabelCompact]}>
+        <AppText
+          weight="medium"
+          style={[styles.optionLabel, dropdown && styles.optionLabelCompact]}
+        >
           {option.label}
         </AppText>
         {selected ? <Ionicons name="checkmark" size={16} color={palette.gold} /> : null}
@@ -93,7 +99,11 @@ export function SelectField({
       <View ref={triggerRef} collapsable={false}>
         <Pressable
           onPress={handleOpen}
-          style={[styles.trigger, compact && styles.triggerCompact, error ? styles.triggerError : null]}
+          style={[
+            styles.trigger,
+            compact && styles.triggerCompact,
+            error ? styles.triggerError : null,
+          ]}
           accessibilityRole="button"
           accessibilityLabel={label ?? placeholder}
         >
@@ -118,7 +128,12 @@ export function SelectField({
       {error ? <AppText style={styles.error}>{error}</AppText> : null}
 
       {dropdown ? (
-        <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        <Modal
+          visible={open}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setOpen(false)}
+        >
           <Pressable style={styles.dropdownBackdrop} onPress={() => setOpen(false)}>
             {anchor ? (
               <View

@@ -153,7 +153,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
                         value: option.key,
                         label: option.label,
                       }))}
-                      value={activeDuration?.key}
+                      value={activeDuration?.key ?? null}
                       onChange={(next) =>
                         setSelectedDuration(next as 'hourly' | 'weekly' | 'monthly')
                       }

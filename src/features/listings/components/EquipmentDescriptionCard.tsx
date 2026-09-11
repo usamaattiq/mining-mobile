@@ -28,11 +28,7 @@ export function EquipmentDescriptionCard({
         <AppText weight="bold" style={styles.title}>
           {t('equipmentListing.description')}
         </AppText>
-        <Ionicons
-          name={expanded ? 'chevron-up' : 'chevron-down'}
-          size={18}
-          color={palette.muted}
-        />
+        <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color={palette.muted} />
       </Pressable>
       <AppText style={styles.description} numberOfLines={expanded ? undefined : COLLAPSED_LINES}>
         {description}
