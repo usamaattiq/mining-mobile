@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { palette, radius, spacing } from '@/theme';
+import { KeyboardDoneBar } from '@/shared/components/KeyboardDoneBar';
 import type { CodeInputProps } from '@/shared/types/codeInput.types';
 
 /** Shared digit-box input, used for both OTP verification and MPIN entry. */
@@ -14,6 +15,7 @@ export function CodeInput({
 }: CodeInputProps): React.ReactElement {
   const inputRef = React.useRef<TextInput>(null);
   const [focused, setFocused] = React.useState(false);
+  const accessoryId = React.useId();
   const digits = Array.from({ length }, (_, index) => value[index] ?? '');
 
   return (
@@ -49,9 +51,12 @@ export function CodeInput({
         autoComplete={secure ? 'off' : Platform.OS === 'android' ? 'sms-otp' : 'one-time-code'}
         textContentType={secure ? 'none' : 'oneTimeCode'}
         importantForAutofill={secure ? 'no' : 'yes'}
+        inputAccessoryViewID={accessoryId}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
+
+      <KeyboardDoneBar nativeID={accessoryId} disabled={value.length !== length} />
     </Pressable>
   );
 }
