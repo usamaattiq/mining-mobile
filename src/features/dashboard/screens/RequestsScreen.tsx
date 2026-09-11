@@ -63,6 +63,7 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
             thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
             placeholderIcon: 'construct-outline',
             subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.units })}`,
+            subtitleIcon: 'construct-outline',
             primaryBadge: {
               key: 'mode',
               label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
@@ -72,7 +73,11 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
               ? { key: 'delivery', label: t('equipmentListing.deliveryBadge'), icon: 'car-outline' }
               : undefined,
             createdAt: listing.createdAt,
-            onPress: () => navigation.navigate('EquipmentListingDetail', { id: listing.id }),
+            onPress: () =>
+              navigation.navigate('CompleteListingDetail', {
+                id: listing.id,
+                category: 'equipment',
+              }),
           };
         })
       : category === 'services'
@@ -82,6 +87,7 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
             thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
             placeholderIcon: 'briefcase-outline',
             subtitle: listing.serviceCategoryLabel,
+            subtitleIcon: 'briefcase-outline',
             primaryBadge: {
               key: 'serviceType',
               label: t(
@@ -92,7 +98,11 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
               icon: listing.serviceType === 'onsite' ? 'location-outline' : 'globe-outline',
             },
             priceText: priceText(listing.price),
-            onPress: () => navigation.navigate('ServiceListingDetail', { id: listing.id }),
+            onPress: () =>
+              navigation.navigate('CompleteListingDetail', {
+                id: listing.id,
+                category: 'services',
+              }),
           }))
         : goldListings.map((listing) => ({
             id: listing.id,
@@ -106,7 +116,8 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
                 : null,
             ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
             priceText: priceText(listing.price),
-            onPress: () => navigation.navigate('GoldListingDetail', { id: listing.id }),
+            onPress: () =>
+              navigation.navigate('CompleteListingDetail', { id: listing.id, category: 'gold' }),
           }));
 
   return (

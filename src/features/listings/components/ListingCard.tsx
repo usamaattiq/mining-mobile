@@ -33,6 +33,7 @@ export function ListingCard({
   thumbnail,
   placeholderIcon,
   subtitle,
+  subtitleIcon,
   primaryBadge,
   secondaryBadges,
   cornerBadge,
@@ -76,9 +77,14 @@ export function ListingCard({
             {title}
           </AppText>
           {subtitle ? (
-            <AppText style={styles.subtitle} numberOfLines={1}>
-              {subtitle}
-            </AppText>
+            <View style={styles.subtitleRow}>
+              {subtitleIcon ? (
+                <Ionicons name={subtitleIcon} size={13} color={palette.gold} />
+              ) : null}
+              <AppText style={styles.subtitle} numberOfLines={1}>
+                {subtitle}
+              </AppText>
+            </View>
           ) : null}
 
           {secondaryBadges && secondaryBadges.length > 0 ? (
@@ -162,6 +168,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: palette.charcoal,
     paddingRight: 84,
+  },
+  subtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   subtitle: {
     fontSize: 13,

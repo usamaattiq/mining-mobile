@@ -13,6 +13,8 @@ export type ListingCardProps = {
   placeholderIcon: keyof typeof Ionicons.glyphMap;
   /** Small subtitle line under the title (e.g. equipment type, service category). */
   subtitle?: string;
+  /** Icon shown before the subtitle text. */
+  subtitleIcon?: keyof typeof Ionicons.glyphMap;
   /** Filled gold pill — e.g. Rent/Sell, Onsite/Online. */
   primaryBadge?: ListingCardBadge;
   /** Soft-gold pills — e.g. duration, purity, weight. */

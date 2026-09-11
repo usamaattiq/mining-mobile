@@ -15,12 +15,10 @@ export type RootStackParamList = {
   SecuritySettings: undefined;
   EquipmentListingMode: undefined;
   EquipmentListingForm: { mode: EquipmentListingMode };
-  EquipmentListingDetail: { id: string };
   ServiceListingMode: undefined;
   ServiceListingForm: { serviceType: ServiceType };
-  ServiceListingDetail: { id: string };
   GoldListingForm: undefined;
-  GoldListingDetail: { id: string };
+  CompleteListingDetail: { id: string; category: ListingCategory };
 };
 
 export type DashboardTabParamList = {
