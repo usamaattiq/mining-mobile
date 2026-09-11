@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-start',
     gap: spacing.sm,
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     padding: spacing.lg,
     minHeight: 160,

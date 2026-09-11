@@ -215,7 +215,7 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
   },
   content: {
     padding: spacing.lg,

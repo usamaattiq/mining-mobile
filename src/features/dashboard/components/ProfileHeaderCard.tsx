@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/shared/components/AppText';
@@ -9,20 +9,31 @@ import type { ProfileHeaderCardProps } from '@/features/dashboard/types/profileH
 /** Gold identity header used atop the dashboard Profile screen — avatar, name, and contact meta. */
 export function ProfileHeaderCard({
   initial,
+  avatarUrl,
   name,
   email,
   phone,
+  onPressAvatar,
 }: ProfileHeaderCardProps): React.ReactElement {
   const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.card, { paddingTop: insets.top + spacing.md }]}>
       <View style={styles.inner}>
-        <View style={styles.avatarRing}>
-          <AppText weight="bold" style={styles.avatarInitial}>
-            {initial}
-          </AppText>
-        </View>
+        <Pressable
+          style={styles.avatarRing}
+          onPress={onPressAvatar}
+          disabled={!onPressAvatar}
+          accessibilityRole={onPressAvatar ? 'button' : undefined}
+        >
+          {avatarUrl ? (
+            <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+          ) : (
+            <AppText weight="bold" style={styles.avatarInitial}>
+              {initial}
+            </AppText>
+          )}
+        </Pressable>
 
         <View style={styles.copy}>
           <AppText weight="bold" style={styles.name} numberOfLines={1}>
@@ -70,6 +81,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.22)',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
   avatarInitial: {
     fontSize: 32,

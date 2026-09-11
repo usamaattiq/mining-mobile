@@ -17,9 +17,8 @@ function contentTypeFromAsset(asset: ImagePicker.ImagePickerAsset): UploadableCo
 
 /**
  * Opens the device image picker, uploads the chosen image straight to S3 via
- * mining-api's presigned URL, and returns the object key to save on whatever
- * record it belongs to (avatar, document, etc). Use `resolveMediaUrl(key)`
- * (see media.ts) to build a displayable URL from that key later.
+ * mining-api's presigned URL, and returns both the object key (to save on
+ * whatever record it belongs to) and the ready-to-display public URL.
  */
 export function useMediaUpload() {
   const [state, setState] = React.useState<MediaUploadState>({
@@ -55,16 +54,19 @@ export function useMediaUpload() {
     return { uri: asset.uri, contentType: contentTypeFromAsset(asset) };
   }, []);
 
-  const pickAndUpload = React.useCallback(async (): Promise<{ key: string } | null> => {
+  const pickAndUpload = React.useCallback(async (): Promise<{
+    key: string;
+    url: string;
+  } | null> => {
     const picked = await pickImage();
     if (!picked) return null;
 
     setState({ uploading: true, progress: 'uploading', error: null });
 
     try {
-      const { key } = await uploadMedia(picked);
+      const { key, url } = await uploadMedia(picked);
       setState({ uploading: false, progress: 'done', error: null });
-      return { key };
+      return { key, url };
     } catch (error) {
       setState({
         uploading: false,

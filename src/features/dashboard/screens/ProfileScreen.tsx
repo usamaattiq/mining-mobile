@@ -109,9 +109,11 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
 
       <ProfileHeaderCard
         initial={initial}
+        avatarUrl={profile?.avatarUrl}
         name={profile?.fullName ?? '—'}
         email={profile?.email}
         phone={profile?.phoneE164}
+        onPressAvatar={() => navigation.navigate('PersonalInformation')}
       />
 
       <CurvedSheetScrollView>
@@ -150,6 +152,6 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
   },
 });

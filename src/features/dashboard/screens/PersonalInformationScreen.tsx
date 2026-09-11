@@ -8,9 +8,12 @@ import type { RootStackParamList } from '@/navigation/types';
 import { authApi } from '@/features/auth/api/authApi';
 import { ApiError } from '@/shared/services/api';
 import { useProfileStore } from '@/store/profileStore';
+import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { FormInput } from '@/shared/components/FormInput';
+import { AvatarPicker } from '@/shared/components/AvatarPicker';
+import { LocationField } from '@/shared/components/LocationField';
 import { Button } from '@/shared/components/Button';
 import { palette, spacing } from '@/theme';
 
@@ -26,8 +29,19 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
   const [fullName, setFullName] = React.useState(profile?.fullName ?? '');
   const [email, setEmail] = React.useState(profile?.email ?? '');
   const [address, setAddress] = React.useState(profile?.address ?? '');
+  const [locationCoords, setLocationCoords] = React.useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(
+    profile?.latitude != null && profile?.longitude != null
+      ? { latitude: profile.latitude, longitude: profile.longitude }
+      : null,
+  );
+  const [avatarUrl, setAvatarUrl] = React.useState(profile?.avatarUrl ?? null);
   const [saving, setSaving] = React.useState(false);
   const [emailServerError, setEmailServerError] = React.useState<string | null>(null);
+  const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
+    useLocationMapPicker();
 
   const trimmedEmail = email.trim();
   const isEmailFormatValid = trimmedEmail.length === 0 || EMAIL_REGEX.test(trimmedEmail);
@@ -38,10 +52,35 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
     setEmailServerError(null);
   };
 
+  const handleUseCurrentLocation = async () => {
+    const selection = await getCurrentLocation();
+    if (!selection) {
+      Alert.alert(t('common.error'), t('location.locationFailed'));
+      return;
+    }
+    setAddress(selection.label);
+    setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+  };
+
+  const handleSelectOnMap = () => {
+    openMapPickerForSelection((selection) => {
+      setAddress(selection.label);
+      setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+    }, locationCoords);
+  };
+
+  const profileLocationCoords =
+    profile?.latitude != null && profile?.longitude != null
+      ? { latitude: profile.latitude, longitude: profile.longitude }
+      : null;
+
   const hasChanges =
     fullName.trim() !== (profile?.fullName ?? '') ||
     trimmedEmail !== (profile?.email ?? '') ||
-    address.trim() !== (profile?.address ?? '');
+    address.trim() !== (profile?.address ?? '') ||
+    locationCoords?.latitude !== profileLocationCoords?.latitude ||
+    locationCoords?.longitude !== profileLocationCoords?.longitude ||
+    avatarUrl !== (profile?.avatarUrl ?? null);
 
   const handleSave = async () => {
     if (emailError || !isEmailFormatValid) return;
@@ -52,6 +91,8 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
         fullName: fullName.trim(),
         email: trimmedEmail || null,
         address: address.trim() || null,
+        locationCoordinates: locationCoords,
+        avatarUrl,
       });
       setProfile(updated);
       navigation.goBack();
@@ -80,6 +121,8 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
       />
 
       <CurvedSheetScrollView keyboardShouldPersistTaps="handled">
+        <AvatarPicker uri={avatarUrl} onChangeUrl={setAvatarUrl} />
+
         <FormInput label={t('profile.fullName')} value={fullName} onChangeText={setFullName} />
         <FormInput
           label={t('profile.email')}
@@ -90,7 +133,14 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
           error={emailError ?? undefined}
         />
         <FormInput label={t('profile.phone')} value={profile?.phoneE164 ?? ''} editable={false} />
-        <FormInput label={t('profile.address')} value={address} onChangeText={setAddress} />
+        <LocationField
+          label={t('profile.address')}
+          value={address}
+          loading={locationLoading}
+          onChangeText={setAddress}
+          onUseCurrentLocation={() => void handleUseCurrentLocation()}
+          onSelectOnMap={handleSelectOnMap}
+        />
 
         <Button
           label={t('common.save')}
@@ -100,6 +150,8 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
           style={styles.saveButton}
         />
       </CurvedSheetScrollView>
+
+      {mapPickerSheet}
     </View>
   );
 }

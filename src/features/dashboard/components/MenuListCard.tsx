@@ -4,7 +4,7 @@ import { MenuRow } from '@/features/dashboard/components/MenuRow';
 import { palette, radius } from '@/theme';
 import type { MenuListCardProps } from '@/features/dashboard/types/menuListCard.types';
 
-/** White rounded card of stacked MenuRow items with dividers between them. */
+/** Off-white rounded card of stacked MenuRow items with dividers between them. */
 export function MenuListCard({ items }: MenuListCardProps): React.ReactElement {
   return (
     <View style={styles.card}>
@@ -17,7 +17,7 @@ export function MenuListCard({ items }: MenuListCardProps): React.ReactElement {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     overflow: 'hidden',
   },

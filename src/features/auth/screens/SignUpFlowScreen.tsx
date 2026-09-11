@@ -252,8 +252,8 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
 
       if (avatarAsset) {
         try {
-          const { key } = await uploadMedia(avatarAsset);
-          const updatedProfile = await authApi.updateMe({ avatarUrl: key });
+          const { url } = await uploadMedia(avatarAsset);
+          const updatedProfile = await authApi.updateMe({ avatarUrl: url });
           setProfile(updatedProfile);
         } catch {
           // Avatar upload failing shouldn't block account creation; user can retry from profile.
@@ -414,7 +414,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           <AvatarPicker
             label={t('signUpPersonalInfo.profileImage')}
             uri={null}
-            onChangeKey={() => {}}
+            onChangeUrl={() => {}}
             deferUpload
             onPickLocal={setAvatarAsset}
           />

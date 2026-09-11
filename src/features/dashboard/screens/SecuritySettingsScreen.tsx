@@ -271,12 +271,12 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   menuCard: {
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     overflow: 'hidden',
   },
   card: {
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     padding: spacing.lg,
   },

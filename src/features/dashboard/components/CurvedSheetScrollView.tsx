@@ -26,7 +26,7 @@ export function CurvedSheetScrollView({
 const styles = StyleSheet.create({
   scroll: {
     flex: 1,
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
     borderTopLeftRadius: OVERLAP,
     borderTopRightRadius: OVERLAP,
     marginTop: -OVERLAP,

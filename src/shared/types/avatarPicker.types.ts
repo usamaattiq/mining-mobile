@@ -2,8 +2,9 @@ import type { UploadableContentType } from '@/shared/services/media';
 
 export type AvatarPickerProps = {
   label?: string;
+  /** Displayable image URL (not an S3 key) — already resolved by the caller/upload result. */
   uri: string | null;
-  onChangeKey: (key: string | null) => void;
+  onChangeUrl: (url: string | null) => void;
 } & (
   | { deferUpload?: false; onPickLocal?: never }
   | {

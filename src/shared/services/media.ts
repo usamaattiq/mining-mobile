@@ -1,9 +1,10 @@
+import * as FileSystem from 'expo-file-system/legacy';
 import { env } from '@/shared/config/env';
 import { apiFetch } from './api';
 
 export type UploadableContentType = 'image/jpeg' | 'image/png' | 'image/webp' | 'application/pdf';
 
-type PresignUploadResult = { uploadUrl: string; key: string; expiresIn: number };
+type PresignUploadResult = { uploadUrl: string; key: string; publicUrl: string; expiresIn: number };
 
 /** Builds a directly-accessible URL for an S3 object key stored via mining-api. */
 export function resolveMediaUrl(key: string | null | undefined): string | null {
@@ -19,25 +20,29 @@ async function presignUpload(contentType: UploadableContentType): Promise<Presig
 
 /**
  * Uploads a local file (e.g. from expo-image-picker) directly to S3 via a
- * presigned PUT, then returns the object key to store on the backend record
- * (avatar, document, etc) — never the raw S3 URL, since the bucket is private.
+ * presigned PUT, then returns the object key (to store on whatever backend
+ * record it belongs to) and the public URL mining-api computed for it.
+ *
+ * Uses expo-file-system's native upload rather than fetch().blob() — RN's
+ * fetch/Blob polyfill round-trips binary data through base64, which can
+ * silently corrupt the bytes (S3 accepts the PUT, but the object is left
+ * unreadable as an image).
  */
 export async function uploadMedia(file: {
   uri: string;
   contentType: UploadableContentType;
-}): Promise<{ key: string }> {
-  const { uploadUrl, key } = await presignUpload(file.contentType);
-  const blob = await (await fetch(file.uri)).blob();
+}): Promise<{ key: string; url: string }> {
+  const { uploadUrl, key, publicUrl } = await presignUpload(file.contentType);
 
-  const res = await fetch(uploadUrl, {
-    method: 'PUT',
+  const res = await FileSystem.uploadAsync(uploadUrl, file.uri, {
+    httpMethod: 'PUT',
+    uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
     headers: { 'Content-Type': file.contentType },
-    body: blob,
   });
 
-  if (!res.ok) {
+  if (res.status < 200 || res.status >= 300) {
     throw new Error(`Upload failed: ${res.status}`);
   }
 
-  return { key };
+  return { key, url: publicUrl };
 }

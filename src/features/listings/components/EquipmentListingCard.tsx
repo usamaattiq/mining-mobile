@@ -122,7 +122,7 @@ export function EquipmentListingCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     padding: spacing.sm,
     gap: spacing.sm,

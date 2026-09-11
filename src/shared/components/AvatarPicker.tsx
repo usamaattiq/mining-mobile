@@ -4,18 +4,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import { useMediaUpload } from '@/shared/hooks/useMediaUpload';
-import { resolveMediaUrl } from '@/shared/services/media';
 import type { AvatarPickerProps } from '@/shared/types/avatarPicker.types';
 
 export function AvatarPicker({
   label,
   uri,
-  onChangeKey,
+  onChangeUrl,
   deferUpload,
   onPickLocal,
 }: AvatarPickerProps): React.ReactElement {
   const { uploading, error, pickImage, pickAndUpload } = useMediaUpload();
   const [localUri, setLocalUri] = React.useState<string | null>(null);
+  const [loadError, setLoadError] = React.useState<string | null>(null);
 
   const handlePress = async () => {
     if (deferUpload) {
@@ -25,13 +25,14 @@ export function AvatarPicker({
       return;
     }
 
+    setLoadError(null);
     const result = await pickAndUpload();
     if (result) {
-      onChangeKey(result.key);
+      onChangeUrl(result.url);
     }
   };
 
-  const displayUri = deferUpload ? localUri : uri ? resolveMediaUrl(uri) : null;
+  const displayUri = deferUpload ? localUri : uri;
 
   const handleRemove = () => {
     if (deferUpload) {
@@ -39,7 +40,7 @@ export function AvatarPicker({
       onPickLocal(null);
       return;
     }
-    onChangeKey(null);
+    onChangeUrl(null);
   };
 
   return (
@@ -56,8 +57,19 @@ export function AvatarPicker({
           disabled={uploading}
           activeOpacity={0.8}
         >
-          {displayUri ? (
-            <Image source={{ uri: displayUri }} style={styles.image} />
+          {displayUri && !loadError ? (
+            <Image
+              source={{ uri: displayUri }}
+              style={styles.image}
+              onError={(e) => {
+                setLoadError(e.nativeEvent.error);
+                console.warn(
+                  '[AvatarPicker] failed to load image',
+                  displayUri,
+                  e.nativeEvent.error,
+                );
+              }}
+            />
           ) : (
             <Ionicons name="camera-outline" size={28} color={palette.muted} />
           )}
@@ -73,7 +85,7 @@ export function AvatarPicker({
           </TouchableOpacity>
         ) : null}
       </View>
-      {error ? <AppText style={styles.error}>{error}</AppText> : null}
+      {error || loadError ? <AppText style={styles.error}>{error ?? loadError}</AppText> : null}
     </View>
   );
 }
