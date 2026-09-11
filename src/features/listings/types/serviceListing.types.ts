@@ -8,6 +8,7 @@ export type ServiceListing = {
   serviceCategoryLabel: string;
   title: string;
   description: string;
+  yearsOfExperience: string;
   price: string;
   /** Epoch ms of the requested service date/time, or null if not set. */
   serviceDate: number | null;

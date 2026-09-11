@@ -183,6 +183,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     detailRows = [
       { label: t('serviceListing.serviceCategory'), value: serviceListing.serviceCategoryLabel },
       {
+        label: t('serviceListing.yearsOfExperience'),
+        value: serviceListing.yearsOfExperience
+          ? t('serviceListing.yearsOfExperienceValue', { years: serviceListing.yearsOfExperience })
+          : '',
+      },
+      {
         label: t('serviceListing.type'),
         value: t(
           serviceListing.serviceType === 'onsite'

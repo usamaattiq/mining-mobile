@@ -65,6 +65,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [serviceCategory, setServiceCategory] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [yearsOfExperience, setYearsOfExperience] = React.useState('');
   const [price, setPrice] = React.useState('');
   const [serviceDate, setServiceDate] = React.useState<Date | null>(null);
   const [location, setLocation] = React.useState('');
@@ -123,6 +124,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       serviceCategoryLabel: serviceCategoryLabel ?? '',
       title,
       description,
+      yearsOfExperience,
       price,
       serviceDate: serviceDate ? serviceDate.getTime() : null,
       location: isOnsite ? location : '',
@@ -136,6 +138,12 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     { label: t('serviceListing.serviceCategory'), value: serviceCategoryLabel ?? '' },
     { label: t('serviceListing.title'), value: title },
     { label: t('serviceListing.description'), value: description },
+    {
+      label: t('serviceListing.yearsOfExperience'),
+      value: yearsOfExperience
+        ? t('serviceListing.yearsOfExperienceValue', { years: yearsOfExperience })
+        : '',
+    },
     {
       label: t('serviceListing.price'),
       value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
@@ -208,6 +216,14 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               numberOfLines={4}
               style={styles.descriptionInput}
               required
+            />
+
+            <FormInput
+              label={t('serviceListing.yearsOfExperience')}
+              value={yearsOfExperience}
+              onChangeText={setYearsOfExperience}
+              placeholder={t('serviceListing.yearsOfExperiencePlaceholder')}
+              keyboardType="numeric"
             />
 
             <FormInput
