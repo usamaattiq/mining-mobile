@@ -12,6 +12,7 @@ import { AppText } from '@/shared/components/AppText';
 import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentDescriptionCard } from '@/features/listings/components/EquipmentDescriptionCard';
+import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -67,6 +68,25 @@ export function ServiceListingDetailScreen({ navigation, route }: Props): React.
     void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
   };
 
+  const detailRows = [
+    { label: t('serviceListing.serviceCategory'), value: listing.serviceCategoryLabel },
+    {
+      label: t('serviceListing.type'),
+      value: t(
+        listing.serviceType === 'onsite' ? 'serviceListing.onsite' : 'serviceListing.online',
+      ),
+    },
+    {
+      label: t('serviceListing.dateTimeLabel'),
+      value: listing.serviceDate
+        ? new Intl.DateTimeFormat(currentLanguage, {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(listing.serviceDate)
+        : '',
+    },
+  ].filter((row) => (row.value ?? '').trim().length > 0);
+
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
@@ -91,21 +111,6 @@ export function ServiceListingDetailScreen({ navigation, route }: Props): React.
                 {listing.title}
               </AppText>
 
-              <View style={styles.modeBadge}>
-                <Ionicons
-                  name={listing.serviceType === 'onsite' ? 'location-outline' : 'globe-outline'}
-                  size={13}
-                  color={palette.pureWhite}
-                />
-                <AppText weight="semibold" style={styles.modeBadgeText}>
-                  {t(
-                    listing.serviceType === 'onsite'
-                      ? 'serviceListing.onsite'
-                      : 'serviceListing.online',
-                  )}
-                </AppText>
-              </View>
-
               {locationLabel.trim() ? (
                 <Pressable
                   onPress={handleOpenLocation}
@@ -123,28 +128,10 @@ export function ServiceListingDetailScreen({ navigation, route }: Props): React.
                   <Ionicons name="open-outline" size={14} color={palette.muted} />
                 </Pressable>
               ) : null}
-
-              {listing.serviceDate ? (
-                <View style={styles.dateRow}>
-                  <Ionicons name="calendar-outline" size={16} color={palette.gold} />
-                  <AppText style={styles.dateText}>
-                    {new Intl.DateTimeFormat(currentLanguage, {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    }).format(listing.serviceDate)}
-                  </AppText>
-                </View>
-              ) : null}
             </View>
           </View>
 
-          {listing.serviceCategoryLabel ? (
-            <View style={styles.categoryBadge}>
-              <AppText weight="semibold" style={styles.categoryBadgeText}>
-                {listing.serviceCategoryLabel}
-              </AppText>
-            </View>
-          ) : null}
+          <EquipmentListingSummaryCard detailRows={detailRows} media={[]} hideMedia />
 
           {descriptionText ? <EquipmentDescriptionCard description={descriptionText} /> : null}
 
@@ -200,20 +187,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: palette.charcoal,
   },
-  modeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    alignSelf: 'flex-start',
-    backgroundColor: palette.gold,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
-  modeBadgeText: {
-    fontSize: 11,
-    color: palette.pureWhite,
-  },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -227,26 +200,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.gold,
     textDecorationLine: 'underline',
-  },
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  dateText: {
-    fontSize: 14,
-    color: palette.charcoal,
-  },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: palette.softGold,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-  },
-  categoryBadgeText: {
-    fontSize: 12,
-    color: palette.gold,
   },
   notFoundWrap: {
     flex: 1,

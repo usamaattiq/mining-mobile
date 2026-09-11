@@ -238,6 +238,7 @@
     "stepLabel": "الخطوة {current} من {total}",
     "serviceCategory": "نوع الخدمة",
     "serviceCategoryPlaceholder": "اختر نوع الخدمة",
+    "type": "النوع",
     "category": {
       "consulting": "استشارات",
       "drilling": "حفر",
@@ -253,6 +254,7 @@
     "descriptionPlaceholder": "صف ما تتضمنه هذه الخدمة",
     "price": "السعر",
     "serviceDate": "متى تحتاج هذه الخدمة؟",
+    "dateTimeLabel": "التاريخ/الوقت",
     "serviceDatePlaceholder": "اختر التاريخ والوقت",
     "location": "الموقع",
     "mediaTitle": "الصور والمستندات",

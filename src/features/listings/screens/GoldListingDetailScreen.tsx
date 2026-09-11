@@ -12,6 +12,7 @@ import { AppText } from '@/shared/components/AppText';
 import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentDescriptionCard } from '@/features/listings/components/EquipmentDescriptionCard';
+import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -67,6 +68,23 @@ export function GoldListingDetailScreen({ navigation, route }: Props): React.Rea
     void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
   };
 
+  const detailRows = [
+    { label: t('goldListing.purity'), value: listing.purityLabel },
+    {
+      label: t('goldListing.weight'),
+      value: listing.weight ? t('goldListing.weightValue', { weight: listing.weight }) : '',
+    },
+    {
+      label: t('goldListing.auctionEndDate'),
+      value: listing.auctionEndDate
+        ? new Intl.DateTimeFormat(currentLanguage, {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(listing.auctionEndDate)
+        : '',
+    },
+  ].filter((row) => (row.value ?? '').trim().length > 0);
+
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
@@ -91,23 +109,6 @@ export function GoldListingDetailScreen({ navigation, route }: Props): React.Rea
                 {listing.title}
               </AppText>
 
-              <View style={styles.badgeRow}>
-                {listing.purityLabel ? (
-                  <View style={styles.badge}>
-                    <AppText weight="semibold" style={styles.badgeText}>
-                      {listing.purityLabel}
-                    </AppText>
-                  </View>
-                ) : null}
-                {listing.weight ? (
-                  <View style={styles.badge}>
-                    <AppText weight="semibold" style={styles.badgeText}>
-                      {t('goldListing.weightValue', { weight: listing.weight })}
-                    </AppText>
-                  </View>
-                ) : null}
-              </View>
-
               {locationLabel.trim() ? (
                 <Pressable
                   onPress={handleOpenLocation}
@@ -125,21 +126,10 @@ export function GoldListingDetailScreen({ navigation, route }: Props): React.Rea
                   <Ionicons name="open-outline" size={14} color={palette.muted} />
                 </Pressable>
               ) : null}
-
-              {listing.auctionEndDate ? (
-                <View style={styles.dateRow}>
-                  <Ionicons name="time-outline" size={16} color={palette.gold} />
-                  <AppText style={styles.dateText}>
-                    {t('goldListing.auctionEndDate')}:{' '}
-                    {new Intl.DateTimeFormat(currentLanguage, {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    }).format(listing.auctionEndDate)}
-                  </AppText>
-                </View>
-              ) : null}
             </View>
           </View>
+
+          <EquipmentListingSummaryCard detailRows={detailRows} media={[]} hideMedia />
 
           {descriptionText ? <EquipmentDescriptionCard description={descriptionText} /> : null}
 
@@ -195,21 +185,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: palette.charcoal,
   },
-  badgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-  },
-  badge: {
-    backgroundColor: palette.softGold,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
-  badgeText: {
-    fontSize: 11,
-    color: palette.gold,
-  },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -223,15 +198,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.gold,
     textDecorationLine: 'underline',
-  },
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  dateText: {
-    fontSize: 14,
-    color: palette.charcoal,
   },
   notFoundWrap: {
     flex: 1,

@@ -242,6 +242,7 @@
     "stepLabel": "Step {current} of {total}",
     "serviceCategory": "Service Type",
     "serviceCategoryPlaceholder": "Choose service type",
+    "type": "Type",
     "category": {
       "consulting": "Consulting",
       "drilling": "Drilling",
@@ -257,6 +258,7 @@
     "descriptionPlaceholder": "Describe what this service includes",
     "price": "Price",
     "serviceDate": "When do you need this service?",
+    "dateTimeLabel": "Date/Time",
     "serviceDatePlaceholder": "Select date & time",
     "location": "Location",
     "mediaTitle": "Photos & Documents",
