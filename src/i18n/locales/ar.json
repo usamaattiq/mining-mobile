@@ -168,6 +168,7 @@
   },
   "equipmentListing": {
     "modeTitle": "عرض معدات",
+    "modeSubtitle": "اختر كيف تريد عرض معداتك.",
     "rent": "إيجار",
     "rentSubtitle": "أجّر معداتك للمشترين",
     "sell": "بيع",
@@ -228,6 +229,7 @@
   },
   "serviceListing": {
     "modeTitle": "عرض خدمة",
+    "modeSubtitle": "اختر كيف تريد تقديم خدمتك.",
     "onsite": "في الموقع",
     "onsiteSubtitle": "تقديم الخدمة في موقع العميل",
     "online": "عبر الإنترنت",

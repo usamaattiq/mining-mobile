@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
+import { AppText } from '@/shared/components/AppText';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
-import { ListingModeCard } from '@/features/listings/components/ListingModeCard';
+import { OptionRowCard } from '@/shared/components/OptionRowCard';
 import { palette, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ServiceListingMode'>;
@@ -27,21 +28,21 @@ export function ServiceListingModeScreen({ navigation }: Props): React.ReactElem
         style={styles.header}
       />
 
-      <CurvedSheetScrollView>
-        <View style={styles.cardsRow}>
-          <ListingModeCard
-            icon="location-outline"
-            title={t('serviceListing.onsite')}
-            subtitle={t('serviceListing.onsiteSubtitle')}
-            onPress={() => navigation.navigate('ServiceListingForm', { serviceType: 'onsite' })}
-          />
-          <ListingModeCard
-            icon="globe-outline"
-            title={t('serviceListing.online')}
-            subtitle={t('serviceListing.onlineSubtitle')}
-            onPress={() => navigation.navigate('ServiceListingForm', { serviceType: 'online' })}
-          />
-        </View>
+      <CurvedSheetScrollView contentContainerStyle={styles.content}>
+        {/* <AppText style={styles.intro}>{t('serviceListing.modeSubtitle')}</AppText> */}
+
+        <OptionRowCard
+          icon="location-outline"
+          title={t('serviceListing.onsite')}
+          subtitle={t('serviceListing.onsiteSubtitle')}
+          onPress={() => navigation.navigate('ServiceListingForm', { serviceType: 'onsite' })}
+        />
+        <OptionRowCard
+          icon="globe-outline"
+          title={t('serviceListing.online')}
+          subtitle={t('serviceListing.onlineSubtitle')}
+          onPress={() => navigation.navigate('ServiceListingForm', { serviceType: 'online' })}
+        />
       </CurvedSheetScrollView>
     </View>
   );
@@ -55,8 +56,13 @@ const styles = StyleSheet.create({
   header: {
     paddingBottom: spacing.xl,
   },
-  cardsRow: {
-    flexDirection: 'row',
+  content: {
     gap: spacing.md,
+  },
+  intro: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: palette.muted,
+    marginBottom: spacing.xs,
   },
 });

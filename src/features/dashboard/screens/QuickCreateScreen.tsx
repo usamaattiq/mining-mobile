@@ -8,7 +8,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { AppText } from '@/shared/components/AppText';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
-import { QuickCreateOptionCard } from '@/features/dashboard/components/QuickCreateOptionCard';
+import { OptionRowCard } from '@/shared/components/OptionRowCard';
 import { palette, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'QuickCreate'>;
@@ -51,10 +51,10 @@ export function QuickCreateScreen({ navigation }: Props): React.ReactElement {
       />
 
       <CurvedSheetScrollView contentContainerStyle={styles.content}>
-        <AppText style={styles.intro}>{t('dashboardHome.quickCreateSubtitle')}</AppText>
+        {/* <AppText style={styles.intro}>{t('dashboardHome.quickCreateSubtitle')}</AppText> */}
 
         {actions.map((action) => (
-          <QuickCreateOptionCard key={action.title} {...action} />
+          <OptionRowCard key={action.title} {...action} />
         ))}
       </CurvedSheetScrollView>
     </View>

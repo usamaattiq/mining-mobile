@@ -1,6 +1,6 @@
 import type { Ionicons } from '@expo/vector-icons';
 
-export type ListingModeCardProps = {
+export type OptionRowCardProps = {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   subtitle: string;

@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
+import { AppText } from '@/shared/components/AppText';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
-import { ListingModeCard } from '@/features/listings/components/ListingModeCard';
+import { OptionRowCard } from '@/shared/components/OptionRowCard';
 import { palette, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingMode'>;
@@ -27,21 +28,21 @@ export function EquipmentListingModeScreen({ navigation }: Props): React.ReactEl
         style={styles.header}
       />
 
-      <CurvedSheetScrollView>
-        <View style={styles.cardsRow}>
-          <ListingModeCard
-            icon="key-outline"
-            title={t('equipmentListing.rent')}
-            subtitle={t('equipmentListing.rentSubtitle')}
-            onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'rent' })}
-          />
-          <ListingModeCard
-            icon="pricetag-outline"
-            title={t('equipmentListing.sell')}
-            subtitle={t('equipmentListing.sellSubtitle')}
-            onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'sell' })}
-          />
-        </View>
+      <CurvedSheetScrollView contentContainerStyle={styles.content}>
+        {/* <AppText style={styles.intro}>{t('equipmentListing.modeSubtitle')}</AppText> */}
+
+        <OptionRowCard
+          icon="key-outline"
+          title={t('equipmentListing.rent')}
+          subtitle={t('equipmentListing.rentSubtitle')}
+          onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'rent' })}
+        />
+        <OptionRowCard
+          icon="pricetag-outline"
+          title={t('equipmentListing.sell')}
+          subtitle={t('equipmentListing.sellSubtitle')}
+          onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'sell' })}
+        />
       </CurvedSheetScrollView>
     </View>
   );
@@ -55,8 +56,13 @@ const styles = StyleSheet.create({
   header: {
     paddingBottom: spacing.xl,
   },
-  cardsRow: {
-    flexDirection: 'row',
+  content: {
     gap: spacing.md,
+  },
+  intro: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: palette.muted,
+    marginBottom: spacing.xs,
   },
 });

@@ -5,15 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
-import type { QuickCreateOptionCardProps } from '@/features/dashboard/types/quickCreateOptionCard.types';
+import type { OptionRowCardProps } from '@/shared/types/optionRowCard.types';
 
-/** Bold, gradient-icon option card used on the "What would you like to list?" screen. */
-export function QuickCreateOptionCard({
+/** Bold, gradient-icon full-width row card used for a small set of tappable choices (e.g. Rent/Sell, Onsite/Online, quick-create). */
+export function OptionRowCard({
   icon,
   title,
   subtitle,
   onPress,
-}: QuickCreateOptionCardProps): React.ReactElement {
+}: OptionRowCardProps): React.ReactElement {
   return (
     <Pressable
       onPress={onPress}

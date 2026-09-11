@@ -172,6 +172,7 @@
   },
   "equipmentListing": {
     "modeTitle": "List Equipment",
+    "modeSubtitle": "Choose how you'd like to list your equipment.",
     "rent": "Rent",
     "rentSubtitle": "Rent out your equipment to buyers",
     "sell": "Sell",
@@ -232,6 +233,7 @@
   },
   "serviceListing": {
     "modeTitle": "List Service",
+    "modeSubtitle": "Choose how you'd like to offer your service.",
     "onsite": "Onsite",
     "onsiteSubtitle": "Perform the service at the client's location",
     "online": "Online",
