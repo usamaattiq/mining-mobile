@@ -12,9 +12,11 @@ export function FormInput({
   leftAdornment,
   rightAdornment,
   style,
+  editable,
   ...rest
 }: FormInputProps): React.ReactElement {
   const { currentLanguage } = useLanguage();
+  const disabled = editable === false;
 
   return (
     <View style={styles.container}>
@@ -24,11 +26,23 @@ export function FormInput({
           {required ? <AppText style={styles.required}> *</AppText> : null}
         </AppText>
       ) : null}
-      <View style={[styles.inputRow, error ? styles.inputRowError : null]}>
+      <View
+        style={[
+          styles.inputRow,
+          disabled && styles.inputRowDisabled,
+          error ? styles.inputRowError : null,
+        ]}
+      >
         {leftAdornment}
         <TextInput
-          style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }, style]}
+          style={[
+            styles.input,
+            { fontFamily: getFontFamily(currentLanguage) },
+            disabled && styles.inputDisabled,
+            style,
+          ]}
           placeholderTextColor={palette.muted}
+          editable={editable}
           {...rest}
         />
         {rightAdornment}
@@ -62,12 +76,19 @@ const styles = StyleSheet.create({
   inputRowError: {
     borderColor: palette.danger,
   },
+  inputRowDisabled: {
+    backgroundColor: palette.softGold,
+    borderColor: palette.softGold,
+  },
   input: {
     flex: 1,
     paddingVertical: spacing.sm + 4,
     fontSize: 15,
     color: palette.charcoal,
     textAlignVertical: 'center',
+  },
+  inputDisabled: {
+    color: palette.muted,
   },
   error: {
     fontSize: 12,
