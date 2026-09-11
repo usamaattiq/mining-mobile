@@ -6,12 +6,15 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { authApi } from '@/features/auth/api/authApi';
+import { ApiError } from '@/shared/services/api';
 import { useProfileStore } from '@/store/profileStore';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { FormInput } from '@/shared/components/FormInput';
 import { Button } from '@/shared/components/Button';
 import { palette, spacing } from '@/theme';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PersonalInformation'>;
 
@@ -24,24 +27,41 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
   const [email, setEmail] = React.useState(profile?.email ?? '');
   const [address, setAddress] = React.useState(profile?.address ?? '');
   const [saving, setSaving] = React.useState(false);
+  const [emailServerError, setEmailServerError] = React.useState<string | null>(null);
+
+  const trimmedEmail = email.trim();
+  const isEmailFormatValid = trimmedEmail.length === 0 || EMAIL_REGEX.test(trimmedEmail);
+  const emailError = emailServerError;
+
+  const handleEmailChange = (next: string) => {
+    setEmail(next);
+    setEmailServerError(null);
+  };
 
   const hasChanges =
     fullName.trim() !== (profile?.fullName ?? '') ||
-    email.trim() !== (profile?.email ?? '') ||
+    trimmedEmail !== (profile?.email ?? '') ||
     address.trim() !== (profile?.address ?? '');
 
   const handleSave = async () => {
+    if (emailError || !isEmailFormatValid) return;
+
     setSaving(true);
     try {
       const updated = await authApi.updateMe({
         fullName: fullName.trim(),
-        email: email.trim() || null,
+        email: trimmedEmail || null,
         address: address.trim() || null,
       });
       setProfile(updated);
       navigation.goBack();
-    } catch {
-      Alert.alert(t('common.error'), t('profile.saveError'));
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409 && /email/i.test(error.message)) {
+        setEmailServerError(error.message);
+        return;
+      }
+      const message = error instanceof ApiError ? error.message : t('profile.saveError');
+      Alert.alert(t('common.error'), message);
     } finally {
       setSaving(false);
     }
@@ -64,9 +84,10 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
         <FormInput
           label={t('profile.email')}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={handleEmailChange}
           keyboardType="email-address"
           autoCapitalize="none"
+          error={emailError ?? undefined}
         />
         <FormInput label={t('profile.phone')} value={profile?.phoneE164 ?? ''} editable={false} />
         <FormInput label={t('profile.address')} value={address} onChangeText={setAddress} />
@@ -75,7 +96,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
           label={t('common.save')}
           onPress={() => void handleSave()}
           loading={saving}
-          disabled={!hasChanges || saving}
+          disabled={!hasChanges || saving || !!emailError || !isEmailFormatValid}
           style={styles.saveButton}
         />
       </CurvedSheetScrollView>
