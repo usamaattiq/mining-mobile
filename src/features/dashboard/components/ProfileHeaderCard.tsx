@@ -11,8 +11,8 @@ export function ProfileHeaderCard({
   initial,
   avatarUrl,
   name,
-  email,
   phone,
+  companyName,
   onPressAvatar,
 }: ProfileHeaderCardProps): React.ReactElement {
   const insets = useSafeAreaInsets();
@@ -39,19 +39,19 @@ export function ProfileHeaderCard({
           <AppText weight="bold" style={styles.name} numberOfLines={1}>
             {name}
           </AppText>
-          {email ? (
-            <View style={styles.metaRow}>
-              <Ionicons name="mail" size={13} color={palette.pureWhite} />
-              <AppText style={styles.metaText} numberOfLines={1}>
-                {email}
-              </AppText>
-            </View>
-          ) : null}
           {phone ? (
             <View style={styles.metaRow}>
               <Ionicons name="call" size={13} color={palette.pureWhite} />
               <AppText style={styles.metaText} numberOfLines={1}>
                 {phone}
+              </AppText>
+            </View>
+          ) : null}
+          {companyName ? (
+            <View style={styles.metaRow}>
+              <Ionicons name="business" size={13} color={palette.pureWhite} />
+              <AppText style={styles.metaText} numberOfLines={1}>
+                {companyName}
               </AppText>
             </View>
           ) : null}
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   inner: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: spacing.md,
   },
   avatarRing: {
@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
   copy: {
     flex: 1,
     gap: 6,
-    paddingTop: 4,
   },
   name: {
     fontSize: 24,

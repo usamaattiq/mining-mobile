@@ -312,6 +312,7 @@
     "personalInformationSubtitle": "Name, email, phone and address",
     "language": "Language",
     "fullName": "Full name",
+    "companyName": "Company name",
     "address": "Address",
     "saveError": "Couldn't save your changes. Please try again.",
     "email": "Email",

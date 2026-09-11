@@ -27,6 +27,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
   const setProfile = useProfileStore((state) => state.setProfile);
 
   const [fullName, setFullName] = React.useState(profile?.fullName ?? '');
+  const [companyName, setCompanyName] = React.useState(profile?.companyName ?? '');
   const [email, setEmail] = React.useState(profile?.email ?? '');
   const [address, setAddress] = React.useState(profile?.address ?? '');
   const [locationCoords, setLocationCoords] = React.useState<{
@@ -74,8 +75,11 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
       ? { latitude: profile.latitude, longitude: profile.longitude }
       : null;
 
+  const isCompany = profile?.accountType === 'company';
+
   const hasChanges =
     fullName.trim() !== (profile?.fullName ?? '') ||
+    (isCompany && companyName.trim() !== (profile?.companyName ?? '')) ||
     trimmedEmail !== (profile?.email ?? '') ||
     address.trim() !== (profile?.address ?? '') ||
     locationCoords?.latitude !== profileLocationCoords?.latitude ||
@@ -89,6 +93,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
     try {
       const updated = await authApi.updateMe({
         fullName: fullName.trim(),
+        ...(isCompany ? { companyName: companyName.trim() || null } : {}),
         email: trimmedEmail || null,
         address: address.trim() || null,
         locationCoordinates: locationCoords,
@@ -124,6 +129,13 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
         <AvatarPicker uri={avatarUrl} onChangeUrl={setAvatarUrl} />
 
         <FormInput label={t('profile.fullName')} value={fullName} onChangeText={setFullName} />
+        {isCompany ? (
+          <FormInput
+            label={t('profile.companyName')}
+            value={companyName}
+            onChangeText={setCompanyName}
+          />
+        ) : null}
         <FormInput
           label={t('profile.email')}
           value={email}

@@ -111,8 +111,8 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
         initial={initial}
         avatarUrl={profile?.avatarUrl}
         name={profile?.fullName ?? '—'}
-        email={profile?.email}
         phone={profile?.phoneE164}
+        companyName={profile?.accountType === 'company' ? profile.companyName : null}
         onPressAvatar={() => navigation.navigate('PersonalInformation')}
       />
 
