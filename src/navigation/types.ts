@@ -19,6 +19,7 @@ export type RootStackParamList = {
   ServiceListingForm: { serviceType: ServiceType };
   GoldListingForm: undefined;
   CompleteListingDetail: { id: string; category: ListingCategory };
+  QuickCreate: undefined;
 };
 
 export type DashboardTabParamList = {

@@ -162,7 +162,8 @@
     "listService": "عرض خدمة",
     "listServiceSubtitle": "قدّم خدمات التعدين الخاصة بك للمشترين",
     "auctionGold": "مزاد الذهب",
-    "auctionGoldSubtitle": "ابدأ مزادًا مباشرًا للذهب"
+    "auctionGoldSubtitle": "ابدأ مزادًا مباشرًا للذهب",
+    "quickCreateTitle": "ماذا تريد أن تعرض؟"
   },
   "equipmentListing": {
     "modeTitle": "عرض معدات",

@@ -162,7 +162,8 @@
     "listService": "List Service",
     "listServiceSubtitle": "Offer your mining services to buyers",
     "auctionGold": "Auction Gold",
-    "auctionGoldSubtitle": "Start a live gold auction"
+    "auctionGoldSubtitle": "Start a live gold auction",
+    "quickCreateTitle": "What would you like to list?"
   },
   "dashboardAbout": {
     "title": "About",

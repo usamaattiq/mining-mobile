@@ -13,6 +13,7 @@ import { ServiceListingModeScreen } from '@/features/listings/screens/ServiceLis
 import { ServiceListingFormScreen } from '@/features/listings/screens/ServiceListingFormScreen';
 import { GoldListingFormScreen } from '@/features/listings/screens/GoldListingFormScreen';
 import { CompleteListingDetailScreen } from '@/features/listings/screens/CompleteListingDetailScreen';
+import { QuickCreateScreen } from '@/features/dashboard/screens/QuickCreateScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme';
 import { useAuthStore } from '@/store/authStore';
@@ -58,6 +59,11 @@ export function AppNavigator(): React.ReactElement {
       <Stack.Screen name="ServiceListingForm" component={ServiceListingFormScreen} />
       <Stack.Screen name="GoldListingForm" component={GoldListingFormScreen} />
       <Stack.Screen name="CompleteListingDetail" component={CompleteListingDetailScreen} />
+      <Stack.Screen
+        name="QuickCreate"
+        component={QuickCreateScreen}
+        options={{ contentStyle: { backgroundColor: palette.gold } }}
+      />
     </Stack.Navigator>
   );
 }

@@ -2,12 +2,14 @@ import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
+import type { RootStackParamList } from '@/navigation/types';
 
 const TAB_FOCUS_TIMING = { duration: 200 };
 
@@ -42,6 +44,7 @@ const TAB_VISUALS: Record<string, TabVisual> = {
 
 export const FLOATING_TAB_BAR_HEIGHT = 72;
 export const FLOATING_TAB_BAR_MARGIN = 16;
+const PLUS_BUTTON_SIZE = 60;
 
 /** Distance from the tab bar container bottom to the pill bar. */
 export function getFloatingTabBarBottomOffset(safeAreaBottom: number): number {
@@ -104,42 +107,58 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const bottomOffset = getFloatingTabBarBottomOffset(insets.bottom);
   const reservedHeight = getFloatingTabBarReservedHeight(insets.bottom);
+  const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
+
+  const routes = state.routes.filter((route) => TAB_VISUALS[route.name]);
+  const firstHalf = routes.slice(0, Math.ceil(routes.length / 2));
+  const secondHalf = routes.slice(Math.ceil(routes.length / 2));
+
+  const renderTab = (route: (typeof routes)[number]) => {
+    const visual = TAB_VISUALS[route.name];
+    if (!visual) return null;
+    const index = state.routes.findIndex((r) => r.key === route.key);
+    const focused = state.index === index;
+    const onPress = () => {
+      const event = navigation.emit({
+        type: 'tabPress',
+        target: route.key,
+        canPreventDefault: true,
+      });
+
+      if (!focused && !event.defaultPrevented) {
+        navigation.navigate(route.name);
+      }
+    };
+
+    return (
+      <TabBarItem
+        key={route.key}
+        focused={focused}
+        label={t(visual.labelKey)}
+        icon={visual.icon}
+        iconFocused={visual.iconFocused}
+        onPress={onPress}
+      />
+    );
+  };
 
   return (
     <View pointerEvents="box-none" style={{ height: reservedHeight }}>
       <View pointerEvents="box-none" style={[styles.wrapper, { bottom: bottomOffset }]}>
         <View style={styles.bar}>
-          {state.routes.map((route, index) => {
-            const visual = TAB_VISUALS[route.name];
-            if (!visual) {
-              return null;
-            }
-
-            const focused = state.index === index;
-            const onPress = () => {
-              const event = navigation.emit({
-                type: 'tabPress',
-                target: route.key,
-                canPreventDefault: true,
-              });
-
-              if (!focused && !event.defaultPrevented) {
-                navigation.navigate(route.name);
-              }
-            };
-
-            return (
-              <TabBarItem
-                key={route.key}
-                focused={focused}
-                label={t(visual.labelKey)}
-                icon={visual.icon}
-                iconFocused={visual.iconFocused}
-                onPress={onPress}
-              />
-            );
-          })}
+          {firstHalf.map(renderTab)}
+          <View style={styles.plusSlot} />
+          {secondHalf.map(renderTab)}
         </View>
+
+        <Pressable
+          onPress={() => rootNavigation?.navigate('QuickCreate')}
+          accessibilityRole="button"
+          accessibilityLabel={t('dashboardHome.quickCreateTitle')}
+          style={({ pressed }) => [styles.plusButton, pressed && styles.plusButtonPressed]}
+        >
+          <Ionicons name="add" size={28} color={palette.pureWhite} />
+        </Pressable>
       </View>
     </View>
   );
@@ -173,6 +192,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: spacing.xs,
+  },
+  plusSlot: {
+    width: PLUS_BUTTON_SIZE,
+  },
+  plusButton: {
+    position: 'absolute',
+    top: -PLUS_BUTTON_SIZE / 2 + 14,
+    left: '50%',
+    marginLeft: -PLUS_BUTTON_SIZE / 2,
+    width: PLUS_BUTTON_SIZE,
+    height: PLUS_BUTTON_SIZE,
+    borderRadius: radius.pill,
+    backgroundColor: palette.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: palette.pureWhite,
+    shadowColor: '#000000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 10,
+    elevation: 14,
+  },
+  plusButtonPressed: {
+    opacity: 0.9,
   },
   tabItemInner: {
     alignItems: 'center',
