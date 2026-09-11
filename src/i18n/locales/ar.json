@@ -195,6 +195,7 @@
     "hourlyBadge": "بالساعة",
     "monthlyBadge": "شهري",
     "weeklyBadge": "أسبوعي",
+    "durationPlaceholder": "اختر المدة",
     "hourlyUnit": "/ ساعة",
     "weeklyUnit": "/ أسبوع",
     "monthlyUnit": "/ شهر",

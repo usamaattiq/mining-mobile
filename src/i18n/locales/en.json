@@ -199,6 +199,7 @@
     "hourlyBadge": "Hourly",
     "monthlyBadge": "Monthly",
     "weeklyBadge": "Weekly",
+    "durationPlaceholder": "Select duration",
     "hourlyUnit": "/ hr",
     "weeklyUnit": "/ week",
     "monthlyUnit": "/ month",

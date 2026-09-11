@@ -18,4 +18,8 @@ export type SelectFieldProps = {
   /** Shows a search input above the option list — useful for longer lists. */
   searchable?: boolean;
   searchPlaceholder?: string;
+  /** Smaller trigger (less padding, smaller text) for inline/compact placements. */
+  compact?: boolean;
+  /** Opens a small popover menu anchored under the trigger instead of a bottom sheet. */
+  dropdown?: boolean;
 };

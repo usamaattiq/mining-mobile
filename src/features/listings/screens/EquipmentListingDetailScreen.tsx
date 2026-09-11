@@ -11,7 +11,9 @@ import { AppText } from '@/shared/components/AppText';
 import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
+import { EquipmentDescriptionCard } from '@/features/listings/components/EquipmentDescriptionCard';
 import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
+import { SelectField } from '@/shared/components/SelectField';
 import { useListingsStore } from '@/store/listingsStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
@@ -59,9 +61,10 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
 
   const detailRows = [
     { label: t('equipmentListing.equipmentType'), value: listing.equipmentTypeLabel },
-    { label: t('equipmentListing.description'), value: listing.description },
     { label: t('equipmentListing.units'), value: String(listing.units) },
   ].filter((row) => (row.value ?? '').trim().length > 0);
+
+  const descriptionText = (listing.description ?? '').trim();
 
   const locationLabel = listing.location ?? '';
 
@@ -142,24 +145,21 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
                 </View>
 
                 {durationOptions.length > 1 ? (
-                  <View style={styles.durationRow}>
-                    {durationOptions.map((option) => {
-                      const selected = option.key === activeDuration?.key;
-                      return (
-                        <Pressable
-                          key={option.key}
-                          onPress={() => setSelectedDuration(option.key)}
-                          style={[styles.durationButton, selected && styles.durationButtonSelected]}
-                        >
-                          <AppText
-                            weight="semibold"
-                            style={[styles.durationText, selected && styles.durationTextSelected]}
-                          >
-                            {option.label}
-                          </AppText>
-                        </Pressable>
-                      );
-                    })}
+                  <View style={styles.durationDropdown}>
+                    <SelectField
+                      placeholder={t('equipmentListing.durationPlaceholder')}
+                      sheetTitle={t('equipmentListing.durationPlaceholder')}
+                      options={durationOptions.map((option) => ({
+                        value: option.key,
+                        label: option.label,
+                      }))}
+                      value={activeDuration?.key}
+                      onChange={(next) =>
+                        setSelectedDuration(next as 'hourly' | 'weekly' | 'monthly')
+                      }
+                      compact
+                      dropdown
+                    />
                   </View>
                 ) : null}
               </View>
@@ -191,6 +191,8 @@ export function EquipmentListingDetailScreen({ navigation, route }: Props): Reac
           </View>
 
           <EquipmentListingSummaryCard detailRows={detailRows} media={listing.media} hideMedia />
+
+          {descriptionText ? <EquipmentDescriptionCard description={descriptionText} /> : null}
 
           {listing.deliveryAvailable ? (
             <DeliveryAvailableBanner subtitle={deliverySubtitle} />
@@ -254,27 +256,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: palette.muted,
   },
-  durationRow: {
-    flexDirection: 'row',
-    gap: spacing.xs,
-  },
-  durationButton: {
-    borderWidth: 1,
-    borderColor: palette.softGold,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-  },
-  durationButtonSelected: {
-    backgroundColor: palette.gold,
-    borderColor: palette.gold,
-  },
-  durationText: {
-    fontSize: 12,
-    color: palette.charcoal,
-  },
-  durationTextSelected: {
-    color: palette.pureWhite,
+  durationDropdown: {
+    width: 90,
   },
   titleBlock: {
     gap: spacing.xs,

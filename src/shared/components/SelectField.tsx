@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -8,7 +8,10 @@ import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { palette, radius, spacing } from '@/theme';
 import type { SelectFieldProps } from '@/shared/types/selectField.types';
 
-/** Dropdown-style field: a FormInput-shaped trigger that opens a bottom sheet list of options. */
+/**
+ * Dropdown-style field: a FormInput-shaped trigger that opens a list of options.
+ * Defaults to a bottom sheet; pass `dropdown` for a compact popover anchored under the trigger.
+ */
 export function SelectField({
   label,
   placeholder,
@@ -20,10 +23,16 @@ export function SelectField({
   error,
   searchable,
   searchPlaceholder,
+  compact,
+  dropdown,
 }: SelectFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
+  const [anchor, setAnchor] = React.useState<{ x: number; y: number; width: number; height: number } | null>(
+    null,
+  );
+  const triggerRef = React.useRef<View>(null);
   const selectedOption = options.find((option) => option.value === value);
 
   const filteredOptions = searchable
@@ -36,6 +45,43 @@ export function SelectField({
     setQuery('');
   };
 
+  const handleOpen = () => {
+    if (dropdown) {
+      triggerRef.current?.measureInWindow((x, y, width, height) => {
+        setAnchor({ x, y, width, height });
+        setOpen(true);
+      });
+      return;
+    }
+    setOpen(true);
+  };
+
+  const optionList = filteredOptions.map((option) => {
+    const selected = option.value === value;
+    return (
+      <Pressable
+        key={option.value}
+        onPress={() => handleSelect(option.value)}
+        style={({ pressed }) => [
+          styles.option,
+          dropdown && styles.optionCompact,
+          selected && styles.optionSelected,
+          pressed && styles.pressed,
+        ]}
+      >
+        {option.icon ? (
+          <View style={styles.optionIconWrap}>
+            <Ionicons name={option.icon} size={18} color={palette.gold} />
+          </View>
+        ) : null}
+        <AppText weight="medium" style={[styles.optionLabel, dropdown && styles.optionLabelCompact]}>
+          {option.label}
+        </AppText>
+        {selected ? <Ionicons name="checkmark" size={16} color={palette.gold} /> : null}
+      </Pressable>
+    );
+  });
+
   return (
     <View style={styles.container}>
       {label ? (
@@ -44,77 +90,77 @@ export function SelectField({
           {required ? <AppText style={styles.required}> *</AppText> : null}
         </AppText>
       ) : null}
-      <Pressable
-        onPress={() => setOpen(true)}
-        style={[styles.trigger, error ? styles.triggerError : null]}
-        accessibilityRole="button"
-        accessibilityLabel={label ?? placeholder}
-      >
-        {selectedOption?.icon ? (
-          <View style={styles.triggerIconWrap}>
-            <Ionicons name={selectedOption.icon} size={16} color={palette.gold} />
-          </View>
-        ) : null}
-        <AppText
-          style={[styles.triggerText, !selectedOption && styles.triggerPlaceholder]}
-          numberOfLines={1}
+      <View ref={triggerRef} collapsable={false}>
+        <Pressable
+          onPress={handleOpen}
+          style={[styles.trigger, compact && styles.triggerCompact, error ? styles.triggerError : null]}
+          accessibilityRole="button"
+          accessibilityLabel={label ?? placeholder}
         >
-          {selectedOption?.label ?? placeholder}
-        </AppText>
-        <Ionicons name="chevron-down" size={18} color={palette.muted} />
-      </Pressable>
+          {selectedOption?.icon ? (
+            <View style={styles.triggerIconWrap}>
+              <Ionicons name={selectedOption.icon} size={16} color={palette.gold} />
+            </View>
+          ) : null}
+          <AppText
+            style={[
+              styles.triggerText,
+              compact && styles.triggerTextCompact,
+              !selectedOption && styles.triggerPlaceholder,
+            ]}
+            numberOfLines={1}
+          >
+            {selectedOption?.label ?? placeholder}
+          </AppText>
+          <Ionicons name="chevron-down" size={compact ? 14 : 18} color={palette.muted} />
+        </Pressable>
+      </View>
       {error ? <AppText style={styles.error}>{error}</AppText> : null}
 
-      <AppBottomSheet visible={open} onClose={() => setOpen(false)} heightRatio={0.5}>
-        <AppText weight="bold" style={styles.sheetTitle}>
-          {sheetTitle}
-        </AppText>
-
-        {searchable ? (
-          <View style={styles.searchRow}>
-            <Ionicons name="search-outline" size={18} color={palette.muted} />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              placeholder={searchPlaceholder ?? t('common.search')}
-              placeholderTextColor={palette.muted}
-              style={styles.searchInput}
-            />
-            {query ? (
-              <Pressable onPress={() => setQuery('')} hitSlop={8}>
-                <Ionicons name="close-circle" size={18} color={palette.muted} />
-              </Pressable>
-            ) : null}
-          </View>
-        ) : null}
-
-        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          {filteredOptions.map((option) => {
-            const selected = option.value === value;
-            return (
-              <Pressable
-                key={option.value}
-                onPress={() => handleSelect(option.value)}
-                style={({ pressed }) => [
-                  styles.option,
-                  selected && styles.optionSelected,
-                  pressed && styles.pressed,
+      {dropdown ? (
+        <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+          <Pressable style={styles.dropdownBackdrop} onPress={() => setOpen(false)}>
+            {anchor ? (
+              <View
+                style={[
+                  styles.dropdownMenu,
+                  { top: anchor.y + anchor.height + 4, left: anchor.x, minWidth: anchor.width },
                 ]}
               >
-                {option.icon ? (
-                  <View style={styles.optionIconWrap}>
-                    <Ionicons name={option.icon} size={18} color={palette.gold} />
-                  </View>
-                ) : null}
-                <AppText weight="medium" style={styles.optionLabel}>
-                  {option.label}
-                </AppText>
-                {selected ? <Ionicons name="checkmark" size={18} color={palette.gold} /> : null}
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </AppBottomSheet>
+                {optionList}
+              </View>
+            ) : null}
+          </Pressable>
+        </Modal>
+      ) : (
+        <AppBottomSheet visible={open} onClose={() => setOpen(false)} heightRatio={0.5}>
+          <AppText weight="bold" style={styles.sheetTitle}>
+            {sheetTitle}
+          </AppText>
+
+          {searchable ? (
+            <View style={styles.searchRow}>
+              <Ionicons name="search-outline" size={18} color={palette.muted} />
+              <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder={searchPlaceholder ?? t('common.search')}
+                placeholderTextColor={palette.muted}
+                style={styles.searchInput}
+              />
+              {query ? (
+                <Pressable onPress={() => setQuery('')} hitSlop={8}>
+                  <Ionicons name="close-circle" size={18} color={palette.muted} />
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
+
+          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            {optionList}
+          </ScrollView>
+        </AppBottomSheet>
+      )}
     </View>
   );
 }
@@ -141,6 +187,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 4,
   },
+  triggerCompact: {
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
   triggerError: {
     borderColor: palette.danger,
   },
@@ -156,6 +207,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: palette.charcoal,
+  },
+  triggerTextCompact: {
+    fontSize: 13,
   },
   triggerPlaceholder: {
     color: palette.muted,
@@ -193,7 +247,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.sm,
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
+  },
+  optionCompact: {
+    minHeight: 0,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.sm,
   },
   optionSelected: {
     backgroundColor: palette.softGold,
@@ -211,7 +270,26 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: palette.charcoal,
   },
+  optionLabelCompact: {
+    fontSize: 13,
+  },
   pressed: {
     opacity: 0.88,
+  },
+  dropdownBackdrop: {
+    flex: 1,
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    backgroundColor: palette.pureWhite,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    // paddingVertical: spacing.xs,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
 });
