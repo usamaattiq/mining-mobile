@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
+import { AppText } from '@/shared/components/AppText';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
-import { HomeActionCard } from '@/features/dashboard/components/HomeActionCard';
+import { QuickCreateOptionCard } from '@/features/dashboard/components/QuickCreateOptionCard';
 import { palette, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'QuickCreate'>;
@@ -49,9 +50,11 @@ export function QuickCreateScreen({ navigation }: Props): React.ReactElement {
         style={styles.header}
       />
 
-      <CurvedSheetScrollView>
+      <CurvedSheetScrollView contentContainerStyle={styles.content}>
+        <AppText style={styles.intro}>{t('dashboardHome.quickCreateSubtitle')}</AppText>
+
         {actions.map((action) => (
-          <HomeActionCard key={action.title} {...action} />
+          <QuickCreateOptionCard key={action.title} {...action} />
         ))}
       </CurvedSheetScrollView>
     </View>
@@ -65,5 +68,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingBottom: spacing.xl,
+  },
+  content: {
+    gap: spacing.md,
+  },
+  intro: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: palette.muted,
+    marginBottom: spacing.xs,
   },
 });
