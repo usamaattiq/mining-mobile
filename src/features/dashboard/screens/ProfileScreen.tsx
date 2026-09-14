@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import type { DashboardTabParamList, RootStackParamList } from '@/navigation/typ
 import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/authStore';
 import { useProfileStore } from '@/store/profileStore';
+import { confirmSwitchMarketplaceRole, useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { getDeviceId } from '@/shared/utils/deviceId';
 import { ProfileHeaderCard } from '@/features/dashboard/components/ProfileHeaderCard';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
@@ -32,6 +33,7 @@ type Props = CompositeScreenProps<
 export function ProfileScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const profile = useProfileStore((state) => state.profile);
+  const role = useMarketplaceRoleStore((state) => state.role);
   const { currentLanguage, setLanguage } = useLanguage();
   const languageOptions = React.useMemo(() => getLanguageOptions(t), [t]);
   const currentLanguageLabel =
@@ -40,18 +42,8 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
   const [legalDoc, setLegalDoc] = React.useState<LegalDocumentKind | null>(null);
   const [languageModalVisible, setLanguageModalVisible] = React.useState(false);
 
-  const handleSwitchToBuyer = async () => {
-    const buyerAppUrl = 'dahabibuyer://';
-    try {
-      const canOpen = await Linking.canOpenURL(buyerAppUrl);
-      if (canOpen) {
-        await Linking.openURL(buyerAppUrl);
-        return;
-      }
-    } catch {
-      // Fall through to the not-installed message.
-    }
-    showAppAlert(t('profile.switchToBuyer'), t('profile.switchToBuyerUnavailable'));
+  const handleSwitchRole = () => {
+    confirmSwitchMarketplaceRole(t);
   };
 
   const handleLogout = () => {
@@ -137,9 +129,13 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
         <MenuRow
           variant="gold"
           icon="swap-horizontal-outline"
-          label={t('profile.switchToBuyer')}
-          subtitle={t('profile.switchToBuyerSubtitle')}
-          onPress={() => void handleSwitchToBuyer()}
+          label={role === 'supplier' ? t('profile.switchToBuyer') : t('profile.switchToSupplier')}
+          subtitle={
+            role === 'supplier'
+              ? t('profile.switchToBuyerSubtitle')
+              : t('profile.switchToSupplierSubtitle')
+          }
+          onPress={handleSwitchRole}
         />
 
         <MenuRow

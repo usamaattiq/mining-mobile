@@ -25,6 +25,7 @@ import { ApiError } from '@/shared/services/api';
 import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
@@ -159,6 +160,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         serviceDate: serviceDate ? serviceDate.getTime() : null,
         location: isOnsite ? location : '',
         media: persistedMedia,
+        postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isServiceListing(listing)) addListing(listing);
       navigation.popToTop();

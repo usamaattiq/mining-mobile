@@ -5,6 +5,8 @@ export type EquipmentListingMode = 'rent' | 'sell';
 /** Top-level Requests-tab category — switchable, mirrors the Home action cards. */
 export type ListingCategory = 'equipment' | 'services' | 'gold';
 
+export type MarketplaceRole = 'buyer' | 'supplier';
+
 export type ServiceType = 'onsite' | 'online';
 
 export type DashboardTabParamList = {

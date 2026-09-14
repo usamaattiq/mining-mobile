@@ -25,6 +25,7 @@ import { ApiError } from '@/shared/services/api';
 import { listingsApi, isEquipmentListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { useListingsStore } from '@/store/listingsStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
@@ -167,6 +168,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         deliveryAvailable,
         deliveryType,
         deliveryPricePerKm,
+        postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isEquipmentListing(listing)) addListing(listing);
       navigation.popToTop();

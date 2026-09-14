@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { setAuthTokenProvider, setSessionRevokedHandler } from '@/shared/services/api';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useListingsStore } from '@/store/listingsStore';
+import { useMarketListingsStore } from '@/store/marketListingsStore';
 import { useMessagesStore } from '@/store/messagesStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
@@ -40,6 +41,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     useGoldListingsStore.getState().setListings([]);
     useMessagesStore.getState().setConversations([]);
     useNotificationsStore.getState().setItems([]);
+    useMarketListingsStore.getState().setListings([]);
     set({ accessToken: null, status: 'unauthenticated' });
   },
 }));

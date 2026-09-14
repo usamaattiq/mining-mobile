@@ -1,5 +1,5 @@
 import { apiFetch } from '@/shared/services/api';
-import type { ListingCategory } from '@/navigation/types';
+import type { ListingCategory, MarketplaceRole } from '@/navigation/types';
 import type { EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
@@ -30,6 +30,12 @@ export const listingsApi = {
   list(category?: ListingCategory): Promise<ListingDto[]> {
     const query = category ? `?category=${encodeURIComponent(category)}` : '';
     return apiFetch(`/listings${query}`);
+  },
+
+  feed(postedAs: MarketplaceRole, category?: ListingCategory): Promise<ListingDto[]> {
+    const params = new URLSearchParams({ postedAs });
+    if (category) params.set('category', category);
+    return apiFetch(`/listings/feed?${params.toString()}`);
   },
 
   get(id: string): Promise<ListingDto> {

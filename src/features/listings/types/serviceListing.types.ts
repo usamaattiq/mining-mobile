@@ -14,5 +14,6 @@ export type ServiceListing = {
   serviceDate: number | null;
   location: string;
   media: ServiceMediaAsset[];
+  postedAs: 'buyer' | 'supplier';
   createdAt: number;
 };

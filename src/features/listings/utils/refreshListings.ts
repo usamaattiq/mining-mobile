@@ -5,7 +5,9 @@ import type { ListingDto } from '@/features/listings/api/listingsApi';
 import { listingsApi } from '@/features/listings/api/listingsApi';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useListingsStore } from '@/store/listingsStore';
+import { useMarketListingsStore } from '@/store/marketListingsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
+import type { MarketplaceRole } from '@/navigation/types';
 
 export function applyListings(listings: ListingDto[]): void {
   useListingsStore
@@ -21,4 +23,8 @@ export function applyListings(listings: ListingDto[]): void {
 
 export async function refreshListings(): Promise<void> {
   applyListings(await listingsApi.list());
+}
+
+export async function refreshMarketListings(postedAs: MarketplaceRole): Promise<void> {
+  useMarketListingsStore.getState().setListings(await listingsApi.feed(postedAs));
 }

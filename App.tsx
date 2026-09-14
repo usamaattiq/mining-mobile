@@ -13,6 +13,7 @@ import { appFontAssets, palette } from '@/theme';
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
 import { useAuthStore } from '@/store/authStore';
 import { useDevicePrefsStore } from '@/store/devicePrefsStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useProfileStore } from '@/store/profileStore';
 import { authApi } from '@/features/auth/api/authApi';
 
@@ -33,7 +34,11 @@ export default function App() {
   const isReady = isI18nReady && isStoresReady && (fontsLoaded || Boolean(fontError));
 
   React.useEffect(() => {
-    void Promise.all([useAuthStore.getState().hydrate(), useDevicePrefsStore.getState().hydrate()])
+    void Promise.all([
+      useAuthStore.getState().hydrate(),
+      useDevicePrefsStore.getState().hydrate(),
+      useMarketplaceRoleStore.getState().hydrate(),
+    ])
       .then(async () => {
         // A persisted token alone isn't enough to trust the session — confirm it
         // against the server and load the profile, or drop it if it's stale/revoked.

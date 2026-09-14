@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect, type CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -19,16 +19,23 @@ import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { Button } from '@/shared/components/Button';
 import { ListingCard } from '@/features/listings/components/ListingCard';
+import {
+  isEquipmentListing,
+  isGoldListing,
+  isServiceListing,
+} from '@/features/listings/api/listingsApi';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { useProfileStore } from '@/store/profileStore';
-import { useListingsStore } from '@/store/listingsStore';
-import { useServiceListingsStore } from '@/store/serviceListingsStore';
-import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useMarketListingsStore } from '@/store/marketListingsStore';
+import {
+  confirmSwitchMarketplaceRole,
+  oppositeMarketplaceRole,
+  useMarketplaceRoleStore,
+} from '@/store/marketplaceRoleStore';
 import { notificationsApi } from '@/features/dashboard/api/notificationsApi';
-import { refreshListings } from '@/features/listings/utils/refreshListings';
+import { refreshMarketListings } from '@/features/listings/utils/refreshListings';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { AppText } from '@/shared/components/AppText';
-import { showAppAlert } from '@/shared/services/appAlert';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { palette, radius, spacing } from '@/theme';
@@ -45,10 +52,12 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
   const profile = useProfileStore((state) => state.profile);
+  const role = useMarketplaceRoleStore((state) => state.role);
   const hasUnread = useNotificationsStore((state) => state.items.some((item) => !item.read));
-  const equipmentListings = useListingsStore((state) => state.listings);
-  const serviceListings = useServiceListingsStore((state) => state.listings);
-  const goldListings = useGoldListingsStore((state) => state.listings);
+  const marketListings = useMarketListingsStore((state) => state.listings);
+  const equipmentListings = marketListings.filter(isEquipmentListing);
+  const serviceListings = marketListings.filter(isServiceListing);
+  const goldListings = marketListings.filter(isGoldListing);
   const name = profile?.fullName?.trim() || '—';
   const initial = name.charAt(0).toUpperCase();
 
@@ -63,22 +72,12 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       void notificationsApi.list().then((items) => {
         useNotificationsStore.getState().setItems(items);
       });
-      void refreshListings();
-    }, []),
+      void refreshMarketListings(oppositeMarketplaceRole(role));
+    }, [role]),
   );
 
-  const handleSwitchToBuyer = async () => {
-    const buyerAppUrl = 'dahabibuyer://';
-    try {
-      const canOpen = await Linking.canOpenURL(buyerAppUrl);
-      if (canOpen) {
-        await Linking.openURL(buyerAppUrl);
-        return;
-      }
-    } catch {
-      // Fall through to the not-installed message.
-    }
-    showAppAlert(t('profile.switchToBuyer'), t('profile.switchToBuyerUnavailable'));
+  const handleSwitchRole = () => {
+    confirmSwitchMarketplaceRole(t);
   };
 
   const handleCategoryChange = (next: ListingCategory) => {
@@ -180,14 +179,16 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       headerExtra={
         <View style={styles.headerExtra}>
           <Pressable
-            onPress={() => void handleSwitchToBuyer()}
+            onPress={handleSwitchRole}
             accessibilityRole="button"
-            accessibilityLabel={t('profile.switchToBuyer')}
+            accessibilityLabel={
+              role === 'supplier' ? t('profile.switchToBuyer') : t('profile.switchToSupplier')
+            }
             style={({ pressed }) => [styles.switchRoleButton, pressed && styles.filterPressed]}
           >
             <Ionicons name="swap-horizontal-outline" size={18} color={palette.gold} />
             <AppText weight="semibold" style={styles.switchRoleLabel}>
-              {t('profile.switchToBuyer')}
+              {role === 'supplier' ? t('profile.switchToBuyer') : t('profile.switchToSupplier')}
             </AppText>
           </Pressable>
           <SegmentedSwitcher

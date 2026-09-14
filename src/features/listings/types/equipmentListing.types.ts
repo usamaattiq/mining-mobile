@@ -20,5 +20,6 @@ export type EquipmentListing = {
   deliveryAvailable: boolean;
   deliveryType: DeliveryType;
   deliveryPricePerKm: string;
+  postedAs: 'buyer' | 'supplier';
   createdAt: number;
 };

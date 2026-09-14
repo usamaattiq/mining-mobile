@@ -25,6 +25,7 @@ import { ApiError } from '@/shared/services/api';
 import { listingsApi, isGoldListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
@@ -128,6 +129,7 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
         auctionEndDate: auctionEndDate ? auctionEndDate.getTime() : null,
         location,
         media: persistedMedia,
+        postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isGoldListing(listing)) addListing(listing);
       navigation.popToTop();

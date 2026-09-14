@@ -13,5 +13,6 @@ export type GoldListing = {
   auctionEndDate: number | null;
   location: string;
   media: ServiceMediaAsset[];
+  postedAs: 'buyer' | 'supplier';
   createdAt: number;
 };
