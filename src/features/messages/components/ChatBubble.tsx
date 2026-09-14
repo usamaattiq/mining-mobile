@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   bubbleTheirs: {
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.softGold,
     borderBottomLeftRadius: 4,
   },
   bubbleText: {
