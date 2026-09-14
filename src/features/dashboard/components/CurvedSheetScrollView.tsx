@@ -3,7 +3,7 @@ import { StyleSheet, type ScrollViewProps } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { palette, radius, spacing } from '@/theme';
 
-const OVERLAP = radius.lg + 4;
+export const CURVED_SHEET_OVERLAP = radius.lg + 4;
 
 /**
  * Rounded white sheet that curves up and overlaps a colored header above it.
@@ -33,9 +33,9 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
     backgroundColor: palette.pureWhite,
-    borderTopLeftRadius: OVERLAP,
-    borderTopRightRadius: OVERLAP,
-    marginTop: -OVERLAP,
+    borderTopLeftRadius: CURVED_SHEET_OVERLAP,
+    borderTopRightRadius: CURVED_SHEET_OVERLAP,
+    marginTop: -CURVED_SHEET_OVERLAP,
     overflow: 'hidden',
   },
   content: {
