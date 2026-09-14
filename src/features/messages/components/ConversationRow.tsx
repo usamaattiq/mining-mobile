@@ -1,15 +1,18 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing } from '@/theme';
-import { cardBackShadow } from '@/theme/cardShadow';
+import { PressableCard } from '@/shared/components/PressableCard';
+import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
+import { CountBadge } from '@/shared/components/CountBadge';
+import { formatRelativeTime } from '@/shared/utils/formatRelativeTime';
+import { palette, spacing } from '@/theme';
 import type { Conversation } from '@/features/messages/types/conversation.types';
-import { formatMessageTime, initialsFromName } from '@/features/messages/utils/formatMessageTime';
+import type { TranslateFn } from '@/shared/types/translate.types';
 
 type ConversationRowProps = {
   conversation: Conversation;
   onPress: () => void;
-  t: (key: string, options?: Record<string, string | number>) => string;
+  t: TranslateFn;
 };
 
 export function ConversationRow({
@@ -21,17 +24,8 @@ export function ConversationRow({
   const unread = conversation.unreadCount > 0;
 
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={conversation.participantName}
-      style={({ pressed }) => [styles.card, cardBackShadow, pressed && styles.pressed]}
-    >
-      <View style={styles.avatar}>
-        <AppText weight="bold" style={styles.avatarText}>
-          {initialsFromName(conversation.participantName)}
-        </AppText>
-      </View>
+    <PressableCard onPress={onPress} accessibilityLabel={conversation.participantName}>
+      <InitialsAvatar name={conversation.participantName} />
       <View style={styles.copy}>
         <View style={styles.topRow}>
           <AppText weight="bold" style={styles.name} numberOfLines={1}>
@@ -39,7 +33,7 @@ export function ConversationRow({
           </AppText>
           {last ? (
             <AppText style={styles.time} numberOfLines={1}>
-              {formatMessageTime(last.sentAt, t)}
+              {formatRelativeTime(last.sentAt, t)}
             </AppText>
           ) : null}
         </View>
@@ -54,43 +48,14 @@ export function ConversationRow({
           >
             {last?.text ?? ''}
           </AppText>
-          {unread ? (
-            <View style={styles.badge}>
-              <AppText weight="semibold" style={styles.badgeText}>
-                {conversation.unreadCount}
-              </AppText>
-            </View>
-          ) : null}
+          <CountBadge count={conversation.unreadCount} />
         </View>
       </View>
-    </Pressable>
+    </PressableCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: palette.warmWhite,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    flexDirection: 'row',
-    gap: spacing.md,
-    alignItems: 'center',
-  },
-  pressed: {
-    opacity: 0.9,
-  },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: palette.softGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 15,
-    color: palette.gold,
-  },
   copy: {
     flex: 1,
     gap: 2,
@@ -126,18 +91,5 @@ const styles = StyleSheet.create({
   },
   previewUnread: {
     color: palette.charcoal,
-  },
-  badge: {
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
-    paddingHorizontal: 6,
-    backgroundColor: palette.gold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeText: {
-    fontSize: 11,
-    color: palette.pureWhite,
   },
 });

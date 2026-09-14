@@ -1,10 +1,10 @@
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { TFunction } from 'i18next';
+import type { TranslateFn } from '@/shared/types/translate.types';
 import type { RootStackParamList } from '@/navigation/types';
 import type { HomeActionCardProps } from '@/features/dashboard/types/homeActionCard.types';
 
 export function listingCreateActions(
-  t: TFunction,
+  t: TranslateFn,
   navigate: NativeStackNavigationProp<RootStackParamList>['navigate'],
 ): HomeActionCardProps[] {
   return [

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 export type AppTopBarProps = {
   /** Left side content mode. */
@@ -16,5 +16,5 @@ export type AppTopBarProps = {
   titleAlign?: 'center' | 'left';
   /** Title text size. Defaults to 'md'; use 'lg' for main dashboard tab screens. */
   titleSize?: 'md' | 'lg';
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 };

@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { showAppAlert } from '@/shared/services/appAlert';
-import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -13,12 +12,11 @@ import { useProfileStore } from '@/store/profileStore';
 import { useDeviceBiometric } from '@/shared/hooks/useDeviceBiometric';
 import { getDeviceId } from '@/shared/utils/deviceId';
 import { ApiError } from '@/shared/services/api';
-import { AppTopBar } from '@/shared/components/AppTopBar';
+import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { CodeInput } from '@/shared/components/CodeInput';
 import { BiometricToggleRow } from '@/shared/components/BiometricToggleRow';
-import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SecuritySettings'>;
@@ -155,19 +153,13 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
   };
 
   return (
-    <View style={styles.root}>
-      <StatusBar style="light" />
-
-      <AppTopBar
-        left="back"
-        variant="gold"
-        title={t('securitySettings.title')}
-        onBackPress={navigation.goBack}
-        style={styles.header}
-      />
-
-      <CurvedSheetScrollView keyboardShouldPersistTaps="handled">
-        <View style={styles.menuCard}>
+    <GoldSheetScreen
+      left="back"
+      title={t('securitySettings.title')}
+      onBackPress={navigation.goBack}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.menuCard}>
           <BiometricToggleRow
             enabled={biometricEnabled}
             onToggle={(enabled) => void handleToggleBiometric(enabled)}
@@ -258,19 +250,11 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
             </View>
           )}
         </View>
-      </CurvedSheetScrollView>
-    </View>
+    </GoldSheetScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.gold,
-  },
-  header: {
-    paddingBottom: spacing.xl,
-  },
   menuCard: {
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,

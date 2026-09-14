@@ -10,10 +10,9 @@ import type {
   ListingCategory,
   RootStackParamList,
 } from '@/navigation/types';
-import { AppTopBar } from '@/shared/components/AppTopBar';
+import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
-import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
-import { AppText } from '@/shared/components/AppText';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { ListingCard } from '@/features/listings/components/ListingCard';
 import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
 import { useListingsStore } from '@/store/listingsStore';
@@ -121,39 +120,27 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
           }));
 
   return (
-    <View style={styles.root}>
-      <AppTopBar
-        variant="gold"
-        title={t('requests.title')}
-        titleAlign="left"
-        titleSize="lg"
-        style={styles.header}
-      />
-      <View style={styles.switcherWrap}>
-        <SegmentedSwitcher value={category} onChange={setCategory} options={categoryOptions} />
-      </View>
-
-      <CurvedSheetScrollView>
-        {cards.length === 0 ? (
-          <View style={styles.empty}>
-            <AppText weight="semibold" style={styles.emptyTitle}>
-              {t('requests.emptyTitle')}
-            </AppText>
-            <AppText style={styles.emptySubtitle}>{t('requests.emptySubtitle')}</AppText>
-          </View>
-        ) : (
-          cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
-        )}
-      </CurvedSheetScrollView>
-    </View>
+    <GoldSheetScreen
+      title={t('requests.title')}
+      titleAlign="left"
+      titleSize="lg"
+      headerStyle={styles.header}
+      headerExtra={
+        <View style={styles.switcherWrap}>
+          <SegmentedSwitcher value={category} onChange={setCategory} options={categoryOptions} />
+        </View>
+      }
+    >
+      {cards.length === 0 ? (
+        <EmptyState title={t('requests.emptyTitle')} subtitle={t('requests.emptySubtitle')} />
+      ) : (
+        cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
+      )}
+    </GoldSheetScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.gold,
-  },
   header: {
     paddingBottom: spacing.lg,
   },
@@ -161,19 +148,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
     backgroundColor: palette.gold,
-  },
-  empty: {
-    paddingVertical: spacing.xxl,
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  emptyTitle: {
-    fontSize: 15,
-    color: palette.charcoal,
-  },
-  emptySubtitle: {
-    fontSize: 13,
-    color: palette.muted,
-    textAlign: 'center',
   },
 });

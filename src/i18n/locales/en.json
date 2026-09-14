@@ -10,6 +10,11 @@
     "search": "Search",
     "save": "Save",
     "error": "Something went wrong",
+    "justNow": "Just now",
+    "minutesAgo": "{count}m",
+    "hoursAgo": "{count}h",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count}d",
     "stepOfTotal": "Step {current} of {total}"
   },
   "language": {
@@ -188,11 +193,6 @@
     "emptySubtitle": "When buyers message you about a listing, threads will show up here.",
     "inputPlaceholder": "Write a message",
     "send": "Send",
-    "justNow": "Just now",
-    "minutesAgo": "{count}m",
-    "hoursAgo": "{count}h",
-    "yesterday": "Yesterday",
-    "daysAgo": "{count}d",
     "notFound": "This conversation is no longer available."
   },
   "equipmentListing": {

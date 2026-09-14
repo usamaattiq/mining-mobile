@@ -1,7 +1,6 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { showAppAlert } from '@/shared/services/appAlert';
-import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -10,13 +9,12 @@ import { authApi } from '@/features/auth/api/authApi';
 import { ApiError } from '@/shared/services/api';
 import { useProfileStore } from '@/store/profileStore';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
-import { AppTopBar } from '@/shared/components/AppTopBar';
-import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
+import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { FormInput } from '@/shared/components/FormInput';
 import { AvatarPicker } from '@/shared/components/AvatarPicker';
 import { LocationField } from '@/shared/components/LocationField';
 import { Button } from '@/shared/components/Button';
-import { palette, spacing } from '@/theme';
+import { spacing } from '@/theme';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -115,18 +113,13 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
   };
 
   return (
-    <View style={styles.root}>
-      <StatusBar style="light" />
-
-      <AppTopBar
+    <>
+      <GoldSheetScreen
         left="back"
-        variant="gold"
         title={t('profile.personalInformation')}
         onBackPress={navigation.goBack}
-        style={styles.header}
-      />
-
-      <CurvedSheetScrollView keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps="handled"
+      >
         <AvatarPicker uri={avatarUrl} onChangeUrl={setAvatarUrl} />
 
         <FormInput label={t('profile.fullName')} value={fullName} onChangeText={setFullName} />
@@ -162,21 +155,14 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
           disabled={!hasChanges || saving || !!emailError || !isEmailFormatValid}
           style={styles.saveButton}
         />
-      </CurvedSheetScrollView>
+      </GoldSheetScreen>
 
       {mapPickerSheet}
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.gold,
-  },
-  header: {
-    paddingBottom: spacing.xl,
-  },
   saveButton: {
     marginTop: spacing.sm,
   },

@@ -10,6 +10,11 @@
     "search": "بحث",
     "save": "حفظ",
     "error": "حدث خطأ ما",
+    "justNow": "الآن",
+    "minutesAgo": "{count} د",
+    "hoursAgo": "{count} س",
+    "yesterday": "أمس",
+    "daysAgo": "{count} ي",
     "stepOfTotal": "الخطوة {current} من {total}"
   },
   "language": {
@@ -324,11 +329,6 @@
     "emptySubtitle": "عندما يراسلك المشترون بشأن إعلان، ستظهر المحادثات هنا.",
     "inputPlaceholder": "اكتب رسالة",
     "send": "إرسال",
-    "justNow": "الآن",
-    "minutesAgo": "{count} د",
-    "hoursAgo": "{count} س",
-    "yesterday": "أمس",
-    "daysAgo": "{count} ي",
     "notFound": "هذه المحادثة لم تعد متاحة."
   },
   "profile": {

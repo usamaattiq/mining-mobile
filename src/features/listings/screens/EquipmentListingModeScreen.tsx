@@ -1,14 +1,10 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
-import { AppTopBar } from '@/shared/components/AppTopBar';
-import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
+import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { OptionRowCard } from '@/shared/components/OptionRowCard';
-import { palette, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingMode'>;
 
@@ -16,44 +12,23 @@ export function EquipmentListingModeScreen({ navigation }: Props): React.ReactEl
   const { t } = useTranslation(undefined, { i18n: appI18n });
 
   return (
-    <View style={styles.root}>
-      <StatusBar style="light" />
-
-      <AppTopBar
-        left="back"
-        variant="gold"
-        title={t('equipmentListing.modeTitle')}
-        onBackPress={navigation.goBack}
-        style={styles.header}
+    <GoldSheetScreen
+      left="back"
+      title={t('equipmentListing.modeTitle')}
+      onBackPress={navigation.goBack}
+    >
+      <OptionRowCard
+        icon="key-outline"
+        title={t('equipmentListing.rent')}
+        subtitle={t('equipmentListing.rentSubtitle')}
+        onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'rent' })}
       />
-
-      <CurvedSheetScrollView contentContainerStyle={styles.content}>
-        <OptionRowCard
-          icon="key-outline"
-          title={t('equipmentListing.rent')}
-          subtitle={t('equipmentListing.rentSubtitle')}
-          onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'rent' })}
-        />
-        <OptionRowCard
-          icon="pricetag-outline"
-          title={t('equipmentListing.sell')}
-          subtitle={t('equipmentListing.sellSubtitle')}
-          onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'sell' })}
-        />
-      </CurvedSheetScrollView>
-    </View>
+      <OptionRowCard
+        icon="pricetag-outline"
+        title={t('equipmentListing.sell')}
+        subtitle={t('equipmentListing.sellSubtitle')}
+        onPress={() => navigation.navigate('EquipmentListingForm', { mode: 'sell' })}
+      />
+    </GoldSheetScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.gold,
-  },
-  header: {
-    paddingBottom: spacing.xl,
-  },
-  content: {
-    gap: spacing.md,
-  },
-});

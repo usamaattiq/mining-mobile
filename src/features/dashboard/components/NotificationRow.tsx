@@ -1,30 +1,26 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
+import { PressableCard } from '@/shared/components/PressableCard';
+import { formatRelativeTime } from '@/shared/utils/formatRelativeTime';
 import { palette, radius, spacing } from '@/theme';
-import { cardBackShadow } from '@/theme/cardShadow';
 import type { InAppNotification } from '@/features/dashboard/types/notification.types';
-import { formatMessageTime } from '@/features/messages/utils/formatMessageTime';
+import type { TranslateFn } from '@/shared/types/translate.types';
 
 type NotificationRowProps = {
   item: InAppNotification;
   onPress: () => void;
-  t: (key: string, options?: Record<string, string | number>) => string;
+  t: TranslateFn;
 };
 
 export function NotificationRow({ item, onPress, t }: NotificationRowProps): React.ReactElement {
   return (
-    <Pressable
+    <PressableCard
       onPress={onPress}
-      accessibilityRole="button"
       accessibilityLabel={t(item.titleKey)}
-      style={({ pressed }) => [
-        styles.card,
-        cardBackShadow,
-        !item.read && styles.unread,
-        pressed && styles.pressed,
-      ]}
+      highlighted={!item.read}
+      style={styles.alignStart}
     >
       <View style={styles.iconWrap}>
         <Ionicons name={item.icon} size={22} color={palette.pureWhite} />
@@ -34,31 +30,20 @@ export function NotificationRow({ item, onPress, t }: NotificationRowProps): Rea
           <AppText weight="bold" style={styles.title} numberOfLines={1}>
             {t(item.titleKey)}
           </AppText>
-          <AppText style={styles.time}>{formatMessageTime(item.sentAt, t)}</AppText>
+          <AppText style={styles.time}>{formatRelativeTime(item.sentAt, t)}</AppText>
         </View>
         <AppText style={styles.body} numberOfLines={2}>
           {t(item.bodyKey)}
         </AppText>
       </View>
       {!item.read ? <View style={styles.dot} /> : null}
-    </Pressable>
+    </PressableCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
+  alignStart: {
     alignItems: 'flex-start',
-    gap: spacing.md,
-    backgroundColor: palette.warmWhite,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-  },
-  unread: {
-    backgroundColor: palette.softGold,
-  },
-  pressed: {
-    opacity: 0.9,
   },
   iconWrap: {
     width: 44,
