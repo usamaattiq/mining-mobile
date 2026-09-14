@@ -10,6 +10,7 @@ import type { DashboardTabParamList, RootStackParamList } from '@/navigation/typ
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { CurvedSheetScrollView } from '@/features/dashboard/components/CurvedSheetScrollView';
 import { HomeActionCard } from '@/features/dashboard/components/HomeActionCard';
+import { useNotificationsStore } from '@/store/notificationsStore';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = CompositeScreenProps<
@@ -19,6 +20,7 @@ type Props = CompositeScreenProps<
 
 export function HomeScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const hasUnread = useNotificationsStore((state) => state.items.some((item) => !item.read));
 
   const actions = [
     {
@@ -52,11 +54,13 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         rightSlot={
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Notifications"
+            accessibilityLabel={t('notifications.title')}
             hitSlop={12}
+            onPress={() => navigation.navigate('Notifications')}
             style={({ pressed }) => [styles.notificationButton, pressed && styles.pressed]}
           >
             <Ionicons name="notifications-outline" size={20} color={palette.pureWhite} />
+            {hasUnread ? <View style={styles.unreadDot} /> : null}
           </Pressable>
         }
       />
@@ -81,6 +85,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.22)',
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: 7,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: palette.pureWhite,
+    borderWidth: 1,
+    borderColor: palette.gold,
   },
   pressed: {
     opacity: 0.75,

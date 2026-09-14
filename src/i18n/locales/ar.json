@@ -140,7 +140,7 @@
   "tabs": {
     "home": "الرئيسية",
     "requests": "الطلبات",
-    "about": "حول",
+    "messages": "الرسائل",
     "profile": "الملف الشخصي"
   },
   "requests": {
@@ -166,6 +166,20 @@
     "auctionGoldSubtitle": "ابدأ مزادًا مباشرًا للذهب",
     "quickCreateTitle": "ماذا تريد أن تعرض؟",
     "quickCreateSubtitle": "اختر فئة للبدء — يمكنك النشر خلال خطوات قليلة فقط."
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "markAllRead": "قراءة الكل",
+    "emptyTitle": "لا توجد إشعارات جديدة",
+    "emptySubtitle": "ستظهر هنا العروض والرسائل وتحديثات الإعلانات.",
+    "offerReceivedTitle": "عرض جديد",
+    "offerReceivedBody": "تم تقديم عرض على إعلان CAT 336 الخاص بك.",
+    "messageTitle": "رسالة جديدة",
+    "messageBody": "عمر الراشد سأل عن التوصيل إلى رأس الخير.",
+    "auctionTitle": "تحديث المزاد",
+    "auctionBody": "تم تقديم مزايدة جديدة على مزاد سبيكة الذهب عيار 22.",
+    "listingLiveTitle": "الإعلان منشور",
+    "listingLiveBody": "مسحكم الجيولوجي الميداني ظاهر الآن للمشترين."
   },
   "equipmentListing": {
     "modeTitle": "عرض معدات",
@@ -303,9 +317,19 @@
     "location": "الموقع",
     "publish": "نشر المزاد"
   },
-  "dashboardAbout": {
-    "title": "حول",
-    "subtitle": "تعرّف على المزيد حول Dahabi."
+  "messages": {
+    "title": "الرسائل",
+    "searchPlaceholder": "ابحث في المحادثات",
+    "emptyTitle": "لا توجد محادثات بعد",
+    "emptySubtitle": "عندما يراسلك المشترون بشأن إعلان، ستظهر المحادثات هنا.",
+    "inputPlaceholder": "اكتب رسالة",
+    "send": "إرسال",
+    "justNow": "الآن",
+    "minutesAgo": "{count} د",
+    "hoursAgo": "{count} س",
+    "yesterday": "أمس",
+    "daysAgo": "{count} ي",
+    "notFound": "هذه المحادثة لم تعد متاحة."
   },
   "profile": {
     "edit": "تعديل الملف الشخصي",

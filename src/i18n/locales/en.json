@@ -140,7 +140,7 @@
   "tabs": {
     "home": "Home",
     "requests": "Requests",
-    "about": "About",
+    "messages": "Messages",
     "profile": "Profile"
   },
   "requests": {
@@ -167,9 +167,33 @@
     "quickCreateTitle": "What would you like to list?",
     "quickCreateSubtitle": "Choose a category to get started — you can publish in just a few steps."
   },
-  "dashboardAbout": {
-    "title": "About",
-    "subtitle": "Learn more about Dahabi."
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Read all",
+    "emptyTitle": "You're all caught up",
+    "emptySubtitle": "Offers, messages, and listing updates will appear here.",
+    "offerReceivedTitle": "New offer received",
+    "offerReceivedBody": "Someone submitted an offer on your CAT 336 listing.",
+    "messageTitle": "New message",
+    "messageBody": "Omar Al-Rashid asked about delivery to Ras Al-Khair.",
+    "auctionTitle": "Auction update",
+    "auctionBody": "A new bid was placed on your 22K gold bar auction.",
+    "listingLiveTitle": "Listing is live",
+    "listingLiveBody": "Your on-site geological survey is now visible to buyers."
+  },
+  "messages": {
+    "title": "Messages",
+    "searchPlaceholder": "Search conversations",
+    "emptyTitle": "No conversations yet",
+    "emptySubtitle": "When buyers message you about a listing, threads will show up here.",
+    "inputPlaceholder": "Write a message",
+    "send": "Send",
+    "justNow": "Just now",
+    "minutesAgo": "{count}m",
+    "hoursAgo": "{count}h",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count}d",
+    "notFound": "This conversation is no longer available."
   },
   "equipmentListing": {
     "modeTitle": "List Equipment",

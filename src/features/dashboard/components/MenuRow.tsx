@@ -32,10 +32,17 @@ export function MenuRow({
       ]}
     >
       <View style={[styles.iconWrap, isGold ? styles.iconWrapGold : styles.iconWrapDefault]}>
-        <Ionicons name={icon} size={isGold ? 22 : 20} color={isGold ? palette.pureWhite : palette.gold} />
+        <Ionicons
+          name={icon}
+          size={isGold ? 22 : 20}
+          color={isGold ? palette.pureWhite : palette.gold}
+        />
       </View>
       <View style={styles.copy}>
-        <AppText weight={isGold ? 'bold' : 'semibold'} style={[styles.label, isGold && styles.labelGold]}>
+        <AppText
+          weight={isGold ? 'bold' : 'semibold'}
+          style={[styles.label, isGold && styles.labelGold]}
+        >
           {label}
         </AppText>
         {subtitle ? (

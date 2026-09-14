@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FloatingTabBar } from '@/features/dashboard/components/FloatingTabBar';
-import { AboutScreen } from '@/features/dashboard/screens/AboutScreen';
+import { MessagesScreen } from '@/features/messages/screens/MessagesScreen';
 import { HomeScreen } from '@/features/dashboard/screens/HomeScreen';
 import { RequestsScreen } from '@/features/dashboard/screens/RequestsScreen';
 import { ProfileScreen } from '@/features/dashboard/screens/ProfileScreen';
@@ -19,7 +19,7 @@ export function DashboardTabNavigator(): React.ReactElement {
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} />
       <Tab.Screen name="Requests" component={RequestsScreen} />
-      <Tab.Screen name="About" component={AboutScreen} />
+      <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
