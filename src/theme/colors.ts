@@ -1,8 +1,8 @@
 export const palette = {
   charcoal: '#222222',
   pureWhite: '#FFFFFF',
-  warmWhite: '#FCFBF8',
-  gold: '#bb8727',
+  warmWhite: '#fcf9f0',
+  gold: '#B07F24',
   goldDark: '#A67526',
   lightGold: '#E4C766',
   softGold: '#F5EBCF',

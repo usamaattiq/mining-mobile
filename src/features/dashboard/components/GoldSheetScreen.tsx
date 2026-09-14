@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   sheet: {
     flex: 1,
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderTopLeftRadius: CURVED_SHEET_OVERLAP,
     borderTopRightRadius: CURVED_SHEET_OVERLAP,
     marginTop: -CURVED_SHEET_OVERLAP,

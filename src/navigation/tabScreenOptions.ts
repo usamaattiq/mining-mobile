@@ -5,7 +5,7 @@ import { palette } from '@/theme';
 export const tabNavigatorScreenOptions: BottomTabNavigationOptions = {
   headerShown: false,
   animation: 'none',
-  sceneStyle: { backgroundColor: palette.pureWhite },
+  sceneStyle: { backgroundColor: palette.warmWhite },
   tabBarStyle: {
     backgroundColor: 'transparent',
     borderTopWidth: 0,
