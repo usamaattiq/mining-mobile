@@ -14,6 +14,7 @@ export function GoldSheetScreen({
   title,
   left = 'none',
   onBackPress,
+  leftSlot,
   rightSlot,
   titleAlign,
   titleSize,
@@ -34,6 +35,7 @@ export function GoldSheetScreen({
         left={left}
         title={title}
         onBackPress={onBackPress}
+        leftSlot={leftSlot}
         rightSlot={rightSlot}
         titleAlign={titleAlign}
         titleSize={titleSize}

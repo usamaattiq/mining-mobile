@@ -3,9 +3,10 @@ import type { ScrollViewProps, StyleProp, ViewStyle } from 'react-native';
 import type { AppTopBarProps } from '@/shared/types/appTopBar.types';
 
 export type GoldSheetScreenProps = {
-  title: string;
+  title?: string;
   left?: AppTopBarProps['left'];
   onBackPress?: () => void;
+  leftSlot?: AppTopBarProps['leftSlot'];
   rightSlot?: AppTopBarProps['rightSlot'];
   titleAlign?: AppTopBarProps['titleAlign'];
   titleSize?: AppTopBarProps['titleSize'];

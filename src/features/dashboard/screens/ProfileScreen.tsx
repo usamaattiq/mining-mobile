@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +39,20 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
   const [loggingOut, setLoggingOut] = React.useState(false);
   const [legalDoc, setLegalDoc] = React.useState<LegalDocumentKind | null>(null);
   const [languageModalVisible, setLanguageModalVisible] = React.useState(false);
+
+  const handleSwitchToBuyer = async () => {
+    const buyerAppUrl = 'dahabibuyer://';
+    try {
+      const canOpen = await Linking.canOpenURL(buyerAppUrl);
+      if (canOpen) {
+        await Linking.openURL(buyerAppUrl);
+        return;
+      }
+    } catch {
+      // Fall through to the not-installed message.
+    }
+    showAppAlert(t('profile.switchToBuyer'), t('profile.switchToBuyerUnavailable'));
+  };
 
   const handleLogout = () => {
     showAppAlert(t('welcome.logoutConfirmTitle'), t('welcome.logoutConfirmMessage'), [
@@ -119,6 +133,14 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
 
       <CurvedSheetScrollView>
         <MenuListCard items={menuItems} />
+
+        <MenuRow
+          variant="gold"
+          icon="swap-horizontal-outline"
+          label={t('profile.switchToBuyer')}
+          subtitle={t('profile.switchToBuyerSubtitle')}
+          onPress={() => void handleSwitchToBuyer()}
+        />
 
         <MenuRow
           variant="gold"

@@ -170,7 +170,14 @@
     "auctionGold": "مزاد الذهب",
     "auctionGoldSubtitle": "ابدأ مزادًا مباشرًا للذهب",
     "quickCreateTitle": "ماذا تريد أن تعرض؟",
-    "quickCreateSubtitle": "اختر فئة للبدء — يمكنك النشر خلال خطوات قليلة فقط."
+    "quickCreateSubtitle": "اختر فئة للبدء — يمكنك النشر خلال خطوات قليلة فقط.",
+    "searchPlaceholder": "ابحث في الإعلانات",
+    "filter": "تصفية",
+    "filterTitle": "تصفية",
+    "filterAll": "الكل",
+    "apply": "تطبيق",
+    "buyer": "مشتري",
+    "supplier": "مورّد"
   },
   "notifications": {
     "title": "الإشعارات",
@@ -354,6 +361,9 @@
     "privacySubtitle": "كيف نتعامل مع بياناتك",
     "terms": "شروط الخدمة",
     "termsSubtitle": "قواعد استخدام Dahabi",
+    "switchToBuyer": "التبديل إلى المشتري",
+    "switchToBuyerSubtitle": "افتح تطبيق Dahabi للمشتري",
+    "switchToBuyerUnavailable": "تطبيق المشتري غير مثبّت على هذا الجهاز بعد.",
     "logout": "تسجيل الخروج",
     "logoutSubtitle": "ستحتاج إلى التحقق لتسجيل الدخول مرة أخرى"
   },

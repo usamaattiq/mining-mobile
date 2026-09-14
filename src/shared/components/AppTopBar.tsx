@@ -10,6 +10,7 @@ export function AppTopBar({
   left = 'none',
   title,
   onBackPress,
+  leftSlot,
   rightSlot,
   includeSafeArea = true,
   variant = 'light',
@@ -19,7 +20,7 @@ export function AppTopBar({
 }: AppTopBarProps): React.ReactElement {
   const insets = useSafeAreaInsets();
   const isGold = variant === 'gold';
-  const showLeftSide = left === 'back' || titleAlign === 'center';
+  const showLeftSide = !leftSlot && (left === 'back' || titleAlign === 'center');
 
   return (
     <View
@@ -30,7 +31,9 @@ export function AppTopBar({
         style,
       ]}
     >
-      {showLeftSide ? (
+      {leftSlot ? (
+        <View style={[styles.side, styles.sideGrow]}>{leftSlot}</View>
+      ) : showLeftSide ? (
         <View style={styles.side}>
           {left === 'back' ? (
             <Pressable
@@ -54,7 +57,7 @@ export function AppTopBar({
         </View>
       ) : null}
 
-      {title ? (
+      {!leftSlot && title ? (
         <View style={[styles.titleBlock, titleAlign === 'left' && styles.titleBlockLeft]}>
           <AppText
             weight="bold"
@@ -69,11 +72,13 @@ export function AppTopBar({
             {title}
           </AppText>
         </View>
-      ) : (
+      ) : !leftSlot ? (
         <View style={styles.titleSpacer} />
-      )}
+      ) : null}
 
-      <View style={[styles.side, styles.sideRight]}>{rightSlot}</View>
+      <View style={[styles.side, styles.sideRight, leftSlot ? styles.sideGrow : null]}>
+        {rightSlot}
+      </View>
     </View>
   );
 }
@@ -98,6 +103,10 @@ const styles = StyleSheet.create({
   },
   sideRight: {
     justifyContent: 'flex-end',
+  },
+  sideGrow: {
+    flex: 1,
+    minWidth: 0,
   },
   titleSpacer: {
     flex: 1,

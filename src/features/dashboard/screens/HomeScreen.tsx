@@ -1,40 +1,174 @@
 import React from 'react';
+import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect, type CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import type { DashboardTabParamList, RootStackParamList } from '@/navigation/types';
+import type {
+  DashboardTabParamList,
+  ListingCategory,
+  RootStackParamList,
+} from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
-import { HomeActionCard } from '@/features/dashboard/components/HomeActionCard';
 import { NotificationBellButton } from '@/features/dashboard/components/NotificationBellButton';
-import { listingCreateActions } from '@/features/dashboard/utils/listingCreateActions';
+import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
+import { SearchField } from '@/shared/components/SearchField';
+import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
+import { EmptyState } from '@/shared/components/EmptyState';
+import { Button } from '@/shared/components/Button';
+import { ListingCard } from '@/features/listings/components/ListingCard';
 import { useNotificationsStore } from '@/store/notificationsStore';
+import { useProfileStore } from '@/store/profileStore';
+import { useListingsStore } from '@/store/listingsStore';
+import { useServiceListingsStore } from '@/store/serviceListingsStore';
+import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { notificationsApi } from '@/features/dashboard/api/notificationsApi';
+import { refreshListings } from '@/features/listings/utils/refreshListings';
+import { buildListingCards } from '@/features/listings/utils/buildListingCards';
+import { AppText } from '@/shared/components/AppText';
+import { showAppAlert } from '@/shared/services/appAlert';
+import { useCurrency } from '@/shared/hooks/useCurrency';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
+import { palette, radius, spacing } from '@/theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<DashboardTabParamList, 'HomeTab'>,
   NativeStackScreenProps<RootStackParamList>
 >;
 
+type HomeFilter = 'all' | 'rent' | 'sell' | 'onsite' | 'online';
+
 export function HomeScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
+  const currency = useCurrency();
+  const profile = useProfileStore((state) => state.profile);
   const hasUnread = useNotificationsStore((state) => state.items.some((item) => !item.read));
-  const actions = listingCreateActions(t, navigation.navigate);
+  const equipmentListings = useListingsStore((state) => state.listings);
+  const serviceListings = useServiceListingsStore((state) => state.listings);
+  const goldListings = useGoldListingsStore((state) => state.listings);
+  const name = profile?.fullName?.trim() || '—';
+  const initial = name.charAt(0).toUpperCase();
+
+  const [category, setCategory] = React.useState<ListingCategory>('equipment');
+  const [query, setQuery] = React.useState('');
+  const [filter, setFilter] = React.useState<HomeFilter>('all');
+  const [draftFilter, setDraftFilter] = React.useState<HomeFilter>('all');
+  const [filterOpen, setFilterOpen] = React.useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       void notificationsApi.list().then((items) => {
         useNotificationsStore.getState().setItems(items);
       });
+      void refreshListings();
     }, []),
   );
 
+  const handleSwitchToBuyer = async () => {
+    const buyerAppUrl = 'dahabibuyer://';
+    try {
+      const canOpen = await Linking.canOpenURL(buyerAppUrl);
+      if (canOpen) {
+        await Linking.openURL(buyerAppUrl);
+        return;
+      }
+    } catch {
+      // Fall through to the not-installed message.
+    }
+    showAppAlert(t('profile.switchToBuyer'), t('profile.switchToBuyerUnavailable'));
+  };
+
+  const handleCategoryChange = (next: ListingCategory) => {
+    setCategory(next);
+    setFilter('all');
+  };
+
+  const openFilter = () => {
+    setDraftFilter(filter);
+    setFilterOpen(true);
+  };
+
+  const applyFilter = () => {
+    setFilter(draftFilter);
+    setFilterOpen(false);
+  };
+
+  const categoryOptions = [
+    { key: 'equipment' as const, label: t('requests.categoryEquipment') },
+    { key: 'services' as const, label: t('requests.categoryServices') },
+    { key: 'gold' as const, label: t('requests.categoryGold') },
+  ];
+
+  const filterOptions: { key: HomeFilter; label: string }[] =
+    category === 'equipment'
+      ? [
+          { key: 'all', label: t('dashboardHome.filterAll') },
+          { key: 'rent', label: t('equipmentListing.rent') },
+          { key: 'sell', label: t('equipmentListing.sell') },
+        ]
+      : category === 'services'
+        ? [
+            { key: 'all', label: t('dashboardHome.filterAll') },
+            { key: 'onsite', label: t('serviceListing.onsite') },
+            { key: 'online', label: t('serviceListing.online') },
+          ]
+        : [{ key: 'all', label: t('dashboardHome.filterAll') }];
+
+  const visibleEquipment =
+    filter === 'rent' || filter === 'sell'
+      ? equipmentListings.filter((listing) => listing.mode === filter)
+      : equipmentListings;
+  const visibleServices =
+    filter === 'onsite' || filter === 'online'
+      ? serviceListings.filter((listing) => listing.serviceType === filter)
+      : serviceListings;
+
+  const cards = buildListingCards({
+    category,
+    equipmentListings: visibleEquipment,
+    serviceListings: visibleServices,
+    goldListings,
+    t,
+    currencyCode: currency.code,
+    locale: currentLanguage,
+    onOpen: (id, listingCategory) =>
+      navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
+  }).filter((card) => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return true;
+    return (
+      card.title.toLowerCase().includes(needle) ||
+      (card.subtitle ?? '').toLowerCase().includes(needle) ||
+      (card.city ?? '').toLowerCase().includes(needle)
+    );
+  });
+
   return (
     <GoldSheetScreen
-      title={t('dashboardHome.title')}
-      titleAlign="left"
-      titleSize="lg"
+      leftSlot={
+        <Pressable
+          onPress={() => navigation.navigate('Profile')}
+          accessibilityRole="button"
+          accessibilityLabel={name}
+          style={({ pressed }) => [styles.identity, pressed && styles.identityPressed]}
+        >
+          <View style={styles.avatar}>
+            {profile?.avatarUrl ? (
+              <Image source={{ uri: profile.avatarUrl }} style={styles.avatarImage} />
+            ) : (
+              <AppText weight="medium" style={styles.avatarInitial}>
+                {initial}
+              </AppText>
+            )}
+          </View>
+          <AppText weight="medium" style={styles.name} numberOfLines={1}>
+            {name}
+          </AppText>
+        </Pressable>
+      }
       rightSlot={
         <NotificationBellButton
           hasUnread={hasUnread}
@@ -42,10 +176,178 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           onPress={() => navigation.navigate('Notifications')}
         />
       }
+      headerStyle={styles.header}
+      headerExtra={
+        <View style={styles.headerExtra}>
+          <Pressable
+            onPress={() => void handleSwitchToBuyer()}
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.switchToBuyer')}
+            style={({ pressed }) => [styles.switchRoleButton, pressed && styles.filterPressed]}
+          >
+            <Ionicons name="swap-horizontal-outline" size={18} color={palette.gold} />
+            <AppText weight="semibold" style={styles.switchRoleLabel}>
+              {t('profile.switchToBuyer')}
+            </AppText>
+          </Pressable>
+          <SegmentedSwitcher
+            value={category}
+            onChange={handleCategoryChange}
+            options={categoryOptions}
+          />
+        </View>
+      }
     >
-      {actions.map((action) => (
-        <HomeActionCard key={action.title} {...action} />
-      ))}
+      <View style={styles.searchRow}>
+        <View style={styles.searchField}>
+          <SearchField
+            value={query}
+            onChangeText={setQuery}
+            placeholder={t('dashboardHome.searchPlaceholder')}
+          />
+        </View>
+        <Pressable
+          onPress={openFilter}
+          accessibilityRole="button"
+          accessibilityLabel={t('dashboardHome.filter')}
+          style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
+        >
+          <Ionicons name="options-outline" size={20} color={palette.gold} />
+        </Pressable>
+      </View>
+
+      {cards.length === 0 ? (
+        <EmptyState title={t('requests.emptyTitle')} subtitle={t('requests.emptySubtitle')} />
+      ) : (
+        cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
+      )}
+
+      <AppBottomSheet visible={filterOpen} onClose={() => setFilterOpen(false)} heightRatio={0.42}>
+        <AppText weight="bold" style={styles.sheetTitle}>
+          {t('dashboardHome.filterTitle')}
+        </AppText>
+        {filterOptions.map((option) => {
+          const selected = draftFilter === option.key;
+          return (
+            <Pressable
+              key={option.key}
+              onPress={() => setDraftFilter(option.key)}
+              style={({ pressed }) => [styles.filterOption, pressed && styles.filterPressed]}
+            >
+              <AppText weight={selected ? 'semibold' : 'medium'} style={styles.filterOptionLabel}>
+                {option.label}
+              </AppText>
+              {selected ? <Ionicons name="checkmark" size={18} color={palette.gold} /> : null}
+            </Pressable>
+          );
+        })}
+        <Button label={t('dashboardHome.apply')} onPress={applyFilter} style={styles.applyButton} />
+      </AppBottomSheet>
     </GoldSheetScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  identity: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minWidth: 0,
+    paddingRight: spacing.sm,
+    maxWidth: '100%',
+  },
+  identityPressed: {
+    opacity: 0.82,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: palette.pureWhite,
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarInitial: {
+    fontSize: 14,
+    color: palette.pureWhite,
+  },
+  name: {
+    flexShrink: 1,
+    fontSize: 14,
+    color: palette.pureWhite,
+  },
+  header: {
+    paddingBottom: spacing.sm,
+  },
+  headerExtra: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+    gap: spacing.sm,
+    backgroundColor: palette.gold,
+  },
+  switchRoleButton: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: palette.pureWhite,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+  },
+  switchRoleLabel: {
+    fontSize: 13,
+    color: palette.gold,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  searchField: {
+    flex: 1,
+    minWidth: 0,
+  },
+  filterButton: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.warmWhite,
+  },
+  filterPressed: {
+    opacity: 0.88,
+  },
+  sheetTitle: {
+    fontSize: 16,
+    color: palette.charcoal,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  filterOption: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+  },
+  filterOptionLabel: {
+    fontSize: 15,
+    color: palette.charcoal,
+  },
+  applyButton: {
+    marginTop: spacing.md,
+  },
+});

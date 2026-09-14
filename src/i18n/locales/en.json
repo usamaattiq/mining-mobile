@@ -170,7 +170,14 @@
     "auctionGold": "Auction Gold",
     "auctionGoldSubtitle": "Start a live gold auction",
     "quickCreateTitle": "What would you like to list?",
-    "quickCreateSubtitle": "Choose a category to get started — you can publish in just a few steps."
+    "quickCreateSubtitle": "Choose a category to get started — you can publish in just a few steps.",
+    "searchPlaceholder": "Search listings",
+    "filter": "Filter",
+    "filterTitle": "Filter",
+    "filterAll": "All",
+    "apply": "Apply",
+    "buyer": "Buyer",
+    "supplier": "Supplier"
   },
   "notifications": {
     "title": "Notifications",
@@ -354,6 +361,9 @@
     "privacySubtitle": "How we handle your data",
     "terms": "Terms of service",
     "termsSubtitle": "The rules for using Dahabi",
+    "switchToBuyer": "Switch to buyer",
+    "switchToBuyerSubtitle": "Open the Dahabi buyer app",
+    "switchToBuyerUnavailable": "The buyer app isn't installed on this device yet.",
     "logout": "Log out",
     "logoutSubtitle": "You'll need to verify to log back in"
   },

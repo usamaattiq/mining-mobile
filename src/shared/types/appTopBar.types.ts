@@ -6,6 +6,8 @@ export type AppTopBarProps = {
   left?: 'back' | 'none';
   title?: string;
   onBackPress?: () => void;
+  /** Replaces the title area — e.g. avatar + name on Home. */
+  leftSlot?: ReactNode;
   /** Optional extra actions on the right. */
   rightSlot?: ReactNode;
   /** Skip top safe-area padding when the parent already applies it. */
