@@ -319,6 +319,7 @@
     "weightPlaceholder": "e.g. 50",
     "weightUnit": "g",
     "weightValue": "{weight} g",
+    "auctionBadge": "Auction",
     "purity": "Purity / Karat",
     "purityPlaceholder": "Choose purity",
     "karatValue": "{karat}K",

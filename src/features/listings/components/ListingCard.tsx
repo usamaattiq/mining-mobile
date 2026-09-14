@@ -4,11 +4,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
-import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
+import type { ListingCardBadge, ListingCardProps } from '@/features/listings/types/listingCard.types';
 
 const LISTING_LIFETIME_MS = 24 * 60 * 60 * 1000;
-const COUNTDOWN_TICK_MS = 60 * 1000;
+const COUNTDOWN_TICK_MS = 1000;
+const HOUR_MS = 60 * 60 * 1000;
+const MINUTE_MS = 60 * 1000;
 const IMAGE_SIZE = 112;
+const BADGE_ROW_HEIGHT = 20;
+const LINE_HEIGHT = 18;
 
 function useRemainingTime(createdAt: number): string {
   const [now, setNow] = React.useState(() => Date.now());
@@ -19,14 +23,40 @@ function useRemainingTime(createdAt: number): string {
   }, []);
 
   const remainingMs = Math.max(0, createdAt + LISTING_LIFETIME_MS - now);
-  const hours = Math.floor(remainingMs / (60 * 60 * 1000));
-  const minutes = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
-  return `${hours}h ${minutes}m`;
+  if (remainingMs >= HOUR_MS) {
+    return `${Math.floor(remainingMs / HOUR_MS)}h`;
+  }
+  if (remainingMs >= MINUTE_MS) {
+    return `${Math.floor(remainingMs / MINUTE_MS)}m`;
+  }
+  return `${Math.floor(remainingMs / 1000)}s`;
+}
+
+function SmallBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement {
+  return (
+    <View style={styles.smallBadge}>
+      {badge.icon ? <Ionicons name={badge.icon} size={10} color={palette.gold} /> : null}
+      <AppText weight="semibold" style={styles.smallBadgeText}>
+        {badge.label}
+      </AppText>
+    </View>
+  );
+}
+
+function StatusBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement {
+  return (
+    <View style={styles.statusBadge}>
+      {badge.icon ? <Ionicons name={badge.icon} size={10} color={palette.pureWhite} /> : null}
+      <AppText weight="semibold" style={styles.statusBadgeText}>
+        {badge.label}
+      </AppText>
+    </View>
+  );
 }
 
 /**
- * Requests-tab list card, shared by every listing category (equipment, service, gold auction):
- * square photo, title/subtitle, badge rows, price, and an optional countdown timer.
+ * Shared Requests-tab card for equipment, services, and gold.
+ * Every category uses the same rows and spacing.
  */
 export function ListingCard({
   title,
@@ -34,9 +64,12 @@ export function ListingCard({
   placeholderIcon,
   subtitle,
   subtitleIcon,
-  primaryBadge,
-  secondaryBadges,
-  cornerBadge,
+  typeBadge,
+  city,
+  durationBadges,
+  topDateText,
+  deliveryBadge,
+  statusBadges,
   priceText,
   createdAt,
   onPress,
@@ -50,17 +83,6 @@ export function ListingCard({
       accessibilityLabel={title}
       style={({ pressed }) => [styles.card, cardBackShadow, pressed && styles.pressed]}
     >
-      {cornerBadge ? (
-        <View style={styles.cornerBadge}>
-          {cornerBadge.icon ? (
-            <Ionicons name={cornerBadge.icon} size={12} color={palette.pureWhite} />
-          ) : null}
-          <AppText weight="semibold" style={styles.cornerBadgeText}>
-            {cornerBadge.label}
-          </AppText>
-        </View>
-      ) : null}
-
       <View style={styles.row}>
         <View style={styles.imageWrap}>
           {thumbnail ? (
@@ -73,56 +95,69 @@ export function ListingCard({
         </View>
 
         <View style={styles.copy}>
-          <AppText weight="bold" style={styles.title} numberOfLines={1}>
-            {title}
-          </AppText>
-          {subtitle ? (
-            <View style={styles.subtitleRow}>
-              {subtitleIcon ? (
-                <Ionicons name={subtitleIcon} size={13} color={palette.gold} />
+          <View style={styles.topRow}>
+            <View style={styles.topLeft}>
+              {durationBadges && durationBadges.length > 0 ? (
+                durationBadges.map((badge) => <SmallBadge key={badge.key} badge={badge} />)
+              ) : topDateText ? (
+                <SmallBadge
+                  badge={{ key: 'datetime', label: topDateText, icon: 'calendar-outline' }}
+                />
               ) : null}
-              <AppText style={styles.subtitle} numberOfLines={1}>
-                {subtitle}
-              </AppText>
             </View>
-          ) : null}
+            {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : <View style={styles.badgeSlot} />}
+          </View>
 
-          {secondaryBadges && secondaryBadges.length > 0 ? (
-            <View style={styles.badgeRow}>
-              {secondaryBadges.map((badge) => (
-                <View key={badge.key} style={styles.secondaryBadge}>
-                  <AppText weight="semibold" style={styles.secondaryBadgeText}>
-                    {badge.label}
-                  </AppText>
-                </View>
-              ))}
-            </View>
-          ) : null}
+          <View style={styles.body}>
+            <AppText weight="bold" style={styles.title} numberOfLines={1}>
+              {title}
+            </AppText>
 
-          <View style={styles.bottomRow}>
-            {primaryBadge ? (
-              <View style={styles.primaryBadge}>
-                {primaryBadge.icon ? (
-                  <Ionicons name={primaryBadge.icon} size={11} color={palette.pureWhite} />
-                ) : null}
-                <AppText weight="semibold" style={styles.primaryBadgeText}>
-                  {primaryBadge.label}
-                </AppText>
+            {typeBadge || subtitle || subtitleIcon ? (
+              <View style={styles.subtitleRow}>
+                {typeBadge ? (
+                  <StatusBadge badge={typeBadge} />
+                ) : (
+                  <>
+                    {subtitleIcon ? (
+                      <Ionicons name={subtitleIcon} size={13} color={palette.gold} />
+                    ) : null}
+                    <AppText style={styles.subtitle} numberOfLines={1}>
+                      {subtitle ?? ' '}
+                    </AppText>
+                  </>
+                )}
               </View>
             ) : null}
-            {priceText ? (
-              <AppText weight="bold" style={styles.price} numberOfLines={1}>
-                {priceText}
+
+            <View style={styles.subtitleRow}>
+              <Ionicons name="location-outline" size={13} color={palette.gold} />
+              <AppText style={styles.subtitle} numberOfLines={1}>
+                {city ?? ' '}
               </AppText>
-            ) : null}
+            </View>
+
+            <AppText weight="bold" style={styles.price} numberOfLines={1}>
+              {priceText ?? ' '}
+            </AppText>
+          </View>
+
+          <View style={styles.bottomRow}>
+            <View style={styles.topLeft}>
+              {(statusBadges ?? []).map((badge) => (
+                <StatusBadge key={badge.key} badge={badge} />
+              ))}
+            </View>
             {createdAt ? (
               <View style={styles.timerBadge}>
-                <Ionicons name="time-outline" size={11} color={palette.gold} />
+                <Ionicons name="time-outline" size={10} color={palette.gold} />
                 <AppText weight="semibold" style={styles.timerText}>
                   {timeLeft}
                 </AppText>
               </View>
-            ) : null}
+            ) : (
+              <View style={styles.badgeSlot} />
+            )}
           </View>
         </View>
       </View>
@@ -135,7 +170,6 @@ const styles = StyleSheet.create({
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     padding: spacing.sm,
-    gap: spacing.sm,
   },
   pressed: {
     opacity: 0.9,
@@ -161,89 +195,96 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
-    justifyContent: 'center',
+    minHeight: IMAGE_SIZE,
+    justifyContent: 'space-between',
+    minWidth: 0,
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: spacing.xs,
+    minHeight: BADGE_ROW_HEIGHT,
+  },
+  topLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    gap: spacing.xs,
+    minWidth: 0,
+  },
+  badgeSlot: {
+    height: BADGE_ROW_HEIGHT,
+    width: 1,
+  },
+  smallBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: palette.softGold,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+  },
+  smallBadgeText: {
+    fontSize: 10,
+    color: palette.gold,
   },
   title: {
     fontSize: 15,
+    lineHeight: LINE_HEIGHT + 4,
     color: palette.charcoal,
-    paddingRight: 84,
   },
   subtitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: spacing.xs,
+    minHeight: 17,
   },
   subtitle: {
+    flex: 1,
     fontSize: 13,
+    lineHeight: 17,
     color: palette.muted,
   },
-  badgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-  },
-  secondaryBadge: {
-    backgroundColor: palette.softGold,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
-  secondaryBadgeText: {
-    fontSize: 11,
-    color: palette.gold,
+  price: {
+    fontSize: 19,
+    lineHeight: LINE_HEIGHT,
+    color: palette.charcoal,
+    textAlign: 'right',
   },
   bottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.xs,
+    minHeight: BADGE_ROW_HEIGHT,
   },
-  primaryBadge: {
+  statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
     backgroundColor: palette.gold,
     borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
   },
-  primaryBadgeText: {
-    fontSize: 11,
-    color: palette.pureWhite,
-  },
-  price: {
-    fontSize: 13,
-    color: palette.charcoal,
-  },
-  cornerBadge: {
-    position: 'absolute',
-    top: 6,
-    right: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    borderRadius: radius.pill,
-    backgroundColor: palette.gold,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    zIndex: 1,
-  },
-  cornerBadgeText: {
-    fontSize: 11,
+  statusBadgeText: {
+    fontSize: 10,
     color: palette.pureWhite,
   },
   timerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
     backgroundColor: palette.softGold,
     borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.xs,
     paddingVertical: 2,
   },
   timerText: {
-    fontSize: 11,
+    fontSize: 12,
     color: palette.gold,
   },
 });

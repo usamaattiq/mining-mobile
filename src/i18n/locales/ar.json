@@ -310,6 +310,7 @@
     "weightPlaceholder": "مثال: 50",
     "weightUnit": "جم",
     "weightValue": "{weight} جم",
+    "auctionBadge": "مزاد",
     "purity": "النقاء / العيار",
     "purityPlaceholder": "اختر النقاء",
     "karatValue": "عيار {karat}",

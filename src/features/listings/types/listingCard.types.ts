@@ -11,18 +11,24 @@ export type ListingCardProps = {
   /** First photo's uri, if any — falls back to `placeholderIcon`. */
   thumbnail?: string;
   placeholderIcon: keyof typeof Ionicons.glyphMap;
-  /** Small subtitle line under the title (e.g. equipment type, service category). */
+  /** Type / units line under the title. */
   subtitle?: string;
-  /** Icon shown before the subtitle text. */
+  /** Icon shown before the type / units line. */
   subtitleIcon?: keyof typeof Ionicons.glyphMap;
-  /** Filled gold pill — e.g. Rent/Sell, Onsite/Online. */
-  primaryBadge?: ListingCardBadge;
-  /** Soft-gold pills — e.g. duration, purity, weight. */
-  secondaryBadges?: ListingCardBadge[];
-  /** Pill in the top-right corner — e.g. "Delivery". */
-  cornerBadge?: ListingCardBadge;
+  /** Replaces the type line (e.g. Auction on gold cards). */
+  typeBadge?: ListingCardBadge;
+  /** City line under the type. */
+  city?: string;
+  /** Hourly / weekly / monthly — top left. */
+  durationBadges?: ListingCardBadge[];
+  /** Shown top left when there are no duration badges. */
+  topDateText?: string;
+  /** Delivery — top right. */
+  deliveryBadge?: ListingCardBadge;
+  /** Rent, sell, online, onsite, K, g — bottom left. */
+  statusBadges?: ListingCardBadge[];
   priceText?: string;
-  /** Epoch ms the listing was created — shown as a live "Xh Ym" countdown when provided. */
+  /** Epoch ms the listing was created — countdown, bottom right. */
   createdAt?: number;
   onPress: () => void;
 };

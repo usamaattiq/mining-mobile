@@ -27,8 +27,8 @@ export async function resolveAddressLabel(latitude: number, longitude: number): 
     [first.streetNumber, first.street].filter(Boolean).join(' ') || first.name,
     first.district,
   ]);
-  const cityLine = dedupeJoin([first.subregion, first.city, first.region]);
-  const label = dedupeJoin([streetLine, cityLine, first.postalCode, first.country]);
+  const city = first.city?.trim() || first.subregion?.trim() || '';
+  const label = dedupeJoin([streetLine, city, first.country]);
 
   return label || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
 }

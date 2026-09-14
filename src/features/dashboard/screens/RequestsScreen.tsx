@@ -21,7 +21,9 @@ import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { refreshListings } from '@/features/listings/utils/refreshListings';
 import { useCurrency } from '@/shared/hooks/useCurrency';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { palette, spacing } from '@/theme';
 
 type Props = CompositeScreenProps<
@@ -31,6 +33,7 @@ type Props = CompositeScreenProps<
 
 export function RequestsScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
   const currency = useCurrency();
   const equipmentListings = useListingsStore((state) => state.listings);
   const serviceListings = useServiceListingsStore((state) => state.listings);
@@ -49,8 +52,26 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
     { key: 'gold' as const, label: t('requests.categoryGold') },
   ];
 
+  const formatDateTime = (epoch: number | null | undefined) =>
+    epoch
+      ? new Intl.DateTimeFormat(currentLanguage, {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        }).format(new Date(epoch))
+      : undefined;
+
+  const cityFromLocation = (location: string | undefined) => {
+    const city = cityFromLocationLabel(location ?? '');
+    return city || undefined;
+  };
+
   const priceText = (amount: string) =>
     amount ? `${currency.code} ${formatAmountWithCommas(amount)}` : undefined;
+
+  const equipmentPrice = (listing: (typeof equipmentListings)[number]) => {
+    if (listing.mode === 'sell') return priceText(listing.salePrice);
+    return priceText(listing.hourlyRental || listing.weeklyRental || listing.monthlyRental);
+  };
 
   const cards: (ListingCardProps & { id: string })[] =
     category === 'equipment'
@@ -58,11 +79,17 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
           const isRent = listing.mode === 'rent';
           const durationBadges = isRent
             ? [
-                listing.hourlyRental ? t('equipmentListing.hourlyBadge') : null,
-                listing.weeklyRental ? t('equipmentListing.weeklyBadge') : null,
-                listing.monthlyRental ? t('equipmentListing.monthlyBadge') : null,
-              ].filter((label): label is string => Boolean(label))
-            : [t('equipmentListing.saleBadge')];
+                listing.hourlyRental
+                  ? { key: 'hourly', label: t('equipmentListing.hourlyBadge') }
+                  : null,
+                listing.weeklyRental
+                  ? { key: 'weekly', label: t('equipmentListing.weeklyBadge') }
+                  : null,
+                listing.monthlyRental
+                  ? { key: 'monthly', label: t('equipmentListing.monthlyBadge') }
+                  : null,
+              ].filter((badge): badge is { key: string; label: string } => Boolean(badge))
+            : [];
 
           return {
             id: listing.id,
@@ -71,14 +98,24 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
             placeholderIcon: 'construct-outline',
             subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.units })}`,
             subtitleIcon: 'construct-outline',
-            primaryBadge: {
-              key: 'mode',
-              label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
-            },
-            secondaryBadges: durationBadges.map((label) => ({ key: label, label })),
-            cornerBadge: listing.deliveryAvailable
-              ? { key: 'delivery', label: t('equipmentListing.deliveryBadge'), icon: 'car-outline' }
+            city: cityFromLocation(listing.location),
+            durationBadges,
+            topDateText:
+              durationBadges.length === 0 ? formatDateTime(listing.createdAt) : undefined,
+            deliveryBadge: listing.deliveryAvailable
+              ? {
+                  key: 'delivery',
+                  label: t('equipmentListing.deliveryBadge'),
+                  icon: 'car-outline',
+                }
               : undefined,
+            statusBadges: [
+              {
+                key: 'mode',
+                label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
+              },
+            ],
+            priceText: equipmentPrice(listing),
             createdAt: listing.createdAt,
             onPress: () =>
               navigation.navigate('CompleteListingDetail', {
@@ -95,16 +132,20 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
             placeholderIcon: 'briefcase-outline',
             subtitle: listing.serviceCategoryLabel,
             subtitleIcon: 'briefcase-outline',
-            primaryBadge: {
-              key: 'serviceType',
-              label: t(
-                listing.serviceType === 'onsite'
-                  ? 'serviceListing.onsite'
-                  : 'serviceListing.online',
-              ),
-              icon: listing.serviceType === 'onsite' ? 'location-outline' : 'globe-outline',
-            },
+            city: cityFromLocation(listing.location),
+            topDateText: formatDateTime(listing.serviceDate ?? listing.createdAt),
+            statusBadges: [
+              {
+                key: 'serviceType',
+                label: t(
+                  listing.serviceType === 'onsite'
+                    ? 'serviceListing.onsite'
+                    : 'serviceListing.online',
+                ),
+              },
+            ],
             priceText: priceText(listing.price),
+            createdAt: listing.createdAt,
             onPress: () =>
               navigation.navigate('CompleteListingDetail', {
                 id: listing.id,
@@ -116,13 +157,19 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
             title: listing.title,
             thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
             placeholderIcon: 'diamond-outline',
-            secondaryBadges: [
-              listing.purityLabel ? { key: 'purity', label: listing.purityLabel } : null,
+            subtitleIcon: 'diamond-outline',
+            subtitle: [
               listing.weight
-                ? { key: 'weight', label: t('goldListing.weightValue', { weight: listing.weight }) }
+                ? t('goldListing.weightValue', { weight: listing.weight })
                 : null,
-            ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
+              listing.purityLabel,
+            ]
+              .filter((part): part is string => Boolean(part))
+              .join(' · ') || undefined,
+            city: cityFromLocation(listing.location),
+            topDateText: formatDateTime(listing.auctionEndDate ?? listing.createdAt),
             priceText: priceText(listing.price),
+            createdAt: listing.createdAt,
             onPress: () =>
               navigation.navigate('CompleteListingDetail', { id: listing.id, category: 'gold' }),
           }));
