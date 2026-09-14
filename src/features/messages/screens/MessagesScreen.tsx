@@ -1,6 +1,7 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CompositeScreenProps } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -10,6 +11,7 @@ import { SearchField } from '@/shared/components/SearchField';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ConversationRow } from '@/features/messages/components/ConversationRow';
 import { useMessagesStore } from '@/store/messagesStore';
+import { messagesApi } from '@/features/messages/api/messagesApi';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<DashboardTabParamList, 'Messages'>,
@@ -20,6 +22,14 @@ export function MessagesScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const conversations = useMessagesStore((state) => state.conversations);
   const [query, setQuery] = React.useState('');
+
+  useFocusEffect(
+    React.useCallback(() => {
+      void messagesApi.listConversations().then((items) => {
+        useMessagesStore.getState().setConversations(items);
+      });
+    }, []),
+  );
 
   const filtered = conversations.filter((conversation) => {
     const needle = query.trim().toLowerCase();

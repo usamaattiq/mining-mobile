@@ -11,6 +11,7 @@ import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen
 import { AppText } from '@/shared/components/AppText';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { useMessagesStore } from '@/store/messagesStore';
+import { messagesApi } from '@/features/messages/api/messagesApi';
 import type { ChatMessage } from '@/features/messages/types/conversation.types';
 import { ChatBubble } from '@/features/messages/components/ChatBubble';
 import { MessageComposer } from '@/features/messages/components/MessageComposer';
@@ -26,14 +27,26 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
   const conversation = useMessagesStore((state) =>
     state.conversations.find((item) => item.id === conversationId),
   );
-  const markRead = useMessagesStore((state) => state.markRead);
-  const sendMessage = useMessagesStore((state) => state.sendMessage);
+  const upsertConversation = useMessagesStore((state) => state.upsertConversation);
   const [draft, setDraft] = React.useState('');
+  const [sending, setSending] = React.useState(false);
   const listRef = React.useRef<FlatList<ChatMessage>>(null);
 
   React.useEffect(() => {
-    markRead(conversationId);
-  }, [conversationId, markRead]);
+    let cancelled = false;
+    void messagesApi
+      .getConversation(conversationId)
+      .then((item) => {
+        if (!cancelled) upsertConversation(item);
+      })
+      .catch(() => undefined);
+    void messagesApi.markRead(conversationId).then((item) => {
+      if (!cancelled) upsertConversation(item);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [conversationId, upsertConversation]);
 
   React.useEffect(() => {
     if (conversation?.messages.length) {
@@ -54,11 +67,19 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
     );
   }
 
-  const submit = () => {
+  const submit = async () => {
     const text = draft.trim();
-    if (!text) return;
-    sendMessage(conversationId, text);
+    if (!text || sending) return;
+    setSending(true);
     setDraft('');
+    try {
+      const updated = await messagesApi.sendMessage(conversationId, text);
+      upsertConversation(updated);
+    } catch {
+      setDraft(text);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (

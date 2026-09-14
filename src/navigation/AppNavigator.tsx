@@ -27,7 +27,7 @@ export function AppNavigator(): React.ReactElement {
   // before this navigator ever renders, so a restored 'authenticated' status
   // here means a verified, non-stale session.
   const [initialRouteName] = React.useState<keyof RootStackParamList>(() =>
-    useAuthStore.getState().status === 'authenticated' ? 'Welcome' : 'Onboarding',
+    useAuthStore.getState().status === 'authenticated' ? 'Dashboard' : 'Onboarding',
   );
 
   return (

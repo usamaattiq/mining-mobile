@@ -20,6 +20,10 @@ import { ListingStepper } from '@/features/listings/components/ListingStepper';
 import { EquipmentMediaUploader } from '@/features/listings/components/EquipmentMediaUploader';
 import { EquipmentListingReview } from '@/features/listings/components/EquipmentListingReview';
 import { palette, radius, spacing } from '@/theme';
+import { showAppAlert } from '@/shared/services/appAlert';
+import { ApiError } from '@/shared/services/api';
+import { listingsApi, isEquipmentListing } from '@/features/listings/api/listingsApi';
+import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { useListingsStore } from '@/store/listingsStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
@@ -141,29 +145,38 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     (option) => option.value === equipmentType,
   )?.label;
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (publishing) return;
     setPublishing(true);
-    addListing({
-      id: `listing_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
-      category: 'equipment',
-      mode,
-      equipmentTypeLabel: equipmentTypeLabel ?? '',
-      title,
-      description,
-      hourlyRental,
-      monthlyRental,
-      weeklyRental,
-      salePrice,
-      units,
-      location,
-      media,
-      deliveryAvailable,
-      deliveryType,
-      deliveryPricePerKm,
-      createdAt: Date.now(),
-    });
-    navigation.popToTop();
+    try {
+      const persistedMedia = await persistListingMedia(media);
+      const listing = await listingsApi.create({
+        category: 'equipment',
+        mode,
+        equipmentTypeLabel: equipmentTypeLabel ?? '',
+        title,
+        description,
+        hourlyRental,
+        monthlyRental,
+        weeklyRental,
+        salePrice,
+        units,
+        location,
+        media: persistedMedia,
+        deliveryAvailable,
+        deliveryType,
+        deliveryPricePerKm,
+      });
+      if (isEquipmentListing(listing)) addListing(listing);
+      navigation.popToTop();
+    } catch (error) {
+      showAppAlert(
+        t('common.error'),
+        error instanceof ApiError ? error.message : t('common.error'),
+      );
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const detailRows = [

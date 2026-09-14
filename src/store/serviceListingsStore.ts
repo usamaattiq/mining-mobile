@@ -3,10 +3,15 @@ import type { ServiceListing } from '@/features/listings/types/serviceListing.ty
 
 interface ServiceListingsState {
   listings: ServiceListing[];
+  setListings: (listings: ServiceListing[]) => void;
   addListing: (listing: ServiceListing) => void;
 }
 
 export const useServiceListingsStore = create<ServiceListingsState>((set) => ({
   listings: [],
-  addListing: (listing) => set((state) => ({ listings: [listing, ...state.listings] })),
+  setListings: (listings) => set({ listings }),
+  addListing: (listing) =>
+    set((state) => ({
+      listings: [listing, ...state.listings.filter((item) => item.id !== listing.id)],
+    })),
 }));

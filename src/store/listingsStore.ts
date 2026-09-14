@@ -3,10 +3,15 @@ import type { EquipmentListing } from '@/features/listings/types/equipmentListin
 
 interface ListingsState {
   listings: EquipmentListing[];
+  setListings: (listings: EquipmentListing[]) => void;
   addListing: (listing: EquipmentListing) => void;
 }
 
 export const useListingsStore = create<ListingsState>((set) => ({
   listings: [],
-  addListing: (listing) => set((state) => ({ listings: [listing, ...state.listings] })),
+  setListings: (listings) => set({ listings }),
+  addListing: (listing) =>
+    set((state) => ({
+      listings: [listing, ...state.listings.filter((item) => item.id !== listing.id)],
+    })),
 }));

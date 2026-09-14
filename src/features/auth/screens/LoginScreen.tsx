@@ -182,7 +182,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
         await setCachedMpin(mpinValue);
       }
       await setDeviceBiometricEnabled(result.profile.biometricEnabled);
-      navigation.replace('Welcome');
+      navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
     } catch (error) {
       setMpin('');
 
@@ -253,7 +253,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
         await clearCachedMpin();
       }
       await setDeviceBiometricEnabled(result.profile.biometricEnabled);
-      navigation.replace('Welcome');
+      navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
     } catch (error) {
       showAppAlert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
       setConfirmNewMpin('');

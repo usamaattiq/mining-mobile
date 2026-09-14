@@ -107,8 +107,9 @@ export async function registerDeviceWithBackend(expoPushToken: string): Promise<
 }
 
 export async function unregisterDeviceWithBackend(expoPushToken: string): Promise<void> {
-  await apiFetch<void>(`/notifications/devices/${encodeURIComponent(expoPushToken)}`, {
-    method: 'DELETE',
+  await apiFetch('/notifications/devices/unregister', {
+    method: 'POST',
+    body: { expoPushToken },
   });
 }
 

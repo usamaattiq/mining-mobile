@@ -20,6 +20,10 @@ import { ServiceMediaUploader } from '@/features/listings/components/ServiceMedi
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { palette, radius, spacing } from '@/theme';
+import { showAppAlert } from '@/shared/services/appAlert';
+import { ApiError } from '@/shared/services/api';
+import { listingsApi, isGoldListing } from '@/features/listings/api/listingsApi';
+import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
@@ -109,23 +113,32 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
 
   const purityLabel = purityOptions.find((option) => option.value === purity)?.label;
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (publishing) return;
     setPublishing(true);
-    addListing({
-      id: `gold_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
-      category: 'gold',
-      title,
-      description,
-      weight,
-      purityLabel: purityLabel ?? '',
-      price,
-      auctionEndDate: auctionEndDate ? auctionEndDate.getTime() : null,
-      location,
-      media,
-      createdAt: Date.now(),
-    });
-    navigation.popToTop();
+    try {
+      const persistedMedia = await persistListingMedia(media);
+      const listing = await listingsApi.create({
+        category: 'gold',
+        title,
+        description,
+        weight,
+        purityLabel: purityLabel ?? '',
+        price,
+        auctionEndDate: auctionEndDate ? auctionEndDate.getTime() : null,
+        location,
+        media: persistedMedia,
+      });
+      if (isGoldListing(listing)) addListing(listing);
+      navigation.popToTop();
+    } catch (error) {
+      showAppAlert(
+        t('common.error'),
+        error instanceof ApiError ? error.message : t('common.error'),
+      );
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const detailRows = [

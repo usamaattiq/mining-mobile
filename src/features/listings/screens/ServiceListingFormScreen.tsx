@@ -20,6 +20,10 @@ import { ServiceMediaUploader } from '@/features/listings/components/ServiceMedi
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { palette, radius, spacing } from '@/theme';
+import { showAppAlert } from '@/shared/services/appAlert';
+import { ApiError } from '@/shared/services/api';
+import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
+import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
@@ -139,24 +143,33 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     (option) => option.value === serviceCategory,
   )?.label;
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (publishing) return;
     setPublishing(true);
-    addListing({
-      id: `service_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
-      category: 'services',
-      serviceType,
-      serviceCategoryLabel: serviceCategoryLabel ?? '',
-      title,
-      description,
-      yearsOfExperience,
-      price,
-      serviceDate: serviceDate ? serviceDate.getTime() : null,
-      location: isOnsite ? location : '',
-      media,
-      createdAt: Date.now(),
-    });
-    navigation.popToTop();
+    try {
+      const persistedMedia = await persistListingMedia(media);
+      const listing = await listingsApi.create({
+        category: 'services',
+        serviceType,
+        serviceCategoryLabel: serviceCategoryLabel ?? '',
+        title,
+        description,
+        yearsOfExperience,
+        price,
+        serviceDate: serviceDate ? serviceDate.getTime() : null,
+        location: isOnsite ? location : '',
+        media: persistedMedia,
+      });
+      if (isServiceListing(listing)) addListing(listing);
+      navigation.popToTop();
+    } catch (error) {
+      showAppAlert(
+        t('common.error'),
+        error instanceof ApiError ? error.message : t('common.error'),
+      );
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const detailRows = [

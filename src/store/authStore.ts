@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { setAuthTokenProvider, setSessionRevokedHandler } from '@/shared/services/api';
+import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useListingsStore } from '@/store/listingsStore';
+import { useMessagesStore } from '@/store/messagesStore';
+import { useNotificationsStore } from '@/store/notificationsStore';
+import { useServiceListingsStore } from '@/store/serviceListingsStore';
 
 const TOKEN_KEY = 'auth.accessToken';
 
@@ -30,6 +35,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clear: async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
+    useListingsStore.getState().setListings([]);
+    useServiceListingsStore.getState().setListings([]);
+    useGoldListingsStore.getState().setListings([]);
+    useMessagesStore.getState().setConversations([]);
+    useNotificationsStore.getState().setItems([]);
     set({ accessToken: null, status: 'unauthenticated' });
   },
 }));

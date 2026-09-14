@@ -19,6 +19,7 @@ import { AttachmentsSection } from '@/features/listings/components/AttachmentsSe
 import { useListingsStore } from '@/store/listingsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { palette, radius, spacing } from '@/theme';
@@ -46,6 +47,29 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const goldListing = useGoldListingsStore((state) =>
     category === 'gold' ? state.listings.find((item) => item.id === id) : undefined,
   );
+
+  React.useEffect(() => {
+    const cached =
+      (category === 'equipment' && equipmentListing) ||
+      (category === 'services' && serviceListing) ||
+      (category === 'gold' && goldListing);
+    if (cached) return;
+
+    let cancelled = false;
+    void listingsApi
+      .get(id)
+      .then((listing) => {
+        if (cancelled) return;
+        if (isEquipmentListing(listing)) useListingsStore.getState().addListing(listing);
+        if (isServiceListing(listing)) useServiceListingsStore.getState().addListing(listing);
+        if (isGoldListing(listing)) useGoldListingsStore.getState().addListing(listing);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, category, equipmentListing, serviceListing, goldListing]);
 
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
