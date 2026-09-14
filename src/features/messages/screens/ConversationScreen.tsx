@@ -111,7 +111,6 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
               text={item.text}
               time={formatClockTime(item.sentAt, currentLanguage)}
               fromMe={item.fromMe}
-              senderName={conversation.participantName}
             />
           )}
         />
@@ -121,6 +120,7 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
           onSend={submit}
           placeholder={t('messages.inputPlaceholder')}
           sendLabel={t('messages.send')}
+          sending={sending}
         />
       </KeyboardAvoidingView>
     </GoldSheetScreen>
@@ -147,9 +147,8 @@ const styles = StyleSheet.create({
     color: palette.pureWhite,
   },
   thread: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-    gap: spacing.sm,
+    flexGrow: 1,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
   },
 });

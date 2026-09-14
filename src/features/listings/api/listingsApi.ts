@@ -18,9 +18,15 @@ export function isGoldListing(listing: ListingDto): listing is GoldListing {
   return listing.category === 'gold';
 }
 
-export type CreateEquipmentListingBody = Omit<EquipmentListing, 'id' | 'createdAt'>;
-export type CreateServiceListingBody = Omit<ServiceListing, 'id' | 'createdAt'>;
-export type CreateGoldListingBody = Omit<GoldListing, 'id' | 'createdAt'>;
+export type CreateEquipmentListingBody = Omit<
+  EquipmentListing,
+  'id' | 'createdAt' | 'ownerId' | 'owner'
+>;
+export type CreateServiceListingBody = Omit<
+  ServiceListing,
+  'id' | 'createdAt' | 'ownerId' | 'owner'
+>;
+export type CreateGoldListingBody = Omit<GoldListing, 'id' | 'createdAt' | 'ownerId' | 'owner'>;
 export type CreateListingBody =
   | CreateEquipmentListingBody
   | CreateServiceListingBody

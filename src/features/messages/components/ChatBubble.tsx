@@ -1,60 +1,61 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AppText } from '@/shared/components/AppText';
-import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
 import { palette, radius, spacing } from '@/theme';
 import type { ChatBubbleProps } from '@/features/messages/types/chatBubble.types';
 
-export function ChatBubble({ text, time, fromMe, senderName }: ChatBubbleProps): React.ReactElement {
+export function ChatBubble({ text, time, fromMe }: ChatBubbleProps): React.ReactElement {
   return (
-    <View style={[styles.row, fromMe && styles.rowMine]}>
-      {!fromMe && senderName ? <InitialsAvatar name={senderName} size="sm" /> : null}
+    <View style={[styles.bubbleRow, fromMe ? styles.bubbleRowMine : styles.bubbleRowTheirs]}>
       <View style={[styles.bubble, fromMe ? styles.bubbleMine : styles.bubbleTheirs]}>
-        <AppText style={[styles.text, fromMe && styles.textMine]}>{text}</AppText>
-        <AppText style={[styles.time, fromMe && styles.timeMine]}>{time}</AppText>
+        <AppText style={[styles.bubbleText, fromMe && styles.bubbleTextMine]}>{text}</AppText>
+        <AppText style={[styles.timeText, fromMe && styles.timeTextMine]}>{time}</AppText>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
+  bubbleRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: spacing.xs,
-    maxWidth: '100%',
+    marginBottom: spacing.xs,
   },
-  rowMine: {
+  bubbleRowMine: {
     justifyContent: 'flex-end',
   },
-  bubble: {
-    maxWidth: '78%',
-    borderRadius: radius.lg,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: 4,
+  bubbleRowTheirs: {
+    justifyContent: 'flex-start',
   },
-  bubbleTheirs: {
-    backgroundColor: palette.warmWhite,
-    borderBottomLeftRadius: radius.sm,
+  bubble: {
+    maxWidth: '82%',
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xs,
   },
   bubbleMine: {
     backgroundColor: palette.gold,
-    borderBottomRightRadius: radius.sm,
+    borderBottomRightRadius: 4,
   },
-  text: {
-    fontSize: 15,
+  bubbleTheirs: {
+    backgroundColor: palette.warmWhite,
+    borderBottomLeftRadius: 4,
+  },
+  bubbleText: {
+    fontSize: 14,
     color: palette.charcoal,
+    lineHeight: 20,
   },
-  textMine: {
+  bubbleTextMine: {
     color: palette.pureWhite,
   },
-  time: {
-    fontSize: 11,
+  timeText: {
+    marginTop: 4,
+    fontSize: 10,
     color: palette.muted,
     alignSelf: 'flex-end',
   },
-  timeMine: {
-    color: 'rgba(255,255,255,0.8)',
+  timeTextMine: {
+    color: 'rgba(255,255,255,0.75)',
   },
 });

@@ -4,4 +4,5 @@ export type MessageComposerProps = {
   onSend: () => void;
   placeholder: string;
   sendLabel: string;
+  sending?: boolean;
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
@@ -12,19 +12,21 @@ export function MessageComposer({
   onSend,
   placeholder,
   sendLabel,
+  sending = false,
 }: MessageComposerProps): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { currentLanguage } = useLanguage();
-  const canSend = Boolean(value.trim());
+  const canSend = Boolean(value.trim()) && !sending;
 
   return (
-    <View style={[styles.composer, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}>
+    <View style={[styles.composer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={palette.muted}
         multiline
+        maxLength={2000}
         style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
       />
       <Pressable
@@ -34,11 +36,15 @@ export function MessageComposer({
         accessibilityLabel={sendLabel}
         style={({ pressed }) => [
           styles.sendButton,
-          !canSend && styles.sendDisabled,
-          pressed && canSend && styles.sendPressed,
+          !canSend && styles.sendButtonDisabled,
+          pressed && canSend && styles.sendButtonPressed,
         ]}
       >
-        <Ionicons name="send" size={18} color={palette.pureWhite} />
+        {sending ? (
+          <ActivityIndicator color={palette.pureWhite} size="small" />
+        ) : (
+          <Ionicons name="send" size={16} color={palette.pureWhite} />
+        )}
       </Pressable>
     </View>
   );
@@ -48,8 +54,8 @@ const styles = StyleSheet.create({
   composer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: palette.softGold,
@@ -57,27 +63,29 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    minHeight: 40,
     maxHeight: 120,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: palette.softGold,
     borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: 15,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    fontSize: 14,
     color: palette.charcoal,
+    backgroundColor: palette.pureWhite,
   },
   sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
     backgroundColor: palette.gold,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendDisabled: {
-    opacity: 0.4,
+  sendButtonPressed: {
+    backgroundColor: palette.goldDark,
   },
-  sendPressed: {
-    opacity: 0.9,
+  sendButtonDisabled: {
+    opacity: 0.4,
   },
 });

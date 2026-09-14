@@ -16,11 +16,15 @@ import { EquipmentListingSummaryCard } from '@/features/listings/components/Equi
 import { EquipmentDescriptionCard } from '@/features/listings/components/EquipmentDescriptionCard';
 import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
+import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
+import { ListingMessageSheet } from '@/features/listings/components/ListingMessageSheet';
+import { Button } from '@/shared/components/Button';
+import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useListingsStore } from '@/store/listingsStore';
+import { useMarketListingsStore } from '@/store/marketListingsStore';
+import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
-import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
-import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { palette, radius, spacing } from '@/theme';
 
@@ -38,31 +42,55 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const insets = useSafeAreaInsets();
   const currency = useCurrency();
 
-  const equipmentListing = useListingsStore((state) =>
+  const profileId = useProfileStore((state) => state.profile?.id);
+  const marketListing = useMarketListingsStore((state) =>
+    state.listings.find((item) => item.id === id),
+  );
+  const mineEquipment = useListingsStore((state) =>
     category === 'equipment' ? state.listings.find((item) => item.id === id) : undefined,
   );
-  const serviceListing = useServiceListingsStore((state) =>
+  const mineService = useServiceListingsStore((state) =>
     category === 'services' ? state.listings.find((item) => item.id === id) : undefined,
   );
-  const goldListing = useGoldListingsStore((state) =>
+  const mineGold = useGoldListingsStore((state) =>
     category === 'gold' ? state.listings.find((item) => item.id === id) : undefined,
   );
+
+  const equipmentListing =
+    (mineEquipment?.owner ? mineEquipment : undefined) ??
+    (category === 'equipment' && marketListing && isEquipmentListing(marketListing)
+      ? marketListing
+      : undefined) ??
+    mineEquipment;
+  const serviceListing =
+    (mineService?.owner ? mineService : undefined) ??
+    (category === 'services' && marketListing && isServiceListing(marketListing)
+      ? marketListing
+      : undefined) ??
+    mineService;
+  const goldListing =
+    (mineGold?.owner ? mineGold : undefined) ??
+    (category === 'gold' && marketListing && isGoldListing(marketListing)
+      ? marketListing
+      : undefined) ??
+    mineGold;
 
   React.useEffect(() => {
     const cached =
       (category === 'equipment' && equipmentListing) ||
       (category === 'services' && serviceListing) ||
       (category === 'gold' && goldListing);
-    if (cached) return;
+    const hasOwner = Boolean(
+      equipmentListing?.owner ?? serviceListing?.owner ?? goldListing?.owner,
+    );
+    if (cached && hasOwner) return;
 
     let cancelled = false;
     void listingsApi
       .get(id)
       .then((listing) => {
         if (cancelled) return;
-        if (isEquipmentListing(listing)) useListingsStore.getState().addListing(listing);
-        if (isServiceListing(listing)) useServiceListingsStore.getState().addListing(listing);
-        if (isGoldListing(listing)) useGoldListingsStore.getState().addListing(listing);
+        useMarketListingsStore.getState().upsertListing(listing);
       })
       .catch(() => undefined);
 
@@ -73,6 +101,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
+  const [messageOpen, setMessageOpen] = React.useState(false);
 
   const backButton = (
     <Pressable
@@ -288,6 +317,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
   };
 
+  const owner = equipmentListing?.owner ?? serviceListing?.owner ?? goldListing?.owner;
+  const ownerId =
+    equipmentListing?.ownerId ?? serviceListing?.ownerId ?? goldListing?.ownerId ?? owner?.id;
+  const canMessage = Boolean(owner) && ownerId !== profileId;
+
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
@@ -338,6 +372,25 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       {backButton}
 
+      {canMessage ? (
+        <View style={[styles.messageBar, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+          <Button
+            label={t('messages.message')}
+            icon="chatbubble-ellipses-outline"
+            onPress={() => setMessageOpen(true)}
+          />
+        </View>
+      ) : null}
+
+      {owner ? (
+        <ListingMessageSheet
+          visible={messageOpen}
+          listingId={id}
+          owner={owner}
+          onClose={() => setMessageOpen(false)}
+        />
+      ) : null}
+
       <EquipmentImageViewerModal
         visible={viewerIndex !== null}
         media={visualMedia}
@@ -356,6 +409,7 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     gap: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
   headerBlock: {
     gap: spacing.xs,
@@ -426,5 +480,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.muted,
     textAlign: 'center',
+  },
+  messageBar: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    backgroundColor: palette.pureWhite,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: palette.softGold,
   },
 });

@@ -1,5 +1,6 @@
 import type { ListingCategory, ServiceType } from '@/navigation/types';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
+import type { ListingOwner } from '@/features/listings/types/listingOwner.types';
 
 export type ServiceListing = {
   id: string;
@@ -15,5 +16,7 @@ export type ServiceListing = {
   location: string;
   media: ServiceMediaAsset[];
   postedAs: 'buyer' | 'supplier';
+  ownerId?: string;
+  owner?: ListingOwner;
   createdAt: number;
 };
