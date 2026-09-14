@@ -71,6 +71,7 @@ export function ListingCard({
   deliveryBadge,
   statusBadges,
   priceText,
+  priceUnit,
   createdAt,
   onPress,
 }: ListingCardProps): React.ReactElement {
@@ -120,7 +121,7 @@ export function ListingCard({
                 ) : (
                   <>
                     {subtitleIcon ? (
-                      <Ionicons name={subtitleIcon} size={13} color={palette.gold} />
+                      <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
                     ) : null}
                     <AppText style={styles.subtitle} numberOfLines={1}>
                       {subtitle ?? ' '}
@@ -131,15 +132,22 @@ export function ListingCard({
             ) : null}
 
             <View style={styles.subtitleRow}>
-              <Ionicons name="location-outline" size={13} color={palette.gold} />
+              <Ionicons name="location-outline" size={12} color={palette.gold} />
               <AppText style={styles.subtitle} numberOfLines={1}>
                 {city ?? ' '}
               </AppText>
             </View>
 
-            <AppText weight="bold" style={styles.price} numberOfLines={1}>
-              {priceText ?? ' '}
-            </AppText>
+            <View style={styles.priceRow}>
+              <AppText weight="bold" style={styles.price} numberOfLines={1}>
+                {priceText ?? ' '}
+              </AppText>
+              {priceUnit ? (
+                <AppText weight="bold" style={styles.priceUnit} numberOfLines={1}>
+                  {priceUnit}
+                </AppText>
+              ) : null}
+            </View>
           </View>
 
           <View style={styles.bottomRow}>
@@ -240,19 +248,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    minHeight: 17,
+    minHeight: 16,
   },
   subtitle: {
     flex: 1,
-    fontSize: 13,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 16,
     color: palette.muted,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 2,
+    minHeight: 26,
   },
   price: {
     fontSize: 19,
-    lineHeight: LINE_HEIGHT,
+    lineHeight: 26,
     color: palette.charcoal,
-    textAlign: 'right',
+    includeFontPadding: false,
+  },
+  priceUnit: {
+    fontSize: 19,
+    lineHeight: 26,
+    color: palette.charcoal,
+    includeFontPadding: false,
   },
   bottomRow: {
     flexDirection: 'row',

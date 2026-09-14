@@ -69,14 +69,35 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
     amount ? `${currency.code} ${formatAmountWithCommas(amount)}` : undefined;
 
   const equipmentPrice = (listing: (typeof equipmentListings)[number]) => {
-    if (listing.mode === 'sell') return priceText(listing.salePrice);
-    return priceText(listing.hourlyRental || listing.weeklyRental || listing.monthlyRental);
+    if (listing.mode === 'sell') {
+      return { priceText: priceText(listing.salePrice), priceUnit: undefined };
+    }
+    if (listing.hourlyRental) {
+      return {
+        priceText: priceText(listing.hourlyRental),
+        priceUnit: t('equipmentListing.cardHourlyUnit'),
+      };
+    }
+    if (listing.weeklyRental) {
+      return {
+        priceText: priceText(listing.weeklyRental),
+        priceUnit: t('equipmentListing.cardWeeklyUnit'),
+      };
+    }
+    if (listing.monthlyRental) {
+      return {
+        priceText: priceText(listing.monthlyRental),
+        priceUnit: t('equipmentListing.cardMonthlyUnit'),
+      };
+    }
+    return { priceText: undefined, priceUnit: undefined };
   };
 
   const cards: (ListingCardProps & { id: string })[] =
     category === 'equipment'
       ? equipmentListings.map((listing) => {
           const isRent = listing.mode === 'rent';
+          const { priceText: amount, priceUnit } = equipmentPrice(listing);
           const durationBadges = isRent
             ? [
                 listing.hourlyRental
@@ -115,7 +136,8 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
                 label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
               },
             ],
-            priceText: equipmentPrice(listing),
+            priceText: amount,
+            priceUnit,
             createdAt: listing.createdAt,
             onPress: () =>
               navigation.navigate('CompleteListingDetail', {

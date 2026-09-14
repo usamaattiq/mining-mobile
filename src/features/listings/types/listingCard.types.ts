@@ -28,6 +28,8 @@ export type ListingCardProps = {
   /** Rent, sell, online, onsite, K, g — bottom left. */
   statusBadges?: ListingCardBadge[];
   priceText?: string;
+  /** Rental unit shown after the amount (/hr, /w, /m) — same typeface as the price. */
+  priceUnit?: string;
   /** Epoch ms the listing was created — countdown, bottom right. */
   createdAt?: number;
   onPress: () => void;
