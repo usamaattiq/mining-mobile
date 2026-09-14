@@ -8,6 +8,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette, spacing } from '@/theme';
@@ -24,7 +25,15 @@ export function EquipmentImageViewerModal({
   const insets = useSafeAreaInsets();
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={onClose}
+    >
+      {visible ? <StatusBar style="light" /> : null}
       <View style={styles.root}>
         {visible ? (
           <ScrollView
