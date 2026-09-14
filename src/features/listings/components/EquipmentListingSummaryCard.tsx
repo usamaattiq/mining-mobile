@@ -5,6 +5,7 @@ import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
+import { ListingVideoThumb } from '@/features/listings/components/ListingVideoThumb';
 import type { EquipmentListingSummaryCardProps } from '@/features/listings/types/equipmentListingSummaryCard.types';
 
 /** Details + media summary card, shared by the review step and the published listing detail screen. */
@@ -63,7 +64,13 @@ export function EquipmentListingSummaryCard({
           </View>
           <View style={styles.mediaGrid}>
             {media.map((item) => (
-              <Image key={item.id} source={{ uri: item.uri }} style={styles.mediaSlot} />
+              <View key={item.id} style={styles.mediaSlotWrap}>
+                {item.kind === 'video' ? (
+                  <ListingVideoThumb uri={item.uri} style={styles.mediaSlot} iconSize={12} />
+                ) : (
+                  <Image source={{ uri: item.uri }} style={styles.mediaSlot} />
+                )}
+              </View>
             ))}
           </View>
         </View>
@@ -127,10 +134,15 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  mediaSlot: {
+  mediaSlotWrap: {
     width: 84,
     height: 84,
     borderRadius: radius.md,
+    overflow: 'hidden',
+  },
+  mediaSlot: {
+    width: 84,
+    height: 84,
     backgroundColor: palette.softGold,
   },
 });

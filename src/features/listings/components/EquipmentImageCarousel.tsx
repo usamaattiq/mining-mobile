@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { palette, radius, spacing } from '@/theme';
+import { ListingVideoThumb } from '@/features/listings/components/ListingVideoThumb';
 import type { EquipmentImageCarouselProps } from '@/features/listings/types/equipmentImageCarousel.types';
 
 const CAROUSEL_HEIGHT = 280;
@@ -47,11 +48,19 @@ export function EquipmentImageCarousel({
         >
           {media.map((item, index) => (
             <Pressable key={item.id} onPress={() => onPressImage(index)}>
-              <Image
-                source={{ uri: item.uri }}
-                style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
-                resizeMode="cover"
-              />
+              {item.kind === 'video' ? (
+                <ListingVideoThumb
+                  uri={item.uri}
+                  style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
+                  iconSize={22}
+                />
+              ) : (
+                <Image
+                  source={{ uri: item.uri }}
+                  style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
+                  resizeMode="cover"
+                />
+              )}
             </Pressable>
           ))}
         </ScrollView>

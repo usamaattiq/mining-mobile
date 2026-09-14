@@ -9,4 +9,5 @@ export type EquipmentMediaAsset = {
 export type EquipmentMediaUploaderProps = {
   media: EquipmentMediaAsset[];
   onChange: (media: EquipmentMediaAsset[]) => void;
+  onBusyChange?: (busy: boolean) => void;
 };

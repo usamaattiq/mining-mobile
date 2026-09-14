@@ -2,7 +2,13 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { env } from '@/shared/config/env';
 import { apiFetch } from './api';
 
-export type UploadableContentType = 'image/jpeg' | 'image/png' | 'image/webp' | 'application/pdf';
+export type UploadableContentType =
+  | 'image/jpeg'
+  | 'image/png'
+  | 'image/webp'
+  | 'application/pdf'
+  | 'video/mp4'
+  | 'video/quicktime';
 
 type PresignUploadResult = { uploadUrl: string; key: string; publicUrl: string; expiresIn: number };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -96,6 +96,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     longitude: number;
   } | null>(null);
   const [media, setMedia] = React.useState<EquipmentMediaAsset[]>([]);
+  const [mediaBusy, setMediaBusy] = React.useState(false);
   const [deliveryAvailable, setDeliveryAvailable] = React.useState(false);
   const [deliveryType, setDeliveryType] = React.useState<DeliveryType>('free');
   const [deliveryPricePerKm, setDeliveryPricePerKm] = React.useState('');
@@ -126,7 +127,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   );
   const deliveryValid =
     !deliveryAvailable || deliveryType === 'free' || deliveryPricePerKm.trim().length > 0;
-  const mediaValid = media.length > 0 && location.trim().length > 0 && deliveryValid;
+  const mediaValid = media.length > 0 && !mediaBusy && location.trim().length > 0 && deliveryValid;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -323,7 +324,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
         {step === 1 ? (
           <View style={styles.stepBlock}>
-            <EquipmentMediaUploader media={media} onChange={setMedia} />
+            <EquipmentMediaUploader media={media} onChange={setMedia} onBusyChange={setMediaBusy} />
             <LocationField
               label={t('equipmentListing.location')}
               value={location}
@@ -390,6 +391,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         ) : null}
       </KeyboardAwareScrollView>
 
+      {publishing ? (
+        <View style={styles.publishOverlay}>
+          <ActivityIndicator size="large" color={palette.pureWhite} />
+        </View>
+      ) : null}
+
       {mapPickerSheet}
     </View>
   );
@@ -399,6 +406,13 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: palette.gold,
+  },
+  publishOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
   },
   header: {
     paddingBottom: spacing.md,

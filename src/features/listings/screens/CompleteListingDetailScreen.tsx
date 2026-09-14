@@ -272,9 +272,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     extraSection = <AttachmentsSection documents={documents} />;
   }
 
-  const photoMedia = media
-    .filter((item) => item.kind === 'photo')
-    .map((item) => ({ id: item.id, uri: item.uri, kind: 'photo' as const }));
+  const visualMedia = media
+    .filter((item) => item.kind === 'photo' || item.kind === 'video')
+    .map((item) => ({
+      id: item.id,
+      uri: item.uri,
+      kind: item.kind as 'photo' | 'video',
+    }));
   const descriptionText = description.trim();
   const locationLabel = location;
 
@@ -290,7 +294,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <EquipmentImageCarousel
-          media={photoMedia}
+          media={visualMedia}
           onPressImage={setViewerIndex}
           style={styles.carousel}
         />
@@ -336,7 +340,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       <EquipmentImageViewerModal
         visible={viewerIndex !== null}
-        media={photoMedia}
+        media={visualMedia}
         initialIndex={viewerIndex ?? 0}
         onClose={() => setViewerIndex(null)}
       />

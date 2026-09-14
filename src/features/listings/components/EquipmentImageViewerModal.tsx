@@ -7,11 +7,14 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette, spacing } from '@/theme';
+import { ListingVideoPlayer } from '@/features/listings/components/ListingVideoPlayer';
 import type { EquipmentImageViewerModalProps } from '@/features/listings/types/equipmentImageViewerModal.types';
 
 /** Full-screen swipeable viewer opened by tapping a photo in the carousel. */
@@ -23,6 +26,17 @@ export function EquipmentImageViewerModal({
 }: EquipmentImageViewerModalProps): React.ReactElement {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const [scrolledIndex, setScrolledIndex] = React.useState<number | null>(null);
+  const activeIndex = scrolledIndex ?? initialIndex;
+
+  React.useEffect(() => {
+    if (!visible) setScrolledIndex(null);
+  }, [visible]);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (width <= 0) return;
+    setScrolledIndex(Math.round(event.nativeEvent.contentOffset.x / width));
+  };
 
   return (
     <Modal
@@ -41,12 +55,24 @@ export function EquipmentImageViewerModal({
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             contentOffset={{ x: initialIndex * width, y: 0 }}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
           >
-            {media.map((item) => (
-              <Pressable key={item.id} onPress={onClose} style={{ width, height }}>
-                <Image source={{ uri: item.uri }} style={styles.image} resizeMode="contain" />
-              </Pressable>
-            ))}
+            {media.map((item, index) =>
+              item.kind === 'video' ? (
+                <View key={item.id} style={{ width, height }}>
+                  <ListingVideoPlayer
+                    uri={item.uri}
+                    style={styles.image}
+                    active={visible && index === activeIndex}
+                  />
+                </View>
+              ) : (
+                <Pressable key={item.id} onPress={onClose} style={{ width, height }}>
+                  <Image source={{ uri: item.uri }} style={styles.image} resizeMode="contain" />
+                </Pressable>
+              ),
+            )}
           </ScrollView>
         ) : null}
 
