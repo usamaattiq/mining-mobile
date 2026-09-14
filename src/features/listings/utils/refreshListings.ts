@@ -21,8 +21,8 @@ export function applyListings(listings: ListingDto[]): void {
     .setListings(listings.filter((item): item is GoldListing => item.category === 'gold'));
 }
 
-export async function refreshListings(): Promise<void> {
-  applyListings(await listingsApi.list());
+export async function refreshListings(postedAs?: MarketplaceRole): Promise<void> {
+  applyListings(await listingsApi.list(undefined, postedAs));
 }
 
 export async function refreshMarketListings(postedAs: MarketplaceRole): Promise<void> {

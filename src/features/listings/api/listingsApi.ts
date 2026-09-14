@@ -27,9 +27,12 @@ export type CreateListingBody =
   | CreateGoldListingBody;
 
 export const listingsApi = {
-  list(category?: ListingCategory): Promise<ListingDto[]> {
-    const query = category ? `?category=${encodeURIComponent(category)}` : '';
-    return apiFetch(`/listings${query}`);
+  list(category?: ListingCategory, postedAs?: MarketplaceRole): Promise<ListingDto[]> {
+    const params = new URLSearchParams();
+    if (category) params.set('category', category);
+    if (postedAs) params.set('postedAs', postedAs);
+    const query = params.toString();
+    return apiFetch(`/listings${query ? `?${query}` : ''}`);
   },
 
   feed(postedAs: MarketplaceRole, category?: ListingCategory): Promise<ListingDto[]> {

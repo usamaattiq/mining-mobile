@@ -18,6 +18,7 @@ import { ListingCard } from '@/features/listings/components/ListingCard';
 import { useListingsStore } from '@/store/listingsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshListings } from '@/features/listings/utils/refreshListings';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -36,12 +37,13 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
   const equipmentListings = useListingsStore((state) => state.listings);
   const serviceListings = useServiceListingsStore((state) => state.listings);
   const goldListings = useGoldListingsStore((state) => state.listings);
+  const role = useMarketplaceRoleStore((state) => state.role);
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
 
   useFocusEffect(
     React.useCallback(() => {
-      void refreshListings();
-    }, []),
+      void refreshListings(role).catch(() => undefined);
+    }, [role]),
   );
 
   const categoryOptions = [

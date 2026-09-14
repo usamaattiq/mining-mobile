@@ -69,10 +69,13 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
 
   useFocusEffect(
     React.useCallback(() => {
-      void notificationsApi.list().then((items) => {
-        useNotificationsStore.getState().setItems(items);
-      });
-      void refreshMarketListings(oppositeMarketplaceRole(role));
+      void notificationsApi
+        .list()
+        .then((items) => {
+          useNotificationsStore.getState().setItems(items);
+        })
+        .catch(() => undefined);
+      void refreshMarketListings(oppositeMarketplaceRole(role)).catch(() => undefined);
     }, [role]),
   );
 
