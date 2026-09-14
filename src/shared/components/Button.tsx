@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
   lg: {
     minHeight: 56,
-    borderRadius: radius.pill,
+    borderRadius: radius.md,
   },
   clip: {
     overflow: 'hidden',

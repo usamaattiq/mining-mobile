@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     minHeight: 44,
-    borderRadius: radius.md,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.gold,
