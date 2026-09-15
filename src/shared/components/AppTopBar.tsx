@@ -86,7 +86,7 @@ export function AppTopBar({
 const styles = StyleSheet.create({
   container: {
     minHeight: 52,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
