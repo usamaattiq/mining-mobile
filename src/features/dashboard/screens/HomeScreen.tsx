@@ -21,6 +21,15 @@ import {
   dayKeyFromEpoch,
   type HomeTypeFilter,
 } from '@/features/dashboard/components/HomeFilterSheet';
+import {
+  equipmentListingAmount,
+  goldListingAmount,
+  goldListingWeight,
+  inNumericRange,
+  matchesGoldKarat,
+  parseFilterNumber,
+  serviceListingAmount,
+} from '@/features/dashboard/utils/homeFilterMatch';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { ListingCard } from '@/features/listings/components/ListingCard';
 import {
@@ -52,11 +61,25 @@ type Props = CompositeScreenProps<
 
 type HomeFilters = {
   type: HomeTypeFilter;
+  listingKind: string[];
   city: string | null;
   dateKey: string | null;
+  priceMin: string;
+  priceMax: string;
+  weightMin: string;
+  weightMax: string;
 };
 
-const EMPTY_FILTERS: HomeFilters = { type: 'all', city: null, dateKey: null };
+const EMPTY_FILTERS: HomeFilters = {
+  type: 'all',
+  listingKind: [],
+  city: null,
+  dateKey: null,
+  priceMin: '',
+  priceMax: '',
+  weightMin: '',
+  weightMax: '',
+};
 
 export function HomeScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -136,7 +159,54 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
             { key: 'onsite' as const, label: t('serviceListing.onsite') },
             { key: 'online' as const, label: t('serviceListing.online') },
           ]
-        : [{ key: 'all' as const, label: t('dashboardHome.filterAll') }];
+        : [
+            { key: 'all' as const, label: t('dashboardHome.filterAll') },
+            { key: '18k' as const, label: t('goldListing.karatValue', { karat: 18 }) },
+            { key: '21k' as const, label: t('goldListing.karatValue', { karat: 21 }) },
+            { key: '22k' as const, label: t('goldListing.karatValue', { karat: 22 }) },
+            { key: '24k' as const, label: t('goldListing.karatValue', { karat: 24 }) },
+          ];
+
+  const kindOptions =
+    category === 'equipment'
+      ? [
+          { key: 'excavator', label: t('equipmentListing.type.excavator') },
+          { key: 'bulldozer', label: t('equipmentListing.type.bulldozer') },
+          { key: 'drillRig', label: t('equipmentListing.type.drillRig') },
+          { key: 'loader', label: t('equipmentListing.type.loader') },
+          { key: 'crusher', label: t('equipmentListing.type.crusher') },
+          { key: 'other', label: t('equipmentListing.type.other') },
+        ]
+      : category === 'services'
+        ? [
+            { key: 'consulting', label: t('serviceListing.category.consulting') },
+            { key: 'drilling', label: t('serviceListing.category.drilling') },
+            { key: 'assayTesting', label: t('serviceListing.category.assayTesting') },
+            { key: 'transportLogistics', label: t('serviceListing.category.transportLogistics') },
+            { key: 'equipmentRepair', label: t('serviceListing.category.equipmentRepair') },
+            {
+              key: 'environmentalPermitting',
+              label: t('serviceListing.category.environmentalPermitting'),
+            },
+            { key: 'other', label: t('serviceListing.category.other') },
+          ]
+        : undefined;
+
+  const selectedKindLabels = new Set(
+    (kindOptions ?? [])
+      .filter((option) => filters.listingKind.includes(option.key))
+      .map((option) => option.label.trim().toLowerCase()),
+  );
+
+  const matchesListingKind = (label: string): boolean => {
+    if (selectedKindLabels.size === 0) return true;
+    return selectedKindLabels.has(label.trim().toLowerCase());
+  };
+
+  const priceMin = parseFilterNumber(filters.priceMin);
+  const priceMax = parseFilterNumber(filters.priceMax);
+  const weightMin = parseFilterNumber(filters.weightMin);
+  const weightMax = parseFilterNumber(filters.weightMax);
 
   const matchesCityAndDate = (location: string, epoch: number): boolean => {
     if (filters.city) {
@@ -152,17 +222,24 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     if (filters.type === 'rent' || filters.type === 'sell') {
       if (listing.mode !== filters.type) return false;
     }
+    if (!matchesListingKind(listing.equipmentTypeLabel)) return false;
+    if (!inNumericRange(equipmentListingAmount(listing), priceMin, priceMax)) return false;
     return matchesCityAndDate(listing.location, listing.createdAt);
   });
   const visibleServices = serviceListings.filter((listing) => {
     if (filters.type === 'onsite' || filters.type === 'online') {
       if (listing.serviceType !== filters.type) return false;
     }
+    if (!matchesListingKind(listing.serviceCategoryLabel)) return false;
+    if (!inNumericRange(serviceListingAmount(listing), priceMin, priceMax)) return false;
     return matchesCityAndDate(listing.location, listing.serviceDate ?? listing.createdAt);
   });
-  const visibleGold = goldListings.filter((listing) =>
-    matchesCityAndDate(listing.location, listing.auctionEndDate ?? listing.createdAt),
-  );
+  const visibleGold = goldListings.filter((listing) => {
+    if (!matchesGoldKarat(listing.purityLabel, filters.type)) return false;
+    if (!inNumericRange(goldListingWeight(listing), weightMin, weightMax)) return false;
+    if (!inNumericRange(goldListingAmount(listing), priceMin, priceMax)) return false;
+    return matchesCityAndDate(listing.location, listing.auctionEndDate ?? listing.createdAt);
+  });
 
   const cards = buildListingCards({
     category,
@@ -277,13 +354,47 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         visible={filterOpen}
         onClose={() => setFilterOpen(false)}
         typeOptions={filterOptions}
+        typeTitle={
+          category === 'gold' ? t('dashboardHome.filterKarat') : t('dashboardHome.filterType')
+        }
+        kindTitle={
+          category === 'equipment'
+            ? t('equipmentListing.equipmentType')
+            : t('serviceListing.serviceCategory')
+        }
+        kindPlaceholder={
+          category === 'equipment'
+            ? t('equipmentListing.equipmentTypePlaceholder')
+            : t('serviceListing.serviceCategoryPlaceholder')
+        }
+        kindOptions={kindOptions}
+        showWeight={category === 'gold'}
+        currencyCode={currency.code}
         locale={currentLanguage}
         draftType={draftFilters.type}
+        draftKind={draftFilters.listingKind}
         draftCity={draftFilters.city}
         draftDateKey={draftFilters.dateKey}
+        draftPriceMin={draftFilters.priceMin}
+        draftPriceMax={draftFilters.priceMax}
+        draftWeightMin={draftFilters.weightMin}
+        draftWeightMax={draftFilters.weightMax}
         onChangeType={(type) => setDraftFilters((current) => ({ ...current, type }))}
+        onChangeKind={(listingKind) => setDraftFilters((current) => ({ ...current, listingKind }))}
         onChangeCity={(city) => setDraftFilters((current) => ({ ...current, city }))}
         onChangeDateKey={(dateKey) => setDraftFilters((current) => ({ ...current, dateKey }))}
+        onChangePriceMin={(next) => setDraftFilters((current) => ({ ...current, priceMin: next }))}
+        onChangePriceMax={(next) => setDraftFilters((current) => ({ ...current, priceMax: next }))}
+        onChangeWeightMin={(next) =>
+          setDraftFilters((current) => ({ ...current, weightMin: next }))
+        }
+        onChangeWeightMax={(next) =>
+          setDraftFilters((current) => ({ ...current, weightMax: next }))
+        }
+        onReset={() => {
+          setDraftFilters(EMPTY_FILTERS);
+          setFilters(EMPTY_FILTERS);
+        }}
         onApply={applyFilter}
       />
     </GoldSheetScreen>

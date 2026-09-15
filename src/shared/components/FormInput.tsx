@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     gap: spacing.xs,
+    backgroundColor: palette.pureWhite,
   },
   inputRowError: {
     borderColor: palette.danger,
