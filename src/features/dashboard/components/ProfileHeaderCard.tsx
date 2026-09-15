@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/shared/components/AppText';
 import { palette, spacing } from '@/theme';
@@ -14,11 +14,14 @@ export function ProfileHeaderCard({
   phone,
   companyName,
   onPressAvatar,
+  logoutLabel,
+  onLogout,
+  logoutDisabled,
 }: ProfileHeaderCardProps): React.ReactElement {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.card, { paddingTop: insets.top + spacing.md }]}>
+    <View style={[styles.card, { paddingTop: insets.top + spacing.sm }]}>
       <View style={styles.inner}>
         <Pressable
           style={styles.avatarRing}
@@ -56,6 +59,23 @@ export function ProfileHeaderCard({
             </View>
           ) : null}
         </View>
+
+        {onLogout && logoutLabel ? (
+          <Pressable
+            onPress={onLogout}
+            disabled={logoutDisabled}
+            accessibilityRole="button"
+            accessibilityLabel={logoutLabel}
+            hitSlop={10}
+            style={({ pressed }) => [
+              styles.logoutButton,
+              pressed && styles.logoutPressed,
+              logoutDisabled && styles.logoutDisabled,
+            ]}
+          >
+            <FontAwesome name="sign-out" size={22} color={palette.pureWhite} />
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -70,12 +90,12 @@ const styles = StyleSheet.create({
   inner: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   avatarRing: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
+    width: 78,
+    height: 78,
+    borderRadius: 39,
     borderWidth: 2,
     borderColor: palette.pureWhite,
     backgroundColor: 'rgba(255, 255, 255, 0.22)',
@@ -93,12 +113,25 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
+    minWidth: 0,
     gap: 6,
   },
   name: {
     fontSize: 24,
     lineHeight: 30,
     color: palette.pureWhite,
+  },
+  logoutButton: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutPressed: {
+    opacity: 0.75,
+  },
+  logoutDisabled: {
+    opacity: 0.55,
   },
   metaRow: {
     flexDirection: 'row',

@@ -8,4 +8,7 @@ export type ProfileHeaderCardProps = {
   companyName?: string | null;
   /** Navigates to the editable profile screen when the avatar is tapped. */
   onPressAvatar?: () => void;
+  logoutLabel?: string;
+  onLogout?: () => void;
+  logoutDisabled?: boolean;
 };

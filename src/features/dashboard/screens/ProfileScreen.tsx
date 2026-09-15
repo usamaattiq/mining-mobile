@@ -121,6 +121,9 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
         phone={profile?.phoneE164}
         companyName={profile?.accountType === 'company' ? profile.companyName : null}
         onPressAvatar={() => navigation.navigate('PersonalInformation')}
+        logoutLabel={t('profile.logout')}
+        onLogout={handleLogout}
+        logoutDisabled={loggingOut}
       />
 
       <CurvedSheetScrollView>
@@ -136,15 +139,6 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
               : t('profile.switchToSupplierSubtitle')
           }
           onPress={handleSwitchRole}
-        />
-
-        <MenuRow
-          variant="gold"
-          icon="log-out-outline"
-          label={t('profile.logout')}
-          subtitle={t('profile.logoutSubtitle')}
-          onPress={handleLogout}
-          disabled={loggingOut}
         />
       </CurvedSheetScrollView>
 
