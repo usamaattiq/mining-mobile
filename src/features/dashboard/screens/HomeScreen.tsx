@@ -178,15 +178,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         </Pressable>
       }
       rightSlot={
-        <NotificationBellButton
-          hasUnread={hasUnread}
-          accessibilityLabel={t('notifications.title')}
-          onPress={() => navigation.navigate('Notifications')}
-        />
-      }
-      headerStyle={styles.header}
-      headerExtra={
-        <View style={styles.headerExtra}>
+        <View style={styles.headerActions}>
           <Pressable
             onPress={handleSwitchRole}
             accessibilityRole="button"
@@ -197,9 +189,19 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           >
             <Ionicons name="swap-horizontal-outline" size={18} color={palette.gold} />
             <AppText weight="semibold" style={styles.switchRoleLabel}>
-              {role === 'supplier' ? t('profile.switchToBuyer') : t('profile.switchToSupplier')}
+              {role === 'supplier' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
             </AppText>
           </Pressable>
+          <NotificationBellButton
+            hasUnread={hasUnread}
+            accessibilityLabel={t('notifications.title')}
+            onPress={() => navigation.navigate('Notifications')}
+          />
+        </View>
+      }
+      headerStyle={styles.header}
+      headerExtra={
+        <View style={styles.headerExtra}>
           <SegmentedSwitcher
             value={category}
             onChange={handleCategoryChange}
@@ -300,11 +302,14 @@ const styles = StyleSheet.create({
   headerExtra: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
-    gap: spacing.sm,
     backgroundColor: palette.gold,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   switchRoleButton: {
-    alignSelf: 'flex-end',
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
