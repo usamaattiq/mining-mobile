@@ -134,7 +134,7 @@ export function AppBottomSheet({
   visible,
   onClose,
   children,
-  heightRatio = 0.85,
+  heightRatio = 0.7,
   sheetStyle,
 }: AppBottomSheetProps): React.ReactElement {
   return (

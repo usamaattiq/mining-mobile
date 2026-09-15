@@ -175,7 +175,7 @@ export function LocationPickerSheet({
     <AppBottomSheet
       visible={visible}
       onClose={onCancel}
-      heightRatio={0.85}
+      heightRatio={0.68}
       sheetStyle={styles.sheet}
     >
       <View style={styles.grabber} />

@@ -150,7 +150,7 @@ export function SelectField({
           </Pressable>
         </Modal>
       ) : (
-        <AppBottomSheet visible={open} onClose={() => setOpen(false)} heightRatio={0.5}>
+        <AppBottomSheet visible={open} onClose={() => setOpen(false)} heightRatio={0.45}>
           <AppText weight="bold" style={styles.sheetTitle}>
             {sheetTitle}
           </AppText>

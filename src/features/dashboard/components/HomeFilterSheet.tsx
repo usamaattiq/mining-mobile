@@ -91,7 +91,7 @@ export function HomeFilterSheet({
   };
 
   return (
-    <AppBottomSheet visible={visible} onClose={onClose} heightRatio={0.62}>
+    <AppBottomSheet visible={visible} onClose={onClose} heightRatio={0.52}>
       <AppText weight="bold" style={styles.sheetTitle}>
         {t('dashboardHome.filterTitle')}
       </AppText>

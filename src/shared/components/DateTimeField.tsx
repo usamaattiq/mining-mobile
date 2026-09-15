@@ -93,7 +93,7 @@ export function DateTimeField({
       ) : null}
 
       {Platform.OS === 'ios' ? (
-        <AppBottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} heightRatio={0.5}>
+        <AppBottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} heightRatio={0.4}>
           <AppText weight="bold" style={styles.sheetTitle}>
             {label}
           </AppText>
