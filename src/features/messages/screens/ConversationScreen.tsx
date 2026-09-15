@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
   thread: {
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
   },
 });
