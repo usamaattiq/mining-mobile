@@ -352,6 +352,12 @@
       "other": "Other"
     },
     "price": "Starting Price",
+    "auctionStartDate": "Auction start date & time",
+    "auctionStartDatePlaceholder": "Select date & time",
+    "auctionDuration": "Auction duration",
+    "auctionDurationHours": "{count, plural, one {# hour} other {# hours}}",
+    "auctionDurationMinutes": "{count} min",
+    "auctionDurationHoursMinutes": "{hours}h {minutes}m",
     "auctionEndDate": "Auction end date & time",
     "auctionEndDatePlaceholder": "Select date & time",
     "location": "Location",

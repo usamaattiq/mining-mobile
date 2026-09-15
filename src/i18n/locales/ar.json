@@ -338,6 +338,12 @@
       "other": "أخرى"
     },
     "price": "سعر البدء",
+    "auctionStartDate": "تاريخ ووقت بدء المزاد",
+    "auctionStartDatePlaceholder": "اختر التاريخ والوقت",
+    "auctionDuration": "مدة المزاد",
+    "auctionDurationHours": "{count, plural, one {ساعة واحدة} other {# ساعات}}",
+    "auctionDurationMinutes": "{count} د",
+    "auctionDurationHoursMinutes": "{hours} س {minutes} د",
     "auctionEndDate": "تاريخ ووقت انتهاء المزاد",
     "auctionEndDatePlaceholder": "اختر التاريخ والوقت",
     "location": "الموقع",

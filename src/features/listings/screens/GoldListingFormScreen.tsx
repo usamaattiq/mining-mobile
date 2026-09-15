@@ -12,6 +12,7 @@ import { AppText } from '@/shared/components/AppText';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
+import { DurationSlider, formatAuctionDurationLabel } from '@/features/listings/components/DurationSlider';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { Button } from '@/shared/components/Button';
@@ -65,7 +66,8 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
   const [weight, setWeight] = React.useState('');
   const [purity, setPurity] = React.useState<string | null>(null);
   const [price, setPrice] = React.useState('');
-  const [auctionEndDate, setAuctionEndDate] = React.useState<Date | null>(null);
+  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(null);
+  const [durationHours, setDurationHours] = React.useState(24);
   const [location, setLocation] = React.useState('');
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
@@ -92,7 +94,7 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
   const detailsValid = Boolean(
     title.trim() && description.trim() && weight.trim() && purity && price.trim(),
   );
-  const mediaValid = media.length > 0 && Boolean(auctionEndDate) && location.trim().length > 0;
+  const mediaValid = media.length > 0 && Boolean(auctionStartDate) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -121,7 +123,10 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
         weight,
         purityLabel: purityLabel ?? '',
         price,
-        auctionEndDate: auctionEndDate ? auctionEndDate.getTime() : null,
+        auctionEndDate:
+          auctionStartDate != null
+            ? auctionStartDate.getTime() + durationHours * 60 * 60 * 1000
+            : null,
         location,
         media: persistedMedia,
         postedAs: useMarketplaceRoleStore.getState().role,
@@ -151,13 +156,17 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
       value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
     },
     {
-      label: t('goldListing.auctionEndDate'),
-      value: auctionEndDate
+      label: t('goldListing.auctionStartDate'),
+      value: auctionStartDate
         ? new Intl.DateTimeFormat(currentLanguage, {
             dateStyle: 'medium',
             timeStyle: 'short',
-          }).format(auctionEndDate)
+          }).format(auctionStartDate)
         : '',
+    },
+    {
+      label: t('goldListing.auctionDuration'),
+      value: formatAuctionDurationLabel(durationHours, t),
     },
     { label: t('goldListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -251,11 +260,17 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
             <ServiceMediaUploader media={media} onChange={setMedia} />
 
             <DateTimeField
-              label={t('goldListing.auctionEndDate')}
-              value={auctionEndDate}
+              label={t('goldListing.auctionStartDate')}
+              value={auctionStartDate}
               required
-              placeholder={t('goldListing.auctionEndDatePlaceholder')}
-              onChange={setAuctionEndDate}
+              placeholder={t('goldListing.auctionStartDatePlaceholder')}
+              onChange={setAuctionStartDate}
+            />
+
+            <DurationSlider
+              label={t('goldListing.auctionDuration')}
+              value={durationHours}
+              onChange={setDurationHours}
             />
 
             <LocationField
