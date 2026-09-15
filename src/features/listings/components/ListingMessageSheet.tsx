@@ -52,6 +52,18 @@ export function ListingMessageSheet({
   const conversationIdRef = React.useRef<string | null>(null);
   conversationIdRef.current = conversationId;
 
+  const storedMessages = useMessagesStore((state) =>
+    conversationId
+      ? (state.conversations.find((item) => item.id === conversationId)?.messages ?? null)
+      : null,
+  );
+
+  React.useEffect(() => {
+    if (storedMessages) {
+      setMessages(storedMessages);
+    }
+  }, [storedMessages]);
+
   const listData = React.useMemo(() => [...messages].reverse(), [messages]);
   const titleName = owner.fullName.trim() || t('messages.fallbackName');
   const avatarInitials = initialsFromName(titleName);

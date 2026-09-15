@@ -11,6 +11,7 @@ import { navigationRef } from '@/navigation/navigationRef';
 import { initializeI18n } from '@/i18n';
 import { appFontAssets, palette } from '@/theme';
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
+import { useChatRealtime } from '@/shared/hooks/useChatRealtime';
 import { useAuthStore } from '@/store/authStore';
 import { useDevicePrefsStore } from '@/store/devicePrefsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
@@ -58,6 +59,7 @@ export default function App() {
   // Actual registration (permission + token + backend call) happens after
   // login, once auth exists — see registerForPushNotifications().
   usePushNotifications();
+  useChatRealtime();
 
   React.useEffect(() => {
     let cancelled = false;

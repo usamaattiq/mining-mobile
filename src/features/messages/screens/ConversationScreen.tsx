@@ -49,6 +49,14 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
   }, [conversationId, upsertConversation]);
 
   React.useEffect(() => {
+    const last = conversation?.messages.at(-1);
+    if (!last || last.fromMe) return;
+    void messagesApi.markRead(conversationId).then((item) => {
+      upsertConversation(item);
+    });
+  }, [conversation?.messages.at(-1)?.id, conversationId, upsertConversation]);
+
+  React.useEffect(() => {
     if (conversation?.messages.length) {
       requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: false }));
     }

@@ -6,6 +6,7 @@ import { useListingsStore } from '@/store/listingsStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
 import { useMessagesStore } from '@/store/messagesStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
+import { chatSocket } from '@/shared/services/chatSocket';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 
 const TOKEN_KEY = 'auth.accessToken';
@@ -42,6 +43,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     useMessagesStore.getState().setConversations([]);
     useNotificationsStore.getState().setItems([]);
     useMarketListingsStore.getState().setListings([]);
+    chatSocket.disconnect();
     set({ accessToken: null, status: 'unauthenticated' });
   },
 }));
