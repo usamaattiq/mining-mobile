@@ -146,12 +146,12 @@
   },
   "tabs": {
     "home": "Home",
-    "requests": "Requests",
+    "requests": "Listing",
     "messages": "Messages",
     "profile": "Profile"
   },
   "requests": {
-    "title": "Requests",
+    "title": "Listing",
     "categoryEquipment": "Equipment",
     "categoryServices": "Services",
     "categoryGold": "Gold",

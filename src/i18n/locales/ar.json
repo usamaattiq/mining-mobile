@@ -146,12 +146,12 @@
   },
   "tabs": {
     "home": "الرئيسية",
-    "requests": "الطلبات",
+    "requests": "الإعلانات",
     "messages": "الرسائل",
     "profile": "الملف الشخصي"
   },
   "requests": {
-    "title": "الطلبات",
+    "title": "الإعلانات",
     "categoryEquipment": "المعدات",
     "categoryServices": "الخدمات",
     "categoryGold": "الذهب",
