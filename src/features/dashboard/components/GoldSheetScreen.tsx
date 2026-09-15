@@ -30,18 +30,20 @@ export function GoldSheetScreen({
   return (
     <View style={[styles.root, style]}>
       {statusBar ? <StatusBar style="light" /> : null}
-      <AppTopBar
-        variant="gold"
-        left={left}
-        title={title}
-        onBackPress={onBackPress}
-        leftSlot={leftSlot}
-        rightSlot={rightSlot}
-        titleAlign={titleAlign}
-        titleSize={titleSize}
-        style={[styles.header, headerStyle]}
-      />
-      {headerExtra}
+      <View style={styles.headerBlock} pointerEvents="box-none">
+        <AppTopBar
+          variant="gold"
+          left={left}
+          title={title}
+          onBackPress={onBackPress}
+          leftSlot={leftSlot}
+          rightSlot={rightSlot}
+          titleAlign={titleAlign}
+          titleSize={titleSize}
+          style={[styles.header, headerStyle]}
+        />
+        {headerExtra}
+      </View>
       {scroll ? (
         <CurvedSheetScrollView contentContainerStyle={contentContainerStyle} {...scrollProps}>
           {children}
@@ -57,6 +59,10 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: palette.gold,
+  },
+  headerBlock: {
+    zIndex: 2,
+    elevation: 4,
   },
   header: {
     paddingBottom: spacing.xl,

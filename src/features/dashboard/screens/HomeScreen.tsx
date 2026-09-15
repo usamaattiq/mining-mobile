@@ -59,7 +59,8 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const serviceListings = marketListings.filter(isServiceListing);
   const goldListings = marketListings.filter(isGoldListing);
   const name = profile?.fullName?.trim() || '—';
-  const initial = name.charAt(0).toUpperCase();
+  const firstName = name === '—' ? name : (name.split(/\s+/)[0] ?? name);
+  const initial = firstName.charAt(0).toUpperCase();
 
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
   const [query, setQuery] = React.useState('');
@@ -78,6 +79,10 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       void refreshMarketListings(oppositeMarketplaceRole(role)).catch(() => undefined);
     }, [role]),
   );
+
+  const openProfile = () => {
+    navigation.navigate('Profile');
+  };
 
   const handleSwitchRole = () => {
     confirmSwitchMarketplaceRole(t);
@@ -152,12 +157,13 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     <GoldSheetScreen
       leftSlot={
         <Pressable
-          onPress={() => navigation.navigate('Profile')}
+          onPress={openProfile}
           accessibilityRole="button"
-          accessibilityLabel={name}
+          accessibilityLabel={firstName}
+          hitSlop={8}
           style={({ pressed }) => [styles.identity, pressed && styles.identityPressed]}
         >
-          <View style={styles.avatar}>
+          <View pointerEvents="none" style={styles.avatar}>
             {profile?.avatarUrl ? (
               <Image source={{ uri: profile.avatarUrl }} style={styles.avatarImage} />
             ) : (
@@ -167,7 +173,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
             )}
           </View>
           <AppText weight="medium" style={styles.name} numberOfLines={1}>
-            {name}
+            {firstName}
           </AppText>
         </Pressable>
       }
@@ -264,9 +270,9 @@ const styles = StyleSheet.create({
     opacity: 0.82,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 22,
     borderWidth: 1.5,
     borderColor: palette.pureWhite,
     backgroundColor: 'rgba(255, 255, 255, 0.22)',
@@ -279,12 +285,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   avatarInitial: {
-    fontSize: 14,
+    fontSize: 18,
     color: palette.pureWhite,
   },
   name: {
     flexShrink: 1,
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '700',
     color: palette.pureWhite,
   },
   header: {
