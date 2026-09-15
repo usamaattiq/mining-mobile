@@ -177,6 +177,12 @@
     "filter": "Filter",
     "filterTitle": "Filter",
     "filterAll": "All",
+    "filterCity": "City",
+    "filterCityPlaceholder": "Search city",
+    "filterCityNoResults": "No cities found",
+    "filterDate": "Date",
+    "filterAllCities": "All cities",
+    "filterAnyDate": "Any date",
     "apply": "Apply",
     "buyer": "Buyer",
     "supplier": "Supplier"

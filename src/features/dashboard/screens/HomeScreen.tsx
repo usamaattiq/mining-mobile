@@ -15,9 +15,13 @@ import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen
 import { NotificationBellButton } from '@/features/dashboard/components/NotificationBellButton';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { SearchField } from '@/shared/components/SearchField';
-import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { EmptyState } from '@/shared/components/EmptyState';
-import { Button } from '@/shared/components/Button';
+import {
+  HomeFilterSheet,
+  dayKeyFromEpoch,
+  type HomeTypeFilter,
+} from '@/features/dashboard/components/HomeFilterSheet';
+import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { ListingCard } from '@/features/listings/components/ListingCard';
 import {
   isEquipmentListing,
@@ -45,7 +49,13 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type HomeFilter = 'all' | 'rent' | 'sell' | 'onsite' | 'online';
+type HomeFilters = {
+  type: HomeTypeFilter;
+  city: string | null;
+  dateKey: string | null;
+};
+
+const EMPTY_FILTERS: HomeFilters = { type: 'all', city: null, dateKey: null };
 
 export function HomeScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -64,8 +74,8 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
 
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
   const [query, setQuery] = React.useState('');
-  const [filter, setFilter] = React.useState<HomeFilter>('all');
-  const [draftFilter, setDraftFilter] = React.useState<HomeFilter>('all');
+  const [filters, setFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
+  const [draftFilters, setDraftFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [filterOpen, setFilterOpen] = React.useState(false);
 
   useFocusEffect(
@@ -90,16 +100,16 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
 
   const handleCategoryChange = (next: ListingCategory) => {
     setCategory(next);
-    setFilter('all');
+    setFilters(EMPTY_FILTERS);
   };
 
   const openFilter = () => {
-    setDraftFilter(filter);
+    setDraftFilters(filters);
     setFilterOpen(true);
   };
 
   const applyFilter = () => {
-    setFilter(draftFilter);
+    setFilters(draftFilters);
     setFilterOpen(false);
   };
 
@@ -109,35 +119,52 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     { key: 'gold' as const, label: t('requests.categoryGold') },
   ];
 
-  const filterOptions: { key: HomeFilter; label: string }[] =
+  const filterOptions =
     category === 'equipment'
       ? [
-          { key: 'all', label: t('dashboardHome.filterAll') },
-          { key: 'rent', label: t('equipmentListing.rent') },
-          { key: 'sell', label: t('equipmentListing.sell') },
+          { key: 'all' as const, label: t('dashboardHome.filterAll') },
+          { key: 'rent' as const, label: t('equipmentListing.rent') },
+          { key: 'sell' as const, label: t('equipmentListing.sell') },
         ]
       : category === 'services'
         ? [
-            { key: 'all', label: t('dashboardHome.filterAll') },
-            { key: 'onsite', label: t('serviceListing.onsite') },
-            { key: 'online', label: t('serviceListing.online') },
+            { key: 'all' as const, label: t('dashboardHome.filterAll') },
+            { key: 'onsite' as const, label: t('serviceListing.onsite') },
+            { key: 'online' as const, label: t('serviceListing.online') },
           ]
-        : [{ key: 'all', label: t('dashboardHome.filterAll') }];
+        : [{ key: 'all' as const, label: t('dashboardHome.filterAll') }];
 
-  const visibleEquipment =
-    filter === 'rent' || filter === 'sell'
-      ? equipmentListings.filter((listing) => listing.mode === filter)
-      : equipmentListings;
-  const visibleServices =
-    filter === 'onsite' || filter === 'online'
-      ? serviceListings.filter((listing) => listing.serviceType === filter)
-      : serviceListings;
+  const matchesCityAndDate = (location: string, epoch: number): boolean => {
+    if (filters.city) {
+      const selectedCity = cityFromLocationLabel(filters.city).toLowerCase();
+      const listingCity = cityFromLocationLabel(location).toLowerCase();
+      if (!selectedCity || listingCity !== selectedCity) return false;
+    }
+    if (filters.dateKey && dayKeyFromEpoch(epoch) !== filters.dateKey) return false;
+    return true;
+  };
+
+  const visibleEquipment = equipmentListings.filter((listing) => {
+    if (filters.type === 'rent' || filters.type === 'sell') {
+      if (listing.mode !== filters.type) return false;
+    }
+    return matchesCityAndDate(listing.location, listing.createdAt);
+  });
+  const visibleServices = serviceListings.filter((listing) => {
+    if (filters.type === 'onsite' || filters.type === 'online') {
+      if (listing.serviceType !== filters.type) return false;
+    }
+    return matchesCityAndDate(listing.location, listing.serviceDate ?? listing.createdAt);
+  });
+  const visibleGold = goldListings.filter((listing) =>
+    matchesCityAndDate(listing.location, listing.auctionEndDate ?? listing.createdAt),
+  );
 
   const cards = buildListingCards({
     category,
     equipmentListings: visibleEquipment,
     serviceListings: visibleServices,
-    goldListings,
+    goldListings: visibleGold,
     t,
     currencyCode: currency.code,
     locale: currentLanguage,
@@ -234,27 +261,19 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
       )}
 
-      <AppBottomSheet visible={filterOpen} onClose={() => setFilterOpen(false)} heightRatio={0.42}>
-        <AppText weight="bold" style={styles.sheetTitle}>
-          {t('dashboardHome.filterTitle')}
-        </AppText>
-        {filterOptions.map((option) => {
-          const selected = draftFilter === option.key;
-          return (
-            <Pressable
-              key={option.key}
-              onPress={() => setDraftFilter(option.key)}
-              style={({ pressed }) => [styles.filterOption, pressed && styles.filterPressed]}
-            >
-              <AppText weight={selected ? 'semibold' : 'medium'} style={styles.filterOptionLabel}>
-                {option.label}
-              </AppText>
-              {selected ? <Ionicons name="checkmark" size={18} color={palette.gold} /> : null}
-            </Pressable>
-          );
-        })}
-        <Button label={t('dashboardHome.apply')} onPress={applyFilter} style={styles.applyButton} />
-      </AppBottomSheet>
+      <HomeFilterSheet
+        visible={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        typeOptions={filterOptions}
+        locale={currentLanguage}
+        draftType={draftFilters.type}
+        draftCity={draftFilters.city}
+        draftDateKey={draftFilters.dateKey}
+        onChangeType={(type) => setDraftFilters((current) => ({ ...current, type }))}
+        onChangeCity={(city) => setDraftFilters((current) => ({ ...current, city }))}
+        onChangeDateKey={(dateKey) => setDraftFilters((current) => ({ ...current, dateKey }))}
+        onApply={applyFilter}
+      />
     </GoldSheetScreen>
   );
 }
@@ -343,27 +362,5 @@ const styles = StyleSheet.create({
   },
   filterPressed: {
     opacity: 0.88,
-  },
-  sheetTitle: {
-    fontSize: 16,
-    color: palette.charcoal,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-    paddingVertical: spacing.sm,
-  },
-  filterOption: {
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.md,
-  },
-  filterOptionLabel: {
-    fontSize: 15,
-    color: palette.charcoal,
-  },
-  applyButton: {
-    marginTop: spacing.md,
   },
 });

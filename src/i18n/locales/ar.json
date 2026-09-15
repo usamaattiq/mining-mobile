@@ -177,6 +177,12 @@
     "filter": "تصفية",
     "filterTitle": "تصفية",
     "filterAll": "الكل",
+    "filterCity": "المدينة",
+    "filterCityPlaceholder": "ابحث عن مدينة",
+    "filterCityNoResults": "لا توجد مدن",
+    "filterDate": "التاريخ",
+    "filterAllCities": "كل المدن",
+    "filterAnyDate": "أي تاريخ",
     "apply": "تطبيق",
     "buyer": "مشتري",
     "supplier": "مورّد"

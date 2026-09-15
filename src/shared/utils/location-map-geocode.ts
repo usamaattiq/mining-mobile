@@ -53,3 +53,43 @@ export async function searchMapLocations(
     longitude: result.geometry.location.lng,
   }));
 }
+
+export type CitySearchResult = {
+  id: string;
+  label: string;
+};
+
+type PlacesAutocompleteApiResponse = {
+  status: string;
+  predictions?: Array<{
+    place_id: string;
+    description: string;
+  }>;
+};
+
+/** Places Autocomplete restricted to cities, same approach as Stride. */
+export async function searchCities(
+  query: string,
+  apiKey: string,
+  language?: string,
+): Promise<CitySearchResult[]> {
+  const trimmed = query.trim();
+  if (!trimmed || !apiKey) return [];
+
+  const url =
+    `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(trimmed)}` +
+    `&types=${encodeURIComponent('(cities)')}` +
+    `&key=${encodeURIComponent(apiKey)}` +
+    (language ? `&language=${encodeURIComponent(language)}` : '');
+
+  const response = await fetch(url);
+  if (!response.ok) return [];
+
+  const payload = (await response.json()) as PlacesAutocompleteApiResponse;
+  if (payload.status !== 'OK' || !payload.predictions?.length) return [];
+
+  return payload.predictions.slice(0, 8).map((item) => ({
+    id: item.place_id,
+    label: item.description,
+  }));
+}
