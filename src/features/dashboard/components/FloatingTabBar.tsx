@@ -30,10 +30,10 @@ const TAB_VISUALS: Record<string, TabVisual> = {
     icon: 'document-text-outline',
     iconFocused: 'document-text',
   },
-  Messages: {
-    labelKey: 'tabs.messages',
-    icon: 'chatbubble-ellipses-outline',
-    iconFocused: 'chatbubble-ellipses',
+  MyOffers: {
+    labelKey: 'tabs.offers',
+    icon: 'pricetag-outline',
+    iconFocused: 'pricetag',
   },
   Profile: {
     labelKey: 'tabs.profile',

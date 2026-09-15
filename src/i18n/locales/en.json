@@ -147,7 +147,7 @@
   "tabs": {
     "home": "Home",
     "requests": "Listing",
-    "messages": "Messages",
+    "offers": "My offers",
     "profile": "Profile"
   },
   "requests": {
@@ -200,6 +200,11 @@
     "auctionBody": "A new bid was placed on your 22K gold bar auction.",
     "listingLiveTitle": "Listing is live",
     "listingLiveBody": "Your on-site geological survey is now visible to buyers."
+  },
+  "offers": {
+    "title": "My offers",
+    "emptyTitle": "No offers yet",
+    "emptySubtitle": "Offers you send or receive will show up here."
   },
   "messages": {
     "title": "Messages",

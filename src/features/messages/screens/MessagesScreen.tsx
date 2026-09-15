@@ -1,11 +1,9 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { CompositeScreenProps } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import type { DashboardTabParamList, RootStackParamList } from '@/navigation/types';
+import type { RootStackParamList } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { SearchField } from '@/shared/components/SearchField';
 import { EmptyState } from '@/shared/components/EmptyState';
@@ -13,10 +11,7 @@ import { ConversationRow } from '@/features/messages/components/ConversationRow'
 import { useMessagesStore } from '@/store/messagesStore';
 import { messagesApi } from '@/features/messages/api/messagesApi';
 
-type Props = CompositeScreenProps<
-  BottomTabScreenProps<DashboardTabParamList, 'Messages'>,
-  NativeStackScreenProps<RootStackParamList>
->;
+type Props = NativeStackScreenProps<RootStackParamList, 'Messages'>;
 
 export function MessagesScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -41,7 +36,13 @@ export function MessagesScreen({ navigation }: Props): React.ReactElement {
   });
 
   return (
-    <GoldSheetScreen title={t('messages.title')} titleAlign="left" titleSize="lg">
+    <GoldSheetScreen
+      title={t('messages.title')}
+      titleAlign="left"
+      titleSize="lg"
+      left="back"
+      onBackPress={navigation.goBack}
+    >
       <SearchField
         value={query}
         onChangeText={setQuery}

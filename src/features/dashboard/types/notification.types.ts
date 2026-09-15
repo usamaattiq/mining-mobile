@@ -1,6 +1,6 @@
 import type { Ionicons } from '@expo/vector-icons';
 
-export type NotificationTarget = 'Requests' | 'Messages' | 'HomeTab';
+export type NotificationTarget = 'Requests' | 'Messages' | 'HomeTab' | 'MyOffers';
 
 export type InAppNotification = {
   id: string;

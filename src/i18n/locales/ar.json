@@ -147,7 +147,7 @@
   "tabs": {
     "home": "الرئيسية",
     "requests": "الإعلانات",
-    "messages": "الرسائل",
+    "offers": "عروضي",
     "profile": "الملف الشخصي"
   },
   "requests": {
@@ -348,6 +348,11 @@
     "auctionEndDatePlaceholder": "اختر التاريخ والوقت",
     "location": "الموقع",
     "publish": "نشر المزاد"
+  },
+  "offers": {
+    "title": "عروضي",
+    "emptyTitle": "لا توجد عروض بعد",
+    "emptySubtitle": "ستظهر هنا العروض التي ترسلها أو تستلمها."
   },
   "messages": {
     "title": "الرسائل",

@@ -29,6 +29,7 @@ import {
   isServiceListing,
 } from '@/features/listings/api/listingsApi';
 import { useNotificationsStore } from '@/store/notificationsStore';
+import { useMessagesStore } from '@/store/messagesStore';
 import { useProfileStore } from '@/store/profileStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
 import {
@@ -64,6 +65,9 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const profile = useProfileStore((state) => state.profile);
   const role = useMarketplaceRoleStore((state) => state.role);
   const hasUnread = useNotificationsStore((state) => state.items.some((item) => !item.read));
+  const hasUnreadMessages = useMessagesStore((state) =>
+    state.conversations.some((item) => item.unreadCount > 0),
+  );
   const marketListings = useMarketListingsStore((state) => state.listings);
   const equipmentListings = marketListings.filter(isEquipmentListing);
   const serviceListings = marketListings.filter(isServiceListing);
@@ -219,6 +223,12 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
               {role === 'supplier' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
             </AppText>
           </Pressable>
+          <NotificationBellButton
+            icon="chatbubble-ellipses-outline"
+            hasUnread={hasUnreadMessages}
+            accessibilityLabel={t('messages.title')}
+            onPress={() => navigation.navigate('Messages')}
+          />
           <NotificationBellButton
             hasUnread={hasUnread}
             accessibilityLabel={t('notifications.title')}

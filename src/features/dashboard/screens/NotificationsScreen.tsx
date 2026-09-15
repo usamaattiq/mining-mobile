@@ -77,6 +77,10 @@ export function NotificationsScreen({ navigation }: Props): React.ReactElement {
             t={t}
             onPress={() => {
               markRead(item.id);
+              if (item.target === 'Messages') {
+                navigation.navigate('Messages');
+                return;
+              }
               navigation.navigate('Dashboard', { screen: item.target });
             }}
           />

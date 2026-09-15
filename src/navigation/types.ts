@@ -12,7 +12,7 @@ export type ServiceType = 'onsite' | 'online';
 export type DashboardTabParamList = {
   HomeTab: undefined;
   Requests: undefined;
-  Messages: undefined;
+  MyOffers: undefined;
   Profile: undefined;
 };
 
@@ -31,6 +31,7 @@ export type RootStackParamList = {
   GoldListingForm: undefined;
   CompleteListingDetail: { id: string; category: ListingCategory };
   Conversation: { conversationId: string };
+  Messages: undefined;
   Notifications: undefined;
   QuickCreate: undefined;
 };

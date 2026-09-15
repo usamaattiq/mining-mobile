@@ -7,12 +7,14 @@ type NotificationBellButtonProps = {
   onPress: () => void;
   hasUnread: boolean;
   accessibilityLabel: string;
+  icon?: keyof typeof Ionicons.glyphMap;
 };
 
 export function NotificationBellButton({
   onPress,
   hasUnread,
   accessibilityLabel,
+  icon = 'notifications-outline',
 }: NotificationBellButtonProps): React.ReactElement {
   return (
     <Pressable
@@ -22,7 +24,7 @@ export function NotificationBellButton({
       onPress={onPress}
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
     >
-      <Ionicons name="notifications-outline" size={20} color={palette.pureWhite} />
+      <Ionicons name={icon} size={20} color={palette.pureWhite} />
       {hasUnread ? <View style={styles.unreadDot} /> : null}
     </Pressable>
   );

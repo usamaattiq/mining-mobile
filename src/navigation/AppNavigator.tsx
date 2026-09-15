@@ -15,6 +15,7 @@ import { GoldListingFormScreen } from '@/features/listings/screens/GoldListingFo
 import { CompleteListingDetailScreen } from '@/features/listings/screens/CompleteListingDetailScreen';
 import { QuickCreateScreen } from '@/features/dashboard/screens/QuickCreateScreen';
 import { ConversationScreen } from '@/features/messages/screens/ConversationScreen';
+import { MessagesScreen } from '@/features/messages/screens/MessagesScreen';
 import { NotificationsScreen } from '@/features/dashboard/screens/NotificationsScreen';
 import type { RootStackParamList } from '@/navigation/types';
 import { palette } from '@/theme';
@@ -61,6 +62,11 @@ export function AppNavigator(): React.ReactElement {
       <Stack.Screen name="ServiceListingForm" component={ServiceListingFormScreen} />
       <Stack.Screen name="GoldListingForm" component={GoldListingFormScreen} />
       <Stack.Screen name="CompleteListingDetail" component={CompleteListingDetailScreen} />
+      <Stack.Screen
+        name="Messages"
+        component={MessagesScreen}
+        options={{ contentStyle: { backgroundColor: palette.gold } }}
+      />
       <Stack.Screen
         name="Conversation"
         component={ConversationScreen}
