@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   headerExtra: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl,
     backgroundColor: palette.gold,
   },

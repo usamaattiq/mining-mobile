@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   switcherWrap: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl,
     backgroundColor: palette.gold,
   },
