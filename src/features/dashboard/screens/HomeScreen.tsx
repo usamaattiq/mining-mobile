@@ -223,17 +223,19 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
               {role === 'supplier' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
             </AppText>
           </Pressable>
-          <NotificationBellButton
-            icon="chatbubble-ellipses-outline"
-            hasUnread={hasUnreadMessages}
-            accessibilityLabel={t('messages.title')}
-            onPress={() => navigation.navigate('Messages')}
-          />
-          <NotificationBellButton
-            hasUnread={hasUnread}
-            accessibilityLabel={t('notifications.title')}
-            onPress={() => navigation.navigate('Notifications')}
-          />
+          <View style={styles.headerIconPair}>
+            <NotificationBellButton
+              icon="chatbubble-ellipses-outline"
+              hasUnread={hasUnreadMessages}
+              accessibilityLabel={t('messages.title')}
+              onPress={() => navigation.navigate('Messages')}
+            />
+            <NotificationBellButton
+              hasUnread={hasUnread}
+              accessibilityLabel={t('notifications.title')}
+              onPress={() => navigation.navigate('Notifications')}
+            />
+          </View>
         </View>
       }
       headerStyle={styles.header}
@@ -337,6 +339,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+  },
+  headerIconPair: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: spacing.sm - 4,
   },
   switchRoleButton: {
     flexDirection: 'row',

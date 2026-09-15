@@ -24,7 +24,7 @@ export function NotificationBellButton({
       onPress={onPress}
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
     >
-      <Ionicons name={icon} size={20} color={palette.pureWhite} />
+      <Ionicons name={icon} size={22} color={palette.pureWhite} />
       {hasUnread ? <View style={styles.unreadDot} /> : null}
     </Pressable>
   );
@@ -32,7 +32,7 @@ export function NotificationBellButton({
 
 const styles = StyleSheet.create({
   button: {
-    width: 36,
+    width: 30,
     height: 36,
     borderRadius: radius.pill,
     alignItems: 'center',
@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
   },
   unreadDot: {
     position: 'absolute',
-    top: 7,
-    right: 8,
+    top: 6,
+    right: 4,
     width: 8,
     height: 8,
     borderRadius: 4,
