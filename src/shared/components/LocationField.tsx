@@ -1,12 +1,11 @@
 import React from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
-import { palette, radius, spacing, getFontFamily } from '@/theme';
-import { combineLocationLabel, splitLocationLabel } from '@/shared/utils/locationLabel';
+import { palette, radius, spacing } from '@/theme';
+import { splitLocationLabel } from '@/shared/utils/locationLabel';
 import type { LocationFieldProps } from '@/shared/types/locationField.types';
 
 /** Location field with "use current location" / "select on map" actions — shared by sign-up and listing forms. */
@@ -15,15 +14,14 @@ export function LocationField({
   value,
   required = false,
   loading = false,
-  onChangeText,
   onUseCurrentLocation,
   onSelectOnMap,
 }: LocationFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
-  const { currentLanguage } = useLanguage();
   const hasValue = Boolean(value?.trim());
   const { addressLine, city, country } = splitLocationLabel(value?.trim() ?? '');
   const cityCountry = [city, country].filter(Boolean).join(', ');
+  const displayLine = addressLine || value?.trim() || '';
 
   return (
     <View style={styles.wrap}>
@@ -36,13 +34,7 @@ export function LocationField({
         <View style={styles.valueBox}>
           <Ionicons name="location" size={16} color={palette.gold} style={styles.valueIcon} />
           <View style={styles.valueTextAnchor}>
-            <TextInput
-              value={addressLine}
-              onChangeText={(text) => onChangeText(combineLocationLabel(text, city, country))}
-              placeholder={t('location.addressLinePlaceholder')}
-              placeholderTextColor={palette.muted}
-              style={[styles.valueInput, { fontFamily: getFontFamily(currentLanguage, 'regular') }]}
-            />
+            <AppText style={styles.valueText}>{displayLine}</AppText>
             {cityCountry ? (
               <AppText style={styles.cityCountry} numberOfLines={1}>
                 {cityCountry}
@@ -116,12 +108,10 @@ const styles = StyleSheet.create({
   valueTextAnchor: {
     flex: 1,
   },
-  valueInput: {
+  valueText: {
     fontSize: 14,
     lineHeight: 20,
     color: palette.charcoal,
-    padding: 0,
-    ...(Platform.OS === 'android' ? { includeFontPadding: false } : null),
   },
   cityCountry: {
     marginTop: 2,

@@ -3,7 +3,7 @@ export type LocationFieldProps = {
   value?: string;
   required?: boolean;
   loading?: boolean;
-  onChangeText: (value: string) => void;
+  onChangeText?: (value: string) => void;
   onUseCurrentLocation: () => void;
   onSelectOnMap: () => void;
 };
