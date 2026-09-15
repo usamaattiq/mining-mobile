@@ -8,7 +8,6 @@ import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
-import { AppText } from '@/shared/components/AppText';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
@@ -37,11 +36,6 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
-  const currencyAdornment = (
-    <AppText weight="semibold" style={styles.currencyAdornment}>
-      {currency.code}
-    </AppText>
-  );
   const isOnsite = serviceType === 'onsite';
 
   const serviceCategoryOptions = [
@@ -273,7 +267,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               value={price}
               onChangeText={setPrice}
               keyboardType="numeric"
-              leftAdornment={currencyAdornment}
+              placeholder={currency.code}
               required
             />
           </View>
@@ -370,10 +364,6 @@ const styles = StyleSheet.create({
     minHeight: 96,
     paddingTop: spacing.sm,
     textAlignVertical: 'top',
-  },
-  currencyAdornment: {
-    fontSize: 15,
-    color: palette.muted,
   },
   continueButton: {
     marginTop: spacing.sm,

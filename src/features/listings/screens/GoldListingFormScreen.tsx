@@ -36,11 +36,6 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
-  const currencyAdornment = (
-    <AppText weight="semibold" style={styles.currencyAdornment}>
-      {currency.code}
-    </AppText>
-  );
   const weightAdornment = (
     <AppText weight="semibold" style={styles.weightAdornment}>
       {t('goldListing.weightUnit')}
@@ -245,7 +240,7 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
               value={price}
               onChangeText={setPrice}
               keyboardType="numeric"
-              leftAdornment={currencyAdornment}
+              placeholder={currency.code}
               required
             />
           </View>
@@ -347,10 +342,6 @@ const styles = StyleSheet.create({
   },
   rowField: {
     flex: 1,
-  },
-  currencyAdornment: {
-    fontSize: 15,
-    color: palette.muted,
   },
   weightAdornment: {
     fontSize: 15,

@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
-import { AppText } from '@/shared/components/AppText';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { CounterField } from '@/shared/components/CounterField';
@@ -37,11 +36,6 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const { mode } = route.params;
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const currency = useCurrency();
-  const currencyAdornment = (
-    <AppText weight="semibold" style={styles.currencyAdornment}>
-      {currency.code}
-    </AppText>
-  );
   const isRent = mode === 'rent';
 
   const steps = [
@@ -279,7 +273,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     value={hourlyRental}
                     onChangeText={setHourlyRental}
                     keyboardType="numeric"
-                    leftAdornment={currencyAdornment}
+                    placeholder={currency.code}
                   />
                 </View>
                 <View style={styles.priceInput}>
@@ -288,7 +282,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     value={weeklyRental}
                     onChangeText={setWeeklyRental}
                     keyboardType="numeric"
-                    leftAdornment={currencyAdornment}
+                    placeholder={currency.code}
                   />
                 </View>
                 <View style={styles.priceInput}>
@@ -297,7 +291,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     value={monthlyRental}
                     onChangeText={setMonthlyRental}
                     keyboardType="numeric"
-                    leftAdornment={currencyAdornment}
+                    placeholder={currency.code}
                   />
                 </View>
               </View>
@@ -307,7 +301,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 value={salePrice}
                 onChangeText={setSalePrice}
                 keyboardType="numeric"
-                leftAdornment={currencyAdornment}
+                placeholder={currency.code}
                 required
               />
             )}
@@ -359,9 +353,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     label={t('equipmentListing.deliveryPricePerKm')}
                     value={deliveryPricePerKm}
                     onChangeText={setDeliveryPricePerKm}
-                    placeholder={t('equipmentListing.deliveryPricePerKmPlaceholder')}
+                    placeholder={currency.code}
                     keyboardType="numeric"
-                    leftAdornment={currencyAdornment}
                     required
                   />
                 ) : null}
@@ -450,10 +443,6 @@ const styles = StyleSheet.create({
   },
   priceInput: {
     flex: 1,
-  },
-  currencyAdornment: {
-    fontSize: 15,
-    color: palette.muted,
   },
   unitsField: {
     width: '50%',
