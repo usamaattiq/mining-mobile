@@ -37,6 +37,15 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
+  const role = useMarketplaceRoleStore((s) => s.role);
+
+  // Gold auctions are supplier-only; bounce buyers who land here somehow.
+  React.useEffect(() => {
+    if (role === 'buyer') {
+      navigation.goBack();
+    }
+  }, [role, navigation]);
+
   const weightAdornment = (
     <AppText weight="semibold" style={styles.weightAdornment}>
       {t('goldListing.weightUnit')}
@@ -175,6 +184,10 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
     .filter((item) => item.kind === 'photo')
     .map((item) => ({ id: item.id, uri: item.uri, kind: 'photo' as const }));
   const documents = media.filter((item) => item.kind === 'document');
+
+  if (role === 'buyer') {
+    return <View style={styles.root} />;
+  }
 
   return (
     <View style={styles.root}>

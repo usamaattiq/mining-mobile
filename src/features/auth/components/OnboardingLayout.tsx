@@ -1,8 +1,8 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -13,9 +13,12 @@ import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { palette, radius, spacing } from '@/theme';
 import type { OnboardingLayoutProps } from '@/features/auth/types/onboardingLayout.types';
 
-/** iOS number-pad accessory height — keep focused fields above KeyboardDoneBar. */
-const IOS_ACCESSORY_OFFSET = 48;
-
+/**
+ * Login / signup shell: gold hero stays fixed; only the white sheet body scrolls.
+ * Avoid KeyboardAwareScrollView here — it re-scrolls on every keystroke (MPIN/OTP)
+ * and was lifting the whole white sheet. Android already uses adjustResize; iOS
+ * gets padding via KeyboardAvoidingView so the sheet bottom does not jump while typing.
+ */
 export function OnboardingLayout({
   steps,
   currentStep,
@@ -37,51 +40,53 @@ export function OnboardingLayout({
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      {/*
-        Hero + sheet share one KeyboardAwareScrollView so the gold header scrolls
-        away with the form when the keyboard opens, instead of sheet content
-        sliding up and vanishing under the fixed gold background.
-      */}
-      <KeyboardAwareScrollView
-        style={styles.flex}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: Math.max(insets.bottom, spacing.lg) },
-        ]}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-        bottomOffset={spacing.md + (Platform.OS === 'ios' ? IOS_ACCESSORY_OFFSET : 0)}
-      >
-        <View style={[styles.hero, { paddingTop: insets.top + spacing.md }]}>
-          <View style={styles.topBar}>
-            {onBack ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Go back"
-                onPress={onBack}
-                hitSlop={12}
-                style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-              >
-                <Ionicons name="chevron-back" size={20} color={palette.pureWhite} />
-              </Pressable>
-            ) : (
-              <View style={styles.backSpacer} />
-            )}
-            <LanguageSwitcher />
-          </View>
-
-          <OnboardingHeadline title={title} subtitle={subtitle} dark />
-
-          {showProgress ? (
-            <AppText weight="semibold" style={styles.stepLabel}>
-              {t('common.stepOfTotal', { current: currentStepNumber, total: steps.length })}
-            </AppText>
-          ) : null}
+      <View style={[styles.hero, { paddingTop: insets.top + spacing.md }]}>
+        <View style={styles.topBar}>
+          {onBack ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              onPress={onBack}
+              hitSlop={12}
+              style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+            >
+              <Ionicons name="chevron-back" size={20} color={palette.pureWhite} />
+            </Pressable>
+          ) : (
+            <View style={styles.backSpacer} />
+          )}
+          <LanguageSwitcher />
         </View>
 
-        <View style={styles.sheet}>
+        <OnboardingHeadline title={title} subtitle={subtitle} dark />
+
+        {showProgress ? (
+          <AppText weight="semibold" style={styles.stepLabel}>
+            {t('common.stepOfTotal', { current: currentStepNumber, total: steps.length })}
+          </AppText>
+        ) : null}
+      </View>
+
+      <KeyboardAvoidingView
+        style={styles.sheet}
+        behavior="padding"
+        // Android window already resizes for the keyboard — extra avoiding lifts the sheet.
+        enabled={Platform.OS === 'ios'}
+      >
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={[
+            styles.sheetContent,
+            { paddingBottom: Math.max(insets.bottom, spacing.lg) },
+          ]}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          automaticallyAdjustKeyboardInsets={false}
+          automaticallyAdjustContentInsets={false}
+          contentInsetAdjustmentBehavior="never"
+        >
           {children}
 
           {showFooter ? (
@@ -95,8 +100,8 @@ export function OnboardingLayout({
               style={styles.continueButton}
             />
           ) : null}
-        </View>
-      </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -108,9 +113,6 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
   },
   hero: {
     backgroundColor: palette.gold,
@@ -145,12 +147,11 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.85)',
   },
   sheet: {
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: palette.pureWhite,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
+    overflow: 'hidden',
     ...Platform.select({
       ios: {
         shadowColor: palette.charcoal,
@@ -163,6 +164,11 @@ const styles = StyleSheet.create({
       },
       default: {},
     }),
+  },
+  sheetContent: {
+    flexGrow: 1,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
   },
   continueButton: {
     width: '100%',
