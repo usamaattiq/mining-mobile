@@ -13,6 +13,9 @@ import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { palette, radius, spacing } from '@/theme';
 import type { OnboardingLayoutProps } from '@/features/auth/types/onboardingLayout.types';
 
+/** iOS number-pad accessory height — keep focused fields above KeyboardDoneBar. */
+const IOS_ACCESSORY_OFFSET = 48;
+
 export function OnboardingLayout({
   steps,
   currentStep,
@@ -34,45 +37,51 @@ export function OnboardingLayout({
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      <View style={[styles.hero, { paddingTop: insets.top + spacing.md }]}>
-        <View style={styles.topBar}>
-          {onBack ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-              onPress={onBack}
-              hitSlop={12}
-              style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-            >
-              <Ionicons name="chevron-back" size={20} color={palette.pureWhite} />
-            </Pressable>
-          ) : (
-            <View style={styles.backSpacer} />
-          )}
-          <LanguageSwitcher />
+      {/*
+        Hero + sheet share one KeyboardAwareScrollView so the gold header scrolls
+        away with the form when the keyboard opens, instead of sheet content
+        sliding up and vanishing under the fixed gold background.
+      */}
+      <KeyboardAwareScrollView
+        style={styles.flex}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: Math.max(insets.bottom, spacing.lg) },
+        ]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        bottomOffset={spacing.md + (Platform.OS === 'ios' ? IOS_ACCESSORY_OFFSET : 0)}
+      >
+        <View style={[styles.hero, { paddingTop: insets.top + spacing.md }]}>
+          <View style={styles.topBar}>
+            {onBack ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+                onPress={onBack}
+                hitSlop={12}
+                style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+              >
+                <Ionicons name="chevron-back" size={20} color={palette.pureWhite} />
+              </Pressable>
+            ) : (
+              <View style={styles.backSpacer} />
+            )}
+            <LanguageSwitcher />
+          </View>
+
+          <OnboardingHeadline title={title} subtitle={subtitle} dark />
+
+          {showProgress ? (
+            <AppText weight="semibold" style={styles.stepLabel}>
+              {t('common.stepOfTotal', { current: currentStepNumber, total: steps.length })}
+            </AppText>
+          ) : null}
         </View>
 
-        <OnboardingHeadline title={title} subtitle={subtitle} dark />
-
-        {showProgress ? (
-          <AppText weight="semibold" style={styles.stepLabel}>
-            {t('common.stepOfTotal', { current: currentStepNumber, total: steps.length })}
-          </AppText>
-        ) : null}
-      </View>
-
-      <View style={styles.sheet}>
-        <KeyboardAwareScrollView
-          style={styles.flex}
-          contentContainerStyle={[
-            styles.sheetContent,
-            { paddingBottom: Math.max(insets.bottom, spacing.lg) },
-          ]}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          showsVerticalScrollIndicator={false}
-          bottomOffset={spacing.md}
-        >
+        <View style={styles.sheet}>
           {children}
 
           {showFooter ? (
@@ -86,8 +95,8 @@ export function OnboardingLayout({
               style={styles.continueButton}
             />
           ) : null}
-        </KeyboardAwareScrollView>
-      </View>
+        </View>
+      </KeyboardAwareScrollView>
     </View>
   );
 }
@@ -99,6 +108,9 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   hero: {
     backgroundColor: palette.gold,
@@ -133,10 +145,12 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.85)',
   },
   sheet: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: palette.pureWhite,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
     ...Platform.select({
       ios: {
         shadowColor: palette.charcoal,
@@ -149,10 +163,6 @@ const styles = StyleSheet.create({
       },
       default: {},
     }),
-  },
-  sheetContent: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
   },
   continueButton: {
     width: '100%',
