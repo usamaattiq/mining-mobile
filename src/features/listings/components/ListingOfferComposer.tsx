@@ -12,9 +12,14 @@ export function ListingOfferComposer({
   placeholder,
   sendLabel,
   submittedLabel,
+  confirmLabel,
+  declineLabel,
   hasOffer,
+  awaitingConfirm,
   submitting,
   onSubmit,
+  onConfirm,
+  onDecline,
 }: ListingOfferComposerProps): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { currentLanguage } = useLanguage();
@@ -23,7 +28,45 @@ export function ListingOfferComposer({
 
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
-      {hasOffer ? (
+      {awaitingConfirm ? (
+        <View style={styles.confirmRow}>
+          <Pressable
+            onPress={onDecline}
+            disabled={submitting}
+            accessibilityRole="button"
+            accessibilityLabel={declineLabel}
+            style={({ pressed }) => [
+              styles.decline,
+              submitting && styles.sendDisabled,
+              pressed && !submitting && styles.declinePressed,
+            ]}
+          >
+            <AppText weight="bold" style={styles.declineLabel}>
+              {declineLabel}
+            </AppText>
+          </Pressable>
+          <Pressable
+            onPress={onConfirm}
+            disabled={submitting}
+            accessibilityRole="button"
+            accessibilityLabel={confirmLabel}
+            style={({ pressed }) => [
+              styles.send,
+              styles.confirm,
+              submitting && styles.sendDisabled,
+              pressed && !submitting && styles.sendPressed,
+            ]}
+          >
+            {submitting ? (
+              <ActivityIndicator color={palette.pureWhite} size="small" />
+            ) : (
+              <AppText weight="bold" style={styles.sendLabel}>
+                {confirmLabel}
+              </AppText>
+            )}
+          </Pressable>
+        </View>
+      ) : hasOffer ? (
         <View style={styles.submittedRow}>
           <Ionicons name="checkmark-circle" size={18} color={palette.gold} />
           <AppText weight="semibold" style={styles.submittedText}>
@@ -136,6 +179,31 @@ const styles = StyleSheet.create({
   },
   submittedText: {
     fontSize: 14,
+    color: palette.charcoal,
+  },
+  confirmRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  confirm: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  decline: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  declinePressed: {
+    backgroundColor: palette.warmWhite,
+  },
+  declineLabel: {
+    fontSize: 13,
     color: palette.charcoal,
   },
 });

@@ -6,8 +6,10 @@ import { listingsApi } from '@/features/listings/api/listingsApi';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
+import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import type { MarketplaceRole } from '@/navigation/types';
+import { listingHasMyOffer } from '@/features/listings/utils/listingOfferState';
 
 export function applyListings(listings: ListingDto[]): void {
   useListingsStore
@@ -29,7 +31,19 @@ export async function refreshMarketListings(postedAs: MarketplaceRole): Promise<
   useMarketListingsStore.getState().setListings(await listingsApi.feed(postedAs));
 }
 
+export async function refreshOfferedListings(): Promise<void> {
+  useOfferedListingsStore.getState().setListings(await listingsApi.myOffers());
+}
+
 export function cacheListing(listing: ListingDto): void {
+  if (listingHasMyOffer(listing)) {
+    useMarketListingsStore.getState().setListings(
+      useMarketListingsStore.getState().listings.filter((item) => item.id !== listing.id),
+    );
+    useOfferedListingsStore.getState().upsertListing(listing);
+    return;
+  }
+
   useMarketListingsStore.getState().upsertListing(listing);
   if (listing.category === 'equipment') {
     useListingsStore.getState().addListing(listing);

@@ -31,10 +31,13 @@
     "noOffers": "No offers yet.",
     "accept": "Accept",
     "reject": "Reject",
+    "confirm": "Confirm",
+    "decline": "Decline",
+    "waitingForConfirmation": "Waiting for the other party to confirm.",
     "actionFailed": "Could not update this offer. Try again.",
     "offerStatus": {
       "active": "New",
-      "selected": "Selected",
+      "selected": "Awaiting confirmation",
       "confirmed": "Accepted",
       "withdrawn": "Withdrawn",
       "declined": "Rejected",
@@ -243,7 +246,7 @@
   "offers": {
     "title": "My offers",
     "emptyTitle": "No offers yet",
-    "emptySubtitle": "Offers you send or receive will show up here."
+    "emptySubtitle": "Listings you send an offer on will show up here."
   },
   "messages": {
     "title": "Messages",

@@ -48,6 +48,7 @@ import {
 } from '@/store/marketplaceRoleStore';
 import { notificationsApi } from '@/features/dashboard/api/notificationsApi';
 import { refreshMarketListings } from '@/features/listings/utils/refreshListings';
+import { listingHasMyOffer } from '@/features/listings/utils/listingOfferState';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { AppText } from '@/shared/components/AppText';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -91,7 +92,9 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const hasUnreadMessages = useMessagesStore((state) =>
     state.conversations.some((item) => item.unreadCount > 0),
   );
-  const marketListings = useMarketListingsStore((state) => state.listings);
+  const marketListings = useMarketListingsStore((state) => state.listings).filter(
+    (listing) => !listingHasMyOffer(listing),
+  );
   const equipmentListings = marketListings.filter(isEquipmentListing);
   const serviceListings = marketListings.filter(isServiceListing);
   const goldListings = marketListings.filter(isGoldListing);

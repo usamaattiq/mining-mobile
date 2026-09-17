@@ -403,6 +403,23 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       .finally(() => setActingOfferId(null));
   };
 
+  const handleResponderOffer = (action: 'confirm' | 'decline') => {
+    const offerId = rfq?.myOfferId;
+    if (!offerId) return;
+    setOfferSubmitting(true);
+    const request =
+      action === 'confirm' ? listingsApi.confirmOffer : listingsApi.declineOffer;
+    void request(id, offerId)
+      .then((listing) => {
+        cacheListing(listing);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+        showAppAlert(t('common.error'), message);
+      })
+      .finally(() => setOfferSubmitting(false));
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.root}
@@ -478,10 +495,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           currencyCode={currency.code}
           placeholder={t('rfq.offerPlaceholder')}
           sendLabel={t('rfq.sendOffer')}
-          submittedLabel={t('rfq.offerSubmitted')}
+          submittedLabel={
+            rfq?.myOfferStatus === 'confirmed' ? t('rfq.offerStatus.confirmed') : t('rfq.offerSubmitted')
+          }
+          confirmLabel={t('rfq.confirm')}
+          declineLabel={t('rfq.decline')}
           hasOffer={hasSentOffer}
+          awaitingConfirm={
+            rfq?.myOfferStatus === 'selected' ||
+            rfq?.status === 'awaiting-your-confirmation' ||
+            Boolean(rfq?.canConfirmOffer)
+          }
           submitting={offerSubmitting}
           onSubmit={handleSubmitOffer}
+          onConfirm={() => handleResponderOffer('confirm')}
+          onDecline={() => handleResponderOffer('decline')}
         />
       ) : null}
 

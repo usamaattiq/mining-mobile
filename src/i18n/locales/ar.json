@@ -31,10 +31,13 @@
     "noOffers": "لا توجد عروض بعد.",
     "accept": "قبول",
     "reject": "رفض",
+    "confirm": "تأكيد",
+    "decline": "رفض العرض",
+    "waitingForConfirmation": "بانتظار تأكيد الطرف الآخر.",
     "actionFailed": "تعذر تحديث هذا العرض. حاول مرة أخرى.",
     "offerStatus": {
       "active": "جديد",
-      "selected": "محدد",
+      "selected": "بانتظار التأكيد",
       "confirmed": "مقبول",
       "withdrawn": "مسحوب",
       "declined": "مرفوض",
@@ -391,7 +394,7 @@
   "offers": {
     "title": "عروضي",
     "emptyTitle": "لا توجد عروض بعد",
-    "emptySubtitle": "ستظهر هنا العروض التي ترسلها أو تستلمها."
+    "emptySubtitle": "ستظهر هنا الإعلانات التي أرسلت عليها عرضاً."
   },
   "messages": {
     "title": "الرسائل",

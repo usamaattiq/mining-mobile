@@ -47,6 +47,10 @@ export const listingsApi = {
     return apiFetch(`/listings/feed?${params.toString()}`);
   },
 
+  myOffers(): Promise<ListingDto[]> {
+    return apiFetch('/listings/my-offers');
+  },
+
   get(id: string): Promise<ListingDto> {
     return apiFetch(`/listings/${id}`);
   },
@@ -65,5 +69,13 @@ export const listingsApi = {
 
   rejectOffer(id: string, offerId: string): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers/${offerId}/reject`, { method: 'POST', body: {} });
+  },
+
+  confirmOffer(id: string, offerId: string): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}/offers/${offerId}/confirm`, { method: 'POST', body: {} });
+  },
+
+  declineOffer(id: string, offerId: string): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}/offers/${offerId}/decline`, { method: 'POST', body: {} });
   },
 };

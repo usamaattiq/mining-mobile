@@ -83,6 +83,10 @@ export function ListingOffersPanel({
                     style={styles.actionButton}
                   />
                 </View>
+              ) : offer.status === 'selected' ? (
+                <AppText style={styles.waiting}>
+                  {t('rfq.waitingForConfirmation')}
+                </AppText>
               ) : null}
             </View>
           );
@@ -150,5 +154,9 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+  },
+  waiting: {
+    fontSize: 13,
+    color: palette.muted,
   },
 });
