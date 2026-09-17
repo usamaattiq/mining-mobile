@@ -125,7 +125,7 @@ export function ListingCard({
                 />
               ) : null}
             </View>
-            {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : <View style={styles.badgeSlot} />}
+            {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
           </View>
 
           <View style={styles.body}>
@@ -133,20 +133,14 @@ export function ListingCard({
               {title}
             </AppText>
 
-            {typeBadge || subtitle || subtitleIcon ? (
+            {subtitle || subtitleIcon ? (
               <View style={styles.subtitleRow}>
-                {typeBadge ? (
-                  <StatusBadge badge={typeBadge} />
-                ) : (
-                  <>
-                    {subtitleIcon ? (
-                      <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
-                    ) : null}
-                    <AppText style={styles.subtitle} numberOfLines={1}>
-                      {subtitle ?? ' '}
-                    </AppText>
-                  </>
-                )}
+                {subtitleIcon ? (
+                  <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
+                ) : null}
+                <AppText style={styles.subtitle} numberOfLines={1}>
+                  {subtitle ?? ' '}
+                </AppText>
               </View>
             ) : null}
 
@@ -175,16 +169,17 @@ export function ListingCard({
                 <StatusBadge key={badge.key} badge={badge} />
               ))}
             </View>
-            {createdAt ? (
-              <View style={styles.timerBadge}>
-                <Ionicons name="time-outline" size={10} color={palette.gold} />
-                <AppText weight="semibold" style={styles.timerText}>
-                  {timeLeft}
-                </AppText>
-              </View>
-            ) : (
-              <View style={styles.badgeSlot} />
-            )}
+            <View style={styles.bottomRight}>
+              {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
+              {createdAt ? (
+                <View style={styles.timerBadge}>
+                  <Ionicons name="time-outline" size={10} color={palette.gold} />
+                  <AppText weight="semibold" style={styles.timerText}>
+                    {timeLeft}
+                  </AppText>
+                </View>
+              ) : null}
+            </View>
           </View>
         </View>
       </View>
@@ -306,6 +301,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.xs,
     minHeight: BADGE_ROW_HEIGHT,
+  },
+  bottomRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   statusBadge: {
     flexDirection: 'row',

@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
@@ -30,6 +31,7 @@ import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { rfqStatusLabel } from '@/features/listings/utils/rfqStatus';
+import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteListingDetail'>;
@@ -61,13 +63,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   );
 
   const equipmentListing =
-    (mineEquipment?.owner ? mineEquipment : undefined) ??
+    (category === 'equipment' && marketListing && isEquipmentListing(marketListing) && marketListing.rfq
+      ? marketListing
+      : undefined) ??
+    (mineEquipment?.rfq ? mineEquipment : undefined) ??
     (category === 'equipment' && marketListing && isEquipmentListing(marketListing)
       ? marketListing
       : undefined) ??
     mineEquipment;
   const serviceListing =
-    (mineService?.owner ? mineService : undefined) ??
+    (category === 'services' && marketListing && isServiceListing(marketListing) && marketListing.rfq
+      ? marketListing
+      : undefined) ??
+    (mineService?.rfq ? mineService : undefined) ??
     (category === 'services' && marketListing && isServiceListing(marketListing)
       ? marketListing
       : undefined) ??
@@ -79,29 +87,20 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       : undefined) ??
     mineGold;
 
-  React.useEffect(() => {
-    const cached =
-      (category === 'equipment' && equipmentListing) ||
-      (category === 'services' && serviceListing) ||
-      (category === 'gold' && goldListing);
-    const hasOwner = Boolean(
-      equipmentListing?.owner ?? serviceListing?.owner ?? goldListing?.owner,
-    );
-    if (cached && hasOwner) return;
-
-    let cancelled = false;
-    void listingsApi
-      .get(id)
-      .then((listing) => {
-        if (cancelled) return;
-        useMarketListingsStore.getState().upsertListing(listing);
-      })
-      .catch(() => undefined);
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, category, equipmentListing, serviceListing, goldListing]);
+  useFocusEffect(
+    React.useCallback(() => {
+      let cancelled = false;
+      void listingsApi
+        .get(id)
+        .then((listing) => {
+          if (!cancelled) cacheListing(listing);
+        })
+        .catch(() => undefined);
+      return () => {
+        cancelled = true;
+      };
+    }, [id]),
+  );
 
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
@@ -361,13 +360,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const rfq = equipmentListing?.rfq ?? serviceListing?.rfq;
   const hasSentOffer = Boolean(
     rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
-  );
+  ) || rfq?.status === 'offer-submitted';
   const canOffer =
     (category === 'equipment' || category === 'services') &&
     postedAs === 'supplier' &&
     Boolean(rfq) &&
     ownerId !== profileId &&
-    rfq?.canSubmitOffer !== false &&
     !hasSentOffer;
   const canMessage = Boolean(owner) && ownerId !== profileId && !canOffer && !hasSentOffer;
 
@@ -376,7 +374,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     void listingsApi
       .submitOffer(id, price)
       .then((listing) => {
-        useMarketListingsStore.getState().upsertListing(listing);
+        cacheListing(listing);
       })
       .catch((error: unknown) => {
         const message =
@@ -405,6 +403,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             {priceNode}
 
             <View style={styles.titleBlock}>
+              {rfq ? (
+                <View style={styles.rfqStatusChip}>
+                  <AppText weight="semibold" style={styles.rfqStatusChipText}>
+                    {rfqStatusLabel(t, rfq)}
+                  </AppText>
+                </View>
+              ) : null}
               <AppText weight="bold" style={styles.title}>
                 {title}
               </AppText>
@@ -534,6 +539,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     color: palette.charcoal,
+  },
+  rfqStatusChip: {
+    alignSelf: 'flex-start',
+    backgroundColor: palette.gold,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  rfqStatusChipText: {
+    fontSize: 11,
+    color: palette.pureWhite,
   },
   locationRow: {
     flexDirection: 'row',

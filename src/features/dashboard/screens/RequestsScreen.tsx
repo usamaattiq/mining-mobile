@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { RefreshControl, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -39,12 +39,20 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
   const goldListings = useGoldListingsStore((state) => state.listings);
   const role = useMarketplaceRoleStore((state) => state.role);
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       void refreshListings(role).catch(() => undefined);
     }, [role]),
   );
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    void refreshListings(role)
+      .catch(() => undefined)
+      .finally(() => setRefreshing(false));
+  }, [role]);
 
   const categoryOptions = [
     { key: 'equipment' as const, label: t('requests.categoryEquipment') },
@@ -76,6 +84,9 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
       titleAlign="left"
       titleSize="lg"
       headerStyle={styles.header}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.gold} />
+      }
       headerExtra={
         <View style={styles.switcherWrap}>
           <SegmentedSwitcher value={category} onChange={setCategory} options={categoryOptions} />

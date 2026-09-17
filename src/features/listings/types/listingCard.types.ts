@@ -16,7 +16,7 @@ export type ListingCardProps = {
   subtitle?: string;
   /** Icon shown before the type / units line. */
   subtitleIcon?: keyof typeof Ionicons.glyphMap;
-  /** Replaces the type line (e.g. Auction on gold cards). */
+  /** RFQ / listing status — top right (where Delivery used to sit). */
   typeBadge?: ListingCardBadge;
   /** City line under the type. */
   city?: string;
@@ -24,9 +24,9 @@ export type ListingCardProps = {
   durationBadges?: ListingCardBadge[];
   /** Shown top left when there are no duration badges. */
   topDateText?: string;
-  /** Delivery — top right. */
+  /** Delivery — bottom right, with remaining time. */
   deliveryBadge?: ListingCardBadge;
-  /** Rent, sell, online, onsite, K, g — bottom left. */
+  /** Rent, sell, online, onsite — bottom left. */
   statusBadges?: ListingCardBadge[];
   priceText?: string;
   /** Rental unit shown after the amount (/hr, /w, /m) — same typeface as the price. */

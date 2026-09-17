@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect, type CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -104,6 +104,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const [filters, setFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [draftFilters, setDraftFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [filterOpen, setFilterOpen] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -116,6 +117,18 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       void refreshMarketListings(oppositeMarketplaceRole(role)).catch(() => undefined);
     }, [role]),
   );
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    void Promise.all([
+      refreshMarketListings(oppositeMarketplaceRole(role)),
+      notificationsApi.list().then((items) => {
+        useNotificationsStore.getState().setItems(items);
+      }),
+    ])
+      .catch(() => undefined)
+      .finally(() => setRefreshing(false));
+  }, [role]);
 
   const openProfile = () => {
     navigation.navigate('Profile');
@@ -323,6 +336,9 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         </View>
       }
       headerStyle={styles.header}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.gold} />
+      }
       headerExtra={
         <View style={styles.headerExtra}>
           <SegmentedSwitcher

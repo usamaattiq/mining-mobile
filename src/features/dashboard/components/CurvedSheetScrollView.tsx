@@ -12,6 +12,7 @@ export const CURVED_SHEET_OVERLAP = radius.lg + 4;
 export function CurvedSheetScrollView({
   contentContainerStyle,
   children,
+  refreshControl,
   ...rest
 }: ScrollViewProps): React.ReactElement {
   return (
@@ -19,9 +20,11 @@ export function CurvedSheetScrollView({
       style={styles.scroll}
       contentContainerStyle={[styles.content, contentContainerStyle]}
       showsVerticalScrollIndicator={false}
-      bounces={false}
+      bounces={Boolean(refreshControl) || rest.bounces}
+      alwaysBounceVertical={Boolean(refreshControl)}
       keyboardShouldPersistTaps="handled"
       bottomOffset={100}
+      refreshControl={refreshControl}
       {...rest}
     >
       {children}

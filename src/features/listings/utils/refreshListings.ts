@@ -28,3 +28,16 @@ export async function refreshListings(postedAs?: MarketplaceRole): Promise<void>
 export async function refreshMarketListings(postedAs: MarketplaceRole): Promise<void> {
   useMarketListingsStore.getState().setListings(await listingsApi.feed(postedAs));
 }
+
+export function cacheListing(listing: ListingDto): void {
+  useMarketListingsStore.getState().upsertListing(listing);
+  if (listing.category === 'equipment') {
+    useListingsStore.getState().addListing(listing);
+  }
+  if (listing.category === 'services') {
+    useServiceListingsStore.getState().addListing(listing);
+  }
+  if (listing.category === 'gold') {
+    useGoldListingsStore.getState().addListing(listing);
+  }
+}
