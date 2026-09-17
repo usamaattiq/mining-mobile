@@ -3,11 +3,17 @@ import appJson from './app.json';
 
 const baseExpo = appJson.expo as ExpoConfig;
 
-const googleMapsApiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? '';
+// Match EAS production vars (and Stride): platform-specific Maps keys, with a
+// single-key fallback for local .env development.
+const legacyMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
+const androidMapsKey =
+  process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID?.trim() || legacyMapsKey || '';
+const iosMapsKey =
+  process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS?.trim() || legacyMapsKey || '';
 
-if (process.env.NODE_ENV === 'production' && !googleMapsApiKey) {
+if (process.env.NODE_ENV === 'production' && !androidMapsKey && !iosMapsKey) {
   console.warn(
-    '[app.config] Google Maps API key is missing — set EXPO_PUBLIC_GOOGLE_MAPS_API_KEY on EAS.',
+    '[app.config] Google Maps API keys are missing — set EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID and EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS on EAS.',
   );
 }
 
@@ -19,7 +25,9 @@ const config: ExpoConfig = {
     [
       'expo-notifications',
       {
-        icon: './assets/images/notification-icon.png',
+        // Use the tracked app icon so EAS always has this file (a separate
+        // notification-icon.png was easy to miss in the upload archive).
+        icon: './assets/images/icon.png',
         color: '#222222',
         defaultChannel: 'default',
       },
@@ -46,6 +54,16 @@ const config: ExpoConfig = {
       {
         locationWhenInUsePermission:
           'Allow $(PRODUCT_NAME) to use your location to find your address.',
+      },
+    ],
+    // SDK 57+: maps keys must go through this plugin. Legacy
+    // ios.config.googleMapsApiKey makes prebuild request the removed
+    // `react-native-google-maps` podspec and fails Install pods.
+    [
+      'react-native-maps',
+      {
+        ...(androidMapsKey ? { androidGoogleMapsApiKey: androidMapsKey } : {}),
+        ...(iosMapsKey ? { iosGoogleMapsApiKey: iosMapsKey } : {}),
       },
     ],
   ],
@@ -75,10 +93,6 @@ const config: ExpoConfig = {
       'android.permission.RECEIVE_BOOT_COMPLETED',
       'android.permission.VIBRATE',
     ],
-    config: {
-      ...baseExpo.android?.config,
-      googleMaps: { apiKey: googleMapsApiKey },
-    },
   },
   ios: {
     ...baseExpo.ios,
@@ -86,10 +100,6 @@ const config: ExpoConfig = {
     infoPlist: {
       ...baseExpo.ios?.infoPlist,
       ITSAppUsesNonExemptEncryption: false,
-    },
-    config: {
-      ...baseExpo.ios?.config,
-      googleMapsApiKey,
     },
   },
 };

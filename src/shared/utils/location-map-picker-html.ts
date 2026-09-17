@@ -1,7 +1,8 @@
 /**
  * Interactive map for location picker (WebView + Maps JavaScript API).
  * Temporary Expo Go–friendly path; native react-native-maps can replace this later.
- * Requires EXPO_PUBLIC_GOOGLE_MAPS_API_KEY with Maps JavaScript API enabled.
+ * Requires a Google Maps JS-capable API key (platform ANDROID/IOS EAS keys or
+ * EXPO_PUBLIC_GOOGLE_MAPS_API_KEY fallback) with Maps JavaScript API enabled.
  * Reverse geocode stays in RN via expo-location — HTML only posts lat/lng.
  */
 export function buildLocationMapPickerHtml(

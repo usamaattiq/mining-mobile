@@ -34,6 +34,15 @@
     "experiments": {
       "tsconfigPaths": true
     },
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/6a8a7e38-8bcf-4186-91b8-6f503fdfb691",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "owner": "mycauses-organization",
     "extra": {
       "eas": {

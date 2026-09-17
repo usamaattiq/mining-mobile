@@ -23,11 +23,13 @@
     "build:preview": "eas build --profile preview",
     "build:ios:preview": "eas build --platform ios --profile preview",
     "build:android:preview": "eas build --platform android --profile preview",
+    "build:dev": "eas build --profile development",
     "submit:ios": "eas submit -p ios --profile production --latest",
     "update:preview": "eas update --channel preview --environment preview",
     "update:production": "eas update --channel production --environment production",
     "env:push:preview": "node scripts/push-eas-env.cjs preview",
-    "env:push:production": "node scripts/push-eas-env.cjs production"
+    "env:push:production": "node scripts/push-eas-env.cjs production",
+    "env:push:development": "node scripts/push-eas-env.cjs development"
   },
   "dependencies": {
     "@expo-google-fonts/cairo": "^0.4.2",
