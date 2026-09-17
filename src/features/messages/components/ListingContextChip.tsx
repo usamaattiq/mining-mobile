@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     paddingVertical: 4,
     paddingHorizontal: spacing.xs,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
   },
   contextInHeader: {
     marginTop: 0,

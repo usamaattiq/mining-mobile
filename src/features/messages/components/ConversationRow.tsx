@@ -5,6 +5,7 @@ import { ListingContextChip } from '@/features/messages/components/ListingContex
 import { formatRelativeTime } from '@/shared/utils/formatRelativeTime';
 import { initialsFromName } from '@/shared/utils/initialsFromName';
 import { palette, radius, spacing } from '@/theme';
+import { cardBackShadow } from '@/theme/cardShadow';
 import type { Conversation } from '@/features/messages/types/conversation.types';
 import type { TranslateFn } from '@/shared/types/translate.types';
 
@@ -50,7 +51,11 @@ export function ConversationRow({
       accessibilityRole="button"
       accessibilityLabel={conversation.participantName}
       onPress={onPress}
-      style={({ pressed }) => [styles.cardWrap, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.cardWrap,
+        unread && styles.cardUnread,
+        pressed && styles.pressed,
+      ]}
     >
       <View style={styles.card}>
         <View style={[styles.avatar, { backgroundColor: AVATAR_TONES[tone] }]}>
@@ -99,23 +104,20 @@ export function ConversationRow({
 
 const styles = StyleSheet.create({
   cardWrap: {
-    borderRadius: radius.md,
-    shadowColor: palette.charcoal,
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    borderRadius: radius.lg,
+    backgroundColor: palette.warmWhite,
+    ...cardBackShadow,
+  },
+  cardUnread: {
+    backgroundColor: palette.softGold,
   },
   pressed: {
-    opacity: 0.92,
+    opacity: 0.9,
   },
   card: {
     flexDirection: 'row',
     gap: spacing.sm,
-    backgroundColor: palette.pureWhite,
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: palette.softGold,
+    borderRadius: radius.lg,
     padding: spacing.md,
   },
   avatar: {
