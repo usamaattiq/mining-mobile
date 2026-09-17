@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from '@/shared/components/AppText';
 import { PressableCard } from '@/shared/components/PressableCard';
 import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
@@ -12,12 +12,14 @@ import type { TranslateFn } from '@/shared/types/translate.types';
 type ConversationRowProps = {
   conversation: Conversation;
   onPress: () => void;
+  onPressListing?: () => void;
   t: TranslateFn;
 };
 
 export function ConversationRow({
   conversation,
   onPress,
+  onPressListing,
   t,
 }: ConversationRowProps): React.ReactElement {
   const last = conversation.messages.at(-1);
@@ -37,9 +39,17 @@ export function ConversationRow({
             </AppText>
           ) : null}
         </View>
-        <AppText style={styles.listing} numberOfLines={1}>
-          {conversation.listingTitle}
-        </AppText>
+        <Pressable
+          onPress={onPressListing}
+          disabled={!onPressListing}
+          hitSlop={6}
+          accessibilityRole="link"
+          accessibilityLabel={conversation.listingTitle}
+        >
+          <AppText style={styles.listing} numberOfLines={1}>
+            {conversation.listingTitle}
+          </AppText>
+        </Pressable>
         <View style={styles.previewRow}>
           <AppText
             weight={unread ? 'semibold' : 'regular'}

@@ -59,6 +59,12 @@ export function MessagesScreen({ navigation }: Props): React.ReactElement {
             onPress={() =>
               navigation.navigate('Conversation', { conversationId: conversation.id })
             }
+            onPressListing={() =>
+              navigation.navigate('CompleteListingDetail', {
+                id: conversation.listingId,
+                category: conversation.listingCategory,
+              })
+            }
           />
         ))
       )}

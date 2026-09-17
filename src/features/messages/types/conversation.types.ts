@@ -1,3 +1,5 @@
+import type { ListingCategory } from '@/navigation/types';
+
 export type ChatMessage = {
   id: string;
   text: string;
@@ -7,8 +9,10 @@ export type ChatMessage = {
 
 export type Conversation = {
   id: string;
-  participantName: string;
+  listingId: string;
   listingTitle: string;
+  listingCategory: ListingCategory;
+  participantName: string;
   unreadCount: number;
   messages: ChatMessage[];
 };

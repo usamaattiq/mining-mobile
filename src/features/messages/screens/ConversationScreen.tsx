@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -75,6 +75,14 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
     );
   }
 
+  const openListing = () => {
+    if (!conversation.listingId || !conversation.listingCategory) return;
+    navigation.navigate('CompleteListingDetail', {
+      id: conversation.listingId,
+      category: conversation.listingCategory,
+    });
+  };
+
   const submit = async () => {
     const text = draft.trim();
     if (!text || sending) return;
@@ -97,12 +105,18 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
       onBackPress={navigation.goBack}
       headerStyle={styles.header}
       headerExtra={
-        <View style={styles.listingChip}>
+        <Pressable
+          onPress={openListing}
+          accessibilityRole="link"
+          accessibilityLabel={conversation.listingTitle}
+          style={({ pressed }) => [styles.listingChip, pressed && styles.listingChipPressed]}
+        >
           <Ionicons name="pricetag-outline" size={14} color={palette.pureWhite} />
           <AppText style={styles.listingChipText} numberOfLines={1}>
             {conversation.listingTitle}
           </AppText>
-        </View>
+          <Ionicons name="chevron-forward" size={14} color={palette.pureWhite} />
+        </Pressable>
       }
       scroll={false}
     >
@@ -148,6 +162,9 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
+  },
+  listingChipPressed: {
+    opacity: 0.85,
   },
   listingChipText: {
     flex: 1,
