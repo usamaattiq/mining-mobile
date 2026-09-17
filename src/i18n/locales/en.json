@@ -20,6 +20,24 @@
     "daysAgo": "{count}d",
     "stepOfTotal": "Step {current} of {total}"
   },
+  "rfq": {
+    "statusLabel": "Status",
+    "offersCount": "Offers",
+    "offerPlaceholder": "Your offer",
+    "sendOffer": "Send offer",
+    "offerSubmitted": "Offer submitted",
+    "offerFailed": "Could not send your offer. Try again.",
+    "status": {
+      "live": "Live",
+      "awaitingConfirmation": "Awaiting confirmation",
+      "offerSubmitted": "Offer submitted",
+      "awaitingYourConfirmation": "Awaiting your confirmation",
+      "confirmed": "Confirmed — still filling",
+      "completed": "Completed",
+      "closed": "Closed",
+      "expired": "Expired"
+    }
+  },
   "language": {
     "english": "English",
     "arabic": "Arabic",

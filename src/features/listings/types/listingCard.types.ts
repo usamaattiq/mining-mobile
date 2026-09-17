@@ -4,6 +4,7 @@ export type ListingCardBadge = {
   key: string;
   label: string;
   icon?: keyof typeof Ionicons.glyphMap;
+  variant?: 'muted' | 'accent' | 'warning' | 'success';
 };
 
 export type ListingCardProps = {
@@ -32,5 +33,7 @@ export type ListingCardProps = {
   priceUnit?: string;
   /** Epoch ms the listing was created — countdown, bottom right. */
   createdAt?: number;
+  /** RFQ expiry from RMS; used for the card countdown when present. */
+  expiresAt?: number;
   onPress: () => void;
 };

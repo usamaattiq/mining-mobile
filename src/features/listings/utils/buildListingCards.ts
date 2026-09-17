@@ -6,6 +6,7 @@ import type { GoldListing } from '@/features/listings/types/goldListing.types';
 import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
 
 export type ListingCardItem = ListingCardProps & { id: string };
 
@@ -117,10 +118,12 @@ export function buildListingCards({
             key: 'mode',
             label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
           },
-        ],
+          rfqStatusBadge(t, listing.rfq),
+        ].filter((badge): badge is NonNullable<typeof badge> => Boolean(badge)),
         priceText: amount,
         priceUnit,
         createdAt: listing.createdAt,
+        expiresAt: listing.rfq?.expiresAt ?? undefined,
         onPress: () => onOpen(listing.id, 'equipment'),
       };
     });
@@ -143,9 +146,11 @@ export function buildListingCards({
             listing.serviceType === 'onsite' ? 'serviceListing.onsite' : 'serviceListing.online',
           ),
         },
-      ],
+        rfqStatusBadge(t, listing.rfq),
+      ].filter((badge): badge is NonNullable<typeof badge> => Boolean(badge)),
       priceText: priceText(currencyCode, listing.price),
       createdAt: listing.createdAt,
+      expiresAt: listing.rfq?.expiresAt ?? undefined,
       onPress: () => onOpen(listing.id, 'services'),
     }));
   }

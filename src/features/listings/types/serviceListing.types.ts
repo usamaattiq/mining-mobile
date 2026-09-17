@@ -1,6 +1,7 @@
 import type { ListingCategory, ServiceType } from '@/navigation/types';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { ListingOwner } from '@/features/listings/types/listingOwner.types';
+import type { ListingRfq } from '@/features/listings/types/listingRfq.types';
 
 export type ServiceListing = {
   id: string;
@@ -18,5 +19,6 @@ export type ServiceListing = {
   postedAs: 'buyer' | 'supplier';
   ownerId?: string;
   owner?: ListingOwner;
+  rfq?: ListingRfq;
   createdAt: number;
 };

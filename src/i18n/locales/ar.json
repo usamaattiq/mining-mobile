@@ -20,6 +20,24 @@
     "daysAgo": "{count} ي",
     "stepOfTotal": "الخطوة {current} من {total}"
   },
+  "rfq": {
+    "statusLabel": "الحالة",
+    "offersCount": "العروض",
+    "offerPlaceholder": "عرضك",
+    "sendOffer": "إرسال العرض",
+    "offerSubmitted": "تم تقديم العرض",
+    "offerFailed": "تعذر إرسال العرض. حاول مرة أخرى.",
+    "status": {
+      "live": "مباشر",
+      "awaitingConfirmation": "بانتظار التأكيد",
+      "offerSubmitted": "تم تقديم عرض",
+      "awaitingYourConfirmation": "بانتظار تأكيدك",
+      "confirmed": "مؤكد — ما زال يُستكمل",
+      "completed": "مكتمل",
+      "closed": "مغلق",
+      "expired": "منتهٍ"
+    }
+  },
   "language": {
     "english": "الإنجليزية",
     "arabic": "العربية",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,7 +18,10 @@ import { DeliveryAvailableBanner } from '@/features/listings/components/Delivery
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
 import { ListingMessageSheet } from '@/features/listings/components/ListingMessageSheet';
+import { ListingOfferComposer } from '@/features/listings/components/ListingOfferComposer';
 import { Button } from '@/shared/components/Button';
+import { showAppAlert } from '@/shared/services/appAlert';
+import { ApiError } from '@/shared/services/api';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
@@ -26,6 +29,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { rfqStatusLabel } from '@/features/listings/utils/rfqStatus';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteListingDetail'>;
@@ -102,6 +106,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
   const [messageOpen, setMessageOpen] = React.useState(false);
+  const [offerSubmitting, setOfferSubmitting] = React.useState(false);
 
   const backButton = (
     <Pressable
@@ -147,6 +152,22 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     detailRows = [
       { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
       { label: t('equipmentListing.units'), value: String(equipmentListing.units) },
+      ...(equipmentListing.rfq
+        ? [
+            {
+              label: t('rfq.statusLabel'),
+              value: rfqStatusLabel(t, equipmentListing.rfq),
+            },
+            ...(equipmentListing.rfq.offersCount !== undefined
+              ? [
+                  {
+                    label: t('rfq.offersCount'),
+                    value: String(equipmentListing.rfq.offersCount),
+                  },
+                ]
+              : []),
+          ]
+        : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
     const durationOptions = isRent
@@ -258,6 +279,22 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             }).format(serviceListing.serviceDate)
           : '',
       },
+      ...(serviceListing.rfq
+        ? [
+            {
+              label: t('rfq.statusLabel'),
+              value: rfqStatusLabel(t, serviceListing.rfq),
+            },
+            ...(serviceListing.rfq.offersCount !== undefined
+              ? [
+                  {
+                    label: t('rfq.offersCount'),
+                    value: String(serviceListing.rfq.offersCount),
+                  },
+                ]
+              : []),
+          ]
+        : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
     priceNode = serviceListing.price ? (
@@ -320,10 +357,40 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const owner = equipmentListing?.owner ?? serviceListing?.owner ?? goldListing?.owner;
   const ownerId =
     equipmentListing?.ownerId ?? serviceListing?.ownerId ?? goldListing?.ownerId ?? owner?.id;
-  const canMessage = Boolean(owner) && ownerId !== profileId;
+  const postedAs = equipmentListing?.postedAs ?? serviceListing?.postedAs ?? goldListing?.postedAs;
+  const rfq = equipmentListing?.rfq ?? serviceListing?.rfq;
+  const hasSentOffer = Boolean(
+    rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
+  );
+  const canOffer =
+    (category === 'equipment' || category === 'services') &&
+    postedAs === 'supplier' &&
+    Boolean(rfq) &&
+    ownerId !== profileId &&
+    rfq?.canSubmitOffer !== false &&
+    !hasSentOffer;
+  const canMessage = Boolean(owner) && ownerId !== profileId && !canOffer && !hasSentOffer;
+
+  const handleSubmitOffer = (price: string) => {
+    setOfferSubmitting(true);
+    void listingsApi
+      .submitOffer(id, price)
+      .then((listing) => {
+        useMarketListingsStore.getState().upsertListing(listing);
+      })
+      .catch((error: unknown) => {
+        const message =
+          error instanceof ApiError ? error.message : t('rfq.offerFailed');
+        showAppAlert(t('common.error'), message);
+      })
+      .finally(() => setOfferSubmitting(false));
+  };
 
   return (
-    <View style={styles.root}>
+    <KeyboardAvoidingView
+      style={styles.root}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <StatusBar style="light" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -372,6 +439,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       {backButton}
 
+      {canOffer || hasSentOffer ? (
+        <ListingOfferComposer
+          currencyCode={currency.code}
+          placeholder={t('rfq.offerPlaceholder')}
+          sendLabel={t('rfq.sendOffer')}
+          submittedLabel={t('rfq.offerSubmitted')}
+          hasOffer={hasSentOffer}
+          submitting={offerSubmitting}
+          onSubmit={handleSubmitOffer}
+        />
+      ) : null}
+
       {canMessage ? (
         <View style={[styles.messageBar, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
           <Button
@@ -397,7 +476,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         initialIndex={viewerIndex ?? 0}
         onClose={() => setViewerIndex(null)}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

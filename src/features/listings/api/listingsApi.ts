@@ -20,11 +20,11 @@ export function isGoldListing(listing: ListingDto): listing is GoldListing {
 
 export type CreateEquipmentListingBody = Omit<
   EquipmentListing,
-  'id' | 'createdAt' | 'ownerId' | 'owner'
+  'id' | 'createdAt' | 'ownerId' | 'owner' | 'rfq'
 >;
 export type CreateServiceListingBody = Omit<
   ServiceListing,
-  'id' | 'createdAt' | 'ownerId' | 'owner'
+  'id' | 'createdAt' | 'ownerId' | 'owner' | 'rfq'
 >;
 export type CreateGoldListingBody = Omit<GoldListing, 'id' | 'createdAt' | 'ownerId' | 'owner'>;
 export type CreateListingBody =
@@ -53,5 +53,9 @@ export const listingsApi = {
 
   create(body: CreateListingBody): Promise<ListingDto> {
     return apiFetch('/listings', { method: 'POST', body });
+  },
+
+  submitOffer(id: string, price: string): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}/offers`, { method: 'POST', body: { price } });
   },
 };

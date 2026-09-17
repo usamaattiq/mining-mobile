@@ -14,7 +14,7 @@ const IMAGE_SIZE = 112;
 const BADGE_ROW_HEIGHT = 20;
 const LINE_HEIGHT = 18;
 
-function useRemainingTime(createdAt: number): string {
+function useRemainingTime(createdAt: number, expiresAt?: number): string {
   const [now, setNow] = React.useState(() => Date.now());
 
   React.useEffect(() => {
@@ -22,7 +22,8 @@ function useRemainingTime(createdAt: number): string {
     return () => clearInterval(timer);
   }, []);
 
-  const remainingMs = Math.max(0, createdAt + LISTING_LIFETIME_MS - now);
+  const end = expiresAt ?? createdAt + LISTING_LIFETIME_MS;
+  const remainingMs = Math.max(0, end - now);
   if (remainingMs >= HOUR_MS) {
     return `${Math.floor(remainingMs / HOUR_MS)}h`;
   }
@@ -43,11 +44,28 @@ function SmallBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement 
   );
 }
 
+function statusBadgeStyle(variant: ListingCardBadge['variant']) {
+  if (variant === 'muted') return styles.statusBadge_muted;
+  if (variant === 'warning') return styles.statusBadge_warning;
+  if (variant === 'success') return styles.statusBadge_success;
+  return undefined;
+}
+
 function StatusBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement {
+  const variant = badge.variant ?? 'accent';
   return (
-    <View style={styles.statusBadge}>
-      {badge.icon ? <Ionicons name={badge.icon} size={10} color={palette.pureWhite} /> : null}
-      <AppText weight="semibold" style={styles.statusBadgeText}>
+    <View style={[styles.statusBadge, statusBadgeStyle(variant)]}>
+      {badge.icon ? (
+        <Ionicons
+          name={badge.icon}
+          size={10}
+          color={variant === 'muted' ? palette.muted : palette.pureWhite}
+        />
+      ) : null}
+      <AppText
+        weight="semibold"
+        style={[styles.statusBadgeText, variant === 'muted' && styles.statusBadgeTextMuted]}
+      >
         {badge.label}
       </AppText>
     </View>
@@ -73,9 +91,10 @@ export function ListingCard({
   priceText,
   priceUnit,
   createdAt,
+  expiresAt,
   onPress,
 }: ListingCardProps): React.ReactElement {
-  const timeLeft = useRemainingTime(createdAt ?? 0);
+  const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
 
   return (
     <Pressable
@@ -297,9 +316,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
   },
+  statusBadge_muted: {
+    backgroundColor: palette.softGold,
+  },
+  statusBadge_warning: {
+    backgroundColor: palette.danger,
+  },
+  statusBadge_success: {
+    backgroundColor: palette.goldDark,
+  },
   statusBadgeText: {
     fontSize: 10,
     color: palette.pureWhite,
+  },
+  statusBadgeTextMuted: {
+    color: palette.muted,
   },
   timerBadge: {
     flexDirection: 'row',

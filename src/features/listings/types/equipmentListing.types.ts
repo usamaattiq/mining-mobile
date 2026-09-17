@@ -1,6 +1,7 @@
 import type { EquipmentListingMode, ListingCategory } from '@/navigation/types';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { ListingOwner } from '@/features/listings/types/listingOwner.types';
+import type { ListingRfq } from '@/features/listings/types/listingRfq.types';
 
 export type DeliveryType = 'free' | 'perKm';
 
@@ -24,5 +25,6 @@ export type EquipmentListing = {
   postedAs: 'buyer' | 'supplier';
   ownerId?: string;
   owner?: ListingOwner;
+  rfq?: ListingRfq;
   createdAt: number;
 };
