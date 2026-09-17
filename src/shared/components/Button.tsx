@@ -71,13 +71,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    borderRadius: radius.md,
+    borderRadius: radius.pill,
     paddingVertical: spacing.sm + 6,
     paddingHorizontal: spacing.lg,
   },
   lg: {
     minHeight: 56,
-    borderRadius: radius.md,
+    borderRadius: radius.pill,
   },
   clip: {
     overflow: 'hidden',

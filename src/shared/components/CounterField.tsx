@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   button: {
     width: 40,
     height: 40,
-    borderRadius: radius.md,
+    borderRadius: radius.pill,
     backgroundColor: palette.gold,
     alignItems: 'center',
     justifyContent: 'center',
