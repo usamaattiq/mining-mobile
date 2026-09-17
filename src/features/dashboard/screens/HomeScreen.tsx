@@ -143,9 +143,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const categoryOptions = [
     { key: 'equipment' as const, label: t('requests.categoryEquipment') },
     { key: 'services' as const, label: t('requests.categoryServices') },
-    ...(role === 'buyer'
-      ? [{ key: 'gold' as const, label: t('requests.categoryGold') }]
-      : []),
+    ...(role === 'buyer' ? [{ key: 'gold' as const, label: t('requests.categoryGold') }] : []),
   ];
 
   React.useEffect(() => {

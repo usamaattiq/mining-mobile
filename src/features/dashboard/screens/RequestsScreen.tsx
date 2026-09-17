@@ -49,9 +49,7 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
   const categoryOptions = [
     { key: 'equipment' as const, label: t('requests.categoryEquipment') },
     { key: 'services' as const, label: t('requests.categoryServices') },
-    ...(role === 'supplier'
-      ? [{ key: 'gold' as const, label: t('requests.categoryGold') }]
-      : []),
+    ...(role === 'supplier' ? [{ key: 'gold' as const, label: t('requests.categoryGold') }] : []),
   ];
 
   React.useEffect(() => {

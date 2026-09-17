@@ -226,6 +226,12 @@ const styles = StyleSheet.create({
     height: BADGE_ROW_HEIGHT,
     width: 1,
   },
+  body: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: 2,
+    minWidth: 0,
+  },
   smallBadge: {
     flexDirection: 'row',
     alignItems: 'center',
