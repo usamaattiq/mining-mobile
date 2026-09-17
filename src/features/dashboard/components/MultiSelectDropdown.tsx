@@ -91,7 +91,14 @@ export function MultiSelectDropdown({
         </View>
       ) : null}
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+      <Modal
+        visible={open}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setOpen(false)}
+      >
         <View style={styles.modalRoot}>
           <Pressable style={StyleSheet.absoluteFill} onPress={() => setOpen(false)} />
           {anchor ? (

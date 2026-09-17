@@ -74,7 +74,14 @@ export function CountryPickerSheet({
   }, [countries, query]);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={onClose}
+    >
       <Pressable style={styles.backdrop} onPress={onClose} />
       <View style={[styles.sheet, { height: sheetHeight }]}>
         <View style={styles.header}>

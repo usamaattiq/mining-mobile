@@ -134,6 +134,8 @@ export function SelectField({
           visible={open}
           transparent
           animationType="fade"
+          statusBarTranslucent
+          navigationBarTranslucent
           onRequestClose={() => setOpen(false)}
         >
           <Pressable style={styles.dropdownBackdrop} onPress={() => setOpen(false)}>

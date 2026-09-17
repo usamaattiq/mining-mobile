@@ -42,7 +42,14 @@ export function LanguageSwitcherModal({
   const { t } = useTranslation(undefined, { i18n: appI18n });
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={onClose}
+    >
       <View style={styles.root}>
         <Pressable
           style={styles.backdrop}
