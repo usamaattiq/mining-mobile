@@ -1,6 +1,5 @@
 import React from 'react';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { FlatList, StyleSheet } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -8,15 +7,15 @@ import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import type { RootStackParamList } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
-import { AppText } from '@/shared/components/AppText';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { useMessagesStore } from '@/store/messagesStore';
 import { messagesApi } from '@/features/messages/api/messagesApi';
 import type { ChatMessage } from '@/features/messages/types/conversation.types';
 import { ChatBubble } from '@/features/messages/components/ChatBubble';
+import { ListingContextChip } from '@/features/messages/components/ListingContextChip';
 import { MessageComposer } from '@/features/messages/components/MessageComposer';
 import { formatClockTime } from '@/shared/utils/formatRelativeTime';
-import { palette, spacing } from '@/theme';
+import { spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Conversation'>;
 
@@ -105,18 +104,13 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
       onBackPress={navigation.goBack}
       headerStyle={styles.header}
       headerExtra={
-        <Pressable
+        <ListingContextChip
+          title={conversation.listingTitle}
+          category={conversation.listingCategory}
+          t={t}
           onPress={openListing}
-          accessibilityRole="link"
-          accessibilityLabel={conversation.listingTitle}
-          style={({ pressed }) => [styles.listingChip, pressed && styles.listingChipPressed]}
-        >
-          <Ionicons name="pricetag-outline" size={14} color={palette.pureWhite} />
-          <AppText style={styles.listingChipText} numberOfLines={1}>
-            {conversation.listingTitle}
-          </AppText>
-          <Ionicons name="chevron-forward" size={14} color={palette.pureWhite} />
-        </Pressable>
+          inHeader
+        />
       }
       scroll={false}
     >
@@ -155,21 +149,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingBottom: spacing.sm,
-  },
-  listingChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  listingChipPressed: {
-    opacity: 0.85,
-  },
-  listingChipText: {
-    flex: 1,
-    fontSize: 13,
-    color: palette.pureWhite,
   },
   thread: {
     flexGrow: 1,

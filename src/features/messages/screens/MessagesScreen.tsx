@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +11,7 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { ConversationRow } from '@/features/messages/components/ConversationRow';
 import { useMessagesStore } from '@/store/messagesStore';
 import { messagesApi } from '@/features/messages/api/messagesApi';
+import { spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Messages'>;
 
@@ -51,23 +53,32 @@ export function MessagesScreen({ navigation }: Props): React.ReactElement {
       {filtered.length === 0 ? (
         <EmptyState title={t('messages.emptyTitle')} subtitle={t('messages.emptySubtitle')} />
       ) : (
-        filtered.map((conversation) => (
-          <ConversationRow
-            key={conversation.id}
-            conversation={conversation}
-            t={t}
-            onPress={() =>
-              navigation.navigate('Conversation', { conversationId: conversation.id })
-            }
-            onPressListing={() =>
-              navigation.navigate('CompleteListingDetail', {
-                id: conversation.listingId,
-                category: conversation.listingCategory,
-              })
-            }
-          />
-        ))
+        <View style={styles.list}>
+          {filtered.map((conversation) => (
+            <ConversationRow
+              key={conversation.id}
+              conversation={conversation}
+              t={t}
+              onPress={() =>
+                navigation.navigate('Conversation', { conversationId: conversation.id })
+              }
+              onPressListing={() =>
+                navigation.navigate('CompleteListingDetail', {
+                  id: conversation.listingId,
+                  category: conversation.listingCategory,
+                })
+              }
+            />
+          ))}
+        </View>
       )}
     </GoldSheetScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  list: {
+    gap: spacing.sm,
+  },
+});
+

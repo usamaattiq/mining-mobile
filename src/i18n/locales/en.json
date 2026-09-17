@@ -225,7 +225,8 @@
     "chatEmpty": "No messages yet. Say hello.",
     "chatOpenFailed": "Could not open this conversation.",
     "chatSendFailed": "Could not send your message. Try again.",
-    "notFound": "This conversation is no longer available."
+    "notFound": "This conversation is no longer available.",
+    "noPreview": "No messages yet"
   },
   "equipmentListing": {
     "modeTitle": "List Equipment",
