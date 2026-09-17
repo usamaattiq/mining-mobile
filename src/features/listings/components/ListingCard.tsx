@@ -227,10 +227,10 @@ const styles = StyleSheet.create({
     width: 1,
   },
   body: {
-    flex: 1,
-    justifyContent: 'center',
     gap: 2,
     minWidth: 0,
+    // marginTop: spacing.,
+    // marginBottom: spacing.xs,
   },
   smallBadge: {
     flexDirection: 'row',
@@ -254,12 +254,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    minHeight: 16,
+    minHeight: 12,
   },
   subtitle: {
     flex: 1,
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 12,
     color: palette.muted,
   },
   priceRow: {
