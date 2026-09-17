@@ -57,7 +57,16 @@ const config: ExpoConfig = {
       {
         action: 'VIEW',
         category: ['BROWSABLE', 'DEFAULT'],
-        data: [{ scheme: 'miningmobile', host: 'requests' }],
+        data: [
+          { scheme: 'miningmobile', host: 'home' },
+          { scheme: 'miningmobile', host: 'requests' },
+          { scheme: 'miningmobile', host: 'requests', pathPrefix: '/' },
+          { scheme: 'miningmobile', host: 'conversation', pathPrefix: '/' },
+          { scheme: 'miningmobile', host: 'listing', pathPrefix: '/' },
+          { scheme: 'miningmobile', host: 'messages' },
+          { scheme: 'miningmobile', host: 'notifications' },
+          { scheme: 'miningmobile', host: 'offers' },
+        ],
       },
     ],
     permissions: [

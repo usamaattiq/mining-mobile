@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { setAuthTokenProvider, setSessionRevokedHandler } from '@/shared/services/api';
+import {
+  registerForPushNotifications,
+  unregisterForPushNotifications,
+} from '@/shared/services/pushNotifications';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
@@ -21,7 +25,7 @@ interface AuthState {
   clear: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   status: 'unknown',
   accessToken: null,
 
@@ -33,9 +37,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   setAuthenticated: async (accessToken: string) => {
     await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
     set({ accessToken, status: 'authenticated' });
+    // Token must be in store before the devices API call attaches Authorization.
+    void registerForPushNotifications();
   },
 
   clear: async () => {
+    // Unregister while the JWT is still available for the devices API.
+    if (get().accessToken) {
+      await unregisterForPushNotifications();
+    }
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     useListingsStore.getState().setListings([]);
     useServiceListingsStore.getState().setListings([]);

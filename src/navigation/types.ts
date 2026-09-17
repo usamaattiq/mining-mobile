@@ -11,7 +11,7 @@ export type ServiceType = 'onsite' | 'online';
 
 export type DashboardTabParamList = {
   HomeTab: undefined;
-  Requests: undefined;
+  Requests: { requestId?: string } | undefined;
   MyOffers: undefined;
   Profile: undefined;
 };

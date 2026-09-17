@@ -8,10 +8,12 @@ import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-c
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { AppAlertHost } from '@/shared/components/AppAlertHost';
 import { navigationRef } from '@/navigation/navigationRef';
+import { navigationLinking } from '@/navigation/linking';
 import { initializeI18n } from '@/i18n';
 import { appFontAssets, palette } from '@/theme';
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications';
 import { useChatRealtime } from '@/shared/hooks/useChatRealtime';
+import { registerForPushNotifications } from '@/shared/services/pushNotifications';
 import { useAuthStore } from '@/store/authStore';
 import { useDevicePrefsStore } from '@/store/devicePrefsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
@@ -47,6 +49,7 @@ export default function App() {
           try {
             const profile = await authApi.getMe();
             useProfileStore.getState().setProfile(profile);
+            void registerForPushNotifications();
           } catch {
             await useAuthStore.getState().clear();
           }
@@ -86,7 +89,7 @@ export default function App() {
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <KeyboardProvider statusBarTranslucent>
         <View style={styles.root}>
-          <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+          <NavigationContainer ref={navigationRef} linking={navigationLinking} theme={navigationTheme}>
             <AppNavigator />
           </NavigationContainer>
           <AppAlertHost />
