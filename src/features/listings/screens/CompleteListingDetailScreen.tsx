@@ -20,6 +20,7 @@ import { AttachmentsSection } from '@/features/listings/components/AttachmentsSe
 import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
 import { ListingMessageSheet } from '@/features/listings/components/ListingMessageSheet';
 import { ListingOfferComposer } from '@/features/listings/components/ListingOfferComposer';
+import { ListingOffersPanel } from '@/features/listings/components/ListingOffersPanel';
 import { Button } from '@/shared/components/Button';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
@@ -106,6 +107,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
   const [messageOpen, setMessageOpen] = React.useState(false);
   const [offerSubmitting, setOfferSubmitting] = React.useState(false);
+  const [actingOfferId, setActingOfferId] = React.useState<string | null>(null);
 
   const backButton = (
     <Pressable
@@ -361,13 +363,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const hasSentOffer = Boolean(
     rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
   ) || rfq?.status === 'offer-submitted';
+  const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
   const canOffer =
     (category === 'equipment' || category === 'services') &&
     postedAs === 'supplier' &&
     Boolean(rfq) &&
-    ownerId !== profileId &&
+    !isOwner &&
     !hasSentOffer;
-  const canMessage = Boolean(owner) && ownerId !== profileId && !canOffer && !hasSentOffer;
+  const canMessage = Boolean(owner) && !isOwner && !canOffer && !hasSentOffer;
+  const showOwnerOffers = isOwner && (category === 'equipment' || category === 'services') && Boolean(rfq);
 
   const handleSubmitOffer = (price: string) => {
     setOfferSubmitting(true);
@@ -382,6 +386,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         showAppAlert(t('common.error'), message);
       })
       .finally(() => setOfferSubmitting(false));
+  };
+
+  const handleDecideOffer = (offerId: string, action: 'accept' | 'reject') => {
+    setActingOfferId(offerId);
+    const request =
+      action === 'accept' ? listingsApi.acceptOffer : listingsApi.rejectOffer;
+    void request(id, offerId)
+      .then((listing) => {
+        cacheListing(listing);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+        showAppAlert(t('common.error'), message);
+      })
+      .finally(() => setActingOfferId(null));
   };
 
   return (
@@ -439,6 +458,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           {descriptionText ? <EquipmentDescriptionCard description={descriptionText} /> : null}
 
           {extraSection}
+
+          {showOwnerOffers ? (
+            <ListingOffersPanel
+              offers={rfq?.offers ?? []}
+              currencyCode={currency.code}
+              actingOfferId={actingOfferId}
+              onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
+              onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
+            />
+          ) : null}
         </View>
       </ScrollView>
 

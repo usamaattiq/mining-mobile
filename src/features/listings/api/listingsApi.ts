@@ -58,4 +58,12 @@ export const listingsApi = {
   submitOffer(id: string, price: string): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers`, { method: 'POST', body: { price } });
   },
+
+  acceptOffer(id: string, offerId: string): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}/offers/${offerId}/accept`, { method: 'POST', body: {} });
+  },
+
+  rejectOffer(id: string, offerId: string): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}/offers/${offerId}/reject`, { method: 'POST', body: {} });
+  },
 };

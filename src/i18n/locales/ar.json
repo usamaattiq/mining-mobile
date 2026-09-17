@@ -27,6 +27,20 @@
     "sendOffer": "إرسال العرض",
     "offerSubmitted": "تم تقديم العرض",
     "offerFailed": "تعذر إرسال العرض. حاول مرة أخرى.",
+    "offersTitle": "العروض",
+    "noOffers": "لا توجد عروض بعد.",
+    "accept": "قبول",
+    "reject": "رفض",
+    "actionFailed": "تعذر تحديث هذا العرض. حاول مرة أخرى.",
+    "offerStatus": {
+      "active": "جديد",
+      "selected": "محدد",
+      "confirmed": "مقبول",
+      "withdrawn": "مسحوب",
+      "declined": "مرفوض",
+      "timedOut": "انتهت المهلة",
+      "lapsed": "منتهٍ"
+    },
     "status": {
       "live": "مباشر",
       "awaitingConfirmation": "بانتظار التأكيد",

@@ -27,6 +27,20 @@
     "sendOffer": "Send offer",
     "offerSubmitted": "Offer submitted",
     "offerFailed": "Could not send your offer. Try again.",
+    "offersTitle": "Offers",
+    "noOffers": "No offers yet.",
+    "accept": "Accept",
+    "reject": "Reject",
+    "actionFailed": "Could not update this offer. Try again.",
+    "offerStatus": {
+      "active": "New",
+      "selected": "Selected",
+      "confirmed": "Accepted",
+      "withdrawn": "Withdrawn",
+      "declined": "Rejected",
+      "timedOut": "Timed out",
+      "lapsed": "Lapsed"
+    },
     "status": {
       "live": "Live",
       "awaitingConfirmation": "Awaiting confirmation",
