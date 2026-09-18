@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Keyboard, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -125,8 +125,15 @@ export function HomeFilterSheet({
   };
 
   return (
-    <AppBottomSheet visible={visible} onClose={onClose} heightRatio={0.78}>
+    <AppBottomSheet
+      visible={visible}
+      onClose={onClose}
+      heightRatio={0.78}
+      avoidKeyboard={!(Platform.OS === 'ios' && pickingDate)}
+    >
+      <View style={styles.sheetBody}>
       <ScrollView
+        style={styles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -244,7 +251,10 @@ export function HomeFilterSheet({
           {t('dashboardHome.filterDate')}
         </AppText>
         <Pressable
-          onPress={() => setPickingDate(true)}
+          onPress={() => {
+            Keyboard.dismiss();
+            setPickingDate(true);
+          }}
           style={({ pressed }) => [styles.dateRow, pressed && styles.pressed]}
         >
           <Ionicons name="calendar-outline" size={18} color={palette.gold} />
@@ -252,38 +262,48 @@ export function HomeFilterSheet({
             {draftDateKey ? formatDayKey(draftDateKey, locale) : t('dashboardHome.filterAnyDate')}
           </AppText>
         </Pressable>
-        {pickingDate ? (
-          <View style={Platform.OS === 'ios' ? styles.iosPickerWrap : undefined}>
-            <DateTimePicker
-              value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
-              mode="date"
-              onChange={handleDateChange}
-              {...(Platform.OS === 'ios'
-                ? {
-                    display: 'spinner' as const,
-                    themeVariant: 'light' as const,
-                    textColor: palette.charcoal,
-                    style: styles.iosPicker,
-                  }
-                : { display: 'default' as const })}
-            />
-          </View>
-        ) : null}
-        {Platform.OS === 'ios' && pickingDate ? (
-          <Button
-            label={t('common.done')}
-            onPress={() => setPickingDate(false)}
-            style={styles.doneButton}
+        {Platform.OS === 'android' && pickingDate ? (
+          <DateTimePicker
+            value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
           />
         ) : null}
 
         <Button label={t('dashboardHome.apply')} onPress={onApply} style={styles.applyButton} />
       </ScrollView>
+      {Platform.OS === 'ios' && pickingDate ? (
+        <View style={styles.iosPickerDock}>
+          <DateTimePicker
+            value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
+            mode="date"
+            display="spinner"
+            themeVariant="light"
+            textColor={palette.charcoal}
+            style={styles.iosPicker}
+            onChange={handleDateChange}
+          />
+          <Button
+            label={t('common.done')}
+            onPress={() => setPickingDate(false)}
+            style={styles.doneButton}
+          />
+        </View>
+      ) : null}
+      </View>
     </AppBottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
+  sheetBody: {
+    flex: 1,
+    minHeight: 0,
+  },
+  scroll: {
+    flex: 1,
+  },
   scrollContent: {
     paddingBottom: spacing.lg,
   },
@@ -362,9 +382,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: palette.charcoal,
   },
-  iosPickerWrap: {
-    height: 216,
-    justifyContent: 'center',
+  iosPickerDock: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: palette.softGold,
+    backgroundColor: palette.warmWhite,
+    paddingTop: spacing.xs,
   },
   iosPicker: {
     height: 216,

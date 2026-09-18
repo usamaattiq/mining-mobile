@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Keyboard, Platform, Pressable, StyleSheet, View } from 'react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +39,7 @@ export function DateTimeField({
       return;
     }
     setDraft(value ?? new Date());
+    Keyboard.dismiss();
     setSheetOpen(true);
   };
 
@@ -93,7 +94,12 @@ export function DateTimeField({
       ) : null}
 
       {Platform.OS === 'ios' ? (
-        <AppBottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} heightRatio={0.52}>
+        <AppBottomSheet
+          visible={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          heightRatio={0.48}
+          avoidKeyboard={false}
+        >
           <AppText weight="bold" style={styles.sheetTitle}>
             {label}
           </AppText>

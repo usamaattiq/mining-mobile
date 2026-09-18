@@ -8,4 +8,9 @@ export type AppBottomSheetProps = {
   /** Sheet height as a fraction of the window (0-1). Default 0.7. */
   heightRatio?: number;
   sheetStyle?: StyleProp<ViewStyle>;
+  /**
+   * When false, the sheet ignores IME size. Use for iOS date/time wheels:
+   * UIDatePicker reports as a keyboard and would otherwise shift the sheet.
+   */
+  avoidKeyboard?: boolean;
 };

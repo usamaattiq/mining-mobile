@@ -41,11 +41,13 @@ function BottomSheetFrame({
   children,
   heightRatio,
   sheetStyle,
+  avoidKeyboard,
 }: {
   onClose: () => void;
   children: React.ReactNode;
   heightRatio: number;
   sheetStyle?: StyleProp<ViewStyle>;
+  avoidKeyboard: boolean;
 }): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { width, height: windowHeight } = useWindowDimensions();
@@ -58,6 +60,10 @@ function BottomSheetFrame({
   const topReserve = Math.max(insets.top, spacing.md);
 
   React.useEffect(() => {
+    if (!avoidKeyboard) {
+      keyboardOcclusionSv.value = 0;
+      return;
+    }
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
     const applyShow = (event: KeyboardEvent) => {
@@ -85,7 +91,7 @@ function BottomSheetFrame({
       hide.remove();
       frame?.remove();
     };
-  }, [keyboardOcclusionSv]);
+  }, [avoidKeyboard, keyboardOcclusionSv]);
 
   React.useEffect(() => {
     if (lastWidthRef.current !== width) {
@@ -136,6 +142,7 @@ export function AppBottomSheet({
   children,
   heightRatio = 0.7,
   sheetStyle,
+  avoidKeyboard = true,
 }: AppBottomSheetProps): React.ReactElement {
   return (
     <Modal
@@ -147,7 +154,12 @@ export function AppBottomSheet({
       navigationBarTranslucent
     >
       <SafeAreaProvider initialMetrics={initialWindowMetrics ?? undefined}>
-        <BottomSheetFrame onClose={onClose} heightRatio={heightRatio} sheetStyle={sheetStyle}>
+        <BottomSheetFrame
+          onClose={onClose}
+          heightRatio={heightRatio}
+          sheetStyle={sheetStyle}
+          avoidKeyboard={avoidKeyboard}
+        >
           {children}
         </BottomSheetFrame>
       </SafeAreaProvider>
