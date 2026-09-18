@@ -69,6 +69,7 @@ const config: ExpoConfig = {
   ],
   android: {
     ...baseExpo.android,
+    googleServicesFile: './google-services.json',
     softwareKeyboardLayoutMode: 'resize',
     intentFilters: [
       ...(baseExpo.android?.intentFilters ?? []),
