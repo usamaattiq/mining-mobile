@@ -11,6 +11,8 @@ export type GoldSheetScreenProps = {
   titleAlign?: AppTopBarProps['titleAlign'];
   titleSize?: AppTopBarProps['titleSize'];
   headerStyle?: ViewStyle;
+  /** Applied to the white curved sheet (not the gold header). */
+  sheetStyle?: StyleProp<ViewStyle>;
   headerExtra?: ReactNode;
   statusBar?: boolean;
   scroll?: boolean;

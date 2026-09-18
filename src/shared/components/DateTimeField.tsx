@@ -93,16 +93,21 @@ export function DateTimeField({
       ) : null}
 
       {Platform.OS === 'ios' ? (
-        <AppBottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} heightRatio={0.4}>
+        <AppBottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} heightRatio={0.52}>
           <AppText weight="bold" style={styles.sheetTitle}>
             {label}
           </AppText>
-          <DateTimePicker
-            value={draft}
-            mode="datetime"
-            display="spinner"
-            onChange={(_event, selected) => selected && setDraft(selected)}
-          />
+          <View style={styles.pickerWrap}>
+            <DateTimePicker
+              value={draft}
+              mode="datetime"
+              display="spinner"
+              themeVariant="light"
+              textColor={palette.charcoal}
+              style={styles.picker}
+              onChange={(_event, selected) => selected && setDraft(selected)}
+            />
+          </View>
           <Button label={t('common.done')} onPress={handleConfirm} style={styles.confirmButton} />
         </AppBottomSheet>
       ) : null}
@@ -151,5 +156,13 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginTop: spacing.sm,
+  },
+  pickerWrap: {
+    height: 216,
+    justifyContent: 'center',
+  },
+  picker: {
+    height: 216,
+    width: '100%',
   },
 });

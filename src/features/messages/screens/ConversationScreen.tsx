@@ -1,6 +1,6 @@
 import React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -103,6 +103,7 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
       left="back"
       onBackPress={navigation.goBack}
       headerStyle={styles.header}
+      sheetStyle={styles.sheet}
       headerExtra={
         <ListingContextChip
           title={conversation.listingTitle}
@@ -114,13 +115,15 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
       }
       scroll={false}
     >
-      <KeyboardAvoidingView style={styles.flex} behavior="padding">
+      <View style={styles.threadClip}>
         <FlatList
           ref={listRef}
           data={conversation.messages}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.thread}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
           renderItem={({ item }) => (
             <ChatBubble
@@ -130,6 +133,8 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
             />
           )}
         />
+      </View>
+      <KeyboardStickyView>
         <MessageComposer
           value={draft}
           onChangeText={setDraft}
@@ -138,14 +143,18 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
           sendLabel={t('messages.send')}
           sending={sending}
         />
-      </KeyboardAvoidingView>
+      </KeyboardStickyView>
     </GoldSheetScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: {
+  sheet: {
+    overflow: 'visible',
+  },
+  threadClip: {
     flex: 1,
+    overflow: 'hidden',
   },
   header: {
     paddingBottom: spacing.sm,

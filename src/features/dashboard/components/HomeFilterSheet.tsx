@@ -253,12 +253,21 @@ export function HomeFilterSheet({
           </AppText>
         </Pressable>
         {pickingDate ? (
-          <DateTimePicker
-            value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleDateChange}
-          />
+          <View style={Platform.OS === 'ios' ? styles.iosPickerWrap : undefined}>
+            <DateTimePicker
+              value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
+              mode="date"
+              onChange={handleDateChange}
+              {...(Platform.OS === 'ios'
+                ? {
+                    display: 'spinner' as const,
+                    themeVariant: 'light' as const,
+                    textColor: palette.charcoal,
+                    style: styles.iosPicker,
+                  }
+                : { display: 'default' as const })}
+            />
+          </View>
         ) : null}
         {Platform.OS === 'ios' && pickingDate ? (
           <Button
@@ -352,6 +361,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: palette.charcoal,
+  },
+  iosPickerWrap: {
+    height: 216,
+    justifyContent: 'center',
+  },
+  iosPicker: {
+    height: 216,
+    width: '100%',
   },
   placeholder: {
     color: palette.muted,

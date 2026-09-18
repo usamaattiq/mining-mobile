@@ -19,6 +19,7 @@ export function GoldSheetScreen({
   titleAlign,
   titleSize,
   headerStyle,
+  sheetStyle,
   headerExtra,
   statusBar = true,
   scroll = true,
@@ -47,7 +48,7 @@ export function GoldSheetScreen({
           {children}
         </CurvedSheetScrollView>
       ) : (
-        <View style={styles.sheet}>{children}</View>
+        <View style={[styles.sheet, sheetStyle]}>{children}</View>
       )}
     </View>
   );
