@@ -33,7 +33,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
-import { rfqStatusLabel } from '@/features/listings/utils/rfqStatus';
+import { rfqStatusBadge, rfqStatusLabel } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { palette, radius, spacing } from '@/theme';
@@ -42,7 +42,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'CompleteListingDetail'>
 type DetailRow = { label: string; value: string };
 type RentalDuration = 'hourly' | 'weekly' | 'monthly';
 /** Loose shape covering both EquipmentMediaAsset and ServiceMediaAsset — this screen only needs id/uri/kind/name. */
-type AnyMediaAsset = { id: string; uri: string; kind: string; name?: string };
+function formatListingDate(locale: string, epoch: number | null | undefined): string {
+  if (!epoch) return '';
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(epoch));
+}
 
 /** Published-listing detail screen shared by equipment, service and gold auction listings. */
 export function CompleteListingDetailScreen({ navigation, route }: Props): React.ReactElement {
@@ -182,6 +188,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     detailRows = [
       { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
       { label: t('equipmentListing.units'), value: String(equipmentListing.units) },
+      {
+        label: t('common.date'),
+        value: formatListingDate(currentLanguage, equipmentListing.createdAt),
+      },
       ...(equipmentListing.rfq
         ? [
             {
@@ -298,12 +308,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
       {
         label: t('serviceListing.dateTimeLabel'),
-        value: serviceListing.serviceDate
-          ? new Intl.DateTimeFormat(currentLanguage, {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            }).format(serviceListing.serviceDate)
-          : '',
+        value: formatListingDate(
+          currentLanguage,
+          serviceListing.serviceDate ?? serviceListing.createdAt,
+        ),
       },
       ...(serviceListing.rfq
         ? [
@@ -346,12 +354,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
       {
         label: t('goldListing.auctionEndDate'),
-        value: goldListing.auctionEndDate
-          ? new Intl.DateTimeFormat(currentLanguage, {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            }).format(goldListing.auctionEndDate)
-          : '',
+        value: formatListingDate(
+          currentLanguage,
+          goldListing.auctionEndDate ?? goldListing.createdAt,
+        ),
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
@@ -400,6 +406,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const showOfferInput = canOffer && !awaitingConfirm;
   const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
   const showOwnerOffers = isOwner && Boolean(rfq);
+  const headerBadge =
+    rfqStatusBadge(t, rfq) ??
+    (equipmentListing
+      ? {
+          key: 'mode',
+          label: t(
+            equipmentListing.mode === 'rent' ? 'equipmentListing.rent' : 'equipmentListing.sell',
+          ),
+          variant: 'accent' as const,
+        }
+      : null);
 
   const handleSubmitOffer = (price: string, units?: number) => {
     setOfferSubmitting(true);
@@ -468,16 +485,24 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
         <View style={styles.content}>
           <View style={styles.headerBlock}>
+            {headerBadge ? (
+              <View
+                style={[
+                  styles.rfqStatusChip,
+                  headerBadge.variant === 'muted' && styles.rfqStatusChipMuted,
+                  headerBadge.variant === 'warning' && styles.rfqStatusChipWarning,
+                  headerBadge.variant === 'success' && styles.rfqStatusChipSuccess,
+                ]}
+              >
+                <AppText weight="semibold" style={styles.rfqStatusChipText}>
+                  {headerBadge.label}
+                </AppText>
+              </View>
+            ) : null}
+
             {priceNode}
 
             <View style={styles.titleBlock}>
-              {rfq ? (
-                <View style={styles.rfqStatusChip}>
-                  <AppText weight="semibold" style={styles.rfqStatusChipText}>
-                    {rfqStatusLabel(t, rfq)}
-                  </AppText>
-                </View>
-              ) : null}
               <AppText weight="bold" style={styles.title}>
                 {title}
               </AppText>
@@ -654,6 +679,15 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 3,
+  },
+  rfqStatusChipMuted: {
+    backgroundColor: palette.muted,
+  },
+  rfqStatusChipWarning: {
+    backgroundColor: palette.goldDark,
+  },
+  rfqStatusChipSuccess: {
+    backgroundColor: palette.gold,
   },
   rfqStatusChipText: {
     fontSize: 11,

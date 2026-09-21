@@ -337,15 +337,13 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
               />
             ) : null}
 
-            <View style={styles.unitsField}>
-              <CounterField
-                label={t('equipmentListing.units')}
-                value={units}
-                onChange={setUnits}
-                min={1}
-                required
-              />
-            </View>
+            <CounterField
+              label={t('equipmentListing.units')}
+              value={units}
+              onChange={setUnits}
+              min={1}
+              required
+            />
           </View>
         ) : null}
 
@@ -478,9 +476,6 @@ const styles = StyleSheet.create({
   },
   priceInput: {
     flex: 1,
-  },
-  unitsField: {
-    width: '50%',
   },
   deliveryTypeBlock: {
     gap: spacing.md,

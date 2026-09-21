@@ -18,7 +18,8 @@
     "hoursAgo": "{count} س",
     "yesterday": "أمس",
     "daysAgo": "{count} ي",
-    "stepOfTotal": "الخطوة {current} من {total}"
+    "stepOfTotal": "الخطوة {current} من {total}",
+    "date": "التاريخ"
   },
   "rfq": {
     "statusLabel": "الحالة",

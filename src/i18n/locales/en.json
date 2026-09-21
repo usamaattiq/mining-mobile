@@ -18,7 +18,8 @@
     "hoursAgo": "{count}h",
     "yesterday": "Yesterday",
     "daysAgo": "{count}d",
-    "stepOfTotal": "Step {current} of {total}"
+    "stepOfTotal": "Step {current} of {total}",
+    "date": "Date"
   },
   "rfq": {
     "statusLabel": "Status",
