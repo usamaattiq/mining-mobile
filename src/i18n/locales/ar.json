@@ -19,7 +19,8 @@
     "yesterday": "أمس",
     "daysAgo": "{count} ي",
     "stepOfTotal": "الخطوة {current} من {total}",
-    "date": "التاريخ"
+    "date": "التاريخ",
+    "postedOn": "تاريخ النشر"
   },
   "rfq": {
     "statusLabel": "الحالة",
