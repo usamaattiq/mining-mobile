@@ -16,33 +16,37 @@ export function HomeCategoryCards({
       {options.map((option) => {
         const selected = option.key === value;
         return (
-          <Pressable
+          <View
             key={option.key}
-            onPress={() => onChange(option.key)}
-            accessibilityRole="button"
-            accessibilityState={{ selected }}
-            accessibilityLabel={option.title}
-            style={({ pressed }) => [
-              styles.card,
-              selected && styles.cardSelected,
-              pressed && styles.pressed,
-            ]}
+            style={[styles.shadowWrap, selected && styles.shadowWrapSelected]}
           >
-            <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
-              <Ionicons
-                name={option.icon}
-                size={24}
-                color={selected ? palette.gold : palette.pureWhite}
-              />
-            </View>
-            <AppText
-              weight="bold"
-              style={[styles.title, selected && styles.titleSelected]}
-              numberOfLines={1}
+            <Pressable
+              onPress={() => onChange(option.key)}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              accessibilityLabel={option.title}
+              style={({ pressed }) => [
+                styles.card,
+                selected && styles.cardSelected,
+                pressed && styles.pressed,
+              ]}
             >
-              {option.title}
-            </AppText>
-          </Pressable>
+              <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
+                <Ionicons
+                  name={option.icon}
+                  size={24}
+                  color={selected ? palette.gold : palette.pureWhite}
+                />
+              </View>
+              <AppText
+                weight="bold"
+                style={[styles.title, selected && styles.titleSelected]}
+                numberOfLines={1}
+              >
+                {option.title}
+              </AppText>
+            </Pressable>
+          </View>
         );
       })}
     </View>
@@ -54,9 +58,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.sm,
   },
-  card: {
+  shadowWrap: {
     flex: 1,
     minWidth: 0,
+    borderRadius: radius.lg,
+    backgroundColor: palette.gold,
+    shadowColor: '#000000',
+    shadowOpacity: 0.18,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  shadowWrapSelected: {
+    backgroundColor: palette.warmWhite,
+  },
+  card: {
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.16)',
     borderRadius: radius.lg,
@@ -65,6 +81,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.md,
     gap: 6,
+    overflow: 'hidden',
   },
   cardSelected: {
     backgroundColor: palette.warmWhite,

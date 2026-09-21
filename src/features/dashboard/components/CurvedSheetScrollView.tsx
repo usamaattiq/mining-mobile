@@ -14,13 +14,14 @@ export function CurvedSheetScrollView({
   contentContainerStyle,
   children,
   refreshControl,
+  style,
   ...rest
 }: ScrollViewProps): React.ReactElement {
   const tabBarPadding = useFloatingTabBarContentPadding();
 
   return (
     <KeyboardAwareScrollView
-      style={styles.scroll}
+      style={[styles.scroll, style]}
       contentContainerStyle={[
         styles.content,
         tabBarPadding > 0 && { paddingBottom: spacing.md + tabBarPadding },
