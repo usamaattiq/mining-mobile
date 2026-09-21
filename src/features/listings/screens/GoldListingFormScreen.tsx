@@ -359,11 +359,11 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
-    gap: spacing.lg,
+    gap: spacing.md,
     paddingBottom: spacing.xxl,
   },
   stepBlock: {
-    gap: spacing.lg,
+    gap: spacing.sm,
   },
   descriptionInput: {
     minHeight: 96,

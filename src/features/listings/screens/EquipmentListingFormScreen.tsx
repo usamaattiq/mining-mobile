@@ -191,15 +191,15 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
     ...(isRent
       ? [
           {
-            label: t('equipmentListing.hourlyRental'),
+            label: t('equipmentListing.hourlyRental', { currency: currency.code }),
             value: hourlyRental ? `${currency.code} ${formatAmountWithCommas(hourlyRental)}` : '',
           },
           {
-            label: t('equipmentListing.weeklyRental'),
+            label: t('equipmentListing.weeklyRental', { currency: currency.code }),
             value: weeklyRental ? `${currency.code} ${formatAmountWithCommas(weeklyRental)}` : '',
           },
           {
-            label: t('equipmentListing.monthlyRental'),
+            label: t('equipmentListing.monthlyRental', { currency: currency.code }),
             value: monthlyRental ? `${currency.code} ${formatAmountWithCommas(monthlyRental)}` : '',
           },
         ]
@@ -300,7 +300,7 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
               <View style={styles.priceRow}>
                 <View style={styles.priceInput}>
                   <FormInput
-                    label={t('equipmentListing.hourlyRental')}
+                    label={t('equipmentListing.hourlyRental', { currency: currency.code })}
                     value={hourlyRental}
                     onChangeText={setHourlyRental}
                     keyboardType="numeric"
@@ -309,7 +309,7 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
                 </View>
                 <View style={styles.priceInput}>
                   <FormInput
-                    label={t('equipmentListing.weeklyRental')}
+                    label={t('equipmentListing.weeklyRental', { currency: currency.code })}
                     value={weeklyRental}
                     onChangeText={setWeeklyRental}
                     keyboardType="numeric"
@@ -318,7 +318,7 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
                 </View>
                 <View style={styles.priceInput}>
                   <FormInput
-                    label={t('equipmentListing.monthlyRental')}
+                    label={t('equipmentListing.monthlyRental', { currency: currency.code })}
                     value={monthlyRental}
                     onChangeText={setMonthlyRental}
                     keyboardType="numeric"
@@ -457,11 +457,11 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
-    gap: spacing.lg,
+    gap: spacing.md,
     paddingBottom: spacing.xxl,
   },
   stepBlock: {
-    gap: spacing.lg,
+    gap: spacing.md,
   },
   choiceRow: {
     flexDirection: 'row',
