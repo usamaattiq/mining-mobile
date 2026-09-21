@@ -15,12 +15,9 @@ export type ListingOfferComposerProps = {
   hasOffer: boolean;
   showInput: boolean;
   awaitingConfirm: boolean;
-  canWithdraw?: boolean;
   submitting: boolean;
-  withdrawLabel?: string;
   onSubmit: (price: string, units?: number) => void;
   onConfirm: () => void;
   onDecline: () => void;
-  onWithdraw?: () => void;
   footer?: ReactNode;
 };

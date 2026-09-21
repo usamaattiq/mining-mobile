@@ -20,19 +20,15 @@ export function ListingOfferComposer({
   declineLabel,
   offerPrice,
   offerUnitsLabel,
-  unitsLabel,
   maxUnits,
   unitPricePlaceholder,
   hasOffer,
   showInput,
   awaitingConfirm,
-  canWithdraw,
   submitting,
-  withdrawLabel,
   onSubmit,
   onConfirm,
   onDecline,
-  onWithdraw,
   footer,
 }: ListingOfferComposerProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -66,10 +62,14 @@ export function ListingOfferComposer({
               {submittedLabel}
             </AppText>
             {offerPrice ? (
-              <AppText weight="bold" style={styles.cardPrice}>
-                {currencyCode} {formatAmountWithCommas(offerPrice)}
-                {offerUnitsLabel ? ` · ${offerUnitsLabel}` : ''}
-              </AppText>
+              <View style={styles.cardPriceRow}>
+                <AppText weight="bold" style={styles.cardPrice}>
+                  {currencyCode} {formatAmountWithCommas(offerPrice)}
+                </AppText>
+                {offerUnitsLabel ? (
+                  <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
+                ) : null}
+              </View>
             ) : null}
           </View>
 
@@ -111,76 +111,65 @@ export function ListingOfferComposer({
                 )}
               </Pressable>
             </View>
-          ) : canWithdraw && onWithdraw ? (
-            <Pressable
-              onPress={onWithdraw}
-              disabled={submitting}
-              accessibilityRole="button"
-              accessibilityLabel={withdrawLabel}
-              style={({ pressed }) => [
-                styles.withdraw,
-                submitting && styles.sendDisabled,
-                pressed && !submitting && styles.declinePressed,
-              ]}
-            >
-              <AppText weight="semibold" style={styles.withdrawLabel}>
-                {withdrawLabel}
-              </AppText>
-            </Pressable>
           ) : null}
         </View>
       ) : null}
 
       {showInput ? (
         <View style={styles.form}>
-          {maxUnits != null ? (
-            <CounterField
-              label={unitsLabel}
-              value={units}
-              onChange={setUnits}
-              min={1}
-              max={unitCap}
-              required
-            />
-          ) : null}
           <View style={styles.row}>
-          <View style={styles.inputWrap}>
-            <AppText weight="semibold" style={styles.currency}>
-              {currencyCode}
-            </AppText>
-            <TextInput
-              value={price}
-              onChangeText={setPrice}
-              placeholder={unitPricePlaceholder ?? placeholder}
-              placeholderTextColor={palette.muted}
-              keyboardType="decimal-pad"
-              editable={!submitting}
-              style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
-            />
+            {maxUnits != null ? (
+              <View style={styles.unitsWrap}>
+                <CounterField
+                  value={units}
+                  onChange={setUnits}
+                  min={1}
+                  max={unitCap}
+                  required
+                />
+              </View>
+            ) : null}
+            <View style={styles.inputWrap}>
+              <AppText weight="semibold" style={styles.currency}>
+                {currencyCode}
+              </AppText>
+              <TextInput
+                value={price}
+                onChangeText={setPrice}
+                placeholder={unitPricePlaceholder ?? placeholder}
+                placeholderTextColor={palette.muted}
+                keyboardType="decimal-pad"
+                editable={!submitting}
+                style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
+              />
+            </View>
           </View>
-          <Pressable
-            onPress={handleSend}
-            disabled={!canSend}
-            accessibilityRole="button"
-            accessibilityLabel={sendLabel}
-            style={({ pressed }) => [
-              styles.send,
-              !canSend && styles.sendDisabled,
-              pressed && canSend && styles.sendPressed,
-            ]}
-          >
-            {submitting ? (
-              <ActivityIndicator color={palette.pureWhite} size="small" />
-            ) : (
-              <>
-                <Ionicons name="send" size={14} color={palette.pureWhite} />
-                <AppText weight="bold" style={styles.sendLabel}>
-                  {sendLabel}
-                </AppText>
-              </>
-            )}
-          </Pressable>
-        </View>
+          <View style={styles.actions}>
+            {footer ? <View style={styles.actionButton}>{footer}</View> : null}
+            <Pressable
+              onPress={handleSend}
+              disabled={!canSend}
+              accessibilityRole="button"
+              accessibilityLabel={sendLabel}
+              style={({ pressed }) => [
+                styles.send,
+                styles.actionButton,
+                !canSend && styles.sendDisabled,
+                pressed && canSend && styles.sendPressed,
+              ]}
+            >
+              {submitting ? (
+                <ActivityIndicator color={palette.pureWhite} size="small" />
+              ) : (
+                <>
+                  <Ionicons name="send" size={14} color={palette.pureWhite} />
+                  <AppText weight="bold" style={styles.sendLabel} numberOfLines={1}>
+                    {sendLabel}
+                  </AppText>
+                </>
+              )}
+            </Pressable>
+          </View>
           {totalPrice ? (
             <AppText weight="semibold" style={styles.total}>
               {t('rfq.offerTotal', {
@@ -191,7 +180,7 @@ export function ListingOfferComposer({
         </View>
       ) : null}
 
-      {footer}
+      {!showInput ? footer : null}
     </View>
   );
 }
@@ -228,10 +217,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: palette.charcoal,
   },
+  cardPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: spacing.xs,
+    flexShrink: 1,
+  },
+  cardUnits: {
+    fontSize: 12,
+    color: palette.muted,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  unitsWrap: {
+    flex: 1,
+    maxWidth: 168,
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: spacing.sm,
+  },
+  actionButton: {
+    flex: 1,
   },
   form: {
     gap: spacing.sm,
@@ -265,6 +276,7 @@ const styles = StyleSheet.create({
   send: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     minHeight: 44,
     paddingHorizontal: spacing.md,
@@ -280,20 +292,6 @@ const styles = StyleSheet.create({
   sendLabel: {
     fontSize: 13,
     color: palette.pureWhite,
-  },
-  withdraw: {
-    alignSelf: 'flex-start',
-    minHeight: 36,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: palette.softGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  withdrawLabel: {
-    fontSize: 12,
-    color: palette.charcoal,
   },
   confirmRow: {
     flexDirection: 'row',

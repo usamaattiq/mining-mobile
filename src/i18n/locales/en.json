@@ -37,6 +37,8 @@
     "confirm": "Confirm",
     "decline": "Decline",
     "withdraw": "Withdraw",
+    "withdrawConfirmTitle": "Withdraw offer?",
+    "withdrawConfirmMessage": "This will remove your offer from this listing.",
     "waitingForConfirmation": "Waiting for the other party to confirm.",
     "actionFailed": "Could not update this offer. Try again.",
     "offerStatus": {

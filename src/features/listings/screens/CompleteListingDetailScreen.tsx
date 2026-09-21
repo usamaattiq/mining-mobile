@@ -134,7 +134,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     <Pressable
       onPress={navigation.goBack}
       hitSlop={12}
-      style={[styles.backButton, { top: insets.top + spacing.sm }]}
+      style={[styles.overlayButton, styles.backButton, { top: insets.top + spacing.sm }]}
       accessibilityRole="button"
       accessibilityLabel={t('common.back')}
     >
@@ -198,14 +198,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               label: t('rfq.statusLabel'),
               value: rfqStatusLabel(t, equipmentListing.rfq),
             },
-            ...(equipmentListing.rfq.offersCount !== undefined
-              ? [
-                  {
-                    label: t('rfq.offersCount'),
-                    value: String(equipmentListing.rfq.offersCount),
-                  },
-                ]
-              : []),
           ]
         : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -319,14 +311,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               label: t('rfq.statusLabel'),
               value: rfqStatusLabel(t, serviceListing.rfq),
             },
-            ...(serviceListing.rfq.offersCount !== undefined
-              ? [
-                  {
-                    label: t('rfq.offersCount'),
-                    value: String(serviceListing.rfq.offersCount),
-                  },
-                ]
-              : []),
           ]
         : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -405,6 +389,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     Boolean(rfq?.canConfirmOffer);
   const showOfferInput = canOffer && !awaitingConfirm;
   const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
+  const canWithdraw =
+    !awaitingConfirm &&
+    (Boolean(rfq?.canWithdrawOffer) ||
+      rfq?.myOfferStatus === 'active' ||
+      rfq?.status === 'offer-submitted');
   const showOwnerOffers = isOwner && Boolean(rfq);
   const headerBadge =
     rfqStatusBadge(t, rfq) ??
@@ -451,22 +440,34 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const handleResponderOffer = (action: 'confirm' | 'decline' | 'withdraw') => {
     const offerId = rfq?.myOfferId;
     if (!offerId) return;
-    setOfferSubmitting(true);
-    const request =
-      action === 'confirm'
-        ? listingsApi.confirmOffer
-        : action === 'decline'
-          ? listingsApi.declineOffer
-          : listingsApi.withdrawOffer;
-    void request(id, offerId)
-      .then((listing) => {
-        applyListing(listing);
-      })
-      .catch((error: unknown) => {
-        const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
-        showAppAlert(t('common.error'), message);
-      })
-      .finally(() => setOfferSubmitting(false));
+    const run = () => {
+      setOfferSubmitting(true);
+      const request =
+        action === 'confirm'
+          ? listingsApi.confirmOffer
+          : action === 'decline'
+            ? listingsApi.declineOffer
+            : listingsApi.withdrawOffer;
+      void request(id, offerId)
+        .then((listing) => {
+          applyListing(listing);
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+          showAppAlert(t('common.error'), message);
+        })
+        .finally(() => setOfferSubmitting(false));
+    };
+
+    if (action === 'withdraw') {
+      showAppAlert(t('rfq.withdrawConfirmTitle'), t('rfq.withdrawConfirmMessage'), [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('rfq.withdraw'), style: 'destructive', onPress: run },
+      ]);
+      return;
+    }
+
+    run();
   };
 
   return (
@@ -548,6 +549,27 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       {backButton}
 
+      {canWithdraw ? (
+        <Pressable
+          onPress={() => handleResponderOffer('withdraw')}
+          disabled={offerSubmitting}
+          hitSlop={12}
+          style={[
+            styles.overlayButton,
+            styles.withdrawButton,
+            { top: insets.top + spacing.sm },
+            offerSubmitting && styles.withdrawDisabled,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={t('rfq.withdraw')}
+        >
+          <Ionicons name="arrow-undo-outline" size={16} color={palette.pureWhite} />
+          <AppText weight="semibold" style={styles.withdrawLabel}>
+            {t('rfq.withdraw')}
+          </AppText>
+        </Pressable>
+      ) : null}
+
       {showOfferInput || hasSentOffer ? (
         <ListingOfferComposer
           currencyCode={currency.code}
@@ -562,7 +584,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }
           confirmLabel={t('rfq.confirm')}
           declineLabel={t('rfq.decline')}
-          withdrawLabel={t('rfq.withdraw')}
           offerPrice={rfq?.myOfferPrice}
           offerUnitsLabel={
             rfq?.myOfferQuantity
@@ -577,22 +598,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           hasOffer={hasSentOffer}
           showInput={showOfferInput}
           awaitingConfirm={awaitingConfirm}
-          canWithdraw={
-            Boolean(rfq?.canWithdrawOffer) ||
-            rfq?.myOfferStatus === 'active' ||
-            rfq?.status === 'offer-submitted'
-          }
           submitting={offerSubmitting}
           onSubmit={handleSubmitOffer}
           onConfirm={() => handleResponderOffer('confirm')}
           onDecline={() => handleResponderOffer('decline')}
-          onWithdraw={() => handleResponderOffer('withdraw')}
           footer={
             canMessage ? (
               <Button
                 label={t('messages.message')}
                 icon="chatbubble-ellipses-outline"
                 onPress={() => setMessageOpen(true)}
+                style={styles.messageButton}
               />
             ) : null
           }
@@ -634,15 +650,31 @@ const styles = StyleSheet.create({
   carousel: {
     borderRadius: 0,
   },
-  backButton: {
+  overlayButton: {
     position: 'absolute',
-    left: spacing.md,
     width: 40,
     height: 40,
     borderRadius: radius.pill,
     backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  backButton: {
+    left: spacing.md,
+  },
+  withdrawButton: {
+    right: spacing.md,
+    width: undefined,
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: spacing.md,
+  },
+  withdrawLabel: {
+    fontSize: 13,
+    color: palette.pureWhite,
+  },
+  withdrawDisabled: {
+    opacity: 0.4,
   },
   priceRow: {
     flexDirection: 'row',
@@ -653,6 +685,8 @@ const styles = StyleSheet.create({
   priceValueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
+    flexWrap: 'wrap',
+    flex: 1,
     gap: spacing.xs,
   },
   priceAmount: {
@@ -706,6 +740,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.gold,
     textDecorationLine: 'underline',
+  },
+  messageButton: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: radius.md,
+    paddingVertical: 0,
   },
   notFoundWrap: {
     flex: 1,
