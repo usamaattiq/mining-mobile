@@ -17,6 +17,7 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { ListingCard } from '@/features/listings/components/ListingCard';
 import { isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
 import { useOfferedListingsStore } from '@/store/offeredListingsStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshOfferedListings } from '@/features/listings/utils/refreshListings';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -33,8 +34,15 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
   const listings = useOfferedListingsStore((state) => state.listings);
+  const role = useMarketplaceRoleStore((state) => state.role);
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
   const [refreshing, setRefreshing] = React.useState(false);
+
+  React.useEffect(() => {
+    if (role !== 'buyer' && category === 'gold') {
+      setCategory('equipment');
+    }
+  }, [role, category]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -78,6 +86,9 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
             options={[
               { key: 'equipment' as const, label: t('requests.categoryEquipment') },
               { key: 'services' as const, label: t('requests.categoryServices') },
+              ...(role === 'buyer'
+                ? [{ key: 'gold' as const, label: t('requests.categoryGold') }]
+                : []),
             ]}
           />
         </View>

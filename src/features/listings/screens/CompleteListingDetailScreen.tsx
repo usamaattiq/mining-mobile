@@ -384,13 +384,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const ownerId =
     equipmentListing?.ownerId ?? serviceListing?.ownerId ?? goldListing?.ownerId ?? owner?.id;
   const postedAs = equipmentListing?.postedAs ?? serviceListing?.postedAs ?? goldListing?.postedAs;
-  const rfq = equipmentListing?.rfq ?? serviceListing?.rfq;
+  const rfq = equipmentListing?.rfq ?? serviceListing?.rfq ?? goldListing?.rfq;
   const hasSentOffer = Boolean(
     rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
   ) || rfq?.status === 'offer-submitted';
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
   const canOffer =
-    (category === 'equipment' || category === 'services') &&
     Boolean(rfq) &&
     !isOwner &&
     (rfq?.canSubmitOffer ?? (!hasSentOffer && Boolean(postedAs)));
@@ -400,7 +399,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     Boolean(rfq?.canConfirmOffer);
   const showOfferInput = canOffer && !awaitingConfirm;
   const canMessage = Boolean(owner) && !isOwner;
-  const showOwnerOffers = isOwner && (category === 'equipment' || category === 'services') && Boolean(rfq);
+  const showOwnerOffers = isOwner && Boolean(rfq);
 
   const handleSubmitOffer = (price: string) => {
     setOfferSubmitting(true);

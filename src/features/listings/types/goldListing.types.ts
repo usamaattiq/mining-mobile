@@ -1,6 +1,7 @@
 import type { ListingCategory } from '@/navigation/types';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { ListingOwner } from '@/features/listings/types/listingOwner.types';
+import type { ListingRfq } from '@/features/listings/types/listingRfq.types';
 
 export type GoldListing = {
   id: string;
@@ -17,5 +18,6 @@ export type GoldListing = {
   postedAs: 'buyer' | 'supplier';
   ownerId?: string;
   owner?: ListingOwner;
+  rfq?: ListingRfq;
   createdAt: number;
 };

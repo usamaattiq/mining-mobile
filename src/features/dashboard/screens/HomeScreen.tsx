@@ -502,9 +502,10 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   activeRole: {
-    fontSize: 20,
+    fontSize: 24,
     color: palette.pureWhite,
     alignSelf: 'flex-start',
+    // paddingVertical: spacing.xs,
   },
   headerActions: {
     flexDirection: 'row',
