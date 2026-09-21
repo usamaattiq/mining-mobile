@@ -26,6 +26,7 @@ export function ListingOfferComposer({
   onConfirm,
   onDecline,
   onWithdraw,
+  footer,
 }: ListingOfferComposerProps): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { currentLanguage } = useLanguage();
@@ -152,6 +153,8 @@ export function ListingOfferComposer({
           </Pressable>
         </View>
       ) : null}
+
+      {footer}
     </View>
   );
 }

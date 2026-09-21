@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export type ListingOfferComposerProps = {
   currencyCode: string;
   placeholder: string;
@@ -16,4 +18,5 @@ export type ListingOfferComposerProps = {
   onConfirm: () => void;
   onDecline: () => void;
   onWithdraw?: () => void;
+  footer?: ReactNode;
 };

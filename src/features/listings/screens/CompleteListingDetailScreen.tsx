@@ -398,7 +398,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     rfq?.status === 'awaiting-your-confirmation' ||
     Boolean(rfq?.canConfirmOffer);
   const showOfferInput = canOffer && !awaitingConfirm;
-  const canMessage = Boolean(owner) && !isOwner;
+  const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
   const showOwnerOffers = isOwner && Boolean(rfq);
 
   const handleSubmitOffer = (price: string) => {
@@ -523,21 +523,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       {backButton}
 
-      {canMessage ? (
-        <View
-          style={[
-            styles.messageBar,
-            !(showOfferInput || hasSentOffer) && { paddingBottom: Math.max(insets.bottom, spacing.md) },
-          ]}
-        >
-          <Button
-            label={t('messages.message')}
-            icon="chatbubble-ellipses-outline"
-            onPress={() => setMessageOpen(true)}
-          />
-        </View>
-      ) : null}
-
       {showOfferInput || hasSentOffer ? (
         <ListingOfferComposer
           currencyCode={currency.code}
@@ -567,6 +552,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           onConfirm={() => handleResponderOffer('confirm')}
           onDecline={() => handleResponderOffer('decline')}
           onWithdraw={() => handleResponderOffer('withdraw')}
+          footer={
+            canMessage ? (
+              <Button
+                label={t('messages.message')}
+                icon="chatbubble-ellipses-outline"
+                onPress={() => setMessageOpen(true)}
+              />
+            ) : null
+          }
         />
       ) : null}
 
@@ -679,12 +673,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.muted,
     textAlign: 'center',
-  },
-  messageBar: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    backgroundColor: palette.pureWhite,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: palette.softGold,
   },
 });
