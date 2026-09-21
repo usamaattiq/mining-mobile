@@ -31,6 +31,7 @@ import {
   serviceListingAmount,
 } from '@/features/dashboard/utils/homeFilterMatch';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
+import { serviceTypeFlags } from '@/features/listings/utils/serviceType';
 import { ListingCard } from '@/features/listings/components/ListingCard';
 import {
   isEquipmentListing,
@@ -251,7 +252,8 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   });
   const visibleServices = serviceListings.filter((listing) => {
     if (filters.type === 'onsite' || filters.type === 'online') {
-      if (listing.serviceType !== filters.type) return false;
+      const flags = serviceTypeFlags(listing.serviceType);
+      if (!flags[filters.type]) return false;
     }
     if (!matchesListingKind(listing.serviceCategoryLabel)) return false;
     if (!inNumericRange(serviceListingAmount(listing), priceMin, priceMax)) return false;

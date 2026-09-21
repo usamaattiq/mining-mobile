@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   topLeft: {
     flex: 1,
     flexDirection: 'row',
-    flexWrap: 'nowrap',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: spacing.xs,
     minWidth: 0,

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { OptionRowCard } from '@/shared/components/OptionRowCard';
-import type { RootStackParamList, ServiceType } from '@/navigation/types';
+import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
@@ -24,6 +24,7 @@ import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
+import { serviceTypeFromFlags, serviceTypeLabels } from '@/features/listings/utils/serviceType';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -36,8 +37,10 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
-  const [serviceType, setServiceType] = React.useState<ServiceType | null>(null);
-  const isOnsite = serviceType === 'onsite';
+  const [onsite, setOnsite] = React.useState(false);
+  const [online, setOnline] = React.useState(false);
+  const serviceType = serviceTypeFromFlags(onsite, online);
+  const isOnsite = onsite;
 
   const serviceCategoryOptions = [
     {
@@ -186,6 +189,10 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
         : '',
     },
     {
+      label: t('serviceListing.type'),
+      value: serviceTypeLabels(t, serviceType).join(' · '),
+    },
+    {
       label: t('serviceListing.price'),
       value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
     },
@@ -213,11 +220,7 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
       <AppTopBar
         left="back"
         variant="gold"
-        title={
-          serviceType === 'online'
-            ? t('serviceListing.onlineFormTitle')
-            : t('serviceListing.onsiteFormTitle')
-        }
+        title={t('serviceListing.formTitle')}
         onBackPress={handleBack}
         style={styles.header}
       />
@@ -237,19 +240,19 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
             <View style={styles.choiceRow}>
               <OptionRowCard
                 compact
-                selected={serviceType === 'onsite'}
+                selected={onsite}
                 icon="location-outline"
                 title={t('serviceListing.onsite')}
                 subtitle={t('serviceListing.onsiteSubtitle')}
-                onPress={() => setServiceType('onsite')}
+                onPress={() => setOnsite((value) => !value)}
               />
               <OptionRowCard
                 compact
-                selected={serviceType === 'online'}
+                selected={online}
                 icon="globe-outline"
                 title={t('serviceListing.online')}
                 subtitle={t('serviceListing.onlineSubtitle')}
-                onPress={() => setServiceType('online')}
+                onPress={() => setOnline((value) => !value)}
               />
             </View>
 

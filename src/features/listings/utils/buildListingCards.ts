@@ -7,6 +7,7 @@ import type { ListingCardProps } from '@/features/listings/types/listingCard.typ
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
+import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
 
 export type ListingCardItem = ListingCardProps & { id: string };
 
@@ -141,12 +142,10 @@ export function buildListingCards({
       city: cityFromLocation(listing.location),
       topDateText: formatDateTime(locale, listing.serviceDate ?? listing.createdAt),
       statusBadges: [
-        {
-          key: 'serviceType',
-          label: t(
-            listing.serviceType === 'onsite' ? 'serviceListing.onsite' : 'serviceListing.online',
-          ),
-        },
+        ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
+          key: label,
+          label,
+        })),
       ],
       priceText: priceText(currencyCode, listing.price),
       createdAt: listing.createdAt,

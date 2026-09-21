@@ -34,6 +34,7 @@ import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { rfqStatusLabel } from '@/features/listings/utils/rfqStatus';
+import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { palette, radius, spacing } from '@/theme';
 
@@ -293,11 +294,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
       {
         label: t('serviceListing.type'),
-        value: t(
-          serviceListing.serviceType === 'onsite'
-            ? 'serviceListing.onsite'
-            : 'serviceListing.online',
-        ),
+        value: serviceTypeLabels(t, serviceListing.serviceType).join(' · '),
       },
       {
         label: t('serviceListing.dateTimeLabel'),

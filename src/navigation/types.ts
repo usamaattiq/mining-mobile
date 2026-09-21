@@ -7,7 +7,7 @@ export type ListingCategory = 'equipment' | 'services' | 'gold';
 
 export type MarketplaceRole = 'buyer' | 'supplier';
 
-export type ServiceType = 'onsite' | 'online';
+export type ServiceType = 'onsite' | 'online' | 'both';
 
 export type DashboardTabParamList = {
   HomeTab: undefined;
