@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   bar: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: palette.softGold,
     gap: spacing.sm,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: palette.softGold,
-    padding: spacing.md,
+    padding: spacing.sm + 2,
     gap: spacing.sm,
   },
   cardHeader: {
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     borderColor: palette.softGold,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
   },
   currency: {
     fontSize: 14,
