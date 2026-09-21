@@ -107,7 +107,7 @@ export function buildListingCards({
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
         city: cityFromLocation(listing.location),
         durationBadges,
-        topDateText: durationBadges.length === 0 ? formatDateTime(locale, listing.createdAt) : undefined,
+        dateText: formatDateTime(locale, listing.createdAt),
         deliveryBadge: listing.deliveryAvailable
           ? {
               key: 'delivery',
@@ -140,7 +140,7 @@ export function buildListingCards({
       subtitleIcon: 'briefcase-outline',
       typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
       city: cityFromLocation(listing.location),
-      topDateText: formatDateTime(locale, listing.serviceDate ?? listing.createdAt),
+      dateText: formatDateTime(locale, listing.serviceDate ?? listing.createdAt),
       statusBadges: [
         ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
           key: label,
@@ -168,7 +168,7 @@ export function buildListingCards({
         .filter((part): part is string => Boolean(part))
         .join(' · ') || undefined,
     city: cityFromLocation(listing.location),
-    topDateText: formatDateTime(locale, listing.auctionEndDate ?? listing.createdAt),
+    dateText: formatDateTime(locale, listing.auctionEndDate ?? listing.createdAt),
     priceText: priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
     onPress: () => onOpen(listing.id, 'gold'),

@@ -84,8 +84,8 @@ export function ListingCard({
   subtitleIcon,
   typeBadge,
   city,
+  dateText,
   durationBadges,
-  topDateText,
   deliveryBadge,
   statusBadges,
   priceText,
@@ -117,13 +117,9 @@ export function ListingCard({
         <View style={styles.copy}>
           <View style={styles.topRow}>
             <View style={styles.topLeft}>
-              {durationBadges && durationBadges.length > 0 ? (
-                durationBadges.map((badge) => <SmallBadge key={badge.key} badge={badge} />)
-              ) : topDateText ? (
-                <SmallBadge
-                  badge={{ key: 'datetime', label: topDateText, icon: 'calendar-outline' }}
-                />
-              ) : null}
+              {durationBadges && durationBadges.length > 0
+                ? durationBadges.map((badge) => <SmallBadge key={badge.key} badge={badge} />)
+                : null}
             </View>
             {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
           </View>
@@ -150,6 +146,15 @@ export function ListingCard({
                 {city ?? ' '}
               </AppText>
             </View>
+
+            {dateText ? (
+              <View style={styles.subtitleRow}>
+                <Ionicons name="calendar-outline" size={12} color={palette.gold} />
+                <AppText style={styles.subtitle} numberOfLines={1}>
+                  {dateText}
+                </AppText>
+              </View>
+            ) : null}
 
             <View style={styles.priceRow}>
               <AppText weight="bold" style={styles.price} numberOfLines={1}>
