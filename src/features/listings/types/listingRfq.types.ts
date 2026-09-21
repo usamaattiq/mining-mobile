@@ -6,6 +6,7 @@ export type ListingRfqOffer = {
   responderName: string;
   status: string;
   price?: string;
+  quantity?: number;
 };
 
 export type ListingRfq = {
@@ -23,5 +24,6 @@ export type ListingRfq = {
   myOfferId?: string;
   myOfferStatus?: string;
   myOfferPrice?: string;
+  myOfferQuantity?: number;
   offers?: ListingRfqOffer[];
 };

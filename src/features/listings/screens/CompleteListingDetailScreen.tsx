@@ -401,10 +401,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
   const showOwnerOffers = isOwner && Boolean(rfq);
 
-  const handleSubmitOffer = (price: string) => {
+  const handleSubmitOffer = (price: string, units?: number) => {
     setOfferSubmitting(true);
     void listingsApi
-      .submitOffer(id, price)
+      .submitOffer(id, price, units)
       .then((listing) => {
         applyListing(listing);
       })
@@ -539,6 +539,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           declineLabel={t('rfq.decline')}
           withdrawLabel={t('rfq.withdraw')}
           offerPrice={rfq?.myOfferPrice}
+          offerUnitsLabel={
+            rfq?.myOfferQuantity
+              ? t('equipmentListing.unitsCount', { count: rfq.myOfferQuantity })
+              : undefined
+          }
+          unitsLabel={t('equipmentListing.units')}
+          unitPricePlaceholder={t('rfq.unitPricePlaceholder')}
+          maxUnits={
+            category === 'equipment' ? Math.max(equipmentListing?.units ?? 1, 1) : undefined
+          }
           hasOffer={hasSentOffer}
           showInput={showOfferInput}
           awaitingConfirm={awaitingConfirm}

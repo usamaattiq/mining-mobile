@@ -2,6 +2,9 @@ import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
+import { CounterField } from '@/shared/components/CounterField';
 import { AppText } from '@/shared/components/AppText';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
@@ -16,6 +19,10 @@ export function ListingOfferComposer({
   confirmLabel,
   declineLabel,
   offerPrice,
+  offerUnitsLabel,
+  unitsLabel,
+  maxUnits,
+  unitPricePlaceholder,
   hasOffer,
   showInput,
   awaitingConfirm,
@@ -28,16 +35,26 @@ export function ListingOfferComposer({
   onWithdraw,
   footer,
 }: ListingOfferComposerProps): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
   const insets = useSafeAreaInsets();
   const { currentLanguage } = useLanguage();
   const [price, setPrice] = React.useState('');
+  const [units, setUnits] = React.useState(1);
+  const unitCap = Math.max(maxUnits ?? 1, 1);
+  React.useEffect(() => {
+    setUnits((current) => Math.min(Math.max(current, 1), unitCap));
+  }, [unitCap]);
   const canSend = /^\d+(\.\d{1,2})?$/.test(price.trim()) && Number(price) > 0 && !submitting;
+  const totalPrice =
+    canSend && maxUnits != null
+      ? (Math.round(Number(price) * units * 100) / 100).toFixed(2)
+      : null;
 
   const handleSend = () => {
     const value = price.trim();
     if (!canSend) return;
     setPrice('');
-    onSubmit(value);
+    onSubmit(value, maxUnits != null ? units : undefined);
   };
 
   return (
@@ -51,6 +68,7 @@ export function ListingOfferComposer({
             {offerPrice ? (
               <AppText weight="bold" style={styles.cardPrice}>
                 {currencyCode} {formatAmountWithCommas(offerPrice)}
+                {offerUnitsLabel ? ` · ${offerUnitsLabel}` : ''}
               </AppText>
             ) : null}
           </View>
@@ -114,7 +132,18 @@ export function ListingOfferComposer({
       ) : null}
 
       {showInput ? (
-        <View style={styles.row}>
+        <View style={styles.form}>
+          {maxUnits != null ? (
+            <CounterField
+              label={unitsLabel}
+              value={units}
+              onChange={setUnits}
+              min={1}
+              max={unitCap}
+              required
+            />
+          ) : null}
+          <View style={styles.row}>
           <View style={styles.inputWrap}>
             <AppText weight="semibold" style={styles.currency}>
               {currencyCode}
@@ -122,7 +151,7 @@ export function ListingOfferComposer({
             <TextInput
               value={price}
               onChangeText={setPrice}
-              placeholder={placeholder}
+              placeholder={unitPricePlaceholder ?? placeholder}
               placeholderTextColor={palette.muted}
               keyboardType="decimal-pad"
               editable={!submitting}
@@ -151,6 +180,14 @@ export function ListingOfferComposer({
               </>
             )}
           </Pressable>
+        </View>
+          {totalPrice ? (
+            <AppText weight="semibold" style={styles.total}>
+              {t('rfq.offerTotal', {
+                amount: `${currencyCode} ${formatAmountWithCommas(totalPrice)}`,
+              })}
+            </AppText>
+          ) : null}
         </View>
       ) : null}
 
@@ -195,6 +232,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  form: {
+    gap: spacing.sm,
+  },
+  total: {
+    fontSize: 13,
+    color: palette.gold,
   },
   inputWrap: {
     flex: 1,

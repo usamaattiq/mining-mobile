@@ -66,6 +66,9 @@ export function ListingOffersPanel({
               {offer.price ? (
                 <AppText weight="bold" style={styles.price}>
                   {currencyCode} {formatAmountWithCommas(offer.price)}
+                  {offer.quantity
+                    ? ` · ${t('equipmentListing.unitsCount', { count: offer.quantity })}`
+                    : ''}
                 </AppText>
               ) : null}
               {canDecide ? (

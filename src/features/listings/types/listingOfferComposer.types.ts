@@ -8,13 +8,17 @@ export type ListingOfferComposerProps = {
   confirmLabel: string;
   declineLabel: string;
   offerPrice?: string;
+  offerUnitsLabel?: string;
+  unitsLabel?: string;
+  maxUnits?: number;
+  unitPricePlaceholder?: string;
   hasOffer: boolean;
   showInput: boolean;
   awaitingConfirm: boolean;
   canWithdraw?: boolean;
   submitting: boolean;
   withdrawLabel?: string;
-  onSubmit: (price: string) => void;
+  onSubmit: (price: string, units?: number) => void;
   onConfirm: () => void;
   onDecline: () => void;
   onWithdraw?: () => void;

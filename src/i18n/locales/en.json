@@ -24,6 +24,8 @@
     "statusLabel": "Status",
     "offersCount": "Offers",
     "offerPlaceholder": "Your offer",
+    "unitPricePlaceholder": "Price per unit",
+    "offerTotal": "Total {amount}",
     "sendOffer": "Send offer",
     "offerSubmitted": "Offer submitted",
     "offerFailed": "Could not send your offer. Try again.",

@@ -24,6 +24,8 @@
     "statusLabel": "الحالة",
     "offersCount": "العروض",
     "offerPlaceholder": "عرضك",
+    "unitPricePlaceholder": "سعر الوحدة",
+    "offerTotal": "الإجمالي {amount}",
     "sendOffer": "إرسال العرض",
     "offerSubmitted": "تم تقديم العرض",
     "offerFailed": "تعذر إرسال العرض. حاول مرة أخرى.",
