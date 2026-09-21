@@ -13,8 +13,8 @@ import type {
 } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { NotificationBellButton } from '@/features/dashboard/components/NotificationBellButton';
-import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { SearchField } from '@/shared/components/SearchField';
+import { HomeCategoryCards } from '@/features/dashboard/components/HomeCategoryCards';
 import { EmptyState } from '@/shared/components/EmptyState';
 import {
   HomeFilterSheet,
@@ -158,9 +158,25 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   };
 
   const categoryOptions = [
-    { key: 'equipment' as const, label: t('requests.categoryEquipment') },
-    { key: 'services' as const, label: t('requests.categoryServices') },
-    ...(role === 'buyer' ? [{ key: 'gold' as const, label: t('requests.categoryGold') }] : []),
+    {
+      key: 'equipment' as const,
+      icon: 'construct-outline' as const,
+      title: t('requests.categoryEquipment'),
+    },
+    {
+      key: 'services' as const,
+      icon: 'briefcase-outline' as const,
+      title: t('requests.categoryServices'),
+    },
+    ...(role === 'buyer'
+      ? [
+          {
+            key: 'gold' as const,
+            icon: 'diamond-outline' as const,
+            title: t('requests.categoryGold'),
+          },
+        ]
+      : []),
   ];
 
   React.useEffect(() => {
@@ -346,17 +362,17 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         </View>
       }
       headerStyle={styles.header}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.gold} />
-      }
       headerExtra={
         <View style={styles.headerExtra}>
-          <SegmentedSwitcher
+          <HomeCategoryCards
             value={category}
-            onChange={handleCategoryChange}
             options={categoryOptions}
+            onChange={handleCategoryChange}
           />
         </View>
+      }
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.gold} />
       }
     >
       <View style={styles.searchRow}>
@@ -486,7 +502,7 @@ const styles = StyleSheet.create({
   },
   headerExtra: {
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.xl + spacing.sm,
     backgroundColor: palette.gold,
   },
   headerActions: {
