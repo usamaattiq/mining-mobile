@@ -325,9 +325,6 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
             <AppText weight="medium" style={styles.name} numberOfLines={1}>
               {firstName}
             </AppText>
-            <AppText weight="semibold" style={styles.roleHint} numberOfLines={1}>
-              {role === 'buyer' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
-            </AppText>
           </View>
         </Pressable>
       }
@@ -364,6 +361,9 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       headerStyle={styles.header}
       headerExtra={
         <View style={styles.headerExtra}>
+          <AppText weight="bold" style={styles.activeRole} numberOfLines={1}>
+            {role === 'buyer' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
+          </AppText>
           <HomeCategoryCards
             value={category}
             options={categoryOptions}
@@ -492,11 +492,6 @@ const styles = StyleSheet.create({
     minWidth: 0,
     justifyContent: 'center',
   },
-  roleHint: {
-    marginTop: 1,
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.82)',
-  },
   header: {
     paddingBottom: spacing.sm,
   },
@@ -504,6 +499,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl + spacing.sm,
     backgroundColor: palette.gold,
+    gap: spacing.sm,
+  },
+  activeRole: {
+    fontSize: 20,
+    color: palette.pureWhite,
+    alignSelf: 'flex-start',
   },
   headerActions: {
     flexDirection: 'row',
