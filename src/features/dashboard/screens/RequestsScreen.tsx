@@ -30,7 +30,7 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-export function RequestsScreen({ navigation }: Props): React.ReactElement {
+export function RequestsScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
@@ -38,7 +38,15 @@ export function RequestsScreen({ navigation }: Props): React.ReactElement {
   const serviceListings = useServiceListingsStore((state) => state.listings);
   const goldListings = useGoldListingsStore((state) => state.listings);
   const role = useMarketplaceRoleStore((state) => state.role);
-  const [category, setCategory] = React.useState<ListingCategory>('equipment');
+  const [category, setCategory] = React.useState<ListingCategory>(
+    route.params?.category ?? 'equipment',
+  );
+
+  React.useEffect(() => {
+    if (route.params?.category) {
+      setCategory(route.params.category);
+    }
+  }, [route.params?.category]);
   const [refreshing, setRefreshing] = React.useState(false);
 
   useFocusEffect(

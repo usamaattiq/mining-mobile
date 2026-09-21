@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import type { RootStackParamList } from '@/navigation/types';
+import type { EquipmentListingMode, RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
@@ -15,6 +15,7 @@ import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { ToggleRow } from '@/shared/components/ToggleRow';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { Button } from '@/shared/components/Button';
+import { OptionRowCard } from '@/shared/components/OptionRowCard';
 import { ListingStepper } from '@/features/listings/components/ListingStepper';
 import { EquipmentMediaUploader } from '@/features/listings/components/EquipmentMediaUploader';
 import { EquipmentListingReview } from '@/features/listings/components/EquipmentListingReview';
@@ -32,10 +33,10 @@ import type { DeliveryType } from '@/features/listings/types/equipmentListing.ty
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingForm'>;
 
-export function EquipmentListingFormScreen({ navigation, route }: Props): React.ReactElement {
-  const { mode } = route.params;
+export function EquipmentListingFormScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const currency = useCurrency();
+  const [mode, setMode] = React.useState<EquipmentListingMode | null>(null);
   const isRent = mode === 'rent';
 
   const steps = [
@@ -113,6 +114,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   };
 
   const detailsValid = Boolean(
+    mode &&
     equipmentType &&
     title.trim() &&
     units > 0 &&
@@ -142,7 +144,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   )?.label;
 
   const handlePublish = async () => {
-    if (publishing) return;
+    if (publishing || !mode) return;
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
@@ -165,7 +167,13 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isEquipmentListing(listing)) addListing(listing);
-      navigation.popToTop();
+      navigation.reset({
+        index: 1,
+        routes: [
+          { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'equipment' } } },
+          { name: 'Welcome', params: { next: 'listings', category: 'equipment' } },
+        ],
+      });
     } catch (error) {
       showAppAlert(
         t('common.error'),
@@ -218,7 +226,11 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       <AppTopBar
         left="back"
         variant="gold"
-        title={isRent ? t('equipmentListing.rentFormTitle') : t('equipmentListing.sellFormTitle')}
+        title={
+          mode === 'sell'
+            ? t('equipmentListing.sellFormTitle')
+            : t('equipmentListing.rentFormTitle')
+        }
         onBackPress={handleBack}
         style={styles.header}
       />
@@ -235,6 +247,25 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>
+            <View style={styles.choiceRow}>
+              <OptionRowCard
+                compact
+                selected={mode === 'rent'}
+                icon="key-outline"
+                title={t('equipmentListing.rent')}
+                subtitle={t('equipmentListing.rentSubtitle')}
+                onPress={() => setMode('rent')}
+              />
+              <OptionRowCard
+                compact
+                selected={mode === 'sell'}
+                icon="pricetag-outline"
+                title={t('equipmentListing.sell')}
+                subtitle={t('equipmentListing.sellSubtitle')}
+                onPress={() => setMode('sell')}
+              />
+            </View>
+
             <SelectField
               label={t('equipmentListing.equipmentType')}
               placeholder={t('equipmentListing.equipmentTypePlaceholder')}
@@ -265,7 +296,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               style={styles.descriptionInput}
             />
 
-            {isRent ? (
+            {mode === 'rent' ? (
               <View style={styles.priceRow}>
                 <View style={styles.priceInput}>
                   <FormInput
@@ -295,7 +326,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   />
                 </View>
               </View>
-            ) : (
+            ) : mode === 'sell' ? (
               <FormInput
                 label={t('equipmentListing.salePrice')}
                 value={salePrice}
@@ -304,7 +335,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 placeholder={currency.code}
                 required
               />
-            )}
+            ) : null}
 
             <View style={styles.unitsField}>
               <CounterField
@@ -431,6 +462,10 @@ const styles = StyleSheet.create({
   },
   stepBlock: {
     gap: spacing.lg,
+  },
+  choiceRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
   },
   descriptionInput: {
     minHeight: 96,

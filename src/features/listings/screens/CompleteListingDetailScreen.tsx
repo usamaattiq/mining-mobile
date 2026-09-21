@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,6 +18,7 @@ import { EquipmentDescriptionCard } from '@/features/listings/components/Equipme
 import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
+import type { ListingDto } from '@/features/listings/api/listingsApi';
 import { ListingMessageSheet } from '@/features/listings/components/ListingMessageSheet';
 import { ListingOfferComposer } from '@/features/listings/components/ListingOfferComposer';
 import { ListingOffersPanel } from '@/features/listings/components/ListingOffersPanel';
@@ -27,6 +28,7 @@ import { ApiError } from '@/shared/services/api';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
+import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
@@ -63,46 +65,58 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     category === 'gold' ? state.listings.find((item) => item.id === id) : undefined,
   );
 
-  const equipmentListing =
-    (category === 'equipment' && marketListing && isEquipmentListing(marketListing) && marketListing.rfq
-      ? marketListing
-      : undefined) ??
-    (mineEquipment?.rfq ? mineEquipment : undefined) ??
-    (category === 'equipment' && marketListing && isEquipmentListing(marketListing)
-      ? marketListing
-      : undefined) ??
-    mineEquipment;
-  const serviceListing =
-    (category === 'services' && marketListing && isServiceListing(marketListing) && marketListing.rfq
-      ? marketListing
-      : undefined) ??
-    (mineService?.rfq ? mineService : undefined) ??
-    (category === 'services' && marketListing && isServiceListing(marketListing)
-      ? marketListing
-      : undefined) ??
-    mineService;
-  const goldListing =
-    (mineGold?.owner ? mineGold : undefined) ??
-    (category === 'gold' && marketListing && isGoldListing(marketListing)
-      ? marketListing
-      : undefined) ??
+  const offeredListing = useOfferedListingsStore((state) =>
+    state.listings.find((item) => item.id === id),
+  );
+  const [fetchedListing, setFetchedListing] = React.useState<ListingDto | null>(null);
+  const [loadFailed, setLoadFailed] = React.useState(false);
+
+  const applyListing = React.useCallback((listing: ListingDto) => {
+    setFetchedListing(listing);
+    setLoadFailed(false);
+    cacheListing(listing);
+  }, []);
+  const hasListingRef = React.useRef(false);
+
+  const source =
+    (fetchedListing?.id === id ? fetchedListing : undefined) ??
+    offeredListing ??
+    marketListing ??
+    mineEquipment ??
+    mineService ??
     mineGold;
+
+  const equipmentListing =
+    category === 'equipment' && source && isEquipmentListing(source) ? source : undefined;
+  const serviceListing =
+    category === 'services' && source && isServiceListing(source) ? source : undefined;
+  const goldListing = category === 'gold' && source && isGoldListing(source) ? source : undefined;
+  hasListingRef.current = Boolean(equipmentListing || serviceListing || goldListing);
 
   useFocusEffect(
     React.useCallback(() => {
       let cancelled = false;
-      void listingsApi
-        .get(id)
-        .then((listing) => {
-          if (!cancelled) cacheListing(listing);
-        })
-        .catch(() => undefined);
+      const reload = () =>
+        listingsApi
+          .get(id)
+          .then((listing) => {
+            if (!cancelled) applyListing(listing);
+          })
+          .catch(() => {
+            if (!cancelled && !hasListingRef.current) {
+              setLoadFailed(true);
+            }
+          });
+      void reload();
+      const timer = setInterval(() => {
+        void reload();
+      }, 5000);
       return () => {
         cancelled = true;
+        clearInterval(timer);
       };
-    }, [id]),
+    }, [applyListing, id]),
   );
-
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
   const [messageOpen, setMessageOpen] = React.useState(false);
@@ -131,9 +145,23 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     </View>
   );
 
-  if (category === 'equipment' && !equipmentListing) return notFound;
-  if (category === 'services' && !serviceListing) return notFound;
-  if (category === 'gold' && !goldListing) return notFound;
+  const missing =
+    (category === 'equipment' && !equipmentListing) ||
+    (category === 'services' && !serviceListing) ||
+    (category === 'gold' && !goldListing);
+
+  if (missing && loadFailed) return notFound;
+  if (missing) {
+    return (
+      <View style={styles.root}>
+        <StatusBar style="dark" />
+        {backButton}
+        <View style={styles.notFoundWrap}>
+          <ActivityIndicator color={palette.gold} />
+        </View>
+      </View>
+    );
+  }
 
   let title = '';
   let media: AnyMediaAsset[] = [];
@@ -366,11 +394,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
   const canOffer =
     (category === 'equipment' || category === 'services') &&
-    postedAs === 'supplier' &&
     Boolean(rfq) &&
     !isOwner &&
-    !hasSentOffer;
-  const canMessage = Boolean(owner) && !isOwner && !canOffer && !hasSentOffer;
+    (rfq?.canSubmitOffer ?? (!hasSentOffer && Boolean(postedAs)));
+  const awaitingConfirm =
+    rfq?.myOfferStatus === 'selected' ||
+    rfq?.status === 'awaiting-your-confirmation' ||
+    Boolean(rfq?.canConfirmOffer);
+  const showOfferInput = canOffer && !awaitingConfirm;
+  const canMessage = Boolean(owner) && !isOwner;
   const showOwnerOffers = isOwner && (category === 'equipment' || category === 'services') && Boolean(rfq);
 
   const handleSubmitOffer = (price: string) => {
@@ -378,7 +410,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     void listingsApi
       .submitOffer(id, price)
       .then((listing) => {
-        cacheListing(listing);
+        applyListing(listing);
       })
       .catch((error: unknown) => {
         const message =
@@ -394,7 +426,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       action === 'accept' ? listingsApi.acceptOffer : listingsApi.rejectOffer;
     void request(id, offerId)
       .then((listing) => {
-        cacheListing(listing);
+        applyListing(listing);
       })
       .catch((error: unknown) => {
         const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
@@ -403,15 +435,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       .finally(() => setActingOfferId(null));
   };
 
-  const handleResponderOffer = (action: 'confirm' | 'decline') => {
+  const handleResponderOffer = (action: 'confirm' | 'decline' | 'withdraw') => {
     const offerId = rfq?.myOfferId;
     if (!offerId) return;
     setOfferSubmitting(true);
     const request =
-      action === 'confirm' ? listingsApi.confirmOffer : listingsApi.declineOffer;
+      action === 'confirm'
+        ? listingsApi.confirmOffer
+        : action === 'decline'
+          ? listingsApi.declineOffer
+          : listingsApi.withdrawOffer;
     void request(id, offerId)
       .then((listing) => {
-        cacheListing(listing);
+        applyListing(listing);
       })
       .catch((error: unknown) => {
         const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
@@ -481,6 +517,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               offers={rfq?.offers ?? []}
               currencyCode={currency.code}
               actingOfferId={actingOfferId}
+              canDecideOffers={rfq?.canDecideOffers !== false}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
             />
@@ -490,37 +527,51 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       {backButton}
 
-      {canOffer || hasSentOffer ? (
-        <ListingOfferComposer
-          currencyCode={currency.code}
-          placeholder={t('rfq.offerPlaceholder')}
-          sendLabel={t('rfq.sendOffer')}
-          submittedLabel={
-            rfq?.myOfferStatus === 'confirmed' ? t('rfq.offerStatus.confirmed') : t('rfq.offerSubmitted')
-          }
-          confirmLabel={t('rfq.confirm')}
-          declineLabel={t('rfq.decline')}
-          hasOffer={hasSentOffer}
-          awaitingConfirm={
-            rfq?.myOfferStatus === 'selected' ||
-            rfq?.status === 'awaiting-your-confirmation' ||
-            Boolean(rfq?.canConfirmOffer)
-          }
-          submitting={offerSubmitting}
-          onSubmit={handleSubmitOffer}
-          onConfirm={() => handleResponderOffer('confirm')}
-          onDecline={() => handleResponderOffer('decline')}
-        />
-      ) : null}
-
       {canMessage ? (
-        <View style={[styles.messageBar, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+        <View
+          style={[
+            styles.messageBar,
+            !(showOfferInput || hasSentOffer) && { paddingBottom: Math.max(insets.bottom, spacing.md) },
+          ]}
+        >
           <Button
             label={t('messages.message')}
             icon="chatbubble-ellipses-outline"
             onPress={() => setMessageOpen(true)}
           />
         </View>
+      ) : null}
+
+      {showOfferInput || hasSentOffer ? (
+        <ListingOfferComposer
+          currencyCode={currency.code}
+          placeholder={t('rfq.offerPlaceholder')}
+          sendLabel={t('rfq.sendOffer')}
+          submittedLabel={
+            awaitingConfirm
+              ? t('rfq.offerStatus.selected')
+              : rfq?.myOfferStatus === 'confirmed'
+                ? t('rfq.offerStatus.confirmed')
+                : t('rfq.offerSubmitted')
+          }
+          confirmLabel={t('rfq.confirm')}
+          declineLabel={t('rfq.decline')}
+          withdrawLabel={t('rfq.withdraw')}
+          offerPrice={rfq?.myOfferPrice}
+          hasOffer={hasSentOffer}
+          showInput={showOfferInput}
+          awaitingConfirm={awaitingConfirm}
+          canWithdraw={
+            Boolean(rfq?.canWithdrawOffer) ||
+            rfq?.myOfferStatus === 'active' ||
+            rfq?.status === 'offer-submitted'
+          }
+          submitting={offerSubmitting}
+          onSubmit={handleSubmitOffer}
+          onConfirm={() => handleResponderOffer('confirm')}
+          onDecline={() => handleResponderOffer('decline')}
+          onWithdraw={() => handleResponderOffer('withdraw')}
+        />
       ) : null}
 
       {owner ? (

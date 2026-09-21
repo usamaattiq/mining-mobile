@@ -11,7 +11,7 @@ export type ServiceType = 'onsite' | 'online';
 
 export type DashboardTabParamList = {
   HomeTab: undefined;
-  Requests: { requestId?: string } | undefined;
+  Requests: { requestId?: string; category?: ListingCategory } | undefined;
   MyOffers: undefined;
   Profile: undefined;
 };
@@ -20,14 +20,12 @@ export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
   SignUpFlow: undefined;
-  Welcome: undefined;
+  Welcome: { next?: 'listings'; category?: ListingCategory } | undefined;
   Dashboard: NavigatorScreenParams<DashboardTabParamList> | undefined;
   PersonalInformation: undefined;
   SecuritySettings: undefined;
-  EquipmentListingMode: undefined;
-  EquipmentListingForm: { mode: EquipmentListingMode };
-  ServiceListingMode: undefined;
-  ServiceListingForm: { serviceType: ServiceType };
+  EquipmentListingForm: undefined;
+  ServiceListingForm: undefined;
   GoldListingForm: undefined;
   CompleteListingDetail: { id: string; category: ListingCategory };
   Conversation: { conversationId: string };

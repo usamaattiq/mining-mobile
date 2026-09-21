@@ -14,13 +14,13 @@ export function listingCreateActions(
       icon: 'construct-outline',
       title: t('dashboardHome.listEquipment'),
       subtitle: t('dashboardHome.listEquipmentSubtitle'),
-      onPress: () => navigate('EquipmentListingMode'),
+      onPress: () => navigate('EquipmentListingForm'),
     },
     {
       icon: 'briefcase-outline',
       title: t('dashboardHome.listService'),
       subtitle: t('dashboardHome.listServiceSubtitle'),
-      onPress: () => navigate('ServiceListingMode'),
+      onPress: () => navigate('ServiceListingForm'),
     },
   ];
 

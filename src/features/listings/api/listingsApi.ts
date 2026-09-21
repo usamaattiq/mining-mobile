@@ -78,4 +78,8 @@ export const listingsApi = {
   declineOffer(id: string, offerId: string): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers/${offerId}/decline`, { method: 'POST', body: {} });
   },
+
+  withdrawOffer(id: string, offerId: string): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}/offers/${offerId}/withdraw`, { method: 'POST', body: {} });
+  },
 };

@@ -19,6 +19,7 @@ export type ListingRfq = {
   canDecideOffers?: boolean;
   canConfirmOffer?: boolean;
   canDeclineOffer?: boolean;
+  canWithdrawOffer?: boolean;
   myOfferId?: string;
   myOfferStatus?: string;
   myOfferPrice?: string;

@@ -21,16 +21,33 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
 const CONTINUE_DELAY_MS = 5000;
 
-export function WelcomeScreen({ navigation }: Props): React.ReactElement {
+export function WelcomeScreen({ navigation, route }: Props): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [continuing, setContinuing] = React.useState(false);
   const progress = useSharedValue(0);
+  const toListings = route.params?.next === 'listings';
+  const listingCategory = route.params?.category;
 
   const handleContinue = React.useCallback(() => {
     setContinuing(true);
+    if (toListings) {
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Dashboard',
+            params: {
+              screen: 'Requests',
+              params: listingCategory ? { category: listingCategory } : undefined,
+            },
+          },
+        ],
+      });
+      return;
+    }
     navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
-  }, [navigation]);
+  }, [listingCategory, navigation, toListings]);
 
   React.useEffect(() => {
     progress.value = withTiming(1, { duration: CONTINUE_DELAY_MS, easing: Easing.linear });
@@ -56,12 +73,14 @@ export function WelcomeScreen({ navigation }: Props): React.ReactElement {
           <Ionicons name="checkmark" size={40} color={palette.pureWhite} />
         </View>
         <AppText weight="bold" style={[styles.title, styles.titleSpacing]}>
-          {t('welcome.title')}
+          {t(toListings ? 'welcome.listingTitle' : 'welcome.title')}
         </AppText>
-        <AppText style={styles.subtitle}>{t('welcome.subtitle')}</AppText>
+        <AppText style={styles.subtitle}>
+          {t(toListings ? 'welcome.listingSubtitle' : 'welcome.subtitle')}
+        </AppText>
 
         <Button
-          label={t('welcome.continue')}
+          label={t(toListings ? 'welcome.listingContinue' : 'welcome.continue')}
           onPress={handleContinue}
           disabled={continuing}
           size="lg"

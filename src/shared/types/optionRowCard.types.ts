@@ -5,4 +5,6 @@ export type OptionRowCardProps = {
   title: string;
   subtitle: string;
   onPress: () => void;
+  selected?: boolean;
+  compact?: boolean;
 };

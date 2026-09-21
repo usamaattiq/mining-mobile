@@ -303,9 +303,14 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
               </AppText>
             )}
           </View>
-          <AppText weight="medium" style={styles.name} numberOfLines={1}>
-            {firstName}
-          </AppText>
+          <View style={styles.identityText}>
+            <AppText weight="medium" style={styles.name} numberOfLines={1}>
+              {firstName}
+            </AppText>
+            <AppText weight="semibold" style={styles.roleHint} numberOfLines={1}>
+              {role === 'buyer' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
+            </AppText>
+          </View>
         </Pressable>
       }
       rightSlot={
@@ -319,8 +324,8 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
             style={({ pressed }) => [styles.switchRoleButton, pressed && styles.filterPressed]}
           >
             <Ionicons name="swap-horizontal-outline" size={18} color={palette.gold} />
-            <AppText weight="semibold" style={styles.switchRoleLabel}>
-              {role === 'supplier' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
+            <AppText weight="semibold" style={styles.switchRoleLabel} numberOfLines={1}>
+              {role === 'supplier' ? t('profile.switchToBuyer') : t('profile.switchToSupplier')}
             </AppText>
           </Pressable>
           <View style={styles.headerIconPair}>
@@ -463,6 +468,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: palette.pureWhite,
+  },
+  identityText: {
+    flexShrink: 1,
+    minWidth: 0,
+    justifyContent: 'center',
+  },
+  roleHint: {
+    marginTop: 1,
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.82)',
   },
   header: {
     paddingBottom: spacing.sm,

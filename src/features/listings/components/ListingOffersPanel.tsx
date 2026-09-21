@@ -12,6 +12,7 @@ export type ListingOffersPanelProps = {
   offers: ListingRfqOffer[];
   currencyCode: string;
   actingOfferId: string | null;
+  canDecideOffers?: boolean;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
 };
@@ -30,6 +31,7 @@ export function ListingOffersPanel({
   offers,
   currencyCode,
   actingOfferId,
+  canDecideOffers = true,
   onAccept,
   onReject,
 }: ListingOffersPanelProps): React.ReactElement {
@@ -47,7 +49,7 @@ export function ListingOffersPanel({
       ) : (
         offers.map((offer) => {
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
-          const canDecide = offer.status === 'active';
+          const canDecide = canDecideOffers && offer.status === 'active';
           const busy = actingOfferId === offer.id;
           return (
             <View key={offer.id} style={styles.card}>

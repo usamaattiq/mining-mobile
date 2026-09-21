@@ -141,7 +141,13 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
         postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isGoldListing(listing)) addListing(listing);
-      navigation.popToTop();
+      navigation.reset({
+        index: 1,
+        routes: [
+          { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'gold' } } },
+          { name: 'Welcome', params: { next: 'listings', category: 'gold' } },
+        ],
+      });
     } catch (error) {
       showAppAlert(
         t('common.error'),

@@ -76,7 +76,7 @@ export function AppTopBar({
         <View style={styles.titleSpacer} />
       ) : null}
 
-      <View style={[styles.side, styles.sideRight, leftSlot ? styles.sideGrow : null]}>
+      <View style={[styles.side, styles.sideRight, leftSlot ? styles.sideFit : null]}>
         {rightSlot}
       </View>
     </View>
@@ -107,6 +107,10 @@ const styles = StyleSheet.create({
   sideGrow: {
     flex: 1,
     minWidth: 0,
+  },
+  sideFit: {
+    flexGrow: 0,
+    flexShrink: 0,
   },
   titleSpacer: {
     flex: 1,

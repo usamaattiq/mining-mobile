@@ -13,33 +13,54 @@ export function OptionRowCard({
   title,
   subtitle,
   onPress,
+  selected = false,
+  compact = false,
 }: OptionRowCardProps): React.ReactElement {
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
+      accessibilityState={{ selected }}
       accessibilityLabel={title}
-      style={({ pressed }) => [styles.card, cardBackShadow, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        compact && styles.cardCompact,
+        selected && styles.cardSelected,
+        cardBackShadow,
+        pressed && styles.pressed,
+      ]}
     >
       <LinearGradient
         colors={[palette.lightGold, palette.gold, palette.goldDark]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.iconWrap}
+        style={[styles.iconWrap, compact && styles.iconWrapCompact]}
       >
-        <Ionicons name={icon} size={30} color={palette.pureWhite} />
+        <Ionicons name={icon} size={compact ? 22 : 30} color={palette.pureWhite} />
       </LinearGradient>
 
       <View style={styles.copy}>
-        <AppText weight="bold" style={styles.title}>
+        <AppText weight="bold" style={[styles.title, compact && styles.titleCompact]}>
           {title}
         </AppText>
-        <AppText style={styles.subtitle}>{subtitle}</AppText>
+        {compact ? null : <AppText style={styles.subtitle}>{subtitle}</AppText>}
       </View>
 
-      <View style={styles.chevronWrap}>
-        <Ionicons name="chevron-forward" size={20} color={palette.gold} />
-      </View>
+      {compact ? (
+        selected ? (
+          <Ionicons name="checkmark-circle" size={20} color={palette.gold} />
+        ) : (
+          <View style={styles.radio} />
+        )
+      ) : (
+        <View style={styles.chevronWrap}>
+          <Ionicons
+            name={selected ? 'checkmark' : 'chevron-forward'}
+            size={20}
+            color={palette.gold}
+          />
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -53,6 +74,20 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg + 4,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  cardCompact: {
+    flex: 1,
+    minWidth: 0,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.lg,
+    gap: spacing.sm,
+  },
+  cardSelected: {
+    borderColor: palette.gold,
+    backgroundColor: palette.softGold,
   },
   pressed: {
     opacity: 0.92,
@@ -65,6 +100,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  iconWrapCompact: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+  },
   copy: {
     flex: 1,
     gap: 3,
@@ -72,6 +112,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     color: palette.charcoal,
+  },
+  titleCompact: {
+    fontSize: 15,
   },
   subtitle: {
     fontSize: 13,
@@ -85,5 +128,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.softGold,
+  },
+  radio: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: palette.softGold,
   },
 });

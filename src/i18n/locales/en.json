@@ -33,6 +33,7 @@
     "reject": "Reject",
     "confirm": "Confirm",
     "decline": "Decline",
+    "withdraw": "Withdraw",
     "waitingForConfirmation": "Waiting for the other party to confirm.",
     "actionFailed": "Could not update this offer. Try again.",
     "offerStatus": {
@@ -176,6 +177,9 @@
     "title": "Welcome to Dahabi",
     "subtitle": "You're all set. Let's get you started.",
     "continue": "Move to Dashboard",
+    "listingTitle": "Congratulations",
+    "listingSubtitle": "Your listing is live.",
+    "listingContinue": "View listings",
     "logout": "Log out",
     "logoutConfirmTitle": "Log out?",
     "logoutConfirmMessage": "You'll need to verify your phone number or enter your MPIN to log back in."

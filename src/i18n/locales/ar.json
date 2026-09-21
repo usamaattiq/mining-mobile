@@ -33,6 +33,7 @@
     "reject": "رفض",
     "confirm": "تأكيد",
     "decline": "رفض العرض",
+    "withdraw": "سحب العرض",
     "waitingForConfirmation": "بانتظار تأكيد الطرف الآخر.",
     "actionFailed": "تعذر تحديث هذا العرض. حاول مرة أخرى.",
     "offerStatus": {
@@ -176,6 +177,9 @@
     "title": "مرحبًا بك في Dahabi",
     "subtitle": "كل شيء جاهز. لنبدأ الآن.",
     "continue": "الانتقال إلى لوحة التحكم",
+    "listingTitle": "تهانينا",
+    "listingSubtitle": "إعلانك أصبح ظاهرًا الآن.",
+    "listingContinue": "عرض الإعلانات",
     "logout": "تسجيل الخروج",
     "logoutConfirmTitle": "تسجيل الخروج؟",
     "logoutConfirmMessage": "ستحتاج إلى التحقق من رقم هاتفك أو إدخال الرمز السري لتسجيل الدخول مرة أخرى."
