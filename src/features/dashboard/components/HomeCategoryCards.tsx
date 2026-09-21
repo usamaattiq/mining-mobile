@@ -67,8 +67,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   cardSelected: {
-    backgroundColor: palette.pureWhite,
-    borderColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
+    borderColor: palette.warmWhite,
   },
   pressed: {
     opacity: 0.88,
