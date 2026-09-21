@@ -7,8 +7,11 @@ export const tabNavigatorScreenOptions: BottomTabNavigationOptions = {
   animation: 'none',
   sceneStyle: { backgroundColor: palette.warmWhite },
   tabBarStyle: {
+    height: 0,
+    overflow: 'hidden' as const,
     backgroundColor: 'transparent',
     borderTopWidth: 0,
     elevation: 0,
   },
+  safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
 };

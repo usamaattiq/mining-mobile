@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -46,12 +46,21 @@ export const FLOATING_TAB_BAR_HEIGHT = 72;
 export const FLOATING_TAB_BAR_MARGIN = 16;
 const PLUS_BUTTON_SIZE = 60;
 
-/** Distance from the tab bar container bottom to the pill bar. */
+export const FloatingTabBarInsetContext = React.createContext(0);
+
+export function useFloatingTabBarContentPadding(): number {
+  return React.useContext(FloatingTabBarInsetContext);
+}
+
+/** Distance from the window bottom to the pill. Android 3-button nav is outside the window. */
 export function getFloatingTabBarBottomOffset(safeAreaBottom: number): number {
+  if (Platform.OS === 'android') {
+    return spacing.sm;
+  }
   return Math.max(safeAreaBottom, spacing.sm) + spacing.sm;
 }
 
-/** Total vertical space the tab bar occupies in the navigator. */
+/** Space scroll content should keep clear so rows are not hidden behind the pill. */
 export function getFloatingTabBarReservedHeight(safeAreaBottom: number): number {
   return getFloatingTabBarBottomOffset(safeAreaBottom) + FLOATING_TAB_BAR_HEIGHT;
 }
@@ -106,7 +115,6 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
   const insets = useSafeAreaInsets();
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const bottomOffset = getFloatingTabBarBottomOffset(insets.bottom);
-  const reservedHeight = getFloatingTabBarReservedHeight(insets.bottom);
   const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
   const routes = state.routes.filter((route) => TAB_VISUALS[route.name]);
@@ -143,8 +151,8 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
   };
 
   return (
-    <View pointerEvents="box-none" style={{ height: reservedHeight }}>
-      <View pointerEvents="box-none" style={[styles.wrapper, { bottom: bottomOffset }]}>
+    <View pointerEvents="box-none" style={styles.dock}>
+      <View pointerEvents="box-none" style={[styles.wrapper, { marginBottom: bottomOffset }]}>
         <View style={styles.bar}>
           {firstHalf.map(renderTab)}
           <View style={styles.plusSlot} />
@@ -165,10 +173,15 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  dock: {
     position: 'absolute',
-    left: FLOATING_TAB_BAR_MARGIN,
-    right: FLOATING_TAB_BAR_MARGIN,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+  },
+  wrapper: {
+    marginHorizontal: FLOATING_TAB_BAR_MARGIN,
     zIndex: 20,
   },
   bar: {

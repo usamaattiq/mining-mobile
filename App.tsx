@@ -87,7 +87,7 @@ export default function App() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      <KeyboardProvider statusBarTranslucent>
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
         <View style={styles.root}>
           <NavigationContainer ref={navigationRef} linking={navigationLinking} theme={navigationTheme}>
             <AppNavigator />

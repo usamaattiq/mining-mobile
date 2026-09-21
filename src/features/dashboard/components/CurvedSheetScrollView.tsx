@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, type ScrollViewProps } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useFloatingTabBarContentPadding } from '@/features/dashboard/components/FloatingTabBar';
 import { palette, radius, spacing } from '@/theme';
 
 export const CURVED_SHEET_OVERLAP = radius.lg + 4;
@@ -15,10 +16,16 @@ export function CurvedSheetScrollView({
   refreshControl,
   ...rest
 }: ScrollViewProps): React.ReactElement {
+  const tabBarPadding = useFloatingTabBarContentPadding();
+
   return (
     <KeyboardAwareScrollView
       style={styles.scroll}
-      contentContainerStyle={[styles.content, contentContainerStyle]}
+      contentContainerStyle={[
+        styles.content,
+        tabBarPadding > 0 && { paddingBottom: spacing.md + tabBarPadding },
+        contentContainerStyle,
+      ]}
       showsVerticalScrollIndicator={false}
       bounces={Boolean(refreshControl) || rest.bounces}
       alwaysBounceVertical={Boolean(refreshControl)}
