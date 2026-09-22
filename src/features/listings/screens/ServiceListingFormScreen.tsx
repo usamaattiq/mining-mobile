@@ -37,6 +37,8 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
+  const role = useMarketplaceRoleStore((state) => state.role);
+  const isSupplier = role === 'supplier';
   const [onsite, setOnsite] = React.useState(false);
   const [online, setOnline] = React.useState(false);
   const serviceType = serviceTypeFromFlags(onsite, online);
@@ -123,7 +125,9 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
     serviceType && serviceCategory && title.trim() && description.trim() && price.trim(),
   );
   const mediaValid =
-    media.length > 0 && Boolean(serviceDate) && (!isOnsite || location.trim().length > 0);
+    media.length > 0 &&
+    (isSupplier || Boolean(serviceDate)) &&
+    (!isOnsite || location.trim().length > 0);
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -155,7 +159,7 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
         description,
         yearsOfExperience,
         price,
-        serviceDate: serviceDate ? serviceDate.getTime() : null,
+        serviceDate: isSupplier ? null : serviceDate ? serviceDate.getTime() : null,
         location: isOnsite ? location : '',
         media: persistedMedia,
         postedAs: useMarketplaceRoleStore.getState().role,
@@ -196,15 +200,19 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
       label: t('serviceListing.price'),
       value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
     },
-    {
-      label: t('serviceListing.serviceDate'),
-      value: serviceDate
-        ? new Intl.DateTimeFormat(currentLanguage, {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-          }).format(serviceDate)
-        : '',
-    },
+    ...(!isSupplier
+      ? [
+          {
+            label: t('serviceListing.serviceDate'),
+            value: serviceDate
+              ? new Intl.DateTimeFormat(currentLanguage, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }).format(serviceDate)
+              : '',
+          },
+        ]
+      : []),
     ...(isOnsite ? [{ label: t('serviceListing.location'), value: location }] : []),
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
@@ -310,13 +318,15 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
           <View style={styles.stepBlock}>
             <ServiceMediaUploader media={media} onChange={setMedia} />
 
-            <DateTimeField
-              label={t('serviceListing.serviceDate')}
-              value={serviceDate}
-              required
-              placeholder={t('serviceListing.serviceDatePlaceholder')}
-              onChange={setServiceDate}
-            />
+            {!isSupplier ? (
+              <DateTimeField
+                label={t('serviceListing.serviceDate')}
+                value={serviceDate}
+                required
+                placeholder={t('serviceListing.serviceDatePlaceholder')}
+                onChange={setServiceDate}
+              />
+            ) : null}
 
             {isOnsite ? (
               <LocationField
