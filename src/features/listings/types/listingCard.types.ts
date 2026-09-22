@@ -36,4 +36,5 @@ export type ListingCardProps = {
   /** RFQ expiry from RMS; used for the card countdown when present. */
   expiresAt?: number;
   onPress: () => void;
+  layout?: 'row' | 'grid';
 };

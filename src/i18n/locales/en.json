@@ -221,6 +221,8 @@
     "quickCreateSubtitle": "Choose a category to get started — you can publish in just a few steps.",
     "searchPlaceholder": "Search listings",
     "filter": "Filter",
+    "viewList": "List view",
+    "viewGrid": "Grid view",
     "filterTitle": "Filter",
     "filterAll": "All",
     "filterCity": "City",

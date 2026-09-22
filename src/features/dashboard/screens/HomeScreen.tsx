@@ -108,6 +108,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const [filters, setFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [draftFilters, setDraftFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [filterOpen, setFilterOpen] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<'list' | 'grid'>('list');
   const [refreshing, setRefreshing] = React.useState(false);
 
   useFocusEffect(
@@ -384,6 +385,20 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           />
         </View>
         <Pressable
+          onPress={() => setViewMode((current) => (current === 'list' ? 'grid' : 'list'))}
+          accessibilityRole="button"
+          accessibilityLabel={
+            viewMode === 'list' ? t('dashboardHome.viewGrid') : t('dashboardHome.viewList')
+          }
+          style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
+        >
+          <Ionicons
+            name={viewMode === 'list' ? 'grid-outline' : 'list-outline'}
+            size={20}
+            color={palette.gold}
+          />
+        </Pressable>
+        <Pressable
           onPress={openFilter}
           accessibilityRole="button"
           accessibilityLabel={t('dashboardHome.filter')}
@@ -395,6 +410,12 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
 
       {cards.length === 0 ? (
         <EmptyState title={t('requests.emptyTitle')} subtitle={t('requests.emptySubtitle')} />
+      ) : viewMode === 'grid' ? (
+        <View style={styles.listingGrid}>
+          {cards.map(({ id, ...card }) => (
+            <ListingCard key={id} layout="grid" {...card} />
+          ))}
+        </View>
       ) : (
         cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
       )}
@@ -538,6 +559,12 @@ const styles = StyleSheet.create({
   searchField: {
     flex: 1,
     minWidth: 0,
+  },
+  listingGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: spacing.md,
   },
   filterButton: {
     width: 48,

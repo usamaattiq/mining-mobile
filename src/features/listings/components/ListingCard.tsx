@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
@@ -93,8 +93,106 @@ export function ListingCard({
   createdAt,
   expiresAt,
   onPress,
+  layout = 'row',
 }: ListingCardProps): React.ReactElement {
   const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
+  const windowWidth = useWindowDimensions().width;
+
+  const timer = createdAt ? (
+    <View style={styles.timerBadge}>
+      <Ionicons name="time-outline" size={10} color={palette.gold} />
+      <AppText weight="semibold" style={styles.timerText}>
+        {timeLeft}
+      </AppText>
+    </View>
+  ) : null;
+
+  if (layout === 'grid') {
+    const extraBadges = [
+      ...(durationBadges ?? []),
+      ...(deliveryBadge ? [deliveryBadge] : []),
+    ];
+
+    return (
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={title}
+        style={({ pressed }) => [styles.gridCard, cardBackShadow, pressed && styles.pressed]}
+      >
+        <View
+          style={[
+            styles.gridImageWrap,
+            { height: Math.round((windowWidth - spacing.md * 2) * 0.32) },
+          ]}
+        >
+          {thumbnail ? (
+            <Image source={{ uri: thumbnail }} style={styles.gridImage} resizeMode="cover" />
+          ) : (
+            <View style={[styles.gridImage, styles.imagePlaceholder]}>
+              <Ionicons name={placeholderIcon} size={36} color={palette.muted} />
+            </View>
+          )}
+          {typeBadge ? (
+            <View style={styles.gridRfqOverlay}>
+              <StatusBadge badge={typeBadge} />
+            </View>
+          ) : null}
+        </View>
+
+        <View style={styles.gridBody}>
+          {(priceText || priceUnit) ? (
+            <View style={styles.gridPriceRow}>
+              <AppText weight="bold" style={styles.gridPrice} numberOfLines={1}>
+                {priceText ?? ' '}
+              </AppText>
+              {priceUnit ? (
+                <AppText weight="bold" style={styles.gridPriceUnit} numberOfLines={1}>
+                  {priceUnit}
+                </AppText>
+              ) : null}
+            </View>
+          ) : null}
+
+          <AppText weight="bold" style={styles.gridTitle} numberOfLines={2}>
+            {title}
+          </AppText>
+
+          {subtitle ? (
+            <AppText style={styles.gridMeta} numberOfLines={1}>
+              {subtitle}
+            </AppText>
+          ) : null}
+
+          {city ? (
+            <View style={styles.gridMetaRow}>
+              <Ionicons name="location-outline" size={12} color={palette.gold} />
+              <AppText style={styles.gridMeta} numberOfLines={1}>
+                {city}
+              </AppText>
+            </View>
+          ) : null}
+
+          {extraBadges.length > 0 ? (
+            <View style={styles.gridBadges}>
+              {extraBadges.map((badge) => (
+                <SmallBadge key={badge.key} badge={badge} />
+              ))}
+            </View>
+          ) : null}
+
+          <View style={styles.gridFooter}>
+            <View style={styles.gridFooterLeft}>
+              {(statusBadges ?? []).map((badge) => (
+                <StatusBadge key={badge.key} badge={badge} />
+              ))}
+            </View>
+            {timer}
+          </View>
+        </View>
+      </Pressable>
+    );
+  }
 
   return (
     <Pressable
@@ -197,6 +295,84 @@ const styles = StyleSheet.create({
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     padding: spacing.sm,
+  },
+  gridCard: {
+    width: '48%',
+    backgroundColor: palette.warmWhite,
+    borderRadius: radius.lg,
+  },
+  gridImageWrap: {
+    width: '100%',
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    overflow: 'hidden',
+    backgroundColor: palette.softGold,
+  },
+  gridImage: {
+    width: '100%',
+    height: '100%',
+  },
+  gridBody: {
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+    gap: 4,
+  },
+  gridRfqOverlay: {
+    position: 'absolute',
+    top: spacing.xs + 2,
+    right: spacing.xs + 2,
+    zIndex: 1,
+  },
+  gridPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    gap: 2,
+  },
+  gridPrice: {
+    fontSize: 15,
+    color: palette.charcoal,
+  },
+  gridPriceUnit: {
+    fontSize: 12,
+    color: palette.muted,
+  },
+  gridTitle: {
+    fontSize: 13,
+    lineHeight: 17,
+    color: palette.charcoal,
+  },
+  gridMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  gridMeta: {
+    flexShrink: 1,
+    fontSize: 11,
+    color: palette.muted,
+  },
+  gridBadges: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+    display: 'none',
+  },
+  gridFooter: {
+    marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.xs,
+  },
+  gridFooterLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 4,
+    minWidth: 0,
   },
   pressed: {
     opacity: 0.9,
