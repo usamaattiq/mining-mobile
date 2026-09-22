@@ -20,7 +20,7 @@ const MAX_PHOTOS = 3;
 const MAX_VIDEOS = 1;
 const MAX_VIDEO_MB = 20;
 const MAX_VIDEO_BYTES = MAX_VIDEO_MB * 1024 * 1024;
-const SHEET_HEIGHT_RATIO = 0.32;
+const SHEET_HEIGHT_RATIO = 0.28;
 
 function newId(): string {
   return `media_${Math.random().toString(16).slice(2, 10)}`;
@@ -240,6 +240,7 @@ export function EquipmentMediaUploader({
         visible={sheetKind !== null}
         onClose={() => setSheetKind(null)}
         heightRatio={SHEET_HEIGHT_RATIO}
+        fitContent
       >
         <AppText weight="bold" style={styles.sheetTitle}>
           {sheetKind === 'video' ? t('equipmentListing.addVideo') : t('equipmentListing.addPhoto')}

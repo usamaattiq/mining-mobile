@@ -15,7 +15,7 @@ import type {
 } from '@/features/listings/types/serviceMedia.types';
 
 const MAX_PHOTOS = 3;
-const SHEET_HEIGHT_RATIO = 0.4;
+const SHEET_HEIGHT_RATIO = 0.28;
 
 function newId(): string {
   return `media_${Math.random().toString(16).slice(2, 10)}`;
@@ -185,6 +185,7 @@ export function ServiceMediaUploader({
         visible={sheetOpen}
         onClose={() => setSheetOpen(false)}
         heightRatio={SHEET_HEIGHT_RATIO}
+        fitContent
       >
         <AppText weight="bold" style={styles.sheetTitle}>
           {t('serviceListing.addPhoto')}

@@ -40,12 +40,14 @@ function BottomSheetFrame({
   onClose,
   children,
   heightRatio,
+  fitContent,
   sheetStyle,
   avoidKeyboard,
 }: {
   onClose: () => void;
   children: React.ReactNode;
   heightRatio: number;
+  fitContent: boolean;
   sheetStyle?: StyleProp<ViewStyle>;
   avoidKeyboard: boolean;
 }): React.ReactElement {
@@ -114,6 +116,14 @@ function BottomSheetFrame({
       fullH * clampedRatio,
       Math.max(fullH - lift - topReserve, fullH * 0.32),
     );
+    if (fitContent) {
+      return {
+        marginBottom: lift,
+        height: undefined,
+        maxHeight,
+        paddingBottom: closedPaddingBottom,
+      };
+    }
     return {
       marginBottom: lift,
       height: maxHeight,
@@ -130,7 +140,7 @@ function BottomSheetFrame({
         accessibilityLabel="Close"
       />
       <Animated.View style={[styles.sheet, animatedSheetStyle, sheetStyle]}>
-        <View style={styles.sheetInner}>{children}</View>
+        <View style={fitContent ? styles.sheetInnerFit : styles.sheetInner}>{children}</View>
       </Animated.View>
     </View>
   );
@@ -141,6 +151,7 @@ export function AppBottomSheet({
   onClose,
   children,
   heightRatio = 0.7,
+  fitContent = false,
   sheetStyle,
   avoidKeyboard = true,
 }: AppBottomSheetProps): React.ReactElement {
@@ -157,6 +168,7 @@ export function AppBottomSheet({
         <BottomSheetFrame
           onClose={onClose}
           heightRatio={heightRatio}
+          fitContent={fitContent}
           sheetStyle={sheetStyle}
           avoidKeyboard={avoidKeyboard}
         >
@@ -188,5 +200,8 @@ const styles = StyleSheet.create({
   sheetInner: {
     flex: 1,
     minHeight: 0,
+  },
+  sheetInnerFit: {
+    flexGrow: 0,
   },
 });

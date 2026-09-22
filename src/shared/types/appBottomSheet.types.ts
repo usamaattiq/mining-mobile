@@ -7,6 +7,8 @@ export type AppBottomSheetProps = {
   children: ReactNode;
   /** Sheet height as a fraction of the window (0-1). Default 0.7. */
   heightRatio?: number;
+  /** Size the sheet to its children instead of a fixed window ratio. */
+  fitContent?: boolean;
   sheetStyle?: StyleProp<ViewStyle>;
   /**
    * When false, the sheet ignores IME size. Use for iOS date/time wheels:
