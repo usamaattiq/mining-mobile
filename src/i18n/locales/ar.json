@@ -357,6 +357,7 @@
     "description": "الوصف",
     "descriptionPlaceholder": "صف ما تتضمنه هذه الخدمة",
     "yearsOfExperience": "سنوات الخبرة",
+    "yearsOfExperienceWanted": "كم سنة خبرة تريد؟",
     "yearsOfExperiencePlaceholder": "مثال: 5",
     "yearsOfExperienceValue": "{years} سنوات",
     "price": "السعر",

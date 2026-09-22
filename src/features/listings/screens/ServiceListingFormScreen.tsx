@@ -41,6 +41,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const currency = useCurrency();
   const role = useMarketplaceRoleStore((state) => state.role);
   const isSupplier = role === 'supplier';
+  const isBuyer = role === 'buyer';
   const [onsite, setOnsite] = React.useState(false);
   const [online, setOnline] = React.useState(false);
   const serviceType = serviceTypeFromFlags(onsite, online);
@@ -141,7 +142,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setTitle(sourceListing.title);
     setDescription(sourceListing.description ?? '');
     setYearsOfExperience(sourceListing.yearsOfExperience ?? '');
-    setPrice(sourceListing.price ?? '');
+    setPrice(isBuyer ? '' : sourceListing.price ?? '');
     setServiceDate(
       sourceListing.serviceDate && sourceListing.serviceDate > Date.now()
         ? new Date(sourceListing.serviceDate)
@@ -172,7 +173,11 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   };
 
   const detailsValid = Boolean(
-    serviceType && serviceCategory && title.trim() && description.trim() && price.trim(),
+    serviceType &&
+      serviceCategory &&
+      title.trim() &&
+      description.trim() &&
+      (isBuyer || price.trim()),
   );
   const mediaValid =
     media.length > 0 &&
@@ -208,7 +213,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         title,
         description,
         yearsOfExperience,
-        price,
+        price: isBuyer ? '' : price,
         serviceDate: isSupplier ? null : serviceDate ? serviceDate.getTime() : null,
         location: isOnsite ? location : '',
         media: persistedMedia,
@@ -237,7 +242,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     { label: t('serviceListing.title'), value: title },
     { label: t('serviceListing.description'), value: description },
     {
-      label: t('serviceListing.yearsOfExperience'),
+      label: t(
+        isBuyer ? 'serviceListing.yearsOfExperienceWanted' : 'serviceListing.yearsOfExperience',
+      ),
       value: yearsOfExperience
         ? t('serviceListing.yearsOfExperienceValue', { years: yearsOfExperience })
         : '',
@@ -246,10 +253,14 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       label: t('serviceListing.type'),
       value: serviceTypeLabels(t, serviceType).join(' · '),
     },
-    {
-      label: t('serviceListing.price'),
-      value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
-    },
+    ...(isBuyer
+      ? []
+      : [
+          {
+            label: t('serviceListing.price'),
+            value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
+          },
+        ]),
     ...(!isSupplier
       ? [
           {
@@ -346,21 +357,27 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <FormInput
-              label={t('serviceListing.yearsOfExperience')}
+              label={t(
+                isBuyer
+                  ? 'serviceListing.yearsOfExperienceWanted'
+                  : 'serviceListing.yearsOfExperience',
+              )}
               value={yearsOfExperience}
               onChangeText={setYearsOfExperience}
               placeholder={t('serviceListing.yearsOfExperiencePlaceholder')}
               keyboardType="numeric"
             />
 
-            <FormInput
-              label={t('serviceListing.price')}
-              value={price}
-              onChangeText={setPrice}
-              keyboardType="numeric"
-              placeholder={currency.code}
-              required
-            />
+            {isBuyer ? null : (
+              <FormInput
+                label={t('serviceListing.price')}
+                value={price}
+                onChangeText={setPrice}
+                keyboardType="numeric"
+                placeholder={currency.code}
+                required
+              />
+            )}
           </View>
         ) : null}
 

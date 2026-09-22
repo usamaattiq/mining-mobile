@@ -377,6 +377,7 @@
     "description": "Description",
     "descriptionPlaceholder": "Describe what this service includes",
     "yearsOfExperience": "Years of Experience",
+    "yearsOfExperienceWanted": "Years of experience do you want?",
     "yearsOfExperiencePlaceholder": "e.g. 5",
     "yearsOfExperienceValue": "{years} years",
     "price": "Price",

@@ -248,7 +248,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         ? { amount: equipmentListing.salePrice, unit: '' }
         : null;
 
-    priceNode = price ? (
+    priceNode =
+      equipmentListing.postedAs === 'buyer' || !price ? null : (
       <View style={styles.priceRow}>
         <View style={styles.priceValueRow}>
           <AppText weight="bold" style={styles.priceAmount}>
@@ -274,7 +275,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           </View>
         ) : null}
       </View>
-    ) : null;
+    );
 
     const deliverySubtitle = equipmentListing.deliveryAvailable
       ? equipmentListing.deliveryType === 'free'
@@ -293,7 +294,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     detailRows = [
       { label: t('serviceListing.serviceCategory'), value: serviceListing.serviceCategoryLabel },
       {
-        label: t('serviceListing.yearsOfExperience'),
+        label: t(
+          serviceListing.postedAs === 'buyer'
+            ? 'serviceListing.yearsOfExperienceWanted'
+            : 'serviceListing.yearsOfExperience',
+        ),
         value: serviceListing.yearsOfExperience
           ? t('serviceListing.yearsOfExperienceValue', { years: serviceListing.yearsOfExperience })
           : '',
@@ -319,11 +324,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
-    priceNode = serviceListing.price ? (
+    priceNode =
+      serviceListing.postedAs === 'buyer' || !serviceListing.price ? null : (
       <AppText weight="bold" style={styles.priceAmount}>
         {currency.code} {formatAmountWithCommas(serviceListing.price)}
       </AppText>
-    ) : null;
+    );
 
     extraSection = <AttachmentsSection documents={documents} />;
   } else if (category === 'gold' && goldListing) {
@@ -349,11 +355,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
-    priceNode = goldListing.price ? (
+    priceNode =
+      goldListing.postedAs === 'buyer' || !goldListing.price ? null : (
       <AppText weight="bold" style={styles.priceAmount}>
         {currency.code} {formatAmountWithCommas(goldListing.price)}
       </AppText>
-    ) : null;
+    );
 
     extraSection = <AttachmentsSection documents={documents} />;
   }
@@ -401,7 +408,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const showOwnerOffers = isOwner && Boolean(rfq);
   const headerBadge =
     rfqStatusBadge(t, rfq) ??
-    (equipmentListing
+    (equipmentListing && equipmentListing.postedAs !== 'buyer'
       ? {
           key: 'mode',
           label: t(

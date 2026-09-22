@@ -117,13 +117,16 @@ export function buildListingCards({
               icon: 'car-outline',
             }
           : undefined,
-        statusBadges: [
-          {
-            key: 'mode',
-            label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
-          },
-        ],
-        priceText: amount,
+        statusBadges:
+          listing.postedAs === 'buyer'
+            ? []
+            : [
+                {
+                  key: 'mode',
+                  label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
+                },
+              ],
+        priceText: listing.postedAs === 'buyer' ? undefined : amount,
         priceUnit,
         createdAt: listing.createdAt,
         expiresAt: listing.rfq?.expiresAt ?? undefined,
@@ -154,7 +157,7 @@ export function buildListingCards({
           label,
         })),
       ],
-      priceText: priceText(currencyCode, listing.price),
+      priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
       createdAt: listing.createdAt,
       expiresAt: listing.rfq?.expiresAt ?? undefined,
       ended: listingHasEnded({
@@ -181,7 +184,7 @@ export function buildListingCards({
         .filter((part): part is string => Boolean(part))
         .join(' · ') || undefined,
     city: cityFromLocation(listing.location),
-    priceText: priceText(currencyCode, listing.price),
+    priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
     expiresAt: listing.auctionEndDate ?? undefined,
     ended: listingHasEnded({

@@ -42,7 +42,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const currency = useCurrency();
   const role = useMarketplaceRoleStore((state) => state.role);
   const isBuyer = role === 'buyer';
-  const [mode, setMode] = React.useState<EquipmentListingMode | null>(null);
+  const [mode, setMode] = React.useState<EquipmentListingMode | null>(isBuyer ? 'sell' : null);
   const isRent = mode === 'rent';
 
   const steps = [
@@ -129,14 +129,14 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   React.useEffect(() => {
     if (!sourceListing || filledRepost.current) return;
     filledRepost.current = true;
-    setMode(sourceListing.mode);
+    setMode(isBuyer ? 'sell' : sourceListing.mode);
     setEquipmentType(matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel));
     setTitle(sourceListing.title);
     setDescription(sourceListing.description ?? '');
-    setHourlyRental(sourceListing.hourlyRental ?? '');
-    setMonthlyRental(sourceListing.monthlyRental ?? '');
-    setWeeklyRental(sourceListing.weeklyRental ?? '');
-    setSalePrice(sourceListing.salePrice ?? '');
+    setHourlyRental(isBuyer ? '' : sourceListing.hourlyRental ?? '');
+    setMonthlyRental(isBuyer ? '' : sourceListing.monthlyRental ?? '');
+    setWeeklyRental(isBuyer ? '' : sourceListing.weeklyRental ?? '');
+    setSalePrice(isBuyer ? '' : sourceListing.salePrice ?? '');
     setUnits(Math.max(sourceListing.units ?? 1, 1));
     setLocation(sourceListing.location ?? '');
     setNeededDate(
@@ -175,9 +175,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     equipmentType &&
     title.trim() &&
     units > 0 &&
-    (isRent
-      ? hourlyRental.trim() || monthlyRental.trim() || weeklyRental.trim()
-      : salePrice.trim()),
+    (isBuyer ||
+      (isRent
+        ? hourlyRental.trim() || monthlyRental.trim() || weeklyRental.trim()
+        : salePrice.trim())),
   );
   const deliveryValid =
     !deliveryAvailable || deliveryType === 'free' || deliveryPricePerKm.trim().length > 0;
@@ -212,14 +213,14 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       const persistedMedia = await persistListingMedia(media);
       const listing = await listingsApi.create({
         category: 'equipment',
-        mode,
+        mode: isBuyer ? 'sell' : mode,
         equipmentTypeLabel: equipmentTypeLabel ?? '',
         title,
         description,
-        hourlyRental,
-        monthlyRental,
-        weeklyRental,
-        salePrice,
+        hourlyRental: isBuyer ? '' : hourlyRental,
+        monthlyRental: isBuyer ? '' : monthlyRental,
+        weeklyRental: isBuyer ? '' : weeklyRental,
+        salePrice: isBuyer ? '' : salePrice,
         units,
         location,
         media: persistedMedia,
@@ -251,27 +252,31 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     { label: t('equipmentListing.equipmentType'), value: equipmentTypeLabel ?? '' },
     { label: t('equipmentListing.title'), value: title },
     { label: t('equipmentListing.description'), value: description },
-    ...(isRent
-      ? [
-          {
-            label: t('equipmentListing.hourlyRental', { currency: currency.code }),
-            value: hourlyRental ? `${currency.code} ${formatAmountWithCommas(hourlyRental)}` : '',
-          },
-          {
-            label: t('equipmentListing.weeklyRental', { currency: currency.code }),
-            value: weeklyRental ? `${currency.code} ${formatAmountWithCommas(weeklyRental)}` : '',
-          },
-          {
-            label: t('equipmentListing.monthlyRental', { currency: currency.code }),
-            value: monthlyRental ? `${currency.code} ${formatAmountWithCommas(monthlyRental)}` : '',
-          },
-        ]
-      : [
-          {
-            label: t('equipmentListing.salePrice'),
-            value: salePrice ? `${currency.code} ${formatAmountWithCommas(salePrice)}` : '',
-          },
-        ]),
+    ...(isBuyer
+      ? []
+      : isRent
+        ? [
+            {
+              label: t('equipmentListing.hourlyRental', { currency: currency.code }),
+              value: hourlyRental ? `${currency.code} ${formatAmountWithCommas(hourlyRental)}` : '',
+            },
+            {
+              label: t('equipmentListing.weeklyRental', { currency: currency.code }),
+              value: weeklyRental ? `${currency.code} ${formatAmountWithCommas(weeklyRental)}` : '',
+            },
+            {
+              label: t('equipmentListing.monthlyRental', { currency: currency.code }),
+              value: monthlyRental
+                ? `${currency.code} ${formatAmountWithCommas(monthlyRental)}`
+                : '',
+            },
+          ]
+        : [
+            {
+              label: t('equipmentListing.salePrice'),
+              value: salePrice ? `${currency.code} ${formatAmountWithCommas(salePrice)}` : '',
+            },
+          ]),
     { label: t('equipmentListing.units'), value: String(units) },
     ...(!isBuyer
       ? []
@@ -303,9 +308,11 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         left="back"
         variant="gold"
         title={
-          mode === 'sell'
-            ? t('equipmentListing.sellFormTitle')
-            : t('equipmentListing.rentFormTitle')
+          isBuyer
+            ? t('equipmentListing.modeTitle')
+            : mode === 'sell'
+              ? t('equipmentListing.sellFormTitle')
+              : t('equipmentListing.rentFormTitle')
         }
         onBackPress={handleBack}
         style={styles.header}
@@ -323,24 +330,26 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>
-            <View style={styles.choiceRow}>
-              <OptionRowCard
-                compact
-                selected={mode === 'rent'}
-                icon="key-outline"
-                title={t('equipmentListing.rent')}
-                subtitle={t('equipmentListing.rentSubtitle')}
-                onPress={() => setMode('rent')}
-              />
-              <OptionRowCard
-                compact
-                selected={mode === 'sell'}
-                icon="pricetag-outline"
-                title={t('equipmentListing.sell')}
-                subtitle={t('equipmentListing.sellSubtitle')}
-                onPress={() => setMode('sell')}
-              />
-            </View>
+            {!isBuyer ? (
+              <View style={styles.choiceRow}>
+                <OptionRowCard
+                  compact
+                  selected={mode === 'rent'}
+                  icon="key-outline"
+                  title={t('equipmentListing.rent')}
+                  subtitle={t('equipmentListing.rentSubtitle')}
+                  onPress={() => setMode('rent')}
+                />
+                <OptionRowCard
+                  compact
+                  selected={mode === 'sell'}
+                  icon="pricetag-outline"
+                  title={t('equipmentListing.sell')}
+                  subtitle={t('equipmentListing.sellSubtitle')}
+                  onPress={() => setMode('sell')}
+                />
+              </View>
+            ) : null}
 
             <SelectField
               label={t('equipmentListing.equipmentType')}
@@ -372,7 +381,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               style={styles.descriptionInput}
             />
 
-            {mode === 'rent' ? (
+            {!isBuyer && mode === 'rent' ? (
               <View style={styles.priceRow}>
                 <View style={styles.priceInput}>
                   <FormInput
@@ -402,7 +411,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   />
                 </View>
               </View>
-            ) : mode === 'sell' ? (
+            ) : !isBuyer && mode === 'sell' ? (
               <FormInput
                 label={t('equipmentListing.salePrice')}
                 value={salePrice}
