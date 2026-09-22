@@ -421,7 +421,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const handleSubmitOffer = (price: string, units?: number) => {
     setOfferSubmitting(true);
     void listingsApi
-      .submitOffer(id, price, units)
+      .submitOffer(id, price, category === 'equipment' ? units : undefined)
       .then((listing) => {
         applyListing(listing);
       })
@@ -552,6 +552,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               currencyCode={currency.code}
               actingOfferId={actingOfferId}
               canDecideOffers={rfq?.canDecideOffers !== false}
+              showUnits={category === 'equipment'}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
             />
@@ -598,12 +599,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           declineLabel={t('rfq.decline')}
           offerPrice={rfq?.myOfferPrice}
           offerUnitsLabel={
-            rfq?.myOfferQuantity
+            category === 'equipment' && rfq?.myOfferQuantity
               ? t('equipmentListing.unitsCount', { count: rfq.myOfferQuantity })
               : undefined
           }
-          unitsLabel={t('equipmentListing.units')}
-          unitPricePlaceholder={t('rfq.unitPricePlaceholder')}
+          unitsLabel={category === 'equipment' ? t('equipmentListing.units') : undefined}
+          unitPricePlaceholder={
+            category === 'equipment' ? t('rfq.unitPricePlaceholder') : undefined
+          }
           maxUnits={
             category === 'equipment' ? Math.max(equipmentListing?.units ?? 1, 1) : undefined
           }

@@ -13,6 +13,7 @@ export type ListingOffersPanelProps = {
   currencyCode: string;
   actingOfferId: string | null;
   canDecideOffers?: boolean;
+  showUnits?: boolean;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
 };
@@ -32,6 +33,7 @@ export function ListingOffersPanel({
   currencyCode,
   actingOfferId,
   canDecideOffers = true,
+  showUnits = false,
   onAccept,
   onReject,
 }: ListingOffersPanelProps): React.ReactElement {
@@ -66,7 +68,7 @@ export function ListingOffersPanel({
               {offer.price ? (
                 <AppText weight="bold" style={styles.price}>
                   {currencyCode} {formatAmountWithCommas(offer.price)}
-                  {offer.quantity
+                  {showUnits && offer.quantity
                     ? ` · ${t('equipmentListing.unitsCount', { count: offer.quantity })}`
                     : ''}
                 </AppText>
