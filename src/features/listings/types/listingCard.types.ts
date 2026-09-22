@@ -20,8 +20,6 @@ export type ListingCardProps = {
   typeBadge?: ListingCardBadge;
   /** City line under the type. */
   city?: string;
-  /** Date shown under the city. */
-  dateText?: string;
   /** Hourly / weekly / monthly — top left. */
   durationBadges?: ListingCardBadge[];
   /** Delivery — bottom right, with remaining time. */

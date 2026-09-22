@@ -18,17 +18,8 @@ export type BuildListingCardsInput = {
   goldListings: GoldListing[];
   t: TFunction;
   currencyCode: string;
-  locale: string;
   onOpen: (id: string, category: ListingCategory) => void;
 };
-
-function formatDateTime(locale: string, epoch: number | null | undefined): string | undefined {
-  if (!epoch) return undefined;
-  return new Intl.DateTimeFormat(locale, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(epoch));
-}
 
 function cityFromLocation(location: string | undefined): string | undefined {
   const city = cityFromLocationLabel(location ?? '');
@@ -76,7 +67,6 @@ export function buildListingCards({
   goldListings,
   t,
   currencyCode,
-  locale,
   onOpen,
 }: BuildListingCardsInput): ListingCardItem[] {
   if (category === 'equipment') {
@@ -107,7 +97,6 @@ export function buildListingCards({
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
         city: cityFromLocation(listing.location),
         durationBadges,
-        dateText: formatDateTime(locale, listing.createdAt),
         deliveryBadge: listing.deliveryAvailable
           ? {
               key: 'delivery',
@@ -140,7 +129,6 @@ export function buildListingCards({
       subtitleIcon: 'briefcase-outline',
       typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
       city: cityFromLocation(listing.location),
-      dateText: formatDateTime(locale, listing.serviceDate ?? listing.createdAt),
       statusBadges: [
         ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
           key: label,
@@ -168,7 +156,6 @@ export function buildListingCards({
         .filter((part): part is string => Boolean(part))
         .join(' · ') || undefined,
     city: cityFromLocation(listing.location),
-    dateText: formatDateTime(locale, listing.auctionEndDate ?? listing.createdAt),
     priceText: priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
     onPress: () => onOpen(listing.id, 'gold'),

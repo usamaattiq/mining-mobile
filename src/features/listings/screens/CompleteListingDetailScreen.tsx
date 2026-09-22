@@ -189,6 +189,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
       { label: t('equipmentListing.units'), value: String(equipmentListing.units) },
       {
+        label: t('equipmentListing.neededDate'),
+        value: formatListingDate(currentLanguage, equipmentListing.neededDate),
+      },
+      {
         label: t('common.postedOn'),
         value: formatListingDate(currentLanguage, equipmentListing.createdAt),
       },

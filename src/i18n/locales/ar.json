@@ -299,6 +299,8 @@
     "cardMonthlyUnit": "/ش",
     "saleBadge": "للبيع",
     "units": "عدد الوحدات",
+    "neededDate": "متى تحتاج هذه المعدات؟",
+    "neededDatePlaceholder": "اختر التاريخ والوقت",
     "location": "الموقع",
     "unitsCount": "{count} وحدة",
     "mediaTitle": "الصور والفيديو",

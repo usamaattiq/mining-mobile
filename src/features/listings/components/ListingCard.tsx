@@ -84,7 +84,6 @@ export function ListingCard({
   subtitleIcon,
   typeBadge,
   city,
-  dateText,
   durationBadges,
   deliveryBadge,
   statusBadges,
@@ -244,15 +243,6 @@ export function ListingCard({
                 {city ?? ' '}
               </AppText>
             </View>
-
-            {dateText ? (
-              <View style={styles.subtitleRow}>
-                <Ionicons name="calendar-outline" size={12} color={palette.gold} />
-                <AppText style={styles.subtitle} numberOfLines={1}>
-                  {dateText}
-                </AppText>
-              </View>
-            ) : null}
 
             <View style={styles.priceRow}>
               <AppText weight="bold" style={styles.price} numberOfLines={1}>

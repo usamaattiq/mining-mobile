@@ -290,7 +290,6 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     goldListings: visibleGold,
     t,
     currencyCode: currency.code,
-    locale: currentLanguage,
     onOpen: (id, listingCategory) =>
       navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
   }).filter((card) => {

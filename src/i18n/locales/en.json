@@ -319,6 +319,8 @@
     "cardMonthlyUnit": "/m",
     "saleBadge": "For Sale",
     "units": "Number of units",
+    "neededDate": "When do you need this equipment?",
+    "neededDatePlaceholder": "Select date & time",
     "location": "Location",
     "unitsCount": "{count} Units",
     "mediaTitle": "Photos & Video",

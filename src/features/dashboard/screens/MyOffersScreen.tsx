@@ -21,7 +21,6 @@ import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshOfferedListings } from '@/features/listings/utils/refreshListings';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { palette, spacing } from '@/theme';
 
 type Props = CompositeScreenProps<
@@ -31,7 +30,6 @@ type Props = CompositeScreenProps<
 
 export function MyOffersScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
-  const { currentLanguage } = useLanguage();
   const currency = useCurrency();
   const listings = useOfferedListingsStore((state) => state.listings);
   const role = useMarketplaceRoleStore((state) => state.role);
@@ -64,7 +62,6 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
     goldListings: listings.filter(isGoldListing),
     t,
     currencyCode: currency.code,
-    locale: currentLanguage,
     onOpen: (id, listingCategory) =>
       navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
   });

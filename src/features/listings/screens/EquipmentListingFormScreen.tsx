@@ -9,6 +9,7 @@ import type { EquipmentListingMode, RootStackParamList } from '@/navigation/type
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
+import { DateTimeField } from '@/shared/components/DateTimeField';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
@@ -27,6 +28,7 @@ import { persistListingMedia } from '@/features/listings/utils/persistListingMed
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { DeliveryType } from '@/features/listings/types/equipmentListing.types';
@@ -35,7 +37,10 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingForm'>;
 
 export function EquipmentListingFormScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
   const currency = useCurrency();
+  const role = useMarketplaceRoleStore((state) => state.role);
+  const isBuyer = role === 'buyer';
   const [mode, setMode] = React.useState<EquipmentListingMode | null>(null);
   const isRent = mode === 'rent';
 
@@ -87,6 +92,7 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
   const [salePrice, setSalePrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
   const [location, setLocation] = React.useState('');
+  const [neededDate, setNeededDate] = React.useState<Date | null>(null);
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
     longitude: number;
@@ -124,7 +130,12 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
   );
   const deliveryValid =
     !deliveryAvailable || deliveryType === 'free' || deliveryPricePerKm.trim().length > 0;
-  const mediaValid = media.length > 0 && !mediaBusy && location.trim().length > 0 && deliveryValid;
+  const mediaValid =
+    media.length > 0 &&
+    !mediaBusy &&
+    location.trim().length > 0 &&
+    deliveryValid &&
+    (!isBuyer || Boolean(neededDate));
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -164,6 +175,7 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
         deliveryAvailable,
         deliveryType,
         deliveryPricePerKm,
+        neededDate: isBuyer && neededDate ? neededDate.getTime() : null,
         postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isEquipmentListing(listing)) addListing(listing);
@@ -210,6 +222,19 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
           },
         ]),
     { label: t('equipmentListing.units'), value: String(units) },
+    ...(!isBuyer
+      ? []
+      : [
+          {
+            label: t('equipmentListing.neededDate'),
+            value: neededDate
+              ? new Intl.DateTimeFormat(currentLanguage, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }).format(neededDate)
+              : '',
+          },
+        ]),
     { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
@@ -350,6 +375,15 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
         {step === 1 ? (
           <View style={styles.stepBlock}>
             <EquipmentMediaUploader media={media} onChange={setMedia} onBusyChange={setMediaBusy} />
+            {isBuyer ? (
+              <DateTimeField
+                label={t('equipmentListing.neededDate')}
+                value={neededDate}
+                required
+                placeholder={t('equipmentListing.neededDatePlaceholder')}
+                onChange={setNeededDate}
+              />
+            ) : null}
             <LocationField
               label={t('equipmentListing.location')}
               value={location}

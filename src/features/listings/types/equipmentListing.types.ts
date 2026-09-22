@@ -26,5 +26,6 @@ export type EquipmentListing = {
   ownerId?: string;
   owner?: ListingOwner;
   rfq?: ListingRfq;
+  neededDate?: number | null;
   createdAt: number;
 };
