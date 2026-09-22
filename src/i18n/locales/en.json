@@ -106,6 +106,7 @@
     "fullName": "Full name",
     "companyName": "Company name",
     "emailOptional": "Email (optional)",
+    "emailPlaceholder": "name@example.com",
     "emailAlreadyExists": "This email already exists",
     "location": "Location",
     "panToSelect": "Move the map to select a location"
@@ -437,7 +438,8 @@
     "companyName": "Company name",
     "address": "Address",
     "saveError": "Couldn't save your changes. Please try again.",
-    "email": "Email",
+    "email": "Email (optional)",
+    "emailPlaceholder": "name@example.com",
     "phone": "Phone",
     "security": "Security settings",
     "securitySubtitle": "MPIN, biometrics, and device sessions",

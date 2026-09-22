@@ -132,6 +132,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
         ) : null}
         <FormInput
           label={t('profile.email')}
+          placeholder={t('profile.emailPlaceholder')}
           value={email}
           onChangeText={handleEmailChange}
           keyboardType="email-address"

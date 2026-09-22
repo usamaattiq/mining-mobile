@@ -106,6 +106,7 @@
     "fullName": "الاسم الكامل",
     "companyName": "اسم الشركة",
     "emailOptional": "البريد الإلكتروني (اختياري)",
+    "emailPlaceholder": "name@example.com",
     "emailAlreadyExists": "هذا البريد الإلكتروني مستخدم بالفعل",
     "location": "الموقع",
     "panToSelect": "حرّك الخريطة لاختيار الموقع"
@@ -437,7 +438,8 @@
     "companyName": "اسم الشركة",
     "address": "العنوان",
     "saveError": "تعذّر حفظ التغييرات. حاول مرة أخرى.",
-    "email": "البريد الإلكتروني",
+    "email": "البريد الإلكتروني (اختياري)",
+    "emailPlaceholder": "name@example.com",
     "phone": "رقم الهاتف",
     "security": "إعدادات الأمان",
     "securitySubtitle": "رمز الدخول، البصمة، وجلسات الأجهزة",

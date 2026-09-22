@@ -440,7 +440,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           ) : null}
           <FormInput
             label={t('signUpPersonalInfo.emailOptional')}
-            placeholder={t('signUpPersonalInfo.emailOptional')}
+            placeholder={t('signUpPersonalInfo.emailPlaceholder')}
             error={emailError ?? undefined}
             autoCapitalize="none"
             keyboardType="email-address"
