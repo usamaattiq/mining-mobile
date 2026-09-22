@@ -28,6 +28,9 @@ export function formatAuctionDurationLabel(hours: number, t: TFunction): string 
   const minutes = Math.round((hours - wholeHours) * 60);
 
   if (minutes === 0) {
+    if (wholeHours === 1) {
+      return t('goldListing.auctionDurationHour');
+    }
     return t('goldListing.auctionDurationHours', { count: wholeHours });
   }
   if (wholeHours === 0) {
