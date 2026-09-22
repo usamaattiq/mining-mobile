@@ -9,17 +9,22 @@ export function listingCreateActions(
   navigate: NativeStackNavigationProp<RootStackParamList>['navigate'],
   role: MarketplaceRole,
 ): HomeActionCardProps[] {
+  const isBuyer = role === 'buyer';
   const actions: HomeActionCardProps[] = [
     {
       icon: 'construct-outline',
-      title: t('dashboardHome.listEquipment'),
-      subtitle: t('dashboardHome.listEquipmentSubtitle'),
+      title: t(isBuyer ? 'dashboardHome.requestEquipment' : 'dashboardHome.listEquipment'),
+      subtitle: t(
+        isBuyer ? 'dashboardHome.requestEquipmentSubtitle' : 'dashboardHome.listEquipmentSubtitle',
+      ),
       onPress: () => navigate('EquipmentListingForm'),
     },
     {
       icon: 'briefcase-outline',
-      title: t('dashboardHome.listService'),
-      subtitle: t('dashboardHome.listServiceSubtitle'),
+      title: t(isBuyer ? 'dashboardHome.requestService' : 'dashboardHome.listService'),
+      subtitle: t(
+        isBuyer ? 'dashboardHome.requestServiceSubtitle' : 'dashboardHome.listServiceSubtitle',
+      ),
       onPress: () => navigate('ServiceListingForm'),
     },
   ];

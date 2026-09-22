@@ -19,7 +19,9 @@ export function QuickCreateScreen({ navigation }: Props): React.ReactElement {
   return (
     <GoldSheetScreen
       left="back"
-      title={t('dashboardHome.quickCreateTitle')}
+      title={t(
+        role === 'buyer' ? 'dashboardHome.quickCreateTitleBuyer' : 'dashboardHome.quickCreateTitle',
+      )}
       onBackPress={navigation.goBack}
     >
       {actions.map((action) => (
