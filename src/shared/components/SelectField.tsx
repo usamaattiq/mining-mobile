@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -175,9 +176,14 @@ export function SelectField({
             </View>
           ) : null}
 
-          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <KeyboardAwareScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            bottomOffset={16}
+            extraKeyboardSpace={0}
+          >
             {optionList}
-          </ScrollView>
+          </KeyboardAwareScrollView>
         </AppBottomSheet>
       )}
     </View>

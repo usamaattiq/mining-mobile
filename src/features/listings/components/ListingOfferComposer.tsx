@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useKeyboardState } from 'react-native-keyboard-controller';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +35,7 @@ export function ListingOfferComposer({
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const insets = useSafeAreaInsets();
   const { currentLanguage } = useLanguage();
+  const keyboardVisible = useKeyboardState((state) => state.isVisible);
   const [price, setPrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
   const unitCap = Math.max(maxUnits ?? 1, 1);
@@ -54,7 +56,12 @@ export function ListingOfferComposer({
   };
 
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+    <View
+      style={[
+        styles.bar,
+        { paddingBottom: keyboardVisible ? spacing.sm : Math.max(insets.bottom, spacing.md) },
+      ]}
+    >
       {hasOffer ? (
         <View style={styles.card}>
           <View style={styles.cardHeader}>

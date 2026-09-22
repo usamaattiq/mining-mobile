@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -482,13 +482,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={styles.root}>
       <StatusBar style="light" />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         <EquipmentImageCarousel
           media={visualMedia}
           onPressImage={setViewerIndex}
@@ -641,7 +642,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         initialIndex={viewerIndex ?? 0}
         onClose={() => setViewerIndex(null)}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 

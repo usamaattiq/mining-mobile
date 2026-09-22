@@ -1,5 +1,5 @@
 import React from 'react';
-import { Keyboard, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Keyboard, Platform, Pressable, StyleSheet, View } from 'react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { FormInput } from '@/shared/components/FormInput';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { HomeCitySearchField } from '@/features/dashboard/components/HomeCitySearchField';
 import { MultiSelectDropdown } from '@/features/dashboard/components/MultiSelectDropdown';
 import { palette, radius, spacing } from '@/theme';
@@ -132,11 +133,13 @@ export function HomeFilterSheet({
       avoidKeyboard={!(Platform.OS === 'ios' && pickingDate)}
     >
       <View style={styles.sheetBody}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        bottomOffset={16}
+        extraKeyboardSpace={0}
       >
         <View style={styles.titleRow}>
           <AppText weight="bold" style={styles.sheetTitle}>
@@ -272,7 +275,7 @@ export function HomeFilterSheet({
         ) : null}
 
         <Button label={t('dashboardHome.apply')} onPress={onApply} style={styles.applyButton} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
       {Platform.OS === 'ios' && pickingDate ? (
         <View style={styles.iosPickerDock}>
           <DateTimePicker

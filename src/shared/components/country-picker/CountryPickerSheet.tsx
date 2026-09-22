@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -82,6 +83,7 @@ export function CountryPickerSheet({
       navigationBarTranslucent
       onRequestClose={onClose}
     >
+      <KeyboardAvoidingView style={styles.avoid} behavior="padding">
       <Pressable style={styles.backdrop} onPress={onClose} />
       <View style={[styles.sheet, { height: sheetHeight }]}>
         <View style={styles.header}>
@@ -122,11 +124,16 @@ export function CountryPickerSheet({
           keyboardShouldPersistTaps="handled"
         />
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  avoid: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(34, 34, 34, 0.4)',

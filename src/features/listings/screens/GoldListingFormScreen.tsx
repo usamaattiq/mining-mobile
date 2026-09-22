@@ -257,7 +257,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        bottomOffset={100}
+        bottomOffset={24}
+        extraKeyboardSpace={0}
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>

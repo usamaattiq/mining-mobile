@@ -1,6 +1,5 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -134,8 +133,7 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
           )}
         />
       </View>
-      <KeyboardStickyView>
-        <MessageComposer
+      <MessageComposer
           value={draft}
           onChangeText={setDraft}
           onSend={submit}
@@ -143,7 +141,6 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
           sendLabel={t('messages.send')}
           sending={sending}
         />
-      </KeyboardStickyView>
     </GoldSheetScreen>
   );
 }
