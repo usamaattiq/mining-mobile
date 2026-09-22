@@ -598,6 +598,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           confirmLabel={t('rfq.confirm')}
           declineLabel={t('rfq.decline')}
           offerPrice={rfq?.myOfferPrice}
+          offerUnits={category === 'equipment' ? rfq?.myOfferQuantity : undefined}
           offerUnitsLabel={
             category === 'equipment' && rfq?.myOfferQuantity
               ? t('equipmentListing.unitsCount', { count: rfq.myOfferQuantity })

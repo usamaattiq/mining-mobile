@@ -9,6 +9,7 @@ export type ListingOfferComposerProps = {
   declineLabel: string;
   offerPrice?: string;
   offerUnitsLabel?: string;
+  offerUnits?: number;
   unitsLabel?: string;
   maxUnits?: number;
   unitPricePlaceholder?: string;

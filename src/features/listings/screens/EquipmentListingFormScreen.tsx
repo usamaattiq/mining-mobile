@@ -30,7 +30,8 @@ import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { DeliveryType, EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 
@@ -189,6 +190,19 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     deliveryValid &&
     (!isBuyer || Boolean(neededDate));
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
+
+  const supplierPriceLines = !isBuyer
+    ? (isRent
+        ? [
+            { key: 'hourly', amount: parsePositiveAmount(hourlyRental) },
+            { key: 'weekly', amount: parsePositiveAmount(weeklyRental) },
+            { key: 'monthly', amount: parsePositiveAmount(monthlyRental) },
+          ]
+        : [{ key: 'sale', amount: parsePositiveAmount(salePrice) }]
+      ).flatMap((line) =>
+        line.amount != null ? [{ key: line.key, amount: line.amount }] : [],
+      )
+    : [];
 
   const handleBack = () => {
     if (step > 0) {
@@ -430,6 +444,17 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               min={1}
               required
             />
+
+            {!isBuyer
+              ? supplierPriceLines.map((line) => (
+                  <PriceTimesUnitsSummary
+                    key={line.key}
+                    currencyCode={currency.code}
+                    unitAmount={line.amount}
+                    units={units}
+                  />
+                ))
+              : null}
           </View>
         ) : null}
 

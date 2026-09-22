@@ -3,12 +3,11 @@ import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react
 import { useKeyboardState } from 'react-native-keyboard-controller';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
-import { i18n as appI18n } from '@/i18n';
 import { CounterField } from '@/shared/components/CounterField';
 import { AppText } from '@/shared/components/AppText';
+import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { getFontFamily, palette, radius, spacing } from '@/theme';
 import type { ListingOfferComposerProps } from '@/features/listings/types/listingOfferComposer.types';
 
@@ -21,6 +20,7 @@ export function ListingOfferComposer({
   declineLabel,
   offerPrice,
   offerUnitsLabel,
+  offerUnits,
   maxUnits,
   unitPricePlaceholder,
   hasOffer,
@@ -32,7 +32,6 @@ export function ListingOfferComposer({
   onDecline,
   footer,
 }: ListingOfferComposerProps): React.ReactElement {
-  const { t } = useTranslation(undefined, { i18n: appI18n });
   const insets = useSafeAreaInsets();
   const { currentLanguage } = useLanguage();
   const keyboardVisible = useKeyboardState((state) => state.isVisible);
@@ -43,10 +42,13 @@ export function ListingOfferComposer({
     setUnits((current) => Math.min(Math.max(current, 1), unitCap));
   }, [unitCap]);
   const canSend = /^\d+(\.\d{1,2})?$/.test(price.trim()) && Number(price) > 0 && !submitting;
-  const totalPrice =
-    canSend && maxUnits != null
-      ? (Math.round(Number(price) * units * 100) / 100).toFixed(2)
-      : null;
+  const draftUnitAmount = parsePositiveAmount(price);
+  const submittedTotal = parsePositiveAmount(offerPrice);
+  const submittedUnits = offerUnits != null && offerUnits > 0 ? offerUnits : null;
+  const submittedUnitAmount =
+    submittedTotal != null && submittedUnits
+      ? Math.round((submittedTotal / submittedUnits) * 100) / 100
+      : submittedTotal;
 
   const handleSend = () => {
     const value = price.trim();
@@ -64,21 +66,25 @@ export function ListingOfferComposer({
     >
       {hasOffer ? (
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
-              {submittedLabel}
-            </AppText>
-            {offerPrice ? (
-              <View style={styles.cardPriceRow}>
-                <AppText weight="bold" style={styles.cardPrice}>
-                  {currencyCode} {formatAmountWithCommas(offerPrice)}
-                </AppText>
-                {offerUnitsLabel ? (
-                  <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
-                ) : null}
-              </View>
-            ) : null}
-          </View>
+          <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+            {submittedLabel}
+          </AppText>
+          {submittedUnitAmount != null && submittedUnits ? (
+            <PriceTimesUnitsSummary
+              currencyCode={currencyCode}
+              unitAmount={submittedUnitAmount}
+              units={submittedUnits}
+            />
+          ) : offerPrice ? (
+            <View style={styles.cardPriceRow}>
+              <AppText weight="bold" style={styles.cardPrice}>
+                {currencyCode} {formatAmountWithCommas(offerPrice)}
+              </AppText>
+              {offerUnitsLabel ? (
+                <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
+              ) : null}
+            </View>
+          ) : null}
 
           {awaitingConfirm ? (
             <View style={styles.confirmRow}>
@@ -151,6 +157,13 @@ export function ListingOfferComposer({
               />
             </View>
           </View>
+          {draftUnitAmount != null && maxUnits != null ? (
+            <PriceTimesUnitsSummary
+              currencyCode={currencyCode}
+              unitAmount={draftUnitAmount}
+              units={units}
+            />
+          ) : null}
           <View style={styles.actions}>
             {footer ? <View style={styles.actionButton}>{footer}</View> : null}
             <Pressable
@@ -177,13 +190,6 @@ export function ListingOfferComposer({
               )}
             </Pressable>
           </View>
-          {totalPrice ? (
-            <AppText weight="semibold" style={styles.total}>
-              {t('rfq.offerTotal', {
-                amount: `${currencyCode} ${formatAmountWithCommas(totalPrice)}`,
-              })}
-            </AppText>
-          ) : null}
         </View>
       ) : null}
 
@@ -253,10 +259,6 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: spacing.sm,
-  },
-  total: {
-    fontSize: 13,
-    color: palette.gold,
   },
   inputWrap: {
     flex: 1,
