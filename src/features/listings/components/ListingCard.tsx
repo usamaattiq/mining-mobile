@@ -86,7 +86,6 @@ export function ListingCard({
   subtitleIcon,
   typeBadge,
   city,
-  durationBadges,
   deliveryBadge,
   statusBadges,
   priceText,
@@ -129,10 +128,7 @@ export function ListingCard({
   ) : null;
 
   if (layout === 'grid') {
-    const extraBadges = [
-      ...(durationBadges ?? []),
-      ...(deliveryBadge ? [deliveryBadge] : []),
-    ];
+    const extraBadges = deliveryBadge ? [deliveryBadge] : [];
 
     return (
       <Pressable
@@ -237,9 +233,7 @@ export function ListingCard({
         <View style={styles.copy}>
           <View style={styles.topRow}>
             <View style={styles.topLeft}>
-              {durationBadges && durationBadges.length > 0
-                ? durationBadges.map((badge) => <SmallBadge key={badge.key} badge={badge} />)
-                : null}
+              {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
             </View>
             {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
           </View>
@@ -286,7 +280,6 @@ export function ListingCard({
               ))}
             </View>
             <View style={styles.bottomRight}>
-              {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
               {timer}
               {repostButton}
             </View>
