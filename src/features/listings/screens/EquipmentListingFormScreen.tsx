@@ -499,7 +499,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
                 {deliveryType === 'perKm' ? (
                   <FormInput
-                    label={t('equipmentListing.deliveryPricePerKm')}
+                    label={t('equipmentListing.deliveryPricePerKm', { currency: currency.code })}
                     value={deliveryPricePerKm}
                     onChangeText={setDeliveryPricePerKm}
                     placeholder={currency.code}

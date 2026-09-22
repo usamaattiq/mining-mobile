@@ -345,7 +345,7 @@
     "deliveryType": "Delivery type",
     "deliveryFree": "Free",
     "deliveryPerKm": "Per KM",
-    "deliveryPricePerKm": "Price per KM",
+    "deliveryPricePerKm": "Price per KM ({currency})",
     "deliveryPricePerKmPlaceholder": "e.g. 5",
     "publish": "Publish listing"
   },

@@ -325,7 +325,7 @@
     "deliveryType": "نوع التوصيل",
     "deliveryFree": "مجاني",
     "deliveryPerKm": "لكل كم",
-    "deliveryPricePerKm": "السعر لكل كم",
+    "deliveryPricePerKm": "السعر لكل كم ({currency})",
     "deliveryPricePerKmPlaceholder": "مثال: 5",
     "publish": "نشر الإعلان"
   },
