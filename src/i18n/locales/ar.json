@@ -208,6 +208,13 @@
     "categoryGold": "الذهب",
     "emptyTitle": "لا توجد إعلانات بعد",
     "emptySubtitle": "ستظهر هنا المعدات التي تقوم بعرضها.",
+    "emptyLiveTitle": "لا توجد إعلانات نشطة",
+    "emptyLiveSubtitle": "ستظهر هنا الإعلانات النشطة.",
+    "emptyPastTitle": "لا توجد إعلانات سابقة",
+    "emptyPastSubtitle": "ستظهر هنا الإعلانات المغلقة والمكتملة والمنتهية.",
+    "filterAll": "الكل",
+    "filterLive": "نشط",
+    "filterPast": "السابقة",
     "notFound": "هذا الإعلان لم يعد متاحًا.",
     "repost": "إعادة النشر"
   },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshControl, StyleSheet, View } from 'react-native';
+import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -15,6 +15,7 @@ import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ListingCard } from '@/features/listings/components/ListingCard';
+import { AppText } from '@/shared/components/AppText';
 import { useListingsStore } from '@/store/listingsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
@@ -28,6 +29,8 @@ type Props = CompositeScreenProps<
   BottomTabScreenProps<DashboardTabParamList, 'Requests'>,
   NativeStackScreenProps<RootStackParamList>
 >;
+
+type LifeFilter = 'all' | 'live' | 'past';
 
 export function RequestsScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -45,6 +48,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
       setCategory(route.params.category);
     }
   }, [route.params?.category]);
+  const [lifeFilter, setLifeFilter] = React.useState<LifeFilter>('all');
   const [refreshing, setRefreshing] = React.useState(false);
 
   useFocusEffect(
@@ -94,6 +98,31 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     },
   });
 
+  const visibleCards = cards.filter((card) => {
+    if (lifeFilter === 'past') return Boolean(card.ended);
+    if (lifeFilter === 'live') return !card.ended;
+    return true;
+  });
+
+  const emptyTitle =
+    lifeFilter === 'live'
+      ? t('requests.emptyLiveTitle')
+      : lifeFilter === 'past'
+        ? t('requests.emptyPastTitle')
+        : t('requests.emptyTitle');
+  const emptySubtitle =
+    lifeFilter === 'live'
+      ? t('requests.emptyLiveSubtitle')
+      : lifeFilter === 'past'
+        ? t('requests.emptyPastSubtitle')
+        : t('requests.emptySubtitle');
+
+  const lifeOptions: { key: LifeFilter; label: string }[] = [
+    { key: 'all', label: t('requests.filterAll') },
+    { key: 'live', label: t('requests.filterLive') },
+    { key: 'past', label: t('requests.filterPast') },
+  ];
+
   return (
     <GoldSheetScreen
       title={t('requests.title')}
@@ -109,10 +138,34 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
         </View>
       }
     >
-      {cards.length === 0 ? (
-        <EmptyState title={t('requests.emptyTitle')} subtitle={t('requests.emptySubtitle')} />
+      <View style={styles.lifeRow}>
+        {lifeOptions.map((option) => {
+          const selected = option.key === lifeFilter;
+          return (
+            <Pressable
+              key={option.key}
+              onPress={() => setLifeFilter(option.key)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected }}
+              style={({ pressed }) => [styles.lifeTab, pressed && styles.lifeTabPressed]}
+            >
+              <AppText
+                weight={selected ? 'bold' : 'medium'}
+                style={[styles.lifeTabLabel, selected && styles.lifeTabLabelSelected]}
+                numberOfLines={1}
+              >
+                {option.label}
+              </AppText>
+              <View style={[styles.lifeTabLine, selected && styles.lifeTabLineSelected]} />
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {visibleCards.length === 0 ? (
+        <EmptyState title={emptyTitle} subtitle={emptySubtitle} />
       ) : (
-        cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
+        visibleCards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
       )}
     </GoldSheetScreen>
   );
@@ -125,6 +178,38 @@ const styles = StyleSheet.create({
   switcherWrap: {
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl,
+    backgroundColor: palette.gold,
+  },
+  lifeRow: {
+    flexDirection: 'row',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: palette.softGold,
+    marginHorizontal: -spacing.md,
+    paddingHorizontal: spacing.md,
+  },
+  lifeTab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingTop: spacing.xs,
+  },
+  lifeTabPressed: {
+    opacity: 0.75,
+  },
+  lifeTabLabel: {
+    fontSize: 14,
+    color: palette.muted,
+    paddingBottom: spacing.sm,
+  },
+  lifeTabLabelSelected: {
+    color: palette.gold,
+  },
+  lifeTabLine: {
+    height: 2,
+    width: '100%',
+    borderRadius: 1,
+    backgroundColor: 'transparent',
+  },
+  lifeTabLineSelected: {
     backgroundColor: palette.gold,
   },
 });

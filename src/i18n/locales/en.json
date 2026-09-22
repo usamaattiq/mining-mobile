@@ -208,6 +208,13 @@
     "categoryGold": "Gold",
     "emptyTitle": "No listings yet",
     "emptySubtitle": "Equipment you list will show up here.",
+    "emptyLiveTitle": "No live listings",
+    "emptyLiveSubtitle": "Active listings will show up here.",
+    "emptyPastTitle": "No past listings",
+    "emptyPastSubtitle": "Closed, completed, and expired listings will show up here.",
+    "filterAll": "All",
+    "filterLive": "Live",
+    "filterPast": "Past",
     "notFound": "This listing is no longer available.",
     "repost": "Repost"
   },
