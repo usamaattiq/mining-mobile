@@ -125,11 +125,12 @@ const styles = StyleSheet.create({
   },
   ticks: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   tick: {
     flex: 1,
-    minHeight: 64,
+    flexDirection: 'row',
+    minHeight: 56,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -146,17 +147,17 @@ const styles = StyleSheet.create({
     opacity: 0.88,
   },
   tickHours: {
-    fontSize: 20,
+    fontSize: 18,
     color: palette.charcoal,
   },
   tickHoursSelected: {
     color: palette.pureWhite,
   },
   tickHrs: {
-    fontSize: 11,
+    fontSize: 10,
     letterSpacing: 0.4,
     color: palette.muted,
-    textTransform: 'uppercase',
+    textTransform: 'lowercase',
   },
   tickHrsSelected: {
     color: palette.pureWhite,
