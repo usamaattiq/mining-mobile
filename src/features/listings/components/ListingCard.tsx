@@ -338,16 +338,18 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   gridPrice: {
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 16,
     color: palette.charcoal,
   },
   gridPriceUnit: {
     fontSize: 12,
+    lineHeight: 16,
     color: palette.muted,
   },
   gridTitle: {
     fontSize: 13,
-    lineHeight: 17,
+    lineHeight: 15,
     color: palette.charcoal,
   },
   gridMetaRow: {
@@ -358,6 +360,7 @@ const styles = StyleSheet.create({
   gridMeta: {
     flexShrink: 1,
     fontSize: 11,
+    lineHeight: 12,
     color: palette.muted,
   },
   gridBadges: {
@@ -367,7 +370,7 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   gridFooter: {
-    marginTop: 4,
+    // marginTop: 4,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
