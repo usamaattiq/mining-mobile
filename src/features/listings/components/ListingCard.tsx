@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   subtitle: {
     flex: 1,
     fontSize: 12,
-    lineHeight: 12,
+    lineHeight: 14,
     color: palette.muted,
   },
   priceRow: {
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     gap: 2,
-    minHeight: 26,
+    minHeight: 20,
   },
   price: {
     fontSize: 19,
