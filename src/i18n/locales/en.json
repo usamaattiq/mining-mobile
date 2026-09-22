@@ -421,7 +421,7 @@
     "purityOptions": {
       "other": "Other"
     },
-    "price": "Starting Price",
+    "price": "Starting Price ({currency})",
     "auctionStartDate": "Auction start date & time",
     "auctionStartDatePlaceholder": "Select date & time",
     "auctionDuration": "Auction duration",

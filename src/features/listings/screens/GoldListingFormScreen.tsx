@@ -209,7 +209,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     },
     { label: t('goldListing.purity'), value: purityLabel ?? '' },
     {
-      label: t('goldListing.price'),
+      label: t('goldListing.price', { currency: currency.code }),
       value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
     },
     {
@@ -307,7 +307,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             </View>
 
             <FormInput
-              label={t('goldListing.price')}
+              label={t('goldListing.price', { currency: currency.code })}
               value={price}
               onChangeText={setPrice}
               keyboardType="numeric"

@@ -401,7 +401,7 @@
     "purityOptions": {
       "other": "أخرى"
     },
-    "price": "سعر البدء",
+    "price": "سعر البدء ({currency})",
     "auctionStartDate": "تاريخ ووقت بدء المزاد",
     "auctionStartDatePlaceholder": "اختر التاريخ والوقت",
     "auctionDuration": "مدة المزاد",
