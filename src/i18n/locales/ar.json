@@ -203,7 +203,8 @@
     "categoryGold": "الذهب",
     "emptyTitle": "لا توجد إعلانات بعد",
     "emptySubtitle": "ستظهر هنا المعدات التي تقوم بعرضها.",
-    "notFound": "هذا الإعلان لم يعد متاحًا."
+    "notFound": "هذا الإعلان لم يعد متاحًا.",
+    "repost": "إعادة النشر"
   },
   "listingDetail": {
     "attachments": "المرفقات"

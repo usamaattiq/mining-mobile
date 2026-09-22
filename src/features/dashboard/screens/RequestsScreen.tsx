@@ -81,6 +81,17 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     currencyCode: currency.code,
     onOpen: (id, listingCategory) =>
       navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
+    onRepost: (id, listingCategory) => {
+      if (listingCategory === 'equipment') {
+        navigation.navigate('EquipmentListingForm', { repostId: id });
+        return;
+      }
+      if (listingCategory === 'services') {
+        navigation.navigate('ServiceListingForm', { repostId: id });
+        return;
+      }
+      navigation.navigate('GoldListingForm', { repostId: id });
+    },
   });
 
   return (

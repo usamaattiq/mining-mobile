@@ -24,9 +24,9 @@ export type RootStackParamList = {
   Dashboard: NavigatorScreenParams<DashboardTabParamList> | undefined;
   PersonalInformation: undefined;
   SecuritySettings: undefined;
-  EquipmentListingForm: undefined;
-  ServiceListingForm: undefined;
-  GoldListingForm: undefined;
+  EquipmentListingForm: { repostId?: string } | undefined;
+  ServiceListingForm: { repostId?: string } | undefined;
+  GoldListingForm: { repostId?: string } | undefined;
   CompleteListingDetail: { id: string; category: ListingCategory };
   Conversation: { conversationId: string };
   Messages: undefined;

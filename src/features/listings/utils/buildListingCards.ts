@@ -6,7 +6,7 @@ import type { GoldListing } from '@/features/listings/types/goldListing.types';
 import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
-import { rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
+import { rfqStatusBadge, isEndedRfqStatus } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
 
 export type ListingCardItem = ListingCardProps & { id: string };
@@ -19,7 +19,19 @@ export type BuildListingCardsInput = {
   t: TFunction;
   currencyCode: string;
   onOpen: (id: string, category: ListingCategory) => void;
+  onRepost?: (id: string, category: ListingCategory) => void;
 };
+
+function listingHasEnded(input: {
+  rfqStatus?: string;
+  expiresAt?: number | null;
+  auctionEndDate?: number | null;
+  createdAt: number;
+}): boolean {
+  if (isEndedRfqStatus(input.rfqStatus)) return true;
+  const end = input.expiresAt ?? input.auctionEndDate ?? input.createdAt + 24 * 60 * 60 * 1000;
+  return Date.now() >= end;
+}
 
 function cityFromLocation(location: string | undefined): string | undefined {
   const city = cityFromLocationLabel(location ?? '');
@@ -68,6 +80,7 @@ export function buildListingCards({
   t,
   currencyCode,
   onOpen,
+  onRepost,
 }: BuildListingCardsInput): ListingCardItem[] {
   if (category === 'equipment') {
     return equipmentListings.map((listing) => {
@@ -114,6 +127,12 @@ export function buildListingCards({
         priceUnit,
         createdAt: listing.createdAt,
         expiresAt: listing.rfq?.expiresAt ?? undefined,
+        ended: listingHasEnded({
+          rfqStatus: listing.rfq?.status,
+          expiresAt: listing.rfq?.expiresAt,
+          createdAt: listing.createdAt,
+        }),
+        onRepost: onRepost ? () => onRepost(listing.id, 'equipment') : undefined,
         onPress: () => onOpen(listing.id, 'equipment'),
       };
     });
@@ -138,6 +157,12 @@ export function buildListingCards({
       priceText: priceText(currencyCode, listing.price),
       createdAt: listing.createdAt,
       expiresAt: listing.rfq?.expiresAt ?? undefined,
+      ended: listingHasEnded({
+        rfqStatus: listing.rfq?.status,
+        expiresAt: listing.rfq?.expiresAt,
+        createdAt: listing.createdAt,
+      }),
+      onRepost: onRepost ? () => onRepost(listing.id, 'services') : undefined,
       onPress: () => onOpen(listing.id, 'services'),
     }));
   }
@@ -158,6 +183,12 @@ export function buildListingCards({
     city: cityFromLocation(listing.location),
     priceText: priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
+    expiresAt: listing.auctionEndDate ?? undefined,
+    ended: listingHasEnded({
+      auctionEndDate: listing.auctionEndDate,
+      createdAt: listing.createdAt,
+    }),
+    onRepost: onRepost ? () => onRepost(listing.id, 'gold') : undefined,
     onPress: () => onOpen(listing.id, 'gold'),
   }));
 }

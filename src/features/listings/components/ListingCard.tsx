@@ -2,6 +2,8 @@ import React from 'react';
 import { Image, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
 import type { ListingCardBadge, ListingCardProps } from '@/features/listings/types/listingCard.types';
@@ -91,19 +93,39 @@ export function ListingCard({
   priceUnit,
   createdAt,
   expiresAt,
+  ended,
+  onRepost,
   onPress,
   layout = 'row',
 }: ListingCardProps): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
   const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
   const windowWidth = useWindowDimensions().width;
+  const showRepost = Boolean(ended && onRepost);
+  const showTimer = Boolean(createdAt) && !ended;
 
-  const timer = createdAt ? (
+  const timer = showTimer ? (
     <View style={styles.timerBadge}>
       <Ionicons name="time-outline" size={10} color={palette.gold} />
       <AppText weight="semibold" style={styles.timerText}>
         {timeLeft}
       </AppText>
     </View>
+  ) : null;
+
+  const repostButton = showRepost ? (
+    <Pressable
+      onPress={onRepost}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={t('requests.repost')}
+      style={({ pressed }) => [styles.repostButton, pressed && styles.pressed]}
+    >
+      <Ionicons name="refresh-outline" size={12} color={palette.pureWhite} />
+      <AppText weight="semibold" style={styles.repostLabel}>
+        {t('requests.repost')}
+      </AppText>
+    </Pressable>
   ) : null;
 
   if (layout === 'grid') {
@@ -187,6 +209,7 @@ export function ListingCard({
               ))}
             </View>
             {timer}
+            {repostButton}
           </View>
         </View>
       </Pressable>
@@ -264,14 +287,8 @@ export function ListingCard({
             </View>
             <View style={styles.bottomRight}>
               {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
-              {createdAt ? (
-                <View style={styles.timerBadge}>
-                  <Ionicons name="time-outline" size={10} color={palette.gold} />
-                  <AppText weight="semibold" style={styles.timerText}>
-                    {timeLeft}
-                  </AppText>
-                </View>
-              ) : null}
+              {timer}
+              {repostButton}
             </View>
           </View>
         </View>
@@ -515,5 +532,18 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 12,
     color: palette.gold,
+  },
+  repostButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: palette.gold,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  repostLabel: {
+    fontSize: 11,
+    color: palette.pureWhite,
   },
 });

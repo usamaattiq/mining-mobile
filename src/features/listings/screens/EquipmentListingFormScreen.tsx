@@ -25,17 +25,18 @@ import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isEquipmentListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
+import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
-import type { DeliveryType } from '@/features/listings/types/equipmentListing.types';
+import type { DeliveryType, EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingForm'>;
 
-export function EquipmentListingFormScreen({ navigation }: Props): React.ReactElement {
+export function EquipmentListingFormScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
@@ -53,6 +54,14 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
   const [step, setStep] = React.useState(0);
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useListingsStore((state) => state.addListing);
+  const repostListing = useListingsStore((state) =>
+    route.params?.repostId
+      ? state.listings.find((item) => item.id === route.params?.repostId)
+      : undefined,
+  );
+  const filledRepost = React.useRef(false);
+  const [fetchedRepost, setFetchedRepost] = React.useState<EquipmentListing | undefined>(undefined);
+  const sourceListing = repostListing ?? fetchedRepost;
 
   const equipmentTypeOptions = [
     {
@@ -104,6 +113,48 @@ export function EquipmentListingFormScreen({ navigation }: Props): React.ReactEl
   const [deliveryPricePerKm, setDeliveryPricePerKm] = React.useState('');
   const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
     useLocationMapPicker();
+
+  React.useEffect(() => {
+    const id = route.params?.repostId;
+    if (!id || repostListing) return;
+    let cancelled = false;
+    void listingsApi.get(id).then((listing) => {
+      if (!cancelled && isEquipmentListing(listing)) setFetchedRepost(listing);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [repostListing, route.params?.repostId]);
+
+  React.useEffect(() => {
+    if (!sourceListing || filledRepost.current) return;
+    filledRepost.current = true;
+    setMode(sourceListing.mode);
+    setEquipmentType(matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel));
+    setTitle(sourceListing.title);
+    setDescription(sourceListing.description ?? '');
+    setHourlyRental(sourceListing.hourlyRental ?? '');
+    setMonthlyRental(sourceListing.monthlyRental ?? '');
+    setWeeklyRental(sourceListing.weeklyRental ?? '');
+    setSalePrice(sourceListing.salePrice ?? '');
+    setUnits(Math.max(sourceListing.units ?? 1, 1));
+    setLocation(sourceListing.location ?? '');
+    setNeededDate(
+      sourceListing.neededDate && sourceListing.neededDate > Date.now()
+        ? new Date(sourceListing.neededDate)
+        : null,
+    );
+    setMedia(
+      cloneRepostMedia(
+        (sourceListing.media ?? []).filter(
+          (item): item is EquipmentMediaAsset => item.kind === 'photo' || item.kind === 'video',
+        ),
+      ),
+    );
+    setDeliveryAvailable(Boolean(sourceListing.deliveryAvailable));
+    setDeliveryType(sourceListing.deliveryType ?? 'free');
+    setDeliveryPricePerKm(sourceListing.deliveryPricePerKm ?? '');
+  }, [equipmentTypeOptions, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();

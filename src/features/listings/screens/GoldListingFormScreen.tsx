@@ -25,15 +25,17 @@ import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isGoldListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
+import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
+import type { GoldListing } from '@/features/listings/types/goldListing.types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GoldListingForm'>;
 
-export function GoldListingFormScreen({ navigation }: Props): React.ReactElement {
+export function GoldListingFormScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
@@ -69,6 +71,14 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
   const [step, setStep] = React.useState(0);
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useGoldListingsStore((state) => state.addListing);
+  const storedRepost = useGoldListingsStore((state) =>
+    route.params?.repostId
+      ? state.listings.find((item) => item.id === route.params?.repostId)
+      : undefined,
+  );
+  const filledRepost = React.useRef(false);
+  const [fetchedRepost, setFetchedRepost] = React.useState<GoldListing | undefined>(undefined);
+  const sourceListing = storedRepost ?? fetchedRepost;
 
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
@@ -85,6 +95,38 @@ export function GoldListingFormScreen({ navigation }: Props): React.ReactElement
   const [media, setMedia] = React.useState<ServiceMediaAsset[]>([]);
   const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
     useLocationMapPicker();
+
+  React.useEffect(() => {
+    const id = route.params?.repostId;
+    if (!id || storedRepost) return;
+    let cancelled = false;
+    void listingsApi.get(id).then((listing) => {
+      if (!cancelled && isGoldListing(listing)) setFetchedRepost(listing);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [route.params?.repostId, storedRepost]);
+
+  React.useEffect(() => {
+    if (!sourceListing || filledRepost.current) return;
+    filledRepost.current = true;
+    setTitle(sourceListing.title);
+    setDescription(sourceListing.description ?? '');
+    setWeight(sourceListing.weight ?? '');
+    setPurity(matchSelectOption(purityOptions, sourceListing.purityLabel));
+    setPrice(sourceListing.price ?? '');
+    setAuctionStartDate(new Date());
+    setDurationHours(24);
+    setLocation(sourceListing.location ?? '');
+    setMedia(
+      cloneRepostMedia(
+        (sourceListing.media ?? []).filter(
+          (item): item is ServiceMediaAsset => item.kind === 'photo' || item.kind === 'document',
+        ),
+      ),
+    );
+  }, [purityOptions, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();

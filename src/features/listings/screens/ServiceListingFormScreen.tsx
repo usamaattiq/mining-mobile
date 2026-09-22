@@ -24,16 +24,18 @@ import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
-import { serviceTypeFromFlags, serviceTypeLabels } from '@/features/listings/utils/serviceType';
+import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
+import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels } from '@/features/listings/utils/serviceType';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
+import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ServiceListingForm'>;
 
-export function ServiceListingFormScreen({ navigation }: Props): React.ReactElement {
+export function ServiceListingFormScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
@@ -91,6 +93,14 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
   const [step, setStep] = React.useState(0);
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useServiceListingsStore((state) => state.addListing);
+  const storedRepost = useServiceListingsStore((state) =>
+    route.params?.repostId
+      ? state.listings.find((item) => item.id === route.params?.repostId)
+      : undefined,
+  );
+  const filledRepost = React.useRef(false);
+  const [fetchedRepost, setFetchedRepost] = React.useState<ServiceListing | undefined>(undefined);
+  const sourceListing = storedRepost ?? fetchedRepost;
 
   const [serviceCategory, setServiceCategory] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');
@@ -106,6 +116,46 @@ export function ServiceListingFormScreen({ navigation }: Props): React.ReactElem
   const [media, setMedia] = React.useState<ServiceMediaAsset[]>([]);
   const { locationLoading, getCurrentLocation, openMapPickerForSelection, mapPickerSheet } =
     useLocationMapPicker();
+
+  React.useEffect(() => {
+    const id = route.params?.repostId;
+    if (!id || storedRepost) return;
+    let cancelled = false;
+    void listingsApi.get(id).then((listing) => {
+      if (!cancelled && isServiceListing(listing)) setFetchedRepost(listing);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [route.params?.repostId, storedRepost]);
+
+  React.useEffect(() => {
+    if (!sourceListing || filledRepost.current) return;
+    filledRepost.current = true;
+    const flags = serviceTypeFlags(sourceListing.serviceType);
+    setOnsite(flags.onsite);
+    setOnline(flags.online);
+    setServiceCategory(
+      matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel),
+    );
+    setTitle(sourceListing.title);
+    setDescription(sourceListing.description ?? '');
+    setYearsOfExperience(sourceListing.yearsOfExperience ?? '');
+    setPrice(sourceListing.price ?? '');
+    setServiceDate(
+      sourceListing.serviceDate && sourceListing.serviceDate > Date.now()
+        ? new Date(sourceListing.serviceDate)
+        : null,
+    );
+    setLocation(sourceListing.location ?? '');
+    setMedia(
+      cloneRepostMedia(
+        (sourceListing.media ?? []).filter(
+          (item): item is ServiceMediaAsset => item.kind === 'photo' || item.kind === 'document',
+        ),
+      ),
+    );
+  }, [serviceCategoryOptions, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();

@@ -33,6 +33,9 @@ export type ListingCardProps = {
   createdAt?: number;
   /** RFQ expiry from RMS; used for the card countdown when present. */
   expiresAt?: number;
+  /** Hide remaining-time and show Repost when the listing/RFQ has ended. */
+  ended?: boolean;
+  onRepost?: () => void;
   onPress: () => void;
   layout?: 'row' | 'grid';
 };

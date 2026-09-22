@@ -203,7 +203,8 @@
     "categoryGold": "Gold",
     "emptyTitle": "No listings yet",
     "emptySubtitle": "Equipment you list will show up here.",
-    "notFound": "This listing is no longer available."
+    "notFound": "This listing is no longer available.",
+    "repost": "Repost"
   },
   "listingDetail": {
     "attachments": "Attachments"

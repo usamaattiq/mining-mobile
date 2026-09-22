@@ -21,6 +21,10 @@ export function rfqStatusLabel(t: TFunction, rfq: ListingRfq): string {
   return rfq.statusLabel || rfq.status;
 }
 
+export function isEndedRfqStatus(status: string | undefined): boolean {
+  return status === 'completed' || status === 'closed' || status === 'expired';
+}
+
 export function rfqStatusBadge(t: TFunction, rfq: ListingRfq | undefined): ListingCardBadge | null {
   if (!rfq) return null;
   return {
