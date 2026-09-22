@@ -78,17 +78,26 @@ export function DurationSlider({
             <Pressable
               key={hour}
               onPress={() => onChange(hour)}
-              style={[styles.tick, selected && styles.tickSelected]}
-              hitSlop={4}
+              style={({ pressed }) => [
+                styles.tick,
+                selected && styles.tickSelected,
+                pressed && styles.tickPressed,
+              ]}
               accessibilityRole="button"
               accessibilityState={{ selected }}
               accessibilityLabel={formatAuctionDurationLabel(hour, t)}
             >
               <AppText
-                weight={selected ? 'semibold' : 'medium'}
-                style={[styles.tickLabel, selected && styles.tickLabelSelected]}
+                weight="bold"
+                style={[styles.tickHours, selected && styles.tickHoursSelected]}
               >
                 {hour}
+              </AppText>
+              <AppText
+                weight="semibold"
+                style={[styles.tickHrs, selected && styles.tickHrsSelected]}
+              >
+                {t('goldListing.auctionDurationHrs')}
               </AppText>
             </Pressable>
           );
@@ -116,24 +125,40 @@ const styles = StyleSheet.create({
   },
   ticks: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: spacing.sm,
   },
   tick: {
-    minWidth: 44,
-    height: 36,
-    borderRadius: radius.sm,
+    flex: 1,
+    minHeight: 64,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: palette.softGold,
+    gap: 2,
+    backgroundColor: palette.warmWhite,
+    borderWidth: 1.5,
+    borderColor: palette.softGold,
   },
   tickSelected: {
     backgroundColor: palette.gold,
+    borderColor: palette.goldDark,
   },
-  tickLabel: {
-    fontSize: 13,
+  tickPressed: {
+    opacity: 0.88,
+  },
+  tickHours: {
+    fontSize: 20,
     color: palette.charcoal,
   },
-  tickLabelSelected: {
+  tickHoursSelected: {
+    color: palette.pureWhite,
+  },
+  tickHrs: {
+    fontSize: 11,
+    letterSpacing: 0.4,
+    color: palette.muted,
+    textTransform: 'uppercase',
+  },
+  tickHrsSelected: {
     color: palette.pureWhite,
   },
 });

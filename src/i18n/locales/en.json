@@ -427,6 +427,7 @@
     "auctionDuration": "Auction duration",
     "auctionDurationHour": "1 hour",
     "auctionDurationHours": "{count} hours",
+    "auctionDurationHrs": "hrs",
     "auctionDurationMinutes": "{count} min",
     "auctionDurationHoursMinutes": "{hours}h {minutes}m",
     "auctionEndDate": "Auction end date & time",

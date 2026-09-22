@@ -407,6 +407,7 @@
     "auctionDuration": "مدة المزاد",
     "auctionDurationHour": "ساعة واحدة",
     "auctionDurationHours": "{count} ساعات",
+    "auctionDurationHrs": "ساعة",
     "auctionDurationMinutes": "{count} د",
     "auctionDurationHoursMinutes": "{hours} س {minutes} د",
     "auctionEndDate": "تاريخ ووقت انتهاء المزاد",
