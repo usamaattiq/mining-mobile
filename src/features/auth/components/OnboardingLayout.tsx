@@ -1,8 +1,8 @@
 import React from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -15,9 +15,8 @@ import type { OnboardingLayoutProps } from '@/features/auth/types/onboardingLayo
 
 /**
  * Login / signup shell: gold hero stays fixed; only the white sheet body scrolls.
- * Avoid KeyboardAwareScrollView here — it re-scrolls on every keystroke (MPIN/OTP)
- * and was lifting the whole white sheet. Android already uses adjustResize; iOS
- * gets padding via KeyboardAvoidingView so the sheet bottom does not jump while typing.
+ * KeyboardAwareScrollView lifts the focused field (e.g. signup email) above the keyboard
+ * without using KeyboardAvoidingView, which was jumping the whole sheet on Android.
  */
 export function OnboardingLayout({
   steps,
@@ -67,13 +66,8 @@ export function OnboardingLayout({
         ) : null}
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.sheet}
-        behavior="padding"
-        // Android window already resizes for the keyboard — extra avoiding lifts the sheet.
-        enabled={Platform.OS === 'ios'}
-      >
-        <ScrollView
+      <View style={styles.sheet}>
+        <KeyboardAwareScrollView
           style={styles.flex}
           contentContainerStyle={[
             styles.sheetContent,
@@ -83,9 +77,8 @@ export function OnboardingLayout({
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
           bounces={false}
-          automaticallyAdjustKeyboardInsets={false}
-          automaticallyAdjustContentInsets={false}
-          contentInsetAdjustmentBehavior="never"
+          bottomOffset={24}
+          extraKeyboardSpace={spacing.lg}
         >
           {children}
 
@@ -100,8 +93,8 @@ export function OnboardingLayout({
               style={styles.continueButton}
             />
           ) : null}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
+      </View>
     </View>
   );
 }
