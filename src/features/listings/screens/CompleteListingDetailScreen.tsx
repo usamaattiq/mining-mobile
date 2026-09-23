@@ -322,13 +322,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         value: serviceTypeLabels(t, serviceListing.serviceType).join(' · '),
       },
       {
-        label: t('serviceListing.dateTimeLabel'),
-        value: formatListingDate(
-          currentLanguage,
-          serviceListing.serviceDate ?? serviceListing.createdAt,
-        ),
-      },
-      {
         label: t('serviceListing.listedUntil'),
         value: formatListingDate(currentLanguage, serviceListing.rfq?.expiresAt),
       },
