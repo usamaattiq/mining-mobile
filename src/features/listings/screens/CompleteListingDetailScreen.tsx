@@ -128,6 +128,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
   const [messageOpen, setMessageOpen] = React.useState(false);
+  const [messagePeer, setMessagePeer] = React.useState<{
+    id: string;
+    fullName: string;
+    avatarUrl: string | null;
+  } | null>(null);
   const [offerSubmitting, setOfferSubmitting] = React.useState(false);
   const [actingOfferId, setActingOfferId] = React.useState<string | null>(null);
 
@@ -560,9 +565,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               currencyCode={currency.code}
               actingOfferId={actingOfferId}
               canDecideOffers={rfq?.canDecideOffers !== false}
+              rfqStatus={rfq?.status}
               showUnits={category === 'equipment'}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
+              onMessage={(offer) => {
+                setMessagePeer({
+                  id: offer.responderId,
+                  fullName: offer.responderName,
+                  avatarUrl: null,
+                });
+                setMessageOpen(true);
+              }}
             />
           ) : null}
         </View>
@@ -639,12 +653,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         />
       ) : null}
 
-      {owner ? (
+      {messagePeer || owner ? (
         <ListingMessageSheet
           visible={messageOpen}
           listingId={id}
-          owner={owner}
-          onClose={() => setMessageOpen(false)}
+          owner={messagePeer ?? owner!}
+          buyerId={messagePeer?.id}
+          onClose={() => {
+            setMessageOpen(false);
+            setMessagePeer(null);
+          }}
         />
       ) : null}
 

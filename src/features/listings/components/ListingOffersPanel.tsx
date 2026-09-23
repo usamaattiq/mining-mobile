@@ -14,9 +14,12 @@ export type ListingOffersPanelProps = {
   currencyCode: string;
   actingOfferId: string | null;
   canDecideOffers?: boolean;
+  /** Accept and reject stay hidden unless the request is still live. */
+  rfqStatus?: string;
   showUnits?: boolean;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
+  onMessage?: (offer: ListingRfqOffer) => void;
 };
 
 const OFFER_STATUS_KEY: Record<string, string> = {
@@ -34,11 +37,18 @@ export function ListingOffersPanel({
   currencyCode,
   actingOfferId,
   canDecideOffers = true,
+  rfqStatus,
   showUnits = false,
   onAccept,
   onReject,
+  onMessage,
 }: ListingOffersPanelProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const orderedOffers = [...offers].sort((left, right) => {
+    const rank = (status: string) => (status === 'selected' ? 0 : 1);
+    return rank(left.status) - rank(right.status);
+  });
+  const requestIsLive = (rfqStatus ?? 'live') === 'live';
 
   return (
     <View style={styles.root}>
@@ -50,9 +60,9 @@ export function ListingOffersPanel({
           <AppText style={styles.emptyText}>{t('rfq.noOffers')}</AppText>
         </View>
       ) : (
-        offers.map((offer) => {
+        orderedOffers.map((offer) => {
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
-          const canDecide = canDecideOffers && offer.status === 'active';
+          const canDecide = requestIsLive && canDecideOffers && offer.status === 'active';
           const busy = actingOfferId === offer.id;
           const totalAmount = parsePositiveAmount(offer.price);
           const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : null;
@@ -64,7 +74,9 @@ export function ListingOffersPanel({
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
                 <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-                  {offer.responderName || t('messages.fallbackName')}
+                  {offer.status === 'confirmed'
+                    ? offer.responderName || t('messages.fallbackName')
+                    : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
                 </AppText>
                 {statusKey !== 'active' ? (
                   <View style={styles.tag}>
@@ -107,6 +119,13 @@ export function ListingOffersPanel({
                 <AppText style={styles.waiting}>
                   {t('rfq.waitingForConfirmation')}
                 </AppText>
+              ) : null}
+              {(offer.status === 'selected' || offer.status === 'confirmed') && onMessage ? (
+                <Button
+                  label={t('messages.message')}
+                  icon="chatbubble-ellipses-outline"
+                  onPress={() => onMessage(offer)}
+                />
               ) : null}
             </View>
           );

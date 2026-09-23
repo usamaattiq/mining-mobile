@@ -27,6 +27,8 @@ type Props = {
   visible: boolean;
   listingId: string;
   owner: ListingOwner;
+  /** When the listing owner messages a confirmed responder, that responder's user id. */
+  buyerId?: string;
   onClose: () => void;
 };
 
@@ -39,6 +41,7 @@ export function ListingMessageSheet({
   visible,
   listingId,
   owner,
+  buyerId,
   onClose,
 }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -85,7 +88,7 @@ export function ListingMessageSheet({
     setError(null);
 
     void messagesApi
-      .startConversation(listingId)
+      .startConversation(listingId, buyerId)
       .then(async (conversation) => {
         if (cancelled) return;
         setConversationId(conversation.id);
@@ -109,7 +112,7 @@ export function ListingMessageSheet({
     return () => {
       cancelled = true;
     };
-  }, [visible, listingId, t]);
+  }, [visible, listingId, buyerId, t]);
 
   const send = () => {
     const text = draft.trim();

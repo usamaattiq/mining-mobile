@@ -10,8 +10,11 @@ export const messagesApi = {
     return apiFetch(`/messages/conversations/${id}`);
   },
 
-  startConversation(listingId: string): Promise<Conversation> {
-    return apiFetch('/messages/conversations', { method: 'POST', body: { listingId } });
+  startConversation(listingId: string, buyerId?: string): Promise<Conversation> {
+    return apiFetch('/messages/conversations', {
+      method: 'POST',
+      body: { listingId, ...(buyerId ? { buyerId } : {}) },
+    });
   },
 
   sendMessage(conversationId: string, text: string): Promise<Conversation> {
