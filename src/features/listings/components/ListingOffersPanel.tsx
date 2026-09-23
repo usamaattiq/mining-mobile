@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { palette, radius, spacing } from '@/theme';
 import type { ListingRfqOffer } from '@/features/listings/types/listingRfq.types';
 
@@ -53,24 +54,36 @@ export function ListingOffersPanel({
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
           const canDecide = canDecideOffers && offer.status === 'active';
           const busy = actingOfferId === offer.id;
+          const totalAmount = parsePositiveAmount(offer.price);
+          const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : null;
+          const unitAmount =
+            totalAmount != null && units
+              ? Math.round((totalAmount / units) * 100) / 100
+              : null;
           return (
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
                 <AppText weight="semibold" style={styles.name} numberOfLines={1}>
                   {offer.responderName || t('messages.fallbackName')}
                 </AppText>
-                <View style={styles.tag}>
-                  <AppText weight="semibold" style={styles.tagText}>
-                    {t(`rfq.offerStatus.${statusKey}`)}
-                  </AppText>
-                </View>
+                {statusKey !== 'active' ? (
+                  <View style={styles.tag}>
+                    <AppText weight="semibold" style={styles.tagText}>
+                      {t(`rfq.offerStatus.${statusKey}`)}
+                    </AppText>
+                  </View>
+                ) : null}
               </View>
-              {offer.price ? (
+              {showUnits && unitAmount != null && units ? (
+                <PriceTimesUnitsSummary
+                  currencyCode={currencyCode}
+                  unitAmount={unitAmount}
+                  units={units}
+                  compact
+                />
+              ) : offer.price ? (
                 <AppText weight="bold" style={styles.price}>
                   {currencyCode} {formatAmountWithCommas(offer.price)}
-                  {showUnits && offer.quantity
-                    ? ` · ${t('equipmentListing.unitsCount', { count: offer.quantity })}`
-                    : ''}
                 </AppText>
               ) : null}
               {canDecide ? (
