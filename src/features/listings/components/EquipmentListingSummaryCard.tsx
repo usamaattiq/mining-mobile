@@ -63,7 +63,7 @@ export function EquipmentListingSummaryCard({
             <View style={styles.rowLast}>
               <Pressable
                 onPress={() => setDescriptionOpen((open) => !open)}
-                style={styles.row}
+                style={[styles.row, styles.rowLast]}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: descriptionOpen }}
                 accessibilityLabel={t('equipmentListing.description')}
