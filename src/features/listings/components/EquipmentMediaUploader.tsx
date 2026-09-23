@@ -156,7 +156,7 @@ export function EquipmentMediaUploader({
   return (
     <View style={styles.root}>
       <View style={styles.header}>
-        <AppText weight="bold" style={styles.title}>
+        <AppText weight="semibold" style={styles.title}>
           {t('equipmentListing.mediaTitle')}
           <AppText style={styles.required}> *</AppText>
         </AppText>
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   title: {
-    fontSize: 16,
+    fontSize: 13,
     color: palette.charcoal,
   },
   subtitle: {
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     color: palette.muted,
   },
   required: {
-    fontSize: 16,
+    fontSize: 13,
     color: palette.danger,
   },
   grid: {
