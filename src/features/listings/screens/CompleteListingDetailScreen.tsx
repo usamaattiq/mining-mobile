@@ -34,7 +34,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
-import { rfqStatusBadge, rfqStatusLabel } from '@/features/listings/utils/rfqStatus';
+import { rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { palette, radius, spacing } from '@/theme';
@@ -206,14 +206,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         label: t('equipmentListing.listedUntil'),
         value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
       },
-      ...(equipmentListing.rfq
-        ? [
-            {
-              label: t('rfq.statusLabel'),
-              value: rfqStatusLabel(t, equipmentListing.rfq),
-            },
-          ]
-        : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
     if (equipmentListing.deliveryAvailable) {
@@ -325,14 +317,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         label: t('serviceListing.listedUntil'),
         value: formatListingDate(currentLanguage, serviceListing.rfq?.expiresAt),
       },
-      ...(serviceListing.rfq
-        ? [
-            {
-              label: t('rfq.statusLabel'),
-              value: rfqStatusLabel(t, serviceListing.rfq),
-            },
-          ]
-        : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
     priceNode =
