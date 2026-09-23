@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
@@ -15,8 +16,11 @@ export function EquipmentListingSummaryCard({
   onChangeDetails,
   onChangeMedia,
   hideMedia,
+  description,
 }: EquipmentListingSummaryCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const [descriptionOpen, setDescriptionOpen] = React.useState(false);
+  const descriptionText = description?.trim() ?? '';
 
   return (
     <View style={styles.root}>
@@ -37,7 +41,10 @@ export function EquipmentListingSummaryCard({
           {detailRows.map((row, index) => (
             <View
               key={row.label}
-              style={[styles.row, index === detailRows.length - 1 && styles.rowLast]}
+              style={[
+                styles.row,
+                index === detailRows.length - 1 && !descriptionText && styles.rowLast,
+              ]}
             >
               <AppText style={styles.rowLabel}>{row.label}</AppText>
               <AppText weight="semibold" style={styles.rowValue} numberOfLines={1}>
@@ -45,6 +52,27 @@ export function EquipmentListingSummaryCard({
               </AppText>
             </View>
           ))}
+          {descriptionText ? (
+            <View style={styles.rowLast}>
+              <Pressable
+                onPress={() => setDescriptionOpen((open) => !open)}
+                style={styles.row}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: descriptionOpen }}
+                accessibilityLabel={t('equipmentListing.description')}
+              >
+                <AppText style={styles.rowLabel}>{t('equipmentListing.description')}</AppText>
+                <Ionicons
+                  name={descriptionOpen ? 'chevron-up' : 'chevron-down'}
+                  size={18}
+                  color={palette.muted}
+                />
+              </Pressable>
+              {descriptionOpen ? (
+                <AppText style={styles.description}>{descriptionText}</AppText>
+              ) : null}
+            </View>
+          ) : null}
         </View>
       </View>
 
@@ -100,7 +128,7 @@ const styles = StyleSheet.create({
     color: palette.gold,
   },
   card: {
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
     borderWidth: 1,
     borderColor: palette.softGold,
     borderRadius: radius.md,
@@ -128,6 +156,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.charcoal,
     textAlign: 'right',
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: palette.muted,
+    paddingBottom: spacing.sm,
   },
   mediaGrid: {
     flexDirection: 'row',

@@ -14,7 +14,6 @@ import { SelectField } from '@/shared/components/SelectField';
 import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
-import { EquipmentDescriptionCard } from '@/features/listings/components/EquipmentDescriptionCard';
 import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
@@ -543,9 +542,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             </View>
           </View>
 
-          <EquipmentListingSummaryCard detailRows={detailRows} media={[]} hideMedia />
-
-          {descriptionText ? <EquipmentDescriptionCard description={descriptionText} /> : null}
+          <EquipmentListingSummaryCard
+            detailRows={detailRows}
+            media={[]}
+            hideMedia
+            description={descriptionText}
+          />
 
           {extraSection}
 

@@ -10,4 +10,6 @@ export type EquipmentListingSummaryCardProps = {
   onChangeMedia?: () => void;
   /** Skips the media section entirely — use when the caller already shows the photos elsewhere (e.g. a carousel). */
   hideMedia?: boolean;
+  /** Collapsible description row inside the details card. */
+  description?: string;
 };
