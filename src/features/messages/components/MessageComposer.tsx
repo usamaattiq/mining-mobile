@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useKeyboardState } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -72,8 +72,11 @@ const styles = StyleSheet.create({
     borderColor: palette.softGold,
     borderRadius: radius.md,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingTop: Platform.OS === 'ios' ? 10 : 8,
+    paddingBottom: Platform.OS === 'ios' ? 10 : 8,
     fontSize: 14,
+    lineHeight: 20,
+    textAlignVertical: 'center',
     color: palette.charcoal,
     backgroundColor: palette.pureWhite,
   },
