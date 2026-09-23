@@ -11,6 +11,7 @@ import type { ListingCardBadge, ListingCardProps } from '@/features/listings/typ
 const LISTING_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const COUNTDOWN_TICK_MS = 1000;
 const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
 const MINUTE_MS = 60 * 1000;
 const IMAGE_SIZE = 112;
 const BADGE_ROW_HEIGHT = 20;
@@ -26,6 +27,9 @@ function useRemainingTime(createdAt: number, expiresAt?: number): string {
 
   const end = expiresAt ?? createdAt + LISTING_LIFETIME_MS;
   const remainingMs = Math.max(0, end - now);
+  if (remainingMs > DAY_MS) {
+    return `${Math.floor(remainingMs / DAY_MS)}d`;
+  }
   if (remainingMs >= HOUR_MS) {
     return `${Math.floor(remainingMs / HOUR_MS)}h`;
   }
