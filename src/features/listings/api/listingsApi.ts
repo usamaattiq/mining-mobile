@@ -21,11 +21,11 @@ export function isGoldListing(listing: ListingDto): listing is GoldListing {
 export type CreateEquipmentListingBody = Omit<
   EquipmentListing,
   'id' | 'createdAt' | 'ownerId' | 'owner' | 'rfq'
->;
+> & { expiryHours?: number };
 export type CreateServiceListingBody = Omit<
   ServiceListing,
   'id' | 'createdAt' | 'ownerId' | 'owner' | 'rfq'
->;
+> & { expiryHours?: number };
 export type CreateGoldListingBody = Omit<GoldListing, 'id' | 'createdAt' | 'ownerId' | 'owner'>;
 export type CreateListingBody =
   | CreateEquipmentListingBody

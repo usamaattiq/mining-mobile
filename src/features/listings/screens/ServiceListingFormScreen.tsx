@@ -12,6 +12,7 @@ import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
+import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { Button } from '@/shared/components/Button';
@@ -108,7 +109,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [description, setDescription] = React.useState('');
   const [yearsOfExperience, setYearsOfExperience] = React.useState('');
   const [price, setPrice] = React.useState('');
-  const [serviceDate, setServiceDate] = React.useState<Date | null>(null);
+  const [listedUntil, setListedUntil] = React.useState(defaultListingEnd);
   const [location, setLocation] = React.useState('');
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
@@ -143,11 +144,6 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setDescription(sourceListing.description ?? '');
     setYearsOfExperience(sourceListing.yearsOfExperience ?? '');
     setPrice(isBuyer ? '' : sourceListing.price ?? '');
-    setServiceDate(
-      sourceListing.serviceDate && sourceListing.serviceDate > Date.now()
-        ? new Date(sourceListing.serviceDate)
-        : null,
-    );
     setLocation(sourceListing.location ?? '');
     setMedia(
       cloneRepostMedia(
@@ -181,7 +177,6 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   );
   const mediaValid =
     media.length > 0 &&
-    (isSupplier || Boolean(serviceDate)) &&
     (!isOnsite || location.trim().length > 0);
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
@@ -203,6 +198,10 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
   const handlePublish = async () => {
     if (publishing || !serviceType) return;
+    if (listedUntil.getTime() <= Date.now()) {
+      showAppAlert(t('common.error'), t('serviceListing.listedUntilPast'));
+      return;
+    }
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
@@ -214,7 +213,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         description,
         yearsOfExperience,
         price: isBuyer ? '' : price,
-        serviceDate: isSupplier ? null : serviceDate ? serviceDate.getTime() : null,
+        serviceDate: null,
+        expiryHours: expiryHoursUntil(listedUntil),
         location: isOnsite ? location : '',
         media: persistedMedia,
         postedAs: useMarketplaceRoleStore.getState().role,
@@ -261,20 +261,14 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
           },
         ]),
-    ...(!isSupplier
-      ? [
-          {
-            label: t('serviceListing.serviceDate'),
-            value: serviceDate
-              ? new Intl.DateTimeFormat(currentLanguage, {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                }).format(serviceDate)
-              : '',
-          },
-        ]
-      : []),
     ...(isOnsite ? [{ label: t('serviceListing.location'), value: location }] : []),
+    {
+      label: t('serviceListing.listedUntil'),
+      value: new Intl.DateTimeFormat(currentLanguage, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }).format(listedUntil),
+    },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
   const photoMedia = media
@@ -386,15 +380,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
           <View style={styles.stepBlock}>
             <ServiceMediaUploader media={media} onChange={setMedia} />
 
-            {!isSupplier ? (
-              <DateTimeField
-                label={t('serviceListing.serviceDate')}
-                value={serviceDate}
-                required
-                placeholder={t('serviceListing.serviceDatePlaceholder')}
-                onChange={setServiceDate}
-              />
-            ) : null}
+            <DateTimeField
+              label={t('serviceListing.listedUntil')}
+              value={listedUntil}
+              required
+              placeholder={t('serviceListing.listedUntilPlaceholder')}
+              onChange={setListedUntil}
+            />
 
             {isOnsite ? (
               <LocationField

@@ -10,6 +10,7 @@ import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
+import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
@@ -102,7 +103,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [salePrice, setSalePrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
   const [location, setLocation] = React.useState('');
-  const [neededDate, setNeededDate] = React.useState<Date | null>(null);
+  const [listedUntil, setListedUntil] = React.useState(defaultListingEnd);
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
     longitude: number;
@@ -140,11 +141,6 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setSalePrice(isBuyer ? '' : sourceListing.salePrice ?? '');
     setUnits(Math.max(sourceListing.units ?? 1, 1));
     setLocation(sourceListing.location ?? '');
-    setNeededDate(
-      sourceListing.neededDate && sourceListing.neededDate > Date.now()
-        ? new Date(sourceListing.neededDate)
-        : null,
-    );
     setMedia(
       cloneRepostMedia(
         (sourceListing.media ?? []).filter(
@@ -187,8 +183,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     media.length > 0 &&
     !mediaBusy &&
     location.trim().length > 0 &&
-    deliveryValid &&
-    (!isBuyer || Boolean(neededDate));
+    deliveryValid;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const supplierPriceLines = !isBuyer
@@ -222,6 +217,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
   const handlePublish = async () => {
     if (publishing || !mode) return;
+    if (listedUntil.getTime() <= Date.now()) {
+      showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
+      return;
+    }
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
@@ -241,7 +240,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         deliveryAvailable,
         deliveryType,
         deliveryPricePerKm,
-        neededDate: isBuyer && neededDate ? neededDate.getTime() : null,
+        neededDate: null,
+        expiryHours: expiryHoursUntil(listedUntil),
         postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isEquipmentListing(listing)) addListing(listing);
@@ -292,19 +292,13 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             },
           ]),
     { label: t('equipmentListing.units'), value: String(units) },
-    ...(!isBuyer
-      ? []
-      : [
-          {
-            label: t('equipmentListing.neededDate'),
-            value: neededDate
-              ? new Intl.DateTimeFormat(currentLanguage, {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                }).format(neededDate)
-              : '',
-          },
-        ]),
+    {
+      label: t('equipmentListing.listedUntil'),
+      value: new Intl.DateTimeFormat(currentLanguage, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }).format(listedUntil),
+    },
     { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
@@ -461,15 +455,13 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         {step === 1 ? (
           <View style={styles.stepBlock}>
             <EquipmentMediaUploader media={media} onChange={setMedia} onBusyChange={setMediaBusy} />
-            {isBuyer ? (
-              <DateTimeField
-                label={t('equipmentListing.neededDate')}
-                value={neededDate}
-                required
-                placeholder={t('equipmentListing.neededDatePlaceholder')}
-                onChange={setNeededDate}
-              />
-            ) : null}
+            <DateTimeField
+              label={t('equipmentListing.listedUntil')}
+              value={listedUntil}
+              required
+              placeholder={t('equipmentListing.listedUntilPlaceholder')}
+              onChange={setListedUntil}
+            />
             <LocationField
               label={t('equipmentListing.location')}
               value={location}

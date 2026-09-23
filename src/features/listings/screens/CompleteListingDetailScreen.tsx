@@ -202,6 +202,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         label: t('common.postedOn'),
         value: formatListingDate(currentLanguage, equipmentListing.createdAt),
       },
+      {
+        label: t('equipmentListing.listedUntil'),
+        value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
+      },
       ...(equipmentListing.rfq
         ? [
             {
@@ -323,6 +327,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           currentLanguage,
           serviceListing.serviceDate ?? serviceListing.createdAt,
         ),
+      },
+      {
+        label: t('serviceListing.listedUntil'),
+        value: formatListingDate(currentLanguage, serviceListing.rfq?.expiresAt),
       },
       ...(serviceListing.rfq
         ? [
