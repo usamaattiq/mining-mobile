@@ -5,6 +5,7 @@ export const SIGN_UP_STEPS: OnboardingStep[] = [
   { key: 'otp', label: 'Verify' },
   { key: 'info', label: 'Profile' },
   { key: 'security', label: 'Security' },
+  { key: 'face', label: 'Face ID' },
 ];
 
 export const LOGIN_STEPS: OnboardingStep[] = [

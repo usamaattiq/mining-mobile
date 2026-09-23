@@ -47,15 +47,16 @@ const RESEND_SECONDS = 30;
 const MPIN_LENGTH = 4;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type SignUpStep = 'phone' | 'otp' | 'personal' | 'security';
+type SignUpStep = 'phone' | 'otp' | 'personal' | 'security' | 'face';
 
-const STEP_ORDER: SignUpStep[] = ['phone', 'otp', 'personal', 'security'];
+const STEP_ORDER: SignUpStep[] = ['phone', 'otp', 'personal', 'security', 'face'];
 
 const STEP_INDEX: Record<SignUpStep, number> = {
   phone: 0,
   otp: 1,
   personal: 2,
   security: 3,
+  face: 4,
 };
 
 type AccountType = 'individual' | 'company';
@@ -226,13 +227,16 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     }
   };
 
-  const handleSecurityContinue = async () => {
+  const handleSecurityContinue = () => {
     if (confirmMpin !== mpin) {
       showAppAlert(t('signUpSecurity.mismatchTitle'), t('signUpSecurity.mismatchMessage'));
       setConfirmMpin('');
       return;
     }
+    goToStep('face');
+  };
 
+  const handleFinishSignup = async () => {
     setSubmitting(true);
     try {
       const deviceId = await getDeviceId();
@@ -304,10 +308,15 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           }
         : step === 'personal'
           ? { title: t('signUpPersonalInfo.title'), subtitle: t('signUpPersonalInfo.subtitle') }
-          : {
-              title: t('signUpSecurity.title'),
-              subtitle: t('signUpSecurity.subtitleTemplate', { length: MPIN_LENGTH }),
-            };
+          : step === 'security'
+            ? {
+                title: t('signUpSecurity.title'),
+                subtitle: t('signUpSecurity.subtitleTemplate', { length: MPIN_LENGTH }),
+              }
+            : {
+                title: t('signUpFace.title'),
+                subtitle: t('signUpFace.subtitle'),
+              };
 
   return (
     <OnboardingLayout
@@ -315,7 +324,9 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       currentStep={STEP_INDEX[step]}
       title={header.title}
       subtitle={header.subtitle}
-      onBack={step === 'phone' || step === 'otp' ? goToPreviousStep : undefined}
+      onBack={
+        step === 'phone' || step === 'otp' || step === 'face' ? goToPreviousStep : undefined
+      }
       canContinue={
         (step === 'phone'
           ? isPhoneValid
@@ -323,14 +334,16 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
             ? isOtpValid
             : step === 'personal'
               ? isPersonalValid
-              : isMpinComplete) && !submitting
+              : step === 'security'
+                ? isMpinComplete
+                : true) && !submitting
       }
       continueLabel={
         step === 'phone'
           ? t('signUpPhone.sendCode')
           : step === 'otp'
             ? t('signUpOtp.verify')
-            : step === 'personal'
+            : step === 'personal' || step === 'security'
               ? t('common.continue')
               : t('signUpSecurity.finish')
       }
@@ -343,7 +356,9 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         } else if (step === 'personal') {
           goToStep('security');
         } else if (step === 'security') {
-          void handleSecurityContinue();
+          handleSecurityContinue();
+        } else if (step === 'face') {
+          void handleFinishSignup();
         }
       }}
     >
@@ -483,17 +498,23 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               autoFocus={false}
             />
           </View>
+        </View>
+      ) : null}
 
-          {biometricAvailable ? (
-            <BiometricToggleRow
-              enabled={biometricEnabled}
-              onToggle={(enabled) => void handleToggleBiometric(enabled)}
-              available={biometricAvailable}
-              kind={biometricKind}
-              title={t('signUpSecurity.biometricTitle')}
-              subtitle={t('signUpSecurity.biometricSubtitle')}
-            />
-          ) : null}
+      {step === 'face' ? (
+        <View style={styles.securityForm}>
+          <BiometricToggleRow
+            enabled={biometricEnabled}
+            onToggle={(enabled) => void handleToggleBiometric(enabled)}
+            available={biometricAvailable}
+            kind={biometricKind === 'fingerprint' ? 'fingerprint' : 'face'}
+            title={t('signUpFace.title')}
+            subtitle={
+              biometricAvailable
+                ? t('signUpFace.subtitle')
+                : t('signUpFace.unavailable')
+            }
+          />
         </View>
       ) : null}
       {mapPickerSheet}

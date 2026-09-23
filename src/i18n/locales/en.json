@@ -179,7 +179,13 @@
     "phone": "Phone",
     "verify": "Verify",
     "profile": "Profile",
-    "security": "Security"
+    "security": "Security",
+    "face": "Face ID"
+  },
+  "signUpFace": {
+    "title": "Face ID",
+    "subtitle": "Use Face ID for a faster sign in. You can always use your MPIN.",
+    "unavailable": "Face ID is not available on this device. You can finish and sign in with your MPIN."
   },
   "legal": {
     "updatedTemplate": "Effective {effective} · Last updated {updated}"
