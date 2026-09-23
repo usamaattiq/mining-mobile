@@ -1,5 +1,5 @@
 import React from 'react';
-import { chatSocket, type ChatRealtimePayload } from '@/shared/services/chatSocket';
+import { chatSocket, type ChatReadPayload, type ChatRealtimePayload } from '@/shared/services/chatSocket';
 import { messagesApi } from '@/features/messages/api/messagesApi';
 import { useAuthStore } from '@/store/authStore';
 import { useMessagesStore } from '@/store/messagesStore';
@@ -38,12 +38,24 @@ export function useChatRealtime(): void {
           text: payload.message.text,
           sentAt: payload.message.sentAt,
           fromMe: payload.senderId === viewerId,
+          status:
+            payload.senderId === viewerId ? (payload.message.status ?? 'sent') : undefined,
         },
+      });
+    });
+
+    const unsubscribeRead = chatSocket.onRead((payload: ChatReadPayload) => {
+      useMessagesStore.getState().applyReadReceipt({
+        conversationId: payload.conversationId,
+        readerId: payload.readerId,
+        readAt: payload.readAt,
+        viewerId,
       });
     });
 
     return () => {
       unsubscribe();
+      unsubscribeRead();
       chatSocket.disconnect();
     };
   }, [authStatus, viewerId]);

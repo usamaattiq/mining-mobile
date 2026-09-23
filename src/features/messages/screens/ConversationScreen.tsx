@@ -129,6 +129,7 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
               text={item.text}
               time={formatClockTime(item.sentAt, currentLanguage)}
               fromMe={item.fromMe}
+              status={item.status}
             />
           )}
         />

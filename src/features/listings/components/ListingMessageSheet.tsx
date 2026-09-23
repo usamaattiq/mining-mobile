@@ -97,7 +97,13 @@ export function ListingMessageSheet({
         useMessagesStore.getState().upsertConversation(loaded);
         setMessages(loaded.messages);
         setError(null);
-        void messagesApi.markRead(conversation.id).catch(() => undefined);
+        void messagesApi
+          .markRead(conversation.id)
+          .then((read) => {
+            if (cancelled) return;
+            useMessagesStore.getState().upsertConversation(read);
+          })
+          .catch(() => undefined);
       })
       .catch(() => {
         if (cancelled) return;
@@ -113,6 +119,22 @@ export function ListingMessageSheet({
       cancelled = true;
     };
   }, [visible, listingId, buyerId, t]);
+
+  const latestId = messages.at(-1)?.id;
+  const latestFromMe = messages.at(-1)?.fromMe;
+  React.useEffect(() => {
+    if (!visible || !conversationId || !latestId || latestFromMe) return;
+    let cancelled = false;
+    void messagesApi
+      .markRead(conversationId)
+      .then((read) => {
+        if (!cancelled) useMessagesStore.getState().upsertConversation(read);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, conversationId, latestId, latestFromMe]);
 
   const send = () => {
     const text = draft.trim();
@@ -138,6 +160,7 @@ export function ListingMessageSheet({
       text={item.text}
       time={formatClockTime(item.sentAt, currentLanguage)}
       fromMe={item.fromMe}
+      status={item.status}
     />
   );
 

@@ -10,7 +10,14 @@ export type ChatRealtimePayload = {
     id: string;
     text: string;
     sentAt: number;
+    status?: 'sent' | 'delivered' | 'read';
   };
+};
+
+export type ChatReadPayload = {
+  conversationId: string;
+  readerId: string;
+  readAt: number;
 };
 
 function socketBaseUrl(): string {
@@ -83,6 +90,14 @@ export const chatSocket = {
     active.on('chat:message', handler);
     return () => {
       active.off('chat:message', handler);
+    };
+  },
+
+  onRead(handler: (payload: ChatReadPayload) => void): () => void {
+    const active = getSocket();
+    active.on('chat:read', handler);
+    return () => {
+      active.off('chat:read', handler);
     };
   },
 
