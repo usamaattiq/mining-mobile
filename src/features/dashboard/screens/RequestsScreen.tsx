@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { I18nManager, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -49,6 +50,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     }
   }, [route.params?.category]);
   const [lifeFilter, setLifeFilter] = React.useState<LifeFilter>('all');
+  const [lifeRowWidth, setLifeRowWidth] = React.useState(0);
   const [refreshing, setRefreshing] = React.useState(false);
 
   useFocusEffect(
@@ -122,6 +124,24 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     { key: 'live', label: t('requests.filterLive') },
     { key: 'past', label: t('requests.filterPast') },
   ];
+  const lifeIndex = Math.max(
+    0,
+    lifeOptions.findIndex((option) => option.key === lifeFilter),
+  );
+  const lifeIndicator = useSharedValue(lifeIndex);
+  React.useEffect(() => {
+    lifeIndicator.value = withTiming(lifeIndex, { duration: 240 });
+  }, [lifeIndex, lifeIndicator]);
+  const lifeTabWidth = lifeRowWidth / lifeOptions.length;
+  const lifeIndicatorStyle = useAnimatedStyle(() => {
+    const visualIndex = I18nManager.isRTL
+      ? lifeOptions.length - 1 - lifeIndicator.value
+      : lifeIndicator.value;
+    return {
+      width: lifeTabWidth,
+      transform: [{ translateX: visualIndex * lifeTabWidth }],
+    };
+  }, [lifeTabWidth]);
 
   return (
     <GoldSheetScreen
@@ -139,6 +159,10 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
       }
     >
       <View style={styles.lifeRow}>
+        <View
+          style={styles.lifeTrack}
+          onLayout={(event) => setLifeRowWidth(event.nativeEvent.layout.width)}
+        >
         {lifeOptions.map((option) => {
           const selected = option.key === lifeFilter;
           return (
@@ -156,10 +180,13 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
               >
                 {option.label}
               </AppText>
-              <View style={[styles.lifeTabLine, selected && styles.lifeTabLineSelected]} />
             </Pressable>
           );
         })}
+        {lifeTabWidth > 0 ? (
+          <Animated.View style={[styles.lifeTabLine, lifeIndicatorStyle]} />
+        ) : null}
+        </View>
       </View>
 
       {visibleCards.length === 0 ? (
@@ -181,16 +208,19 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
   },
   lifeRow: {
-    flexDirection: 'row',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: palette.softGold,
     marginHorizontal: -spacing.md,
     paddingHorizontal: spacing.md,
   },
+  lifeTrack: {
+    flexDirection: 'row',
+  },
   lifeTab: {
     flex: 1,
     alignItems: 'center',
     paddingTop: spacing.xs,
+    paddingBottom: spacing.sm,
   },
   lifeTabPressed: {
     opacity: 0.75,
@@ -198,18 +228,16 @@ const styles = StyleSheet.create({
   lifeTabLabel: {
     fontSize: 14,
     color: palette.muted,
-    paddingBottom: spacing.sm,
   },
   lifeTabLabelSelected: {
     color: palette.gold,
   },
   lifeTabLine: {
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
     height: 2,
-    width: '100%',
     borderRadius: 1,
-    backgroundColor: 'transparent',
-  },
-  lifeTabLineSelected: {
     backgroundColor: palette.gold,
   },
 });
