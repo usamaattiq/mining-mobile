@@ -74,6 +74,7 @@ export function ListingOfferComposer({
               currencyCode={currencyCode}
               unitAmount={submittedUnitAmount}
               units={submittedUnits}
+              compact
             />
           ) : offerPrice ? (
             <View style={styles.cardPriceRow}>
@@ -162,6 +163,7 @@ export function ListingOfferComposer({
               currencyCode={currencyCode}
               unitAmount={draftUnitAmount}
               units={units}
+              compact
             />
           ) : null}
           <View style={styles.actions}>

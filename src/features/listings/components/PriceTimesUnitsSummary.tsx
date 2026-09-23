@@ -17,11 +17,32 @@ export function PriceTimesUnitsSummary({
   currencyCode,
   unitAmount,
   units,
+  compact = false,
 }: PriceTimesUnitsSummaryProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const total = Math.round(unitAmount * units * 100) / 100;
   const unitText = formatMoneyAmount(currencyCode, unitAmount);
   const totalText = formatMoneyAmount(currencyCode, total);
+
+  if (compact) {
+    return (
+      <View style={styles.compactWrap}>
+        <View style={styles.compactPriceRow}>
+          <AppText weight="bold" style={styles.compactPrice} numberOfLines={1}>
+            {unitText}
+          </AppText>
+          <AppText style={styles.compactBeside} numberOfLines={1}>
+            {t('rfq.pricePerUnit')}
+          </AppText>
+        </View>
+        <AppText style={styles.compact} numberOfLines={2}>
+          {t('rfq.offerCalculation', { price: unitText, count: units })}
+          {'  ·  '}
+          {t('rfq.offerTotal', { amount: totalText })}
+        </AppText>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.card}>
@@ -95,5 +116,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: palette.muted,
     paddingBottom: 12,
+  },
+  compactWrap: {
+    gap: 2,
+  },
+  compactPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: spacing.xs,
+  },
+  compactPrice: {
+    fontSize: 22,
+    color: palette.charcoal,
+  },
+  compactBeside: {
+    fontSize: 13,
+    color: palette.muted,
+  },
+  compact: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: palette.muted,
   },
 });
