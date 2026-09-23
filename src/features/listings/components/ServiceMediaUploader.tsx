@@ -25,6 +25,7 @@ function newId(): string {
 export function ServiceMediaUploader({
   media,
   onChange,
+  required = true,
 }: ServiceMediaUploaderProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [sheetOpen, setSheetOpen] = React.useState(false);
@@ -105,7 +106,7 @@ export function ServiceMediaUploader({
       <View style={styles.header}>
         <AppText weight="bold" style={styles.title}>
           {t('serviceListing.mediaTitle')}
-          <AppText style={styles.required}> *</AppText>
+          {required ? <AppText style={styles.required}> *</AppText> : null}
         </AppText>
         <AppText style={styles.subtitle}>
           {t('serviceListing.mediaSubtitle', { photos: MAX_PHOTOS })}

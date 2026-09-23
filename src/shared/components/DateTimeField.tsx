@@ -23,6 +23,7 @@ export function DateTimeField({
   value,
   required = false,
   placeholder = 'Select date & time',
+  minimumDate,
   onChange,
 }: DateTimeFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -56,13 +57,13 @@ export function DateTimeField({
     const base = androidDraftDate ?? new Date();
     const combined = new Date(base);
     combined.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
-    onChange(combined);
+    onChange(minimumDate && combined < minimumDate ? new Date(minimumDate) : combined);
     setAndroidStage(null);
     setAndroidDraftDate(null);
   };
 
   const handleConfirm = () => {
-    onChange(draft);
+    onChange(minimumDate && draft < minimumDate ? new Date(minimumDate) : draft);
     setSheetOpen(false);
   };
 
@@ -89,6 +90,14 @@ export function DateTimeField({
         <DateTimePicker
           value={androidStage === 'date' ? (value ?? new Date()) : (androidDraftDate ?? new Date())}
           mode={androidStage}
+          minimumDate={
+            androidStage === 'date' ||
+            (androidDraftDate &&
+              minimumDate &&
+              androidDraftDate.toDateString() === minimumDate.toDateString())
+              ? minimumDate
+              : undefined
+          }
           onChange={handleAndroidChange}
         />
       ) : null}
@@ -107,6 +116,7 @@ export function DateTimeField({
             <DateTimePicker
               value={draft}
               mode="datetime"
+              minimumDate={minimumDate}
               display="spinner"
               themeVariant="light"
               textColor={palette.charcoal}

@@ -10,6 +10,7 @@ import { OptionRowCard } from '@/shared/components/OptionRowCard';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
+import { CounterField } from '@/shared/components/CounterField';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
 import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
@@ -107,7 +108,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [serviceCategory, setServiceCategory] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [yearsOfExperience, setYearsOfExperience] = React.useState('');
+  const [yearsOfExperience, setYearsOfExperience] = React.useState(1);
   const [price, setPrice] = React.useState('');
   const [listedUntil, setListedUntil] = React.useState(defaultListingEnd);
   const [location, setLocation] = React.useState('');
@@ -142,7 +143,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     );
     setTitle(sourceListing.title);
     setDescription(sourceListing.description ?? '');
-    setYearsOfExperience(sourceListing.yearsOfExperience ?? '');
+    setYearsOfExperience(Math.max(Number(sourceListing.yearsOfExperience) || 1, 1));
     setPrice(isBuyer ? '' : sourceListing.price ?? '');
     setLocation(sourceListing.location ?? '');
     setMedia(
@@ -176,7 +177,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       (isBuyer || price.trim()),
   );
   const mediaValid =
-    media.length > 0 &&
+    (isBuyer || media.length > 0) &&
     (!isOnsite || location.trim().length > 0);
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
@@ -211,7 +212,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         serviceCategoryLabel: serviceCategoryLabel ?? '',
         title,
         description,
-        yearsOfExperience,
+        yearsOfExperience: String(yearsOfExperience),
         price: isBuyer ? '' : price,
         serviceDate: null,
         expiryHours: expiryHoursUntil(listedUntil),
@@ -245,9 +246,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       label: t(
         isBuyer ? 'serviceListing.yearsOfExperienceWanted' : 'serviceListing.yearsOfExperience',
       ),
-      value: yearsOfExperience
-        ? t('serviceListing.yearsOfExperienceValue', { years: yearsOfExperience })
-        : '',
+      value: t('serviceListing.yearsOfExperienceValue', { years: yearsOfExperience }),
     },
     {
       label: t('serviceListing.type'),
@@ -351,16 +350,16 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               required
             />
 
-            <FormInput
+            <CounterField
               label={t(
                 isBuyer
                   ? 'serviceListing.yearsOfExperienceWanted'
                   : 'serviceListing.yearsOfExperience',
               )}
               value={yearsOfExperience}
-              onChangeText={setYearsOfExperience}
-              placeholder={t('serviceListing.yearsOfExperiencePlaceholder')}
-              keyboardType="numeric"
+              onChange={setYearsOfExperience}
+              min={1}
+              max={80}
             />
 
             {isBuyer ? null : (
@@ -378,12 +377,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
         {step === 1 ? (
           <View style={styles.stepBlock}>
-            <ServiceMediaUploader media={media} onChange={setMedia} />
+            <ServiceMediaUploader media={media} onChange={setMedia} required={!isBuyer} />
 
             <DateTimeField
               label={t('serviceListing.listedUntil')}
               value={listedUntil}
               required
+              minimumDate={new Date()}
               placeholder={t('serviceListing.listedUntilPlaceholder')}
               onChange={setListedUntil}
             />

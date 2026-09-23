@@ -13,4 +13,5 @@ export type ServiceMediaAsset = {
 export type ServiceMediaUploaderProps = {
   media: ServiceMediaAsset[];
   onChange: (media: ServiceMediaAsset[]) => void;
+  required?: boolean;
 };

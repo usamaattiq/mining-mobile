@@ -180,7 +180,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const deliveryValid =
     !deliveryAvailable || deliveryType === 'free' || deliveryPricePerKm.trim().length > 0;
   const mediaValid =
-    media.length > 0 &&
+    (isBuyer || media.length > 0) &&
     !mediaBusy &&
     location.trim().length > 0 &&
     deliveryValid;
@@ -454,11 +454,17 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
         {step === 1 ? (
           <View style={styles.stepBlock}>
-            <EquipmentMediaUploader media={media} onChange={setMedia} onBusyChange={setMediaBusy} />
+            <EquipmentMediaUploader
+              media={media}
+              onChange={setMedia}
+              onBusyChange={setMediaBusy}
+              required={!isBuyer}
+            />
             <DateTimeField
               label={t('equipmentListing.listedUntil')}
               value={listedUntil}
               required
+              minimumDate={new Date()}
               placeholder={t('equipmentListing.listedUntilPlaceholder')}
               onChange={setListedUntil}
             />
