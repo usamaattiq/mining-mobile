@@ -3,6 +3,8 @@ import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMed
 export type EquipmentListingReviewRow = {
   label: string;
   value: string;
+  /** Smaller grey text shown after the value, e.g. "Per KM". */
+  hint?: string;
 };
 
 export type EquipmentListingReviewProps = {

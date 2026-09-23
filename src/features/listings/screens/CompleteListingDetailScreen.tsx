@@ -14,7 +14,6 @@ import { SelectField } from '@/shared/components/SelectField';
 import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
-import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
@@ -208,6 +207,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         : []),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
+    if (equipmentListing.deliveryAvailable) {
+      detailRows.push({
+        label: t('equipmentListing.deliveryBadge'),
+        ...(equipmentListing.deliveryType === 'free'
+          ? { value: t('equipmentListing.deliveryFree') }
+          : {
+              value: `${currency.code} ${formatAmountWithCommas(equipmentListing.deliveryPricePerKm)} ·`,
+              hint: t('equipmentListing.deliveryPerKm'),
+            }),
+      });
+    }
+
     const durationOptions = isRent
       ? (
           [
@@ -279,14 +290,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       </View>
     );
 
-    const deliverySubtitle = equipmentListing.deliveryAvailable
-      ? equipmentListing.deliveryType === 'free'
-        ? t('equipmentListing.deliveryFree')
-        : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(equipmentListing.deliveryPricePerKm)}`
-      : undefined;
-    extraSection = equipmentListing.deliveryAvailable ? (
-      <DeliveryAvailableBanner subtitle={deliverySubtitle} />
-    ) : null;
   } else if (category === 'services' && serviceListing) {
     title = serviceListing.title;
     media = serviceListing.media;

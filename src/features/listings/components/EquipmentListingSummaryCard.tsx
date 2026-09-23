@@ -47,9 +47,16 @@ export function EquipmentListingSummaryCard({
               ]}
             >
               <AppText style={styles.rowLabel}>{row.label}</AppText>
-              <AppText weight="semibold" style={styles.rowValue} numberOfLines={1}>
-                {row.value}
-              </AppText>
+              <View style={styles.rowValueWrap}>
+                <AppText weight="semibold" style={styles.rowValue} numberOfLines={1}>
+                  {row.value}
+                </AppText>
+                {row.hint ? (
+                  <AppText style={styles.rowHint} numberOfLines={1}>
+                    {row.hint}
+                  </AppText>
+                ) : null}
+              </View>
             </View>
           ))}
           {descriptionText ? (
@@ -151,8 +158,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: palette.muted,
   },
-  rowValue: {
+  rowValueWrap: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'baseline',
+    gap: 4,
+  },
+  rowHint: {
+    fontSize: 11,
+    color: palette.muted,
+  },
+  rowValue: {
+    flexShrink: 1,
     fontSize: 14,
     color: palette.charcoal,
     textAlign: 'right',
