@@ -42,6 +42,7 @@ export function DashboardTabNavigator(): React.ReactElement {
       <View style={styles.root}>
         <Tab.Navigator
           initialRouteName="HomeTab"
+          safeAreaInsets={{ top: 0, right: 0, bottom: 0, left: 0 }}
           tabBar={(props) => <TabBarPropsSync {...props} onProps={setTabBarProps} />}
           screenOptions={tabNavigatorScreenOptions}
         >

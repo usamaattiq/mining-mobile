@@ -1,8 +1,13 @@
 import type { EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
-import type { ListingDto } from '@/features/listings/api/listingsApi';
-import { listingsApi } from '@/features/listings/api/listingsApi';
+import {
+  isEquipmentListing,
+  isGoldListing,
+  isServiceListing,
+  listingsApi,
+  type ListingDto,
+} from '@/features/listings/api/listingsApi';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
@@ -45,13 +50,13 @@ export function cacheListing(listing: ListingDto): void {
   }
 
   useMarketListingsStore.getState().upsertListing(listing);
-  if (listing.category === 'equipment') {
+  if (isEquipmentListing(listing)) {
     useListingsStore.getState().addListing(listing);
   }
-  if (listing.category === 'services') {
+  if (isServiceListing(listing)) {
     useServiceListingsStore.getState().addListing(listing);
   }
-  if (listing.category === 'gold') {
+  if (isGoldListing(listing)) {
     useGoldListingsStore.getState().addListing(listing);
   }
 }

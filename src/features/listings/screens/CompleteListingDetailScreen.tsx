@@ -18,6 +18,9 @@ import { EquipmentDescriptionCard } from '@/features/listings/components/Equipme
 import { DeliveryAvailableBanner } from '@/features/listings/components/DeliveryAvailableBanner';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
 import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
+import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
+import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
+import type { AttachmentDocument } from '@/features/listings/types/attachmentsSection.types';
 import type { ListingDto } from '@/features/listings/api/listingsApi';
 import { ListingMessageSheet } from '@/features/listings/components/ListingMessageSheet';
 import { ListingOfferComposer } from '@/features/listings/components/ListingOfferComposer';
@@ -171,8 +174,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   }
 
   let title = '';
-  let media: AnyMediaAsset[] = [];
-  let documents: AnyMediaAsset[] = [];
+  let media: Array<EquipmentMediaAsset | ServiceMediaAsset> = [];
+  let documents: AttachmentDocument[] = [];
   let description = '';
   let location = '';
   let detailRows: DetailRow[] = [];
