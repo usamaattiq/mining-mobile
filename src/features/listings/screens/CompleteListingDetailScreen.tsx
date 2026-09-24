@@ -552,6 +552,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               canDecideOffers={rfq?.canDecideOffers !== false}
               rfqStatus={rfq?.status}
               showUnits={category === 'equipment'}
+              showLeader={category === 'gold'}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
               onMessage={(offer) => {
@@ -619,6 +620,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             category === 'equipment' ? Math.max(equipmentListing?.units ?? 1, 1) : undefined
           }
           hasOffer={hasSentOffer}
+          leading={category === 'gold' && Boolean(rfq?.isLeading)}
           showInput={showOfferInput}
           awaitingConfirm={awaitingConfirm}
           submitting={offerSubmitting}

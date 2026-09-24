@@ -24,6 +24,7 @@ export function ListingOfferComposer({
   maxUnits,
   unitPricePlaceholder,
   hasOffer,
+  leading = false,
   showInput,
   awaitingConfirm,
   submitting,
@@ -66,9 +67,12 @@ export function ListingOfferComposer({
     >
       {hasOffer ? (
         <View style={styles.card}>
-          <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
-            {submittedLabel}
-          </AppText>
+          <View style={styles.cardTitleRow}>
+            <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+              {submittedLabel}
+            </AppText>
+            {leading ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
+          </View>
           {submittedUnitAmount != null && submittedUnits ? (
             <PriceTimesUnitsSummary
               currencyCode={currencyCode}

@@ -14,6 +14,7 @@ export type ListingOfferComposerProps = {
   maxUnits?: number;
   unitPricePlaceholder?: string;
   hasOffer: boolean;
+  leading?: boolean;
   showInput: boolean;
   awaitingConfirm: boolean;
   submitting: boolean;

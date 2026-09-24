@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
@@ -17,6 +18,8 @@ export type ListingOffersPanelProps = {
   /** Accept and reject stay hidden unless the request is still live. */
   rfqStatus?: string;
   showUnits?: boolean;
+  /** Gold auctions: trophy on the rank-1 bid. */
+  showLeader?: boolean;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
   onMessage?: (offer: ListingRfqOffer) => void;
@@ -39,12 +42,14 @@ export function ListingOffersPanel({
   canDecideOffers = true,
   rfqStatus,
   showUnits = false,
+  showLeader = false,
   onAccept,
   onReject,
   onMessage,
 }: ListingOffersPanelProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const orderedOffers = [...offers].sort((left, right) => {
+    if (left.rank != null && right.rank != null) return left.rank - right.rank;
     const rank = (status: string) => (status === 'selected' ? 0 : 1);
     return rank(left.status) - rank(right.status);
   });
@@ -64,6 +69,7 @@ export function ListingOffersPanel({
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
           const canDecide = requestIsLive && canDecideOffers && offer.status === 'active';
           const busy = actingOfferId === offer.id;
+          const isLeader = showLeader && offer.rank === 1;
           const totalAmount = parsePositiveAmount(offer.price);
           const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : null;
           const unitAmount =
@@ -78,6 +84,9 @@ export function ListingOffersPanel({
                     ? offer.responderName || t('messages.fallbackName')
                     : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
                 </AppText>
+                {isLeader ? (
+                  <Ionicons name="trophy" size={16} color={palette.gold} />
+                ) : null}
                 {statusKey !== 'active' ? (
                   <View style={styles.tag}>
                     <AppText weight="semibold" style={styles.tagText}>

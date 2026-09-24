@@ -7,6 +7,7 @@ export type ListingRfqOffer = {
   status: string;
   price?: string;
   quantity?: number;
+  rank?: number;
 };
 
 export type ListingRfq = {
@@ -25,5 +26,6 @@ export type ListingRfq = {
   myOfferStatus?: string;
   myOfferPrice?: string;
   myOfferQuantity?: number;
+  isLeading?: boolean;
   offers?: ListingRfqOffer[];
 };
