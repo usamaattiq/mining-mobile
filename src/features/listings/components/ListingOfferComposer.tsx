@@ -67,29 +67,27 @@ export function ListingOfferComposer({
     >
       {hasOffer ? (
         <View style={styles.card}>
-          <View style={styles.cardTitleRow}>
+          <View style={styles.cardPriceRow}>
             <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
               {submittedLabel}
             </AppText>
-            {leading ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
-          </View>
-          {submittedUnitAmount != null && submittedUnits ? (
-            <PriceTimesUnitsSummary
-              currencyCode={currencyCode}
-              unitAmount={submittedUnitAmount}
-              units={submittedUnits}
-              compact
-            />
-          ) : offerPrice ? (
-            <View style={styles.cardPriceRow}>
+            {submittedUnitAmount != null && submittedUnits ? (
+              <PriceTimesUnitsSummary
+                currencyCode={currencyCode}
+                unitAmount={submittedUnitAmount}
+                units={submittedUnits}
+                compact
+              />
+            ) : offerPrice ? (
               <AppText weight="bold" style={styles.cardPrice}>
                 {currencyCode} {formatAmountWithCommas(offerPrice)}
               </AppText>
-              {offerUnitsLabel ? (
-                <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
-              ) : null}
-            </View>
-          ) : null}
+            ) : null}
+            {offerUnitsLabel && !(submittedUnitAmount != null && submittedUnits) ? (
+              <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
+            ) : null}
+            {leading ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
+          </View>
 
           {awaitingConfirm ? (
             <View style={styles.confirmRow}>
@@ -231,6 +229,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     color: palette.muted,
+    justifyContent: 'space-between',
   },
   cardPrice: {
     fontSize: 18,

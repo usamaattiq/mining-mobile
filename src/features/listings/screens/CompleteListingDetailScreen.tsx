@@ -779,20 +779,20 @@ const styles = StyleSheet.create({
   },
   highestBid: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: 6,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs,
     backgroundColor: palette.warmWhite,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: palette.softGold,
   },
   highestBidLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: palette.muted,
   },
   highestBidAmount: {
-    fontSize: 16,
+    fontSize: 12,
     color: palette.charcoal,
   },
   priceAmount: {
