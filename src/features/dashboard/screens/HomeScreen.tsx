@@ -94,7 +94,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     state.conversations.some((item) => item.unreadCount > 0),
   );
   const marketListings = useMarketListingsStore((state) => state.listings).filter(
-    (listing) => !listingHasMyOffer(listing),
+    (listing) => listing.rfq?.status === 'live' && !listingHasMyOffer(listing),
   );
   const equipmentListings = marketListings.filter(isEquipmentListing);
   const serviceListings = marketListings.filter(isServiceListing);
