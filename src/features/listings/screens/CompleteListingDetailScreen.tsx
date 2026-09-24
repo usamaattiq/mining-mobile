@@ -34,7 +34,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
-import { rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
+import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { palette, radius, spacing } from '@/theme';
@@ -135,6 +135,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   } | null>(null);
   const [offerSubmitting, setOfferSubmitting] = React.useState(false);
   const [actingOfferId, setActingOfferId] = React.useState<string | null>(null);
+  const countdownEnd =
+    (equipmentListing ?? serviceListing ?? goldListing)?.rfq?.expiresAt ??
+    goldListing?.auctionEndDate ??
+    null;
+  const timeLeft = useCountdown(countdownEnd);
 
   const backButton = (
     <Pressable
@@ -401,6 +406,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       rfq?.myOfferStatus === 'active' ||
       rfq?.status === 'offer-submitted');
   const showOwnerOffers = isOwner && Boolean(rfq);
+  const showCountdown = countdownEnd != null && !isEndedRfqStatus(rfq?.status) && timeLeft != null;
   const headerBadge =
     rfqStatusBadge(t, rfq) ??
     (equipmentListing && equipmentListing.postedAs !== 'buyer'
@@ -493,18 +499,32 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
         <View style={styles.content}>
           <View style={styles.headerBlock}>
-            {headerBadge ? (
-              <View
-                style={[
-                  styles.rfqStatusChip,
-                  headerBadge.variant === 'muted' && styles.rfqStatusChipMuted,
-                  headerBadge.variant === 'warning' && styles.rfqStatusChipWarning,
-                  headerBadge.variant === 'success' && styles.rfqStatusChipSuccess,
-                ]}
-              >
-                <AppText weight="semibold" style={styles.rfqStatusChipText}>
-                  {headerBadge.label}
-                </AppText>
+            {headerBadge || showCountdown ? (
+              <View style={styles.statusRow}>
+                {headerBadge ? (
+                  <View
+                    style={[
+                      styles.rfqStatusChip,
+                      headerBadge.variant === 'muted' && styles.rfqStatusChipMuted,
+                      headerBadge.variant === 'warning' && styles.rfqStatusChipWarning,
+                      headerBadge.variant === 'success' && styles.rfqStatusChipSuccess,
+                    ]}
+                  >
+                    <AppText weight="semibold" style={styles.rfqStatusChipText}>
+                      {headerBadge.label}
+                    </AppText>
+                  </View>
+                ) : (
+                  <View />
+                )}
+                {showCountdown ? (
+                  <View style={styles.timerBadge}>
+                    <Ionicons name="time-outline" size={12} color={palette.gold} />
+                    <AppText weight="semibold" style={styles.timerText}>
+                      {timeLeft}
+                    </AppText>
+                  </View>
+                ) : null}
               </View>
             ) : null}
 
@@ -663,6 +683,27 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   );
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const HOUR_MS = 60 * 60 * 1000;
+const MINUTE_MS = 60 * 1000;
+
+function useCountdown(endsAt: number | null | undefined): string | null {
+  const [now, setNow] = React.useState(() => Date.now());
+
+  React.useEffect(() => {
+    if (endsAt == null) return undefined;
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [endsAt]);
+
+  if (endsAt == null) return null;
+  const remainingMs = Math.max(0, endsAt - now);
+  if (remainingMs > DAY_MS) return `${Math.floor(remainingMs / DAY_MS)}d`;
+  if (remainingMs >= HOUR_MS) return `${Math.floor(remainingMs / HOUR_MS)}h`;
+  if (remainingMs >= MINUTE_MS) return `${Math.floor(remainingMs / MINUTE_MS)}m`;
+  return `${Math.floor(remainingMs / 1000)}s`;
+}
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -735,6 +776,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     color: palette.charcoal,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  timerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: 'auto',
+  },
+  timerText: {
+    fontSize: 13,
+    color: palette.gold,
   },
   rfqStatusChip: {
     alignSelf: 'flex-start',
