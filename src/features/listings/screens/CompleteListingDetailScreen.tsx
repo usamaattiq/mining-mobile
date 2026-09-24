@@ -398,7 +398,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     rfq?.myOfferStatus === 'selected' ||
     rfq?.status === 'awaiting-your-confirmation' ||
     Boolean(rfq?.canConfirmOffer);
-  const showOfferInput = canOffer && !awaitingConfirm;
+  const showOfferInput =
+    !awaitingConfirm &&
+    (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live'));
   const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
   const canWithdraw =
     !awaitingConfirm &&
@@ -624,14 +626,20 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       {showOfferInput || hasSentOffer ? (
         <ListingOfferComposer
           currencyCode={currency.code}
-          placeholder={t('rfq.offerPlaceholder')}
+          placeholder={
+            category === 'gold' && hasSentOffer
+              ? t('rfq.updateOfferPlaceholder')
+              : t('rfq.offerPlaceholder')
+          }
           sendLabel={t('rfq.sendOffer')}
           submittedLabel={
             awaitingConfirm
               ? t('rfq.offerStatus.selected')
               : rfq?.myOfferStatus === 'confirmed'
                 ? t('rfq.offerStatus.confirmed')
-                : t('rfq.offerSubmitted')
+                : category === 'gold'
+                  ? t('rfq.yourOffer')
+                  : t('rfq.offerSubmitted')
           }
           confirmLabel={t('rfq.confirm')}
           declineLabel={t('rfq.decline')}

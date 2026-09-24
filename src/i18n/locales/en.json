@@ -26,6 +26,8 @@
     "statusLabel": "Status",
     "offersCount": "Offers",
     "offerPlaceholder": "Your offer",
+    "yourOffer": "Your Offer",
+    "updateOfferPlaceholder": "Update Your Offer",
     "unitPricePlaceholder": "Price per unit",
     "pricePerUnit": "per unit",
     "totalLabel": "Total",
