@@ -459,6 +459,7 @@
     "auctionDurationMinutes": "{count} min",
     "auctionDurationHoursMinutes": "{hours}h {minutes}m",
     "auctionEndDate": "Auction end date & time",
+    "highestBid": "Highest bid",
     "auctionEndDatePlaceholder": "Select date & time",
     "location": "Location",
     "publish": "Publish auction"

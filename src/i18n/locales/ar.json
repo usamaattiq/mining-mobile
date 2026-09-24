@@ -439,6 +439,7 @@
     "auctionDurationMinutes": "{count} د",
     "auctionDurationHoursMinutes": "{hours} س {minutes} د",
     "auctionEndDate": "تاريخ ووقت انتهاء المزاد",
+    "highestBid": "أعلى عرض",
     "auctionEndDatePlaceholder": "اختر التاريخ والوقت",
     "location": "الموقع",
     "publish": "نشر المزاد"

@@ -16,6 +16,7 @@ export type ListingRfq = {
   statusLabel: string;
   statusVariant: ListingRfqStatusVariant;
   expiresAt: number | null;
+  currentPrice?: string;
   offersCount?: number;
   canSubmitOffer?: boolean;
   canDecideOffers?: boolean;

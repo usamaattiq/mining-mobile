@@ -612,6 +612,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </Pressable>
       ) : null}
 
+      {category === 'gold' && !isOwner && rfq?.currentPrice ? (
+        <View style={styles.highestBid}>
+          <AppText style={styles.highestBidLabel}>{t('goldListing.highestBid')}</AppText>
+          <AppText weight="bold" style={styles.highestBidAmount}>
+            {currency.code} {formatAmountWithCommas(rfq.currentPrice)}
+          </AppText>
+        </View>
+      ) : null}
+
       {showOfferInput || hasSentOffer ? (
         <ListingOfferComposer
           currencyCode={currency.code}
@@ -759,6 +768,24 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flex: 1,
     gap: spacing.xs,
+  },
+  highestBid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    backgroundColor: palette.warmWhite,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: palette.softGold,
+  },
+  highestBidLabel: {
+    fontSize: 13,
+    color: palette.muted,
+  },
+  highestBidAmount: {
+    fontSize: 16,
+    color: palette.charcoal,
   },
   priceAmount: {
     fontSize: 28,
