@@ -20,6 +20,8 @@ export type ListingOffersPanelProps = {
   showUnits?: boolean;
   /** Gold auctions: trophy on the rank-1 bid. */
   showLeader?: boolean;
+  /** Gold auctions: message every bidder, not only the selected one. */
+  messageEveryOffer?: boolean;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
   onMessage?: (offer: ListingRfqOffer) => void;
@@ -43,6 +45,7 @@ export function ListingOffersPanel({
   rfqStatus,
   showUnits = false,
   showLeader = false,
+  messageEveryOffer = false,
   onAccept,
   onReject,
   onMessage,
@@ -129,7 +132,10 @@ export function ListingOffersPanel({
                   {t('rfq.waitingForConfirmation')}
                 </AppText>
               ) : null}
-              {(offer.status === 'selected' || offer.status === 'confirmed') && onMessage ? (
+              {onMessage &&
+              (messageEveryOffer ||
+                offer.status === 'selected' ||
+                offer.status === 'confirmed') ? (
                 <Button
                   label={t('messages.message')}
                   icon="chatbubble-ellipses-outline"

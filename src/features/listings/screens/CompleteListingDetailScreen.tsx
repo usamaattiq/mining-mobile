@@ -573,6 +573,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               rfqStatus={rfq?.status}
               showUnits={category === 'equipment'}
               showLeader={category === 'gold'}
+              messageEveryOffer={category === 'gold'}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
               onMessage={(offer) => {
