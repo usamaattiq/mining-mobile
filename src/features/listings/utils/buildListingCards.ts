@@ -184,10 +184,13 @@ export function buildListingCards({
         .filter((part): part is string => Boolean(part))
         .join(' · ') || undefined,
     city: cityFromLocation(listing.location),
+    typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
     priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
-    expiresAt: listing.auctionEndDate ?? undefined,
+    expiresAt: listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,
     ended: listingHasEnded({
+      rfqStatus: listing.rfq?.status,
+      expiresAt: listing.rfq?.expiresAt,
       auctionEndDate: listing.auctionEndDate,
       createdAt: listing.createdAt,
     }),

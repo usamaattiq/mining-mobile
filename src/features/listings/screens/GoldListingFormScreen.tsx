@@ -174,6 +174,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         weight,
         purityLabel: purityLabel ?? '',
         price,
+        auctionStartDate: auctionStartDate?.getTime() ?? null,
         auctionEndDate:
           auctionStartDate != null
             ? auctionStartDate.getTime() + durationHours * 60 * 60 * 1000

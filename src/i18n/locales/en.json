@@ -56,10 +56,14 @@
       "lapsed": "Lapsed"
     },
     "status": {
+      "comingSoon": "Coming soon",
       "live": "Live",
       "awaitingConfirmation": "Awaiting confirmation",
+      "awaitingAction": "Action required",
       "offerSubmitted": "Offer submitted",
       "awaitingYourConfirmation": "Awaiting your confirmation",
+      "declined": "Declined",
+      "timedOut": "Timed out",
       "confirmed": "Confirmed — still filling",
       "completed": "Completed",
       "closed": "Closed",

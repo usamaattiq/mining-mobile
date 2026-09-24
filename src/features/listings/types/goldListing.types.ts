@@ -11,6 +11,8 @@ export type GoldListing = {
   weight: string;
   purityLabel: string;
   price: string;
+  /** Epoch ms bidding opens. Sent on create; the auction service owns the schedule after that. */
+  auctionStartDate?: number | null;
   /** Epoch ms the auction closes, or null if not set. */
   auctionEndDate: number | null;
   location: string;

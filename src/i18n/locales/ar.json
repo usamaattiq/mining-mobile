@@ -56,10 +56,14 @@
       "lapsed": "منتهٍ"
     },
     "status": {
+      "comingSoon": "قريباً",
       "live": "مباشر",
       "awaitingConfirmation": "بانتظار التأكيد",
+      "awaitingAction": "مطلوب إجراء",
       "offerSubmitted": "تم تقديم عرض",
       "awaitingYourConfirmation": "بانتظار تأكيدك",
+      "declined": "مرفوض",
+      "timedOut": "انتهت المهلة",
       "confirmed": "مؤكد — ما زال يُستكمل",
       "completed": "مكتمل",
       "closed": "مغلق",
