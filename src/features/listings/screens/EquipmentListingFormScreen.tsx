@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import type { EquipmentListingMode, RootStackParamList } from '@/navigation/types';
+import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
@@ -38,14 +38,30 @@ import type { DeliveryType, EquipmentListing } from '@/features/listings/types/e
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingForm'>;
 
+type RentPeriod = 'hourly' | 'weekly' | 'monthly' | 'yearly';
+
+function rentPeriodFromListing(listing: {
+  hourlyRental?: string;
+  weeklyRental?: string;
+  monthlyRental?: string;
+  yearlyRental?: string;
+}): RentPeriod | null {
+  if (listing.hourlyRental?.trim()) return 'hourly';
+  if (listing.weeklyRental?.trim()) return 'weekly';
+  if (listing.monthlyRental?.trim()) return 'monthly';
+  if (listing.yearlyRental?.trim()) return 'yearly';
+  return null;
+}
+
 export function EquipmentListingFormScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
   const role = useMarketplaceRoleStore((state) => state.role);
   const isBuyer = role === 'buyer';
-  const [mode, setMode] = React.useState<EquipmentListingMode | null>(isBuyer ? 'sell' : null);
-  const isRent = mode === 'rent';
+  const [offerRent, setOfferRent] = React.useState(false);
+  const [offerSell, setOfferSell] = React.useState(isBuyer);
+  const mode = offerRent && offerSell ? 'both' : offerRent ? 'rent' : offerSell ? 'sell' : null;
 
   const steps = [
     { key: 'details', label: t('equipmentListing.detailsStep') },
@@ -97,9 +113,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [equipmentType, setEquipmentType] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [hourlyRental, setHourlyRental] = React.useState('');
-  const [monthlyRental, setMonthlyRental] = React.useState('');
-  const [weeklyRental, setWeeklyRental] = React.useState('');
+  const [rentPeriod, setRentPeriod] = React.useState<RentPeriod | null>(null);
+  const [rentalAmount, setRentalAmount] = React.useState('');
   const [salePrice, setSalePrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
   const [location, setLocation] = React.useState('');
@@ -131,13 +146,28 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   React.useEffect(() => {
     if (!sourceListing || filledRepost.current) return;
     filledRepost.current = true;
-    setMode(isBuyer ? 'sell' : sourceListing.mode);
+    const period = isBuyer ? null : rentPeriodFromListing(sourceListing);
+    setOfferRent(!isBuyer && (sourceListing.mode === 'rent' || sourceListing.mode === 'both'));
+    setOfferSell(
+      isBuyer || sourceListing.mode === 'sell' || sourceListing.mode === 'both',
+    );
     setEquipmentType(matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel));
     setTitle(sourceListing.title);
     setDescription(sourceListing.description ?? '');
-    setHourlyRental(isBuyer ? '' : sourceListing.hourlyRental ?? '');
-    setMonthlyRental(isBuyer ? '' : sourceListing.monthlyRental ?? '');
-    setWeeklyRental(isBuyer ? '' : sourceListing.weeklyRental ?? '');
+    setRentPeriod(period);
+    setRentalAmount(
+      isBuyer
+        ? ''
+        : period === 'hourly'
+          ? (sourceListing.hourlyRental ?? '')
+          : period === 'weekly'
+            ? (sourceListing.weeklyRental ?? '')
+            : period === 'monthly'
+              ? (sourceListing.monthlyRental ?? '')
+              : period === 'yearly'
+                ? (sourceListing.yearlyRental ?? '')
+                : '',
+    );
     setSalePrice(isBuyer ? '' : sourceListing.salePrice ?? '');
     setUnits(Math.max(sourceListing.units ?? 1, 1));
     setLocation(sourceListing.location ?? '');
@@ -173,9 +203,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     title.trim() &&
     units > 0 &&
     (isBuyer ||
-      (isRent
-        ? hourlyRental.trim() || monthlyRental.trim() || weeklyRental.trim()
-        : salePrice.trim())),
+      ((offerRent ? Boolean(rentPeriod && rentalAmount.trim()) : true) &&
+        (offerSell ? Boolean(salePrice.trim()) : true))),
   );
   const deliveryValid =
     !deliveryAvailable || deliveryType === 'free' || deliveryPricePerKm.trim().length > 0;
@@ -186,18 +215,26 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     deliveryValid;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
+  const rentalByPeriod = {
+    hourly: offerRent && rentPeriod === 'hourly' ? rentalAmount : '',
+    weekly: offerRent && rentPeriod === 'weekly' ? rentalAmount : '',
+    monthly: offerRent && rentPeriod === 'monthly' ? rentalAmount : '',
+    yearly: offerRent && rentPeriod === 'yearly' ? rentalAmount : '',
+  };
+
   const supplierPriceLines = !isBuyer
-    ? (isRent
-        ? [
-            { key: 'hourly', amount: parsePositiveAmount(hourlyRental) },
-            { key: 'weekly', amount: parsePositiveAmount(weeklyRental) },
-            { key: 'monthly', amount: parsePositiveAmount(monthlyRental) },
-          ]
-        : [{ key: 'sale', amount: parsePositiveAmount(salePrice) }]
-      ).flatMap((line) =>
-        line.amount != null ? [{ key: line.key, amount: line.amount }] : [],
-      )
+    ? [
+        offerRent ? { key: rentPeriod ?? 'rent', amount: parsePositiveAmount(rentalAmount) } : null,
+        offerSell ? { key: 'sale', amount: parsePositiveAmount(salePrice) } : null,
+      ].flatMap((line) => (line && line.amount != null ? [line] : []))
     : [];
+
+  const rentPeriodOptions = [
+    { value: 'hourly' as const, label: t('equipmentListing.hourlyBadge') },
+    { value: 'weekly' as const, label: t('equipmentListing.weeklyBadge') },
+    { value: 'monthly' as const, label: t('equipmentListing.monthlyBadge') },
+    { value: 'yearly' as const, label: t('equipmentListing.yearlyBadge') },
+  ];
 
   const handleBack = () => {
     if (step > 0) {
@@ -230,10 +267,11 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         equipmentTypeLabel: equipmentTypeLabel ?? '',
         title,
         description,
-        hourlyRental: isBuyer ? '' : hourlyRental,
-        monthlyRental: isBuyer ? '' : monthlyRental,
-        weeklyRental: isBuyer ? '' : weeklyRental,
-        salePrice: isBuyer ? '' : salePrice,
+        hourlyRental: isBuyer ? '' : rentalByPeriod.hourly,
+        monthlyRental: isBuyer ? '' : rentalByPeriod.monthly,
+        weeklyRental: isBuyer ? '' : rentalByPeriod.weekly,
+        yearlyRental: isBuyer ? '' : rentalByPeriod.yearly,
+        salePrice: isBuyer || !offerSell ? '' : salePrice,
         units,
         location,
         media: persistedMedia,
@@ -268,29 +306,31 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     { label: t('equipmentListing.description'), value: description },
     ...(isBuyer
       ? []
-      : isRent
-        ? [
-            {
-              label: t('equipmentListing.hourlyRental', { currency: currency.code }),
-              value: hourlyRental ? `${currency.code} ${formatAmountWithCommas(hourlyRental)}` : '',
-            },
-            {
-              label: t('equipmentListing.weeklyRental', { currency: currency.code }),
-              value: weeklyRental ? `${currency.code} ${formatAmountWithCommas(weeklyRental)}` : '',
-            },
-            {
-              label: t('equipmentListing.monthlyRental', { currency: currency.code }),
-              value: monthlyRental
-                ? `${currency.code} ${formatAmountWithCommas(monthlyRental)}`
-                : '',
-            },
-          ]
-        : [
-            {
-              label: t('equipmentListing.salePrice'),
-              value: salePrice ? `${currency.code} ${formatAmountWithCommas(salePrice)}` : '',
-            },
-          ]),
+      : [
+          ...(offerRent
+            ? [
+                {
+                  label: t('equipmentListing.rentPeriod'),
+                  value:
+                    rentPeriodOptions.find((option) => option.value === rentPeriod)?.label ?? '',
+                },
+                {
+                  label: t('equipmentListing.rentalAmount', { currency: currency.code }),
+                  value: rentalAmount
+                    ? `${currency.code} ${formatAmountWithCommas(rentalAmount)}`
+                    : '',
+                },
+              ]
+            : []),
+          ...(offerSell
+            ? [
+                {
+                  label: t('equipmentListing.salePrice'),
+                  value: salePrice ? `${currency.code} ${formatAmountWithCommas(salePrice)}` : '',
+                },
+              ]
+            : []),
+        ]),
     { label: t('equipmentListing.units'), value: String(units) },
     {
       label: t('equipmentListing.listedUntil'),
@@ -320,7 +360,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             ? t('equipmentListing.modeTitle')
             : mode === 'sell'
               ? t('equipmentListing.sellFormTitle')
-              : t('equipmentListing.rentFormTitle')
+              : mode === 'both'
+                ? t('equipmentListing.bothFormTitle')
+                : t('equipmentListing.rentFormTitle')
         }
         onBackPress={handleBack}
         style={styles.header}
@@ -343,19 +385,19 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               <View style={styles.choiceRow}>
                 <OptionRowCard
                   compact
-                  selected={mode === 'rent'}
+                  selected={offerRent}
                   icon="key-outline"
                   title={t('equipmentListing.rent')}
                   subtitle={t('equipmentListing.rentSubtitle')}
-                  onPress={() => setMode('rent')}
+                  onPress={() => setOfferRent((current) => !current)}
                 />
                 <OptionRowCard
                   compact
-                  selected={mode === 'sell'}
+                  selected={offerSell}
                   icon="pricetag-outline"
                   title={t('equipmentListing.sell')}
                   subtitle={t('equipmentListing.sellSubtitle')}
-                  onPress={() => setMode('sell')}
+                  onPress={() => setOfferSell((current) => !current)}
                 />
               </View>
             ) : null}
@@ -390,37 +432,29 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               style={styles.descriptionInput}
             />
 
-            {!isBuyer && mode === 'rent' ? (
-              <View style={styles.priceRow}>
-                <View style={styles.priceInput}>
-                  <FormInput
-                    label={t('equipmentListing.hourlyRental', { currency: currency.code })}
-                    value={hourlyRental}
-                    onChangeText={setHourlyRental}
-                    keyboardType="numeric"
-                    placeholder={currency.code}
-                  />
-                </View>
-                <View style={styles.priceInput}>
-                  <FormInput
-                    label={t('equipmentListing.weeklyRental', { currency: currency.code })}
-                    value={weeklyRental}
-                    onChangeText={setWeeklyRental}
-                    keyboardType="numeric"
-                    placeholder={currency.code}
-                  />
-                </View>
-                <View style={styles.priceInput}>
-                  <FormInput
-                    label={t('equipmentListing.monthlyRental', { currency: currency.code })}
-                    value={monthlyRental}
-                    onChangeText={setMonthlyRental}
-                    keyboardType="numeric"
-                    placeholder={currency.code}
-                  />
-                </View>
-              </View>
-            ) : !isBuyer && mode === 'sell' ? (
+            {!isBuyer && offerRent ? (
+              <>
+                <SelectField
+                  label={t('equipmentListing.rentPeriod')}
+                  placeholder={t('equipmentListing.rentPeriodPlaceholder')}
+                  sheetTitle={t('equipmentListing.rentPeriod')}
+                  options={rentPeriodOptions}
+                  value={rentPeriod}
+                  onChange={(next) => setRentPeriod(next as RentPeriod)}
+                  required
+                />
+                <FormInput
+                  label={t('equipmentListing.rentalAmount', { currency: currency.code })}
+                  value={rentalAmount}
+                  onChangeText={setRentalAmount}
+                  keyboardType="numeric"
+                  placeholder={currency.code}
+                  required
+                />
+              </>
+            ) : null}
+
+            {!isBuyer && offerSell ? (
               <FormInput
                 label={t('equipmentListing.salePrice')}
                 value={salePrice}

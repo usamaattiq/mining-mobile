@@ -15,6 +15,7 @@ export type EquipmentListing = {
   hourlyRental: string;
   monthlyRental: string;
   weeklyRental: string;
+  yearlyRental: string;
   salePrice: string;
   units: number;
   location: string;

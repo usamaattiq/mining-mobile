@@ -261,7 +261,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
 
   const visibleEquipment = equipmentListings.filter((listing) => {
     if (filters.type === 'rent' || filters.type === 'sell') {
-      if (listing.mode !== filters.type) return false;
+      if (listing.mode !== filters.type && listing.mode !== 'both') return false;
     }
     if (!matchesListingKind(listing.equipmentTypeLabel)) return false;
     if (!inNumericRange(equipmentListingAmount(listing), priceMin, priceMax)) return false;

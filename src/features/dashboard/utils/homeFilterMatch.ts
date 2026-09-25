@@ -30,7 +30,13 @@ function firstAmount(...values: string[]): number | null {
 
 export function equipmentListingAmount(listing: EquipmentListing): number | null {
   if (listing.mode === 'sell') return parseFilterNumber(listing.salePrice);
-  return firstAmount(listing.hourlyRental, listing.weeklyRental, listing.monthlyRental);
+  return firstAmount(
+    listing.hourlyRental,
+    listing.weeklyRental,
+    listing.monthlyRental,
+    listing.yearlyRental,
+    listing.salePrice,
+  );
 }
 
 export function serviceListingAmount(listing: ServiceListing): number | null {

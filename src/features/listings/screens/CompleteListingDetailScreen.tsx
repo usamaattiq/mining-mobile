@@ -41,7 +41,7 @@ import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteListingDetail'>;
 type DetailRow = { label: string; value: string };
-type RentalDuration = 'hourly' | 'weekly' | 'monthly';
+type RentalDuration = 'hourly' | 'weekly' | 'monthly' | 'yearly';
 /** Loose shape covering both EquipmentMediaAsset and ServiceMediaAsset — this screen only needs id/uri/kind/name. */
 function formatListingDate(locale: string, epoch: number | null | undefined): string {
   if (!epoch) return '';
@@ -191,7 +191,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   let extraSection: React.ReactNode = null;
 
   if (category === 'equipment' && equipmentListing) {
-    const isRent = equipmentListing.mode === 'rent';
+    const offersRent = equipmentListing.mode === 'rent' || equipmentListing.mode === 'both';
+    const offersSell = equipmentListing.mode === 'sell' || equipmentListing.mode === 'both';
     title = equipmentListing.title;
     media = equipmentListing.media;
     description = equipmentListing.description ?? '';
@@ -225,7 +226,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       });
     }
 
-    const durationOptions = isRent
+    const durationOptions = offersRent
       ? (
           [
             equipmentListing.hourlyRental
@@ -252,6 +253,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   label: t('equipmentListing.monthlyBadge'),
                 }
               : null,
+            equipmentListing.yearlyRental
+              ? {
+                  key: 'yearly' as const,
+                  amount: equipmentListing.yearlyRental,
+                  unit: t('equipmentListing.yearlyUnit'),
+                  label: t('equipmentListing.yearlyBadge'),
+                }
+              : null,
           ] as const
         ).filter((option): option is NonNullable<typeof option> => option !== null)
       : [];
@@ -259,13 +268,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     const activeDuration =
       durationOptions.find((option) => option.key === selectedDuration) ?? durationOptions[0];
 
-    const price = isRent
-      ? activeDuration
-        ? { amount: activeDuration.amount, unit: activeDuration.unit }
-        : null
-      : equipmentListing.salePrice
+    const price = activeDuration
+      ? { amount: activeDuration.amount, unit: activeDuration.unit }
+      : offersSell && equipmentListing.salePrice
         ? { amount: equipmentListing.salePrice, unit: '' }
         : null;
+    if (offersSell && equipmentListing.salePrice && activeDuration) {
+      detailRows.push({
+        label: t('equipmentListing.salePrice'),
+        value: `${currency.code} ${formatAmountWithCommas(equipmentListing.salePrice)}`,
+      });
+    }
 
     priceNode =
       equipmentListing.postedAs === 'buyer' || !price ? null : (
@@ -414,9 +427,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     (equipmentListing && equipmentListing.postedAs !== 'buyer'
       ? {
           key: 'mode',
-          label: t(
-            equipmentListing.mode === 'rent' ? 'equipmentListing.rent' : 'equipmentListing.sell',
-          ),
+          label: [
+            equipmentListing.mode === 'rent' || equipmentListing.mode === 'both'
+              ? t('equipmentListing.rent')
+              : null,
+            equipmentListing.mode === 'sell' || equipmentListing.mode === 'both'
+              ? t('equipmentListing.sell')
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' · '),
           variant: 'accent' as const,
         }
       : null);

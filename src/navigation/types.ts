@@ -1,6 +1,6 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 
-export type EquipmentListingMode = 'rent' | 'sell';
+export type EquipmentListingMode = 'rent' | 'sell' | 'both';
 
 /** Top-level Requests-tab category — switchable, mirrors the Home action cards. */
 export type ListingCategory = 'equipment' | 'services' | 'gold';

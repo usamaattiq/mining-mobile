@@ -42,14 +42,11 @@ function priceText(currencyCode: string, amount: string): string | undefined {
   return amount ? `${currencyCode} ${formatAmountWithCommas(amount)}` : undefined;
 }
 
-function equipmentPrice(
+function rentalPrice(
   listing: EquipmentListing,
   t: TFunction,
   currencyCode: string,
 ): { priceText: string | undefined; priceUnit: string | undefined } {
-  if (listing.mode === 'sell') {
-    return { priceText: priceText(currencyCode, listing.salePrice), priceUnit: undefined };
-  }
   if (listing.hourlyRental) {
     return {
       priceText: priceText(currencyCode, listing.hourlyRental),
@@ -68,6 +65,12 @@ function equipmentPrice(
       priceUnit: t('equipmentListing.cardMonthlyUnit'),
     };
   }
+  if (listing.yearlyRental) {
+    return {
+      priceText: priceText(currencyCode, listing.yearlyRental),
+      priceUnit: t('equipmentListing.cardYearlyUnit'),
+    };
+  }
   return { priceText: undefined, priceUnit: undefined };
 }
 
@@ -84,9 +87,13 @@ export function buildListingCards({
 }: BuildListingCardsInput): ListingCardItem[] {
   if (category === 'equipment') {
     return equipmentListings.map((listing) => {
-      const isRent = listing.mode === 'rent';
-      const { priceText: amount, priceUnit } = equipmentPrice(listing, t, currencyCode);
-      const durationBadges = isRent
+      const offersRent = listing.mode === 'rent' || listing.mode === 'both';
+      const offersSell = listing.mode === 'sell' || listing.mode === 'both';
+      const rental = rentalPrice(listing, t, currencyCode);
+      const price = rental.priceText
+        ? rental
+        : { priceText: priceText(currencyCode, listing.salePrice), priceUnit: undefined };
+      const durationBadges = offersRent
         ? [
             listing.hourlyRental
               ? { key: 'hourly', label: t('equipmentListing.hourlyBadge') }
@@ -96,6 +103,9 @@ export function buildListingCards({
               : null,
             listing.monthlyRental
               ? { key: 'monthly', label: t('equipmentListing.monthlyBadge') }
+              : null,
+            listing.yearlyRental
+              ? { key: 'yearly', label: t('equipmentListing.yearlyBadge') }
               : null,
           ].filter((badge): badge is { key: string; label: string } => Boolean(badge))
         : [];
@@ -121,13 +131,11 @@ export function buildListingCards({
           listing.postedAs === 'buyer'
             ? []
             : [
-                {
-                  key: 'mode',
-                  label: t(isRent ? 'equipmentListing.rent' : 'equipmentListing.sell'),
-                },
-              ],
-        priceText: listing.postedAs === 'buyer' ? undefined : amount,
-        priceUnit,
+                offersRent ? { key: 'rent', label: t('equipmentListing.rent') } : null,
+                offersSell ? { key: 'sell', label: t('equipmentListing.sell') } : null,
+              ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
+        priceText: listing.postedAs === 'buyer' ? undefined : price.priceText,
+        priceUnit: price.priceUnit,
         createdAt: listing.createdAt,
         expiresAt: listing.rfq?.expiresAt ?? undefined,
         ended: listingHasEnded({
