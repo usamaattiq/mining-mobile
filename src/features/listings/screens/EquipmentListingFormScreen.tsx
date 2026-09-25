@@ -6,6 +6,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
+import { AppText } from '@/shared/components/AppText';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
@@ -433,35 +434,47 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             />
 
             {!isBuyer && offerRent ? (
-              <>
-                <SelectField
-                  label={t('equipmentListing.rentPeriod')}
-                  placeholder={t('equipmentListing.rentPeriodPlaceholder')}
-                  sheetTitle={t('equipmentListing.rentPeriod')}
-                  options={rentPeriodOptions}
-                  value={rentPeriod}
-                  onChange={(next) => setRentPeriod(next as RentPeriod)}
-                  required
-                />
-                <FormInput
-                  label={t('equipmentListing.rentalAmount', { currency: currency.code })}
-                  value={rentalAmount}
-                  onChangeText={setRentalAmount}
-                  keyboardType="numeric"
-                  placeholder={currency.code}
-                  required
-                />
-              </>
+              <View style={styles.priceRow}>
+                <View style={styles.priceInput}>
+                  <SelectField
+                    label={t('equipmentListing.rentPeriod')}
+                    placeholder={t('equipmentListing.rentPeriodPlaceholder')}
+                    sheetTitle={t('equipmentListing.rentPeriod')}
+                    options={rentPeriodOptions}
+                    value={rentPeriod}
+                    onChange={(next) => setRentPeriod(next as RentPeriod)}
+                    required
+                  />
+                </View>
+                <View style={styles.priceInput}>
+                  <FormInput
+                    label={t('equipmentListing.rentalAmount', { currency: currency.code })}
+                    value={rentalAmount}
+                    onChangeText={setRentalAmount}
+                    keyboardType="numeric"
+                    placeholder="0"
+                    required
+                    leftAdornment={<AppText style={styles.priceAdornment}>{currency.code}</AppText>}
+                    rightAdornment={
+                      <AppText style={styles.priceAdornment}>{t('rfq.pricePerUnit')}</AppText>
+                    }
+                  />
+                </View>
+              </View>
             ) : null}
 
             {!isBuyer && offerSell ? (
               <FormInput
-                label={t('equipmentListing.salePrice')}
+                label={t('equipmentListing.salePriceWithCurrency', { currency: currency.code })}
                 value={salePrice}
                 onChangeText={setSalePrice}
                 keyboardType="numeric"
-                placeholder={currency.code}
+                placeholder="0"
                 required
+                leftAdornment={<AppText style={styles.priceAdornment}>{currency.code}</AppText>}
+                rightAdornment={
+                  <AppText style={styles.priceAdornment}>{t('rfq.pricePerUnit')}</AppText>
+                }
               />
             ) : null}
 
@@ -611,10 +624,15 @@ const styles = StyleSheet.create({
   },
   priceRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: spacing.sm,
   },
   priceInput: {
     flex: 1,
+  },
+  priceAdornment: {
+    fontSize: 12,
+    color: palette.muted,
   },
   deliveryTypeBlock: {
     gap: spacing.md,

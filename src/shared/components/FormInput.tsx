@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     gap: spacing.xs,
     backgroundColor: palette.pureWhite,
+    minHeight: 52,
   },
   inputRowError: {
     borderColor: palette.danger,

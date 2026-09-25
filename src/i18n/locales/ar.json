@@ -322,6 +322,7 @@
     "rentPeriodPlaceholder": "اختر بالساعة أو أسبوعي أو شهري أو سنوي",
     "rentalAmount": "سعر الإيجار ({currency})",
     "salePrice": "سعر البيع",
+    "salePriceWithCurrency": "سعر البيع ({currency})",
     "hourlyBadge": "بالساعة",
     "monthlyBadge": "شهري",
     "weeklyBadge": "أسبوعي",

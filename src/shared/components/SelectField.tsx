@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 4,
+    minHeight: 52,
   },
   triggerCompact: {
     gap: spacing.xs,

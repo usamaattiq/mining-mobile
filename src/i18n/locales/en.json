@@ -342,6 +342,7 @@
     "rentPeriodPlaceholder": "Choose hourly, weekly, monthly, or yearly",
     "rentalAmount": "Rental price ({currency})",
     "salePrice": "Sale price",
+    "salePriceWithCurrency": "Sale price ({currency})",
     "hourlyBadge": "Hourly",
     "monthlyBadge": "Monthly",
     "weeklyBadge": "Weekly",
