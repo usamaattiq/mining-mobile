@@ -24,6 +24,8 @@ export type ListingCardProps = {
   durationBadges?: ListingCardBadge[];
   /** Delivery — top left. */
   deliveryBadge?: ListingCardBadge;
+  /** Buyer equipment: RFQ or Auction — top left of the card. */
+  requestBadge?: ListingCardBadge;
   /** Rent, sell, online, onsite — bottom left. */
   statusBadges?: ListingCardBadge[];
   priceText?: string;

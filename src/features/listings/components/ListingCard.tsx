@@ -91,6 +91,7 @@ export function ListingCard({
   typeBadge,
   city,
   deliveryBadge,
+  requestBadge,
   statusBadges,
   priceText,
   priceUnit,
@@ -154,6 +155,11 @@ export function ListingCard({
               <Ionicons name={placeholderIcon} size={36} color={palette.muted} />
             </View>
           )}
+          {requestBadge ? (
+            <View style={styles.gridRequestOverlay}>
+              <SmallBadge badge={requestBadge} />
+            </View>
+          ) : null}
           {typeBadge ? (
             <View style={styles.gridRfqOverlay}>
               <StatusBadge badge={typeBadge} />
@@ -237,6 +243,7 @@ export function ListingCard({
         <View style={styles.copy}>
           <View style={styles.topRow}>
             <View style={styles.topLeft}>
+              {requestBadge ? <SmallBadge badge={requestBadge} /> : null}
               {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
             </View>
             {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
@@ -321,6 +328,12 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
     gap: 4,
+  },
+  gridRequestOverlay: {
+    position: 'absolute',
+    top: spacing.xs + 2,
+    left: spacing.xs + 2,
+    zIndex: 1,
   },
   gridRfqOverlay: {
     position: 'absolute',

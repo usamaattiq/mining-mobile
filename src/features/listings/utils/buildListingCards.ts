@@ -118,6 +118,16 @@ export function buildListingCards({
         subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.postedAs === 'supplier' ? (listing.availableUnits ?? listing.units) : listing.units })}`,
         subtitleIcon: 'construct-outline',
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+        requestBadge:
+          listing.postedAs === 'buyer'
+            ? {
+                key: 'request-mode',
+                label:
+                  listing.requestMode === 'auction'
+                    ? t('equipmentListing.requestAuction')
+                    : t('equipmentListing.requestRfq'),
+              }
+            : undefined,
         city: cityFromLocation(listing.location),
         durationBadges,
         deliveryBadge: listing.postedAs !== 'buyer' && listing.deliveryAvailable
