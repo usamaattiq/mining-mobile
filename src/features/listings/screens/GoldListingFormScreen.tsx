@@ -164,6 +164,10 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
 
   const handlePublish = async () => {
     if (publishing) return;
+    if (!auctionStartDate || auctionStartDate.getTime() <= Date.now()) {
+      showAppAlert(t('common.error'), t('goldListing.auctionStartPast'));
+      return;
+    }
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
@@ -326,6 +330,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
               label={t('goldListing.auctionStartDate')}
               value={auctionStartDate}
               required
+              minimumDate={new Date()}
               placeholder={t('goldListing.auctionStartDatePlaceholder')}
               onChange={setAuctionStartDate}
             />

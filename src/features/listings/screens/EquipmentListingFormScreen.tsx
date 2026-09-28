@@ -272,8 +272,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
       return;
     }
-    if (isBuyer && requestMode === 'auction' && !auctionStartDate) {
-      showAppAlert(t('common.error'), t('goldListing.auctionStartDatePlaceholder'));
+    if (
+      isBuyer &&
+      requestMode === 'auction' &&
+      (!auctionStartDate || auctionStartDate.getTime() <= Date.now())
+    ) {
+      showAppAlert(t('common.error'), t('goldListing.auctionStartPast'));
       return;
     }
     setPublishing(true);
@@ -591,6 +595,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   label={t('goldListing.auctionStartDate')}
                   value={auctionStartDate}
                   required
+                  minimumDate={new Date()}
                   placeholder={t('goldListing.auctionStartDatePlaceholder')}
                   onChange={setAuctionStartDate}
                 />

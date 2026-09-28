@@ -488,6 +488,7 @@
     "price": "Starting Price ({currency})",
     "auctionStartDate": "Auction start date & time",
     "auctionStartDatePlaceholder": "Select date & time",
+    "auctionStartPast": "Choose an auction start time in the future.",
     "auctionDuration": "Auction duration",
     "auctionDurationHour": "1 hour",
     "auctionDurationHours": "{count} hours",

@@ -468,6 +468,7 @@
     "price": "سعر البدء ({currency})",
     "auctionStartDate": "تاريخ ووقت بدء المزاد",
     "auctionStartDatePlaceholder": "اختر التاريخ والوقت",
+    "auctionStartPast": "اختر وقت بدء المزاد في المستقبل.",
     "auctionDuration": "مدة المزاد",
     "auctionDurationHour": "ساعة واحدة",
     "auctionDurationHours": "{count} ساعات",

@@ -121,7 +121,10 @@ export function DateTimeField({
               themeVariant="light"
               textColor={palette.charcoal}
               style={styles.picker}
-              onChange={(_event, selected) => selected && setDraft(selected)}
+              onChange={(_event, selected) => {
+                if (!selected) return;
+                setDraft(minimumDate && selected < minimumDate ? new Date(minimumDate) : selected);
+              }}
             />
           </View>
           <Button label={t('common.done')} onPress={handleConfirm} style={styles.confirmButton} />
