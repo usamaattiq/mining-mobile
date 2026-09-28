@@ -11,6 +11,7 @@ import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
+import { DurationSlider, formatAuctionDurationLabel } from '@/features/listings/components/DurationSlider';
 import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
@@ -121,6 +122,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [units, setUnits] = React.useState(1);
   const [location, setLocation] = React.useState('');
   const [listedUntil, setListedUntil] = React.useState(defaultListingEnd);
+  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(null);
+  const [durationHours, setDurationHours] = React.useState(24);
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
     longitude: number;
@@ -220,7 +223,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     (isBuyer || media.length > 0) &&
     !mediaBusy &&
     location.trim().length > 0 &&
-    deliveryValid;
+    deliveryValid &&
+    (!isBuyer || requestMode !== 'auction' || auctionStartDate != null);
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const rentalByPeriod = {
@@ -264,8 +268,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
   const handlePublish = async () => {
     if (publishing || !mode) return;
-    if (isBuyer && listedUntil.getTime() <= Date.now()) {
+    if (isBuyer && requestMode === 'rfq' && listedUntil.getTime() <= Date.now()) {
       showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
+      return;
+    }
+    if (isBuyer && requestMode === 'auction' && !auctionStartDate) {
+      showAppAlert(t('common.error'), t('goldListing.auctionStartDatePlaceholder'));
       return;
     }
     setPublishing(true);
@@ -289,9 +297,20 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         deliveryType,
         deliveryPricePerKm,
         neededDate: null,
-        expiryHours: isBuyer ? expiryHoursUntil(listedUntil) : 24 * 365,
+        expiryHours:
+          isBuyer && requestMode === 'auction'
+            ? Math.max(1, Math.ceil(durationHours))
+            : isBuyer
+              ? expiryHoursUntil(listedUntil)
+              : 24 * 365,
         postedAs: useMarketplaceRoleStore.getState().role,
         requestMode: isBuyer ? requestMode : 'rfq',
+        ...(isBuyer && requestMode === 'auction' && auctionStartDate
+          ? {
+              auctionStartDate: auctionStartDate.getTime(),
+              auctionEndDate: auctionStartDate.getTime() + durationHours * 60 * 60 * 1000,
+            }
+          : {}),
       });
       if (isEquipmentListing(listing)) addListing(listing);
       navigation.reset({
@@ -343,7 +362,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             : []),
         ]),
     { label: t('equipmentListing.units'), value: String(units) },
-    ...(isBuyer
+    ...(isBuyer && requestMode === 'rfq'
       ? [
           {
             label: t('equipmentListing.listedUntil'),
@@ -351,6 +370,23 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               dateStyle: 'medium',
               timeStyle: 'short',
             }).format(listedUntil),
+          },
+        ]
+      : []),
+    ...(isBuyer && requestMode === 'auction'
+      ? [
+          {
+            label: t('goldListing.auctionStartDate'),
+            value: auctionStartDate
+              ? new Intl.DateTimeFormat(currentLanguage, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }).format(auctionStartDate)
+              : '',
+          },
+          {
+            label: t('goldListing.auctionDuration'),
+            value: formatAuctionDurationLabel(durationHours, t),
           },
         ]
       : []),
@@ -539,7 +575,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onBusyChange={setMediaBusy}
               required={!isBuyer}
             />
-            {isBuyer ? (
+            {isBuyer && requestMode === 'rfq' ? (
               <DateTimeField
                 label={t('equipmentListing.listedUntil')}
                 value={listedUntil}
@@ -548,6 +584,22 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 placeholder={t('equipmentListing.listedUntilPlaceholder')}
                 onChange={setListedUntil}
               />
+            ) : null}
+            {isBuyer && requestMode === 'auction' ? (
+              <>
+                <DateTimeField
+                  label={t('goldListing.auctionStartDate')}
+                  value={auctionStartDate}
+                  required
+                  placeholder={t('goldListing.auctionStartDatePlaceholder')}
+                  onChange={setAuctionStartDate}
+                />
+                <DurationSlider
+                  label={t('goldListing.auctionDuration')}
+                  value={durationHours}
+                  onChange={setDurationHours}
+                />
+              </>
             ) : null}
             <LocationField
               label={t('equipmentListing.location')}

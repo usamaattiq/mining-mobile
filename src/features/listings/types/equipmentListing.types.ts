@@ -26,6 +26,8 @@ export type EquipmentListing = {
   deliveryPricePerKm: string;
   postedAs: 'buyer' | 'supplier';
   requestMode?: 'rfq' | 'auction';
+  auctionStartDate?: number | null;
+  auctionEndDate?: number | null;
   ownerId?: string;
   owner?: ListingOwner;
   rfq?: ListingRfq;
