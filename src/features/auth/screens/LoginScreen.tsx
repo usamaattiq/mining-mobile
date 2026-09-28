@@ -359,6 +359,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       canContinue={canContinue && !submitting}
       continueLabel={continueLabel}
       onContinue={handleContinue}
+      avoidKeyboard={step !== 'mpin' && step !== 'forgotNewMpin' && step !== 'forgotConfirmMpin'}
     >
       {step === 'phone' ? (
         <View style={styles.form}>

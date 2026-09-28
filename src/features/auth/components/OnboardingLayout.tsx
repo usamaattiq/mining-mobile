@@ -29,6 +29,7 @@ export function OnboardingLayout({
   continueLabel = 'Continue',
   showFooter = true,
   showProgress = true,
+  avoidKeyboard = true,
   children,
 }: OnboardingLayoutProps): React.ReactElement {
   const insets = useSafeAreaInsets();
@@ -79,6 +80,7 @@ export function OnboardingLayout({
           bounces={false}
           bottomOffset={12}
           extraKeyboardSpace={0}
+          enabled={avoidKeyboard}
         >
           {children}
 

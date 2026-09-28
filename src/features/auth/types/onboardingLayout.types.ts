@@ -14,5 +14,7 @@ export type OnboardingLayoutProps = {
   showFooter?: boolean;
   /** Hide the "Step X of Y" label and progress bar (e.g. login, which isn't a linear wizard). */
   showProgress?: boolean;
+  /** When false, the sheet stays put while the keyboard is open. */
+  avoidKeyboard?: boolean;
   children: ReactNode;
 };
