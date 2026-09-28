@@ -60,6 +60,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const currency = useCurrency();
   const role = useMarketplaceRoleStore((state) => state.role);
   const isBuyer = role === 'buyer';
+  const [requestMode, setRequestMode] = React.useState<'rfq' | 'auction'>('rfq');
   const [offerRent, setOfferRent] = React.useState(false);
   const [offerSell, setOfferSell] = React.useState(isBuyer);
   const mode = offerRent && offerSell ? 'both' : offerRent ? 'rent' : offerSell ? 'sell' : null;
@@ -171,6 +172,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     );
     setSalePrice(isBuyer ? '' : sourceListing.salePrice ?? '');
     setUnits(Math.max(sourceListing.units ?? 1, 1));
+    if (sourceListing.requestMode === 'auction' || sourceListing.requestMode === 'rfq') {
+      setRequestMode(sourceListing.requestMode);
+    }
     setLocation(sourceListing.location ?? '');
     setMedia(
       cloneRepostMedia(
@@ -208,7 +212,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         (offerSell ? Boolean(salePrice.trim()) : true))),
   );
   const deliveryValid =
-    !deliveryAvailable || deliveryType === 'free' || deliveryPricePerKm.trim().length > 0;
+    isBuyer ||
+    !deliveryAvailable ||
+    deliveryType === 'free' ||
+    deliveryPricePerKm.trim().length > 0;
   const mediaValid =
     (isBuyer || media.length > 0) &&
     !mediaBusy &&
@@ -278,12 +285,13 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         units,
         location,
         media: persistedMedia,
-        deliveryAvailable,
+        deliveryAvailable: isBuyer ? false : deliveryAvailable,
         deliveryType,
         deliveryPricePerKm,
         neededDate: null,
         expiryHours: isBuyer ? expiryHoursUntil(listedUntil) : 24 * 365,
         postedAs: useMarketplaceRoleStore.getState().role,
+        requestMode: isBuyer ? requestMode : 'rfq',
       });
       if (isEquipmentListing(listing)) addListing(listing);
       navigation.reset({
@@ -349,7 +357,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
-  const deliverySubtitle = deliveryAvailable
+  const deliverySubtitle = !isBuyer && deliveryAvailable
     ? deliveryType === 'free'
       ? t('equipmentListing.deliveryFree')
       : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(deliveryPricePerKm)}`
@@ -388,6 +396,26 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>
+            {isBuyer ? (
+              <View style={styles.choiceRow}>
+                <OptionRowCard
+                  compact
+                  selected={requestMode === 'rfq'}
+                  icon="document-text-outline"
+                  title={t('equipmentListing.requestRfq')}
+                  subtitle={t('equipmentListing.requestRfqSubtitle')}
+                  onPress={() => setRequestMode('rfq')}
+                />
+                <OptionRowCard
+                  compact
+                  selected={requestMode === 'auction'}
+                  icon="hammer-outline"
+                  title={t('equipmentListing.requestAuction')}
+                  subtitle={t('equipmentListing.requestAuctionSubtitle')}
+                  onPress={() => setRequestMode('auction')}
+                />
+              </View>
+            ) : null}
             {!isBuyer ? (
               <View style={styles.choiceRow}>
                 <OptionRowCard
@@ -530,14 +558,16 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onUseCurrentLocation={() => void handleUseCurrentLocation()}
               onSelectOnMap={handleSelectOnMap}
             />
+            {!isBuyer ? (
             <ToggleRow
               title={t('equipmentListing.deliveryAvailable')}
               subtitle={t('equipmentListing.deliveryAvailableSubtitle')}
               enabled={deliveryAvailable}
               onToggle={setDeliveryAvailable}
             />
+            ) : null}
 
-            {deliveryAvailable ? (
+            {!isBuyer && deliveryAvailable ? (
               <View style={styles.deliveryTypeBlock}>
                 <SegmentedSwitcher
                   value={deliveryType}
@@ -567,7 +597,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           <EquipmentListingReview
             detailRows={detailRows}
             media={media}
-            deliveryAvailable={deliveryAvailable}
+            deliveryAvailable={!isBuyer && deliveryAvailable}
             deliverySubtitle={deliverySubtitle}
             onChangeDetails={() => setStep(0)}
             onChangeMedia={() => setStep(1)}

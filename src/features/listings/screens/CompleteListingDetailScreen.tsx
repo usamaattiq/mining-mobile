@@ -258,7 +258,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           ]),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
-    if (equipmentListing.deliveryAvailable) {
+    if (equipmentListing.postedAs !== 'buyer' && equipmentListing.deliveryAvailable) {
       detailRows.push({
         label: t('equipmentListing.deliveryBadge'),
         ...(equipmentListing.deliveryType === 'free'

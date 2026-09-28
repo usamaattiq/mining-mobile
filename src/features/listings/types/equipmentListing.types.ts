@@ -25,6 +25,7 @@ export type EquipmentListing = {
   deliveryType: DeliveryType;
   deliveryPricePerKm: string;
   postedAs: 'buyer' | 'supplier';
+  requestMode?: 'rfq' | 'auction';
   ownerId?: string;
   owner?: ListingOwner;
   rfq?: ListingRfq;

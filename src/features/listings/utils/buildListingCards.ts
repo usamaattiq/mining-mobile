@@ -120,7 +120,7 @@ export function buildListingCards({
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
         city: cityFromLocation(listing.location),
         durationBadges,
-        deliveryBadge: listing.deliveryAvailable
+        deliveryBadge: listing.postedAs !== 'buyer' && listing.deliveryAvailable
           ? {
               key: 'delivery',
               label: t('equipmentListing.deliveryBadge'),
