@@ -18,10 +18,16 @@ export type ListingOfferComposerProps = {
   showInput: boolean;
   awaitingConfirm: boolean;
   submitting: boolean;
-  fulfillmentModes?: Array<'rent' | 'sale'>;
+  fulfillmentModes?: Array<'rent' | 'sale' | 'onsite' | 'online'>;
+  fulfillmentLabels?: Partial<Record<'rent' | 'sale' | 'onsite' | 'online', string>>;
   fulfillmentRentLabel?: string;
   fulfillmentSaleLabel?: string;
-  onSubmit: (price: string, units?: number, fulfillment?: 'rent' | 'sale') => void;
+  offerChoiceLabel?: string;
+  onSubmit: (
+    price: string,
+    units?: number,
+    fulfillment?: 'rent' | 'sale' | 'onsite' | 'online',
+  ) => void;
   onConfirm: () => void;
   onDecline: () => void;
   footer?: ReactNode;

@@ -85,6 +85,7 @@ export const listingsApi = {
     price: string,
     units?: number,
     fulfillment?: 'rent' | 'sale',
+    delivery?: 'onsite' | 'online',
   ): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers`, {
       method: 'POST',
@@ -92,6 +93,7 @@ export const listingsApi = {
         price,
         ...(units != null ? { units } : {}),
         ...(fulfillment ? { fulfillment } : {}),
+        ...(delivery ? { delivery } : {}),
       },
     });
   },

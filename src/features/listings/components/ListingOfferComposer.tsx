@@ -30,8 +30,10 @@ export function ListingOfferComposer({
   awaitingConfirm,
   submitting,
   fulfillmentModes,
+  fulfillmentLabels,
   fulfillmentRentLabel,
   fulfillmentSaleLabel,
+  offerChoiceLabel,
   onSubmit,
   onConfirm,
   onDecline,
@@ -43,7 +45,7 @@ export function ListingOfferComposer({
   const keyboardVisible = useKeyboardState((state) => state.isVisible);
   const [price, setPrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
-  const [fulfillment, setFulfillment] = React.useState<'rent' | 'sale'>(
+  const [fulfillment, setFulfillment] = React.useState<'rent' | 'sale' | 'onsite' | 'online'>(
     fulfillmentModes?.[0] ?? 'sale',
   );
   const unitCap = Math.max(maxUnits ?? 1, 1);
@@ -97,6 +99,9 @@ export function ListingOfferComposer({
             ) : null}
             {offerUnitsLabel && !(submittedUnitAmount != null && submittedUnits) ? (
               <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
+            ) : null}
+            {offerChoiceLabel ? (
+              <AppText style={styles.cardUnits}>{offerChoiceLabel}</AppText>
             ) : null}
             {leading ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
           </View>
@@ -159,7 +164,8 @@ export function ListingOfferComposer({
                       weight="semibold"
                       style={[styles.fulfillmentLabel, selected && styles.fulfillmentLabelSelected]}
                     >
-                      {mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel}
+                      {fulfillmentLabels?.[mode] ??
+                        (mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel)}
                     </AppText>
                   </Pressable>
                 );

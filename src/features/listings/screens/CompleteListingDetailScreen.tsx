@@ -490,10 +490,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         }
       : null);
 
-  const handleSubmitOffer = (price: string, units?: number, fulfillment?: 'rent' | 'sale') => {
+  const handleSubmitOffer = (
+    price: string,
+    units?: number,
+    choice?: 'rent' | 'sale' | 'onsite' | 'online',
+  ) => {
+    const fulfillment = choice === 'rent' || choice === 'sale' ? choice : undefined;
+    const delivery = choice === 'onsite' || choice === 'online' ? choice : undefined;
     setOfferSubmitting(true);
     void listingsApi
-      .submitOffer(id, price, category === 'equipment' ? units : undefined, fulfillment)
+      .submitOffer(id, price, category === 'equipment' ? units : undefined, fulfillment, delivery)
       .then((listing) => {
         applyListing(listing);
       })
@@ -848,10 +854,25 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 : equipmentListing.mode === 'sell'
                   ? ['sale']
                   : ['rent']
-              : undefined
+              : category === 'services' && serviceListing?.serviceType === 'both'
+                ? ['onsite', 'online']
+                : undefined
           }
+          fulfillmentLabels={{
+            rent: t('equipmentListing.rent'),
+            sale: t('equipmentListing.buy'),
+            onsite: t('serviceListing.onsite'),
+            online: t('serviceListing.online'),
+          }}
           fulfillmentRentLabel={t('equipmentListing.rent')}
           fulfillmentSaleLabel={t('equipmentListing.buy')}
+          offerChoiceLabel={
+            rfq?.myOfferDelivery === 'onsite'
+              ? t('serviceListing.onsite')
+              : rfq?.myOfferDelivery === 'online'
+                ? t('serviceListing.online')
+                : undefined
+          }
           hasOffer={hasSentOffer}
           leading={category === 'gold' && Boolean(rfq?.isLeading)}
           showInput={showOfferInput}

@@ -98,6 +98,13 @@ export function ListingOffersPanel({
                   </View>
                 ) : null}
               </View>
+              {offer.delivery ? (
+                <AppText style={styles.kind}>
+                  {offer.delivery === 'onsite'
+                    ? t('serviceListing.onsite')
+                    : t('serviceListing.online')}
+                </AppText>
+              ) : null}
               {showUnits && offer.kind ? (
                 <AppText style={styles.kind}>
                   {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
