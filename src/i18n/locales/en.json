@@ -48,6 +48,8 @@
     "withdrawConfirmMessage": "This will remove your offer from this listing.",
     "waitingForConfirmation": "Waiting for the other party to confirm.",
     "actionFailed": "Could not update this offer. Try again.",
+    "noUnitsAvailable": "No units available",
+    "lessUnitsAvailable": "Less units available",
     "offerStatus": {
       "active": "New",
       "selected": "Awaiting confirmation",

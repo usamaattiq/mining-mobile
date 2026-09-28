@@ -474,6 +474,22 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   };
 
   const handleDecideOffer = (offerId: string, action: 'accept' | 'reject') => {
+    if (
+      action === 'accept' &&
+      category === 'equipment' &&
+      equipmentListing?.postedAs === 'supplier'
+    ) {
+      const requested =
+        rfq?.offers?.find((offer) => offer.id === offerId)?.quantity ?? 1;
+      if (unitsLeft <= 0) {
+        showAppAlert(t('rfq.noUnitsAvailable'));
+        return;
+      }
+      if (requested > unitsLeft) {
+        showAppAlert(t('rfq.lessUnitsAvailable'));
+        return;
+      }
+    }
     setActingOfferId(offerId);
     const request =
       action === 'accept' ? listingsApi.acceptOffer : listingsApi.rejectOffer;
@@ -483,6 +499,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       })
       .catch((error: unknown) => {
         const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+        if (message === 'No units available') {
+          showAppAlert(t('rfq.noUnitsAvailable'));
+          return;
+        }
+        if (message === 'Less units available') {
+          showAppAlert(t('rfq.lessUnitsAvailable'));
+          return;
+        }
         showAppAlert(t('common.error'), message);
       })
       .finally(() => setActingOfferId(null));

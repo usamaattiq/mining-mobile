@@ -48,6 +48,8 @@
     "withdrawConfirmMessage": "سيتم إزالة عرضك من هذا الإعلان.",
     "waitingForConfirmation": "بانتظار تأكيد الطرف الآخر.",
     "actionFailed": "تعذر تحديث هذا العرض. حاول مرة أخرى.",
+    "noUnitsAvailable": "لا توجد وحدات متاحة",
+    "lessUnitsAvailable": "الوحدات المتاحة أقل من المطلوب",
     "offerStatus": {
       "active": "جديد",
       "selected": "بانتظار التأكيد",
