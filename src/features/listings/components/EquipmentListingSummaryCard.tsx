@@ -56,6 +56,17 @@ export function EquipmentListingSummaryCard({
                     {row.hint}
                   </AppText>
                 ) : null}
+                {row.onEdit ? (
+                  <Pressable
+                    onPress={row.onEdit}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('common.change')}
+                    style={styles.editButton}
+                  >
+                    <Ionicons name="pencil" size={14} color={palette.gold} />
+                  </Pressable>
+                ) : null}
               </View>
             </View>
           ))}
@@ -174,6 +185,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.charcoal,
     textAlign: 'right',
+  },
+  editButton: {
+    width: 28,
+    height: 28,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   description: {
     fontSize: 14,

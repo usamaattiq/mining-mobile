@@ -23,7 +23,9 @@ import type { ListingDto } from '@/features/listings/api/listingsApi';
 import { ListingMessageSheet } from '@/features/listings/components/ListingMessageSheet';
 import { ListingOfferComposer } from '@/features/listings/components/ListingOfferComposer';
 import { ListingOffersPanel } from '@/features/listings/components/ListingOffersPanel';
+import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { Button } from '@/shared/components/Button';
+import { CounterField } from '@/shared/components/CounterField';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -40,7 +42,12 @@ import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteListingDetail'>;
-type DetailRow = { label: string; value: string };
+type DetailRow = {
+  label: string;
+  value: string;
+  hint?: string;
+  onEdit?: () => void;
+};
 type RentalDuration = 'hourly' | 'weekly' | 'monthly' | 'yearly';
 /** Loose shape covering both EquipmentMediaAsset and ServiceMediaAsset — this screen only needs id/uri/kind/name. */
 function formatListingDate(locale: string, epoch: number | null | undefined): string {
@@ -78,6 +85,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   );
   const [fetchedListing, setFetchedListing] = React.useState<ListingDto | null>(null);
   const [loadFailed, setLoadFailed] = React.useState(false);
+  const [unitsEditorOpen, setUnitsEditorOpen] = React.useState(false);
+  const [editUnits, setEditUnits] = React.useState(1);
+  const [savingUnits, setSavingUnits] = React.useState(false);
 
   const applyListing = React.useCallback((listing: ListingDto) => {
     setFetchedListing(listing);
@@ -204,6 +214,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     media = equipmentListing.media;
     description = equipmentListing.description ?? '';
     location = equipmentListing.location ?? '';
+    const ownerCanEditUnits =
+      equipmentListing.postedAs === 'supplier' &&
+      Boolean(
+        profileId && (equipmentListing.ownerId ?? equipmentListing.owner?.id) === profileId,
+      );
     detailRows = [
       { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
       {
@@ -215,6 +230,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         value: String(
           equipmentListing.postedAs === 'supplier' ? unitsLeft : equipmentListing.units,
         ),
+        ...(ownerCanEditUnits
+          ? {
+              onEdit: () => {
+                setEditUnits(unitsLeft);
+                setUnitsEditorOpen(true);
+              },
+            }
+          : {}),
       },
       {
         label: t('equipmentListing.neededDate'),
@@ -774,6 +797,50 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         />
       ) : null}
 
+      {equipmentListing?.postedAs === 'supplier' ? (
+        <AppBottomSheet
+          visible={unitsEditorOpen}
+          onClose={() => setUnitsEditorOpen(false)}
+          fitContent
+        >
+          <View style={styles.unitsEditor}>
+            <CounterField
+              label={t('equipmentListing.availableUnits')}
+              value={editUnits}
+              onChange={setEditUnits}
+              min={Math.max(equipmentListing.units - unitsLeft, 0) === 0 ? 1 : 0}
+              max={9999}
+              required
+            />
+            <Button
+              label={t('equipmentListing.saveUnits')}
+              loading={savingUnits}
+              disabled={editUnits === unitsLeft}
+              onPress={() => {
+                const reserved = Math.max(equipmentListing.units - unitsLeft, 0);
+                setSavingUnits(true);
+                void listingsApi
+                  .updateEquipmentUnits(id, reserved + editUnits)
+                  .then(() => listingsApi.get(id))
+                  .then((listing) => {
+                    applyListing(listing);
+                    setUnitsEditorOpen(false);
+                  })
+                  .catch((error: unknown) => {
+                    const message = error instanceof ApiError ? error.message : '';
+                    if (message.includes('already rented or sold')) {
+                      showAppAlert(t('equipmentListing.unitsBelowCommitted'));
+                      return;
+                    }
+                    showAppAlert(t('common.error'), message || t('common.error'));
+                  })
+                  .finally(() => setSavingUnits(false));
+              }}
+            />
+          </View>
+        </AppBottomSheet>
+      ) : null}
+
       <EquipmentImageViewerModal
         visible={viewerIndex !== null}
         media={visualMedia}
@@ -978,5 +1045,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.muted,
     textAlign: 'center',
+  },
+  unitsEditor: {
+    gap: spacing.md,
+    paddingBottom: spacing.md,
   },
 });

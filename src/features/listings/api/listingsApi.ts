@@ -96,6 +96,10 @@ export const listingsApi = {
     return apiFetch(`/listings/${id}/stock`);
   },
 
+  updateEquipmentUnits(id: string, units: number): Promise<EquipmentStock> {
+    return apiFetch(`/listings/${id}/stock`, { method: 'PATCH', body: { units } });
+  },
+
   returnRentedUnits(id: string, holdId: string): Promise<EquipmentStock> {
     return apiFetch(`/listings/${id}/stock/${holdId}/return`, { method: 'POST', body: {} });
   },

@@ -5,6 +5,7 @@ export type EquipmentListingReviewRow = {
   value: string;
   /** Smaller grey text shown after the value, e.g. "Per KM". */
   hint?: string;
+  onEdit?: () => void;
 };
 
 export type EquipmentListingReviewProps = {
