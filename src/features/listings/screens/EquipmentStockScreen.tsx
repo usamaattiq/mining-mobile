@@ -1,12 +1,10 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
+import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { showAppAlert } from '@/shared/services/appAlert';
@@ -23,7 +21,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentStock'>;
 export function EquipmentStockScreen({ navigation, route }: Props): React.ReactElement {
   const { id } = route.params;
   const { t } = useTranslation(undefined, { i18n: appI18n });
-  const insets = useSafeAreaInsets();
   const [stock, setStock] = React.useState<EquipmentStock | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [returningId, setReturningId] = React.useState<string | null>(null);
@@ -60,26 +57,25 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
   const returned = stock?.holds.filter((hold) => hold.status === 'returned') ?? [];
 
   return (
-    <View style={styles.root}>
-      <StatusBar style="dark" />
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={styles.back}>
-          <Ionicons name="chevron-back" size={22} color={palette.charcoal} />
-        </Pressable>
-        <AppText weight="bold" style={styles.title}>
-          {t('equipmentListing.stockTitle')}
-        </AppText>
-      </View>
-
+    <GoldSheetScreen
+      title={t('equipmentListing.stockTitle')}
+      left="back"
+      onBackPress={() => navigation.goBack()}
+      contentContainerStyle={styles.content}
+    >
       {loading && !stock ? (
         <ActivityIndicator color={palette.gold} style={styles.loader} />
       ) : (
-        <ScrollView contentContainerStyle={styles.content}>
+        <>
           <View style={styles.tiles}>
             <Tile label={t('equipmentListing.stockAvailable')} value={stock?.availableUnits ?? 0} />
             <Tile label={t('equipmentListing.stockOnRent')} value={stock?.rentUnits ?? 0} />
             <Tile label={t('equipmentListing.stockSold')} value={stock?.saleUnits ?? 0} />
           </View>
+
+          <AppText weight="bold" style={styles.sectionTitle}>
+            {t('equipmentListing.stockRecords')}
+          </AppText>
 
           {active.length === 0 && returned.length === 0 ? (
             <AppText style={styles.empty}>{t('equipmentListing.stockEmpty')}</AppText>
@@ -115,9 +111,9 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
               </AppText>
             </View>
           ))}
-        </ScrollView>
+        </>
       )}
-    </View>
+    </GoldSheetScreen>
   );
 }
 
@@ -133,21 +129,6 @@ function Tile({ label, value }: { label: string; value: number }): React.ReactEl
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: palette.pureWhite },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  back: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: { fontSize: 20, color: palette.charcoal },
   loader: { marginTop: spacing.xxl },
   content: { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
   tiles: { flexDirection: 'row', gap: spacing.sm },
@@ -160,6 +141,7 @@ const styles = StyleSheet.create({
   },
   tileValue: { fontSize: 22, color: palette.charcoal },
   tileLabel: { fontSize: 12, color: palette.muted },
+  sectionTitle: { fontSize: 16, color: palette.charcoal, marginTop: spacing.sm },
   empty: { color: palette.muted, fontSize: 14 },
   card: {
     borderWidth: 1,

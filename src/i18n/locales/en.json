@@ -377,6 +377,7 @@
     "stockSold": "Sold",
     "returnToCatalog": "Return to catalog",
     "stockEmpty": "No accepted rent or sale deals yet.",
+    "stockRecords": "Deals",
     "editUnits": "Catalog units",
     "saveUnits": "Save units",
     "unitsBelowCommitted": "Units cannot be less than those already rented or sold.",

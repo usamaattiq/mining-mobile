@@ -357,6 +357,7 @@
     "stockSold": "مباعة",
     "returnToCatalog": "إرجاع إلى الكتالوج",
     "stockEmpty": "لا توجد صفقات إيجار أو بيع مقبولة بعد.",
+    "stockRecords": "الصفقات",
     "editUnits": "وحدات الكتالوج",
     "saveUnits": "حفظ الوحدات",
     "unitsBelowCommitted": "لا يمكن أن تقل الوحدات عن المؤجرة أو المباعة.",
