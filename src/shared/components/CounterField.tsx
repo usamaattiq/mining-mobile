@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
+import { KeyboardDoneBar } from '@/shared/components/KeyboardDoneBar';
 import { palette, radius, spacing } from '@/theme';
 import type { CounterFieldProps } from '@/shared/types/counterField.types';
 
@@ -16,6 +17,7 @@ export function CounterField({
   required,
 }: CounterFieldProps): React.ReactElement {
   const [text, setText] = React.useState(String(value));
+  const accessoryId = React.useId();
 
   React.useEffect(() => {
     setText(String(value));
@@ -73,6 +75,7 @@ export function CounterField({
           onChangeText={handleChangeText}
           onBlur={handleBlur}
           keyboardType="numeric"
+          inputAccessoryViewID={accessoryId}
           style={styles.input}
           textAlign="center"
         />
@@ -91,6 +94,7 @@ export function CounterField({
           <Ionicons name="add" size={18} color={palette.pureWhite} />
         </Pressable>
       </View>
+      <KeyboardDoneBar nativeID={accessoryId} onDone={handleBlur} />
     </View>
   );
 }
