@@ -46,21 +46,11 @@ export function EquipmentListingSummaryCard({
                 index === detailRows.length - 1 && !descriptionText && styles.rowLast,
               ]}
             >
-              {row.onEdit ? (
+              <AppText style={styles.rowLabel}>{row.label}</AppText>
+              <View style={styles.rowValueWrap}>
                 <AppText weight="semibold" style={styles.rowValue} numberOfLines={1}>
                   {row.value}
                 </AppText>
-              ) : (
-                <AppText style={styles.rowLabel}>{row.label}</AppText>
-              )}
-              <View style={styles.rowValueWrap}>
-                {row.onEdit ? (
-                  <AppText style={styles.rowLabel}>{row.label}</AppText>
-                ) : (
-                  <AppText weight="semibold" style={styles.rowValue} numberOfLines={1}>
-                    {row.value}
-                  </AppText>
-                )}
                 {row.hint ? (
                   <AppText style={styles.rowHint} numberOfLines={1}>
                     {row.hint}

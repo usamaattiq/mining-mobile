@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -14,7 +15,7 @@ import {
   type EquipmentStock,
   type EquipmentStockHold,
 } from '@/features/listings/api/listingsApi';
-import { palette, radius, spacing } from '@/theme';
+import { cardBackShadow, palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentStock'>;
 
@@ -68,9 +69,21 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
       ) : (
         <>
           <View style={styles.tiles}>
-            <Tile label={t('equipmentListing.stockAvailable')} value={stock?.availableUnits ?? 0} />
-            <Tile label={t('equipmentListing.stockOnRent')} value={stock?.rentUnits ?? 0} />
-            <Tile label={t('equipmentListing.stockSold')} value={stock?.saleUnits ?? 0} />
+            <Tile
+              icon="cube-outline"
+              label={t('equipmentListing.stockAvailable')}
+              value={stock?.availableUnits ?? 0}
+            />
+            <Tile
+              icon="key-outline"
+              label={t('equipmentListing.stockOnRent')}
+              value={stock?.rentUnits ?? 0}
+            />
+            <Tile
+              icon="pricetag-outline"
+              label={t('equipmentListing.stockSold')}
+              value={stock?.saleUnits ?? 0}
+            />
           </View>
 
           <AppText weight="bold" style={styles.sectionTitle}>
@@ -78,38 +91,43 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
           </AppText>
 
           {active.length === 0 && returned.length === 0 ? (
-            <AppText style={styles.empty}>{t('equipmentListing.stockEmpty')}</AppText>
+            <View style={styles.emptyCard}>
+              <Ionicons name="file-tray-outline" size={28} color={palette.gold} />
+              <AppText style={styles.empty}>{t('equipmentListing.stockEmpty')}</AppText>
+            </View>
           ) : null}
 
           {active.map((hold) => (
-            <View key={hold.id} style={styles.card}>
-              <AppText weight="semibold" style={styles.cardTitle}>
-                {hold.buyerName} · {hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
-              </AppText>
-              <AppText style={styles.cardMeta}>
-                {t('equipmentListing.unitsCount', { count: hold.units })}
-              </AppText>
-              {hold.kind === 'rent' && hold.status === 'active' ? (
-                <Button
-                  label={t('equipmentListing.returnToCatalog')}
-                  variant="outline"
-                  loading={returningId === hold.id}
-                  disabled={returningId != null}
-                  onPress={() => returnHold(hold)}
-                />
-              ) : null}
-            </View>
+            <DealCard
+              key={hold.id}
+              hold={hold}
+              dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
+              kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+              unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
+              action={
+                hold.kind === 'rent' && hold.status === 'active' ? (
+                  <Button
+                    label={t('equipmentListing.returnToCatalog')}
+                    variant="outline"
+                    loading={returningId === hold.id}
+                    disabled={returningId != null}
+                    onPress={() => returnHold(hold)}
+                  />
+                ) : null
+              }
+            />
           ))}
 
           {returned.map((hold) => (
-            <View key={hold.id} style={[styles.card, styles.cardMuted]}>
-              <AppText weight="semibold" style={styles.cardTitle}>
-                {hold.buyerName} · {t('equipmentListing.rent')}
-              </AppText>
-              <AppText style={styles.cardMeta}>
-                {t('equipmentListing.unitsCount', { count: hold.units })} · {t('equipmentListing.stockReturned')}
-              </AppText>
-            </View>
+            <DealCard
+              key={hold.id}
+              hold={hold}
+              muted
+              dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
+              kindLabel={t('equipmentListing.rent')}
+              unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
+              statusLabel={t('equipmentListing.stockReturned')}
+            />
           ))}
         </>
       )}
@@ -117,13 +135,65 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
   );
 }
 
-function Tile({ label, value }: { label: string; value: number }): React.ReactElement {
+function Tile({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  value: number;
+}): React.ReactElement {
   return (
-    <View style={styles.tile}>
+    <View style={[styles.tile, cardBackShadow]}>
+      <Ionicons name={icon} size={18} color={palette.gold} />
       <AppText weight="bold" style={styles.tileValue}>
         {value}
       </AppText>
       <AppText style={styles.tileLabel}>{label}</AppText>
+    </View>
+  );
+}
+
+function formatDealDate(locale: string, epoch: number): string {
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(epoch));
+}
+
+function DealCard({
+  hold,
+  dateLabel,
+  kindLabel,
+  unitsLabel,
+  statusLabel,
+  muted = false,
+  action,
+}: {
+  hold: EquipmentStockHold;
+  dateLabel: string;
+  kindLabel: string;
+  unitsLabel: string;
+  statusLabel?: string;
+  muted?: boolean;
+  action?: React.ReactNode;
+}): React.ReactElement {
+  return (
+    <View style={[styles.card, muted && styles.cardMuted]}>
+      <View style={styles.cardRow}>
+        <View style={styles.cardCopy}>
+          <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+            {hold.buyerName}
+          </AppText>
+          <AppText style={styles.cardMeta} numberOfLines={1}>
+            {unitsLabel} · {dateLabel}
+          </AppText>
+        </View>
+        <View style={[styles.chip, muted && styles.chipMuted]}>
+          <AppText weight="semibold" style={[styles.chipText, muted && styles.chipTextMuted]}>
+            {statusLabel ?? kindLabel}
+          </AppText>
+        </View>
+      </View>
+      {action}
     </View>
   );
 }
@@ -134,23 +204,49 @@ const styles = StyleSheet.create({
   tiles: { flexDirection: 'row', gap: spacing.sm },
   tile: {
     flex: 1,
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
     borderRadius: radius.md,
-    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xs,
+    alignItems: 'center',
     gap: spacing.xs,
   },
   tileValue: { fontSize: 22, color: palette.charcoal },
-  tileLabel: { fontSize: 12, color: palette.muted },
+  tileLabel: { fontSize: 11, color: palette.muted, textAlign: 'center' },
   sectionTitle: { fontSize: 16, color: palette.charcoal, marginTop: spacing.sm },
-  empty: { color: palette.muted, fontSize: 14 },
+  emptyCard: {
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: palette.warmWhite,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    padding: spacing.xl,
+  },
+  empty: { color: palette.muted, fontSize: 14, textAlign: 'center' },
   card: {
+    backgroundColor: palette.pureWhite,
     borderWidth: 1,
     borderColor: palette.softGold,
     borderRadius: radius.md,
-    padding: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     gap: spacing.sm,
   },
-  cardMuted: { opacity: 0.7 },
+  cardMuted: { backgroundColor: palette.warmWhite },
+  cardRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  cardCopy: { flex: 1, gap: 2 },
   cardTitle: { fontSize: 15, color: palette.charcoal },
   cardMeta: { fontSize: 13, color: palette.muted },
+  chip: {
+    backgroundColor: palette.softGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  chipMuted: { backgroundColor: palette.pureWhite },
+  chipText: { fontSize: 12, color: palette.goldDark },
+  chipTextMuted: { color: palette.muted },
 });
