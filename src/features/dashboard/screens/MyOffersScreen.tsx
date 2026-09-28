@@ -55,11 +55,15 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
       .finally(() => setRefreshing(false));
   }, []);
 
+  const sentInThisMode = listings.filter((listing) =>
+    role === 'buyer' ? listing.postedAs === 'supplier' : listing.postedAs === 'buyer',
+  );
+
   const cards = buildListingCards({
     category,
-    equipmentListings: listings.filter(isEquipmentListing),
-    serviceListings: listings.filter(isServiceListing),
-    goldListings: listings.filter(isGoldListing),
+    equipmentListings: sentInThisMode.filter(isEquipmentListing),
+    serviceListings: sentInThisMode.filter(isServiceListing),
+    goldListings: sentInThisMode.filter(isGoldListing),
     t,
     currencyCode: currency.code,
     onOpen: (id, listingCategory) =>
