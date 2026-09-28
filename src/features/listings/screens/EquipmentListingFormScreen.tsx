@@ -454,9 +454,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                     value={rentalAmount}
                     onChangeText={setRentalAmount}
                     keyboardType="numeric"
-                    placeholder="0"
+                    placeholder={currency.code}
                     required
-                    leftAdornment={<AppText style={styles.priceAdornment}>{currency.code}</AppText>}
                     rightAdornment={
                       <AppText style={styles.priceAdornment}>{t('rfq.pricePerUnit')}</AppText>
                     }
@@ -471,9 +470,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 value={salePrice}
                 onChangeText={setSalePrice}
                 keyboardType="numeric"
-                placeholder="0"
+                placeholder={currency.code}
                 required
-                leftAdornment={<AppText style={styles.priceAdornment}>{currency.code}</AppText>}
                 rightAdornment={
                   <AppText style={styles.priceAdornment}>{t('rfq.pricePerUnit')}</AppText>
                 }

@@ -11,6 +11,7 @@ import { useBiometricLogin } from '@/features/auth/hooks/useBiometricLogin';
 import type { RootStackParamList } from '@/navigation/types';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { useAuthStore } from '@/store/authStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useDevicePrefsStore } from '@/store/devicePrefsStore';
 import { useProfileStore } from '@/store/profileStore';
 import { getDeviceId } from '@/shared/utils/deviceId';
@@ -177,6 +178,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       const result = await authApi.loginWithMpin(phoneIdentity, mpinValue, deviceId);
       await setAuthenticated(result.accessToken);
       setProfile(result.profile);
+      await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();
       if (result.profile.biometricEnabled) {
         await setCachedMpin(mpinValue);
@@ -245,6 +247,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       const result = await authApi.resetMpin(phoneIdentity, newMpin, deviceId);
       await setAuthenticated(result.accessToken);
       setProfile(result.profile);
+      await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();
       // The old cached MPIN (if any) is now stale — refresh or drop it.
       if (result.profile.biometricEnabled) {
