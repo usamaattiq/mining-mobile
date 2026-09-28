@@ -668,9 +668,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
 
-          {showOwnerOffers ? (
+          {showOwnerOffers &&
+          (equipmentListing?.postedAs !== 'supplier' ||
+            (rfq?.offers ?? []).some((offer) => offer.status !== 'confirmed')) ? (
             <ListingOffersPanel
-              offers={rfq?.offers ?? []}
+              offers={
+                equipmentListing?.postedAs === 'supplier'
+                  ? (rfq?.offers ?? []).filter((offer) => offer.status !== 'confirmed')
+                  : (rfq?.offers ?? [])
+              }
               currencyCode={currency.code}
               actingOfferId={actingOfferId}
               canDecideOffers={rfq?.canDecideOffers !== false}
