@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Switch, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { showAppAlert } from '@/shared/services/appAlert';
 import * as LocalAuthentication from 'expo-local-authentication';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -26,7 +27,6 @@ import { getDeviceId } from '@/shared/utils/deviceId';
 import { ApiError } from '@/shared/services/api';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
-import { BiometricToggleRow } from '@/shared/components/BiometricToggleRow';
 import { useDeviceBiometric } from '@/shared/hooks/useDeviceBiometric';
 import { CodeInput } from '@/shared/components/CodeInput';
 import { CountryPicker } from '@/shared/components/country-picker';
@@ -315,7 +315,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               }
             : {
                 title: t('signUpFace.title'),
-                subtitle: t('signUpFace.subtitle'),
+                subtitle: t('signUpFace.headerSubtitle'),
               };
 
   return (
@@ -503,19 +503,33 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       ) : null}
 
       {step === 'face' ? (
-        <View style={styles.securityForm}>
-          <BiometricToggleRow
-            enabled={biometricEnabled}
-            onToggle={(enabled) => void handleToggleBiometric(enabled)}
-            available={biometricAvailable}
-            kind={biometricKind === 'fingerprint' ? 'fingerprint' : 'face'}
-            title={t('signUpFace.title')}
-            subtitle={
-              biometricAvailable
-                ? t('signUpFace.subtitle')
-                : t('signUpFace.unavailable')
-            }
-          />
+        <View style={styles.faceStep}>
+          <View style={styles.faceHalo}>
+            <View style={styles.faceIcon}>
+              <MaterialCommunityIcons
+                name={biometricKind === 'fingerprint' ? 'fingerprint' : 'face-recognition'}
+                size={64}
+                color={palette.goldDark}
+              />
+            </View>
+          </View>
+          <View style={styles.faceCard}>
+            <View style={styles.faceCopy}>
+              <AppText weight="semibold" style={styles.faceCardTitle}>
+                {t('signUpFace.title')}
+              </AppText>
+              <AppText style={styles.faceCardBody}>
+                {biometricAvailable ? t('signUpFace.subtitle') : t('signUpFace.unavailable')}
+              </AppText>
+            </View>
+            <Switch
+              value={biometricEnabled}
+              onValueChange={(enabled) => void handleToggleBiometric(enabled)}
+              disabled={!biometricAvailable && !biometricEnabled}
+              trackColor={{ true: palette.gold, false: palette.softGold }}
+              thumbColor={palette.pureWhite}
+            />
+          </View>
         </View>
       ) : null}
       {mapPickerSheet}
@@ -561,5 +575,51 @@ const styles = StyleSheet.create({
   mpinLabel: {
     fontSize: 13,
     color: palette.charcoal,
+  },
+  faceStep: {
+    flex: 1,
+    alignItems: 'center',
+    gap: spacing.xl,
+    paddingTop: spacing.lg,
+  },
+  faceHalo: {
+    width: 168,
+    height: 168,
+    borderRadius: radius.pill,
+    backgroundColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  faceIcon: {
+    width: 120,
+    height: 120,
+    borderRadius: radius.pill,
+    backgroundColor: palette.pureWhite,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  faceCard: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: palette.warmWhite,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+  },
+  faceCopy: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  faceCardTitle: {
+    fontSize: 16,
+    color: palette.charcoal,
+  },
+  faceCardBody: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: palette.muted,
   },
 });

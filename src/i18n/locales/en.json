@@ -193,6 +193,7 @@
   },
   "signUpFace": {
     "title": "Face ID",
+    "headerSubtitle": "A faster way back in, next to your MPIN.",
     "subtitle": "Use Face ID for a faster sign in. You can always use your MPIN.",
     "unavailable": "Face ID is not available on this device. You can finish and sign in with your MPIN."
   },
