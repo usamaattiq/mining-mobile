@@ -18,6 +18,7 @@ export type EquipmentListing = {
   yearlyRental: string;
   salePrice: string;
   units: number;
+  availableUnits?: number;
   location: string;
   media: EquipmentMediaAsset[];
   deliveryAvailable: boolean;

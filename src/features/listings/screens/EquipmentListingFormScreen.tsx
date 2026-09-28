@@ -227,7 +227,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     ? [
         offerRent ? { key: rentPeriod ?? 'rent', amount: parsePositiveAmount(rentalAmount) } : null,
         offerSell ? { key: 'sale', amount: parsePositiveAmount(salePrice) } : null,
-      ].flatMap((line) => (line && line.amount != null ? [line] : []))
+      ].flatMap((line) =>
+        line && line.amount != null ? [{ key: line.key, amount: line.amount }] : [],
+      )
     : [];
 
   const rentPeriodOptions = [

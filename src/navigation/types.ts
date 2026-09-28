@@ -28,6 +28,7 @@ export type RootStackParamList = {
   ServiceListingForm: { repostId?: string } | undefined;
   GoldListingForm: { repostId?: string } | undefined;
   CompleteListingDetail: { id: string; category: ListingCategory };
+  EquipmentStock: { id: string };
   Conversation: { conversationId: string };
   Messages: undefined;
   Notifications: undefined;

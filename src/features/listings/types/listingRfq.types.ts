@@ -8,6 +8,7 @@ export type ListingRfqOffer = {
   price?: string;
   quantity?: number;
   rank?: number;
+  kind?: 'rent' | 'sale';
 };
 
 export type ListingRfq = {
@@ -27,6 +28,7 @@ export type ListingRfq = {
   myOfferStatus?: string;
   myOfferPrice?: string;
   myOfferQuantity?: number;
+  myOfferKind?: 'rent' | 'sale';
   isLeading?: boolean;
   offers?: ListingRfqOffer[];
 };

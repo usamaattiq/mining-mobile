@@ -49,6 +49,9 @@ export function cacheListing(listing: ListingDto): void {
     return;
   }
 
+  useOfferedListingsStore.getState().setListings(
+    useOfferedListingsStore.getState().listings.filter((item) => item.id !== listing.id),
+  );
   useMarketListingsStore.getState().upsertListing(listing);
   if (isEquipmentListing(listing)) {
     useListingsStore.getState().addListing(listing);

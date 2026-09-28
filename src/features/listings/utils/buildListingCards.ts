@@ -115,7 +115,7 @@ export function buildListingCards({
         title: listing.title,
         thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
         placeholderIcon: 'construct-outline',
-        subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.units })}`,
+        subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.postedAs === 'supplier' ? (listing.availableUnits ?? listing.units) : listing.units })}`,
         subtitleIcon: 'construct-outline',
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
         city: cityFromLocation(listing.location),

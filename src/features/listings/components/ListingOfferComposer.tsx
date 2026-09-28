@@ -28,6 +28,9 @@ export function ListingOfferComposer({
   showInput,
   awaitingConfirm,
   submitting,
+  fulfillmentModes,
+  fulfillmentRentLabel,
+  fulfillmentSaleLabel,
   onSubmit,
   onConfirm,
   onDecline,
@@ -38,6 +41,9 @@ export function ListingOfferComposer({
   const keyboardVisible = useKeyboardState((state) => state.isVisible);
   const [price, setPrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
+  const [fulfillment, setFulfillment] = React.useState<'rent' | 'sale'>(
+    fulfillmentModes?.[0] ?? 'sale',
+  );
   const unitCap = Math.max(maxUnits ?? 1, 1);
   React.useEffect(() => {
     setUnits((current) => Math.min(Math.max(current, 1), unitCap));
@@ -55,7 +61,11 @@ export function ListingOfferComposer({
     const value = price.trim();
     if (!canSend) return;
     setPrice('');
-    onSubmit(value, maxUnits != null ? units : undefined);
+    onSubmit(
+      value,
+      maxUnits != null ? units : undefined,
+      fulfillmentModes && fulfillmentModes.length > 1 ? fulfillment : fulfillmentModes?.[0],
+    );
   };
 
   return (
@@ -132,7 +142,28 @@ export function ListingOfferComposer({
       ) : null}
 
       {showInput ? (
-        <View style={styles.form}>
+          <View style={styles.form}>
+          {fulfillmentModes && fulfillmentModes.length > 1 ? (
+            <View style={styles.fulfillmentRow}>
+              {fulfillmentModes.map((mode) => {
+                const selected = fulfillment === mode;
+                return (
+                  <Pressable
+                    key={mode}
+                    onPress={() => setFulfillment(mode)}
+                    style={[styles.fulfillmentChip, selected && styles.fulfillmentChipSelected]}
+                  >
+                    <AppText
+                      weight="semibold"
+                      style={[styles.fulfillmentLabel, selected && styles.fulfillmentLabelSelected]}
+                    >
+                      {mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : null}
           <View style={styles.row}>
             {maxUnits != null ? (
               <View style={styles.unitsWrap}>
@@ -331,5 +362,29 @@ const styles = StyleSheet.create({
   declineLabel: {
     fontSize: 13,
     color: palette.charcoal,
+  },
+  fulfillmentRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  fulfillmentChip: {
+    flex: 1,
+    minHeight: 36,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fulfillmentChipSelected: {
+    backgroundColor: palette.gold,
+    borderColor: palette.gold,
+  },
+  fulfillmentLabel: {
+    fontSize: 13,
+    color: palette.charcoal,
+  },
+  fulfillmentLabelSelected: {
+    color: palette.pureWhite,
   },
 });

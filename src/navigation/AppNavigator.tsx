@@ -11,6 +11,7 @@ import { EquipmentListingFormScreen } from '@/features/listings/screens/Equipmen
 import { ServiceListingFormScreen } from '@/features/listings/screens/ServiceListingFormScreen';
 import { GoldListingFormScreen } from '@/features/listings/screens/GoldListingFormScreen';
 import { CompleteListingDetailScreen } from '@/features/listings/screens/CompleteListingDetailScreen';
+import { EquipmentStockScreen } from '@/features/listings/screens/EquipmentStockScreen';
 import { QuickCreateScreen } from '@/features/dashboard/screens/QuickCreateScreen';
 import { ConversationScreen } from '@/features/messages/screens/ConversationScreen';
 import { MessagesScreen } from '@/features/messages/screens/MessagesScreen';
@@ -60,6 +61,7 @@ export function AppNavigator(): React.ReactElement {
       <Stack.Screen name="ServiceListingForm" component={ServiceListingFormScreen} />
       <Stack.Screen name="GoldListingForm" component={GoldListingFormScreen} />
       <Stack.Screen name="CompleteListingDetail" component={CompleteListingDetailScreen} />
+      <Stack.Screen name="EquipmentStock" component={EquipmentStockScreen} />
       <Stack.Screen
         name="Messages"
         component={MessagesScreen}

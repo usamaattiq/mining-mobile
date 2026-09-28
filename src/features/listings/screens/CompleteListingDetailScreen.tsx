@@ -96,6 +96,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
   const equipmentListing =
     category === 'equipment' && source && isEquipmentListing(source) ? source : undefined;
+  const unitsLeft = supplierUnitsLeft(id, [
+    fetchedListing,
+    marketListing,
+    equipmentListing,
+    offeredListing,
+    mineEquipment,
+  ]);
   const serviceListing =
     category === 'services' && source && isServiceListing(source) ? source : undefined;
   const goldListing = category === 'gold' && source && isGoldListing(source) ? source : undefined;
@@ -199,7 +206,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     location = equipmentListing.location ?? '';
     detailRows = [
       { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
-      { label: t('equipmentListing.units'), value: String(equipmentListing.units) },
+      {
+        label: t(
+          equipmentListing.postedAs === 'supplier'
+            ? 'equipmentListing.availableUnits'
+            : 'equipmentListing.units',
+        ),
+        value: String(
+          equipmentListing.postedAs === 'supplier' ? unitsLeft : equipmentListing.units,
+        ),
+      },
       {
         label: t('equipmentListing.neededDate'),
         value: formatListingDate(currentLanguage, equipmentListing.neededDate),
@@ -413,6 +429,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     Boolean(rfq?.canConfirmOffer);
   const showOfferInput =
     !awaitingConfirm &&
+    (category !== 'equipment' || equipmentListing?.postedAs !== 'supplier' || unitsLeft > 0) &&
     (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live'));
   const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
   const canWithdraw =
@@ -441,10 +458,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         }
       : null);
 
-  const handleSubmitOffer = (price: string, units?: number) => {
+  const handleSubmitOffer = (price: string, units?: number, fulfillment?: 'rent' | 'sale') => {
     setOfferSubmitting(true);
     void listingsApi
-      .submitOffer(id, price, category === 'equipment' ? units : undefined)
+      .submitOffer(id, price, category === 'equipment' ? units : undefined, fulfillment)
       .then((listing) => {
         applyListing(listing);
       })
@@ -586,6 +603,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
           {extraSection}
 
+          {isOwner && equipmentListing?.postedAs === 'supplier' ? (
+            <Button
+              label={t('equipmentListing.manageUnits')}
+              icon="cube-outline"
+              variant="outline"
+              onPress={() => navigation.navigate('EquipmentStock', { id })}
+            />
+          ) : null}
+
           {showOwnerOffers ? (
             <ListingOffersPanel
               offers={rfq?.offers ?? []}
@@ -670,13 +696,26 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               ? t('equipmentListing.unitsCount', { count: rfq.myOfferQuantity })
               : undefined
           }
-          unitsLabel={category === 'equipment' ? t('equipmentListing.units') : undefined}
+          unitsLabel={
+            category === 'equipment'
+              ? t('equipmentListing.unitsLeft', { count: unitsLeft })
+              : undefined
+          }
           unitPricePlaceholder={
             category === 'equipment' ? t('rfq.unitPricePlaceholder') : undefined
           }
-          maxUnits={
-            category === 'equipment' ? Math.max(equipmentListing?.units ?? 1, 1) : undefined
+          maxUnits={category === 'equipment' ? Math.max(unitsLeft, 0) : undefined}
+          fulfillmentModes={
+            category === 'equipment' && equipmentListing?.postedAs === 'supplier'
+              ? equipmentListing.mode === 'both'
+                ? ['rent', 'sale']
+                : equipmentListing.mode === 'sell'
+                  ? ['sale']
+                  : ['rent']
+              : undefined
           }
+          fulfillmentRentLabel={t('equipmentListing.rent')}
+          fulfillmentSaleLabel={t('equipmentListing.buy')}
           hasOffer={hasSentOffer}
           leading={category === 'gold' && Boolean(rfq?.isLeading)}
           showInput={showOfferInput}
@@ -719,6 +758,22 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       />
     </View>
   );
+}
+
+function supplierUnitsLeft(
+  id: string,
+  sources: Array<ListingDto | null | undefined>,
+): number {
+  for (const listing of sources) {
+    if (!listing || !isEquipmentListing(listing) || listing.id !== id) continue;
+    if (listing.postedAs === 'supplier' && listing.availableUnits != null) {
+      return listing.availableUnits;
+    }
+  }
+  for (const listing of sources) {
+    if (listing && isEquipmentListing(listing) && listing.id === id) return listing.units;
+  }
+  return 1;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;

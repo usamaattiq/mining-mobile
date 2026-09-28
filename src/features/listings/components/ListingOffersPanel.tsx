@@ -98,6 +98,11 @@ export function ListingOffersPanel({
                   </View>
                 ) : null}
               </View>
+              {showUnits && offer.kind ? (
+                <AppText style={styles.kind}>
+                  {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+                </AppText>
+              ) : null}
               {showUnits && unitAmount != null && units ? (
                 <PriceTimesUnitsSummary
                   currencyCode={currencyCode}
@@ -197,6 +202,10 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 11,
     color: palette.gold,
+  },
+  kind: {
+    fontSize: 12,
+    color: palette.muted,
   },
   price: {
     fontSize: 18,

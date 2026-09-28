@@ -18,7 +18,10 @@ export type ListingOfferComposerProps = {
   showInput: boolean;
   awaitingConfirm: boolean;
   submitting: boolean;
-  onSubmit: (price: string, units?: number) => void;
+  fulfillmentModes?: Array<'rent' | 'sale'>;
+  fulfillmentRentLabel?: string;
+  fulfillmentSaleLabel?: string;
+  onSubmit: (price: string, units?: number, fulfillment?: 'rent' | 'sale') => void;
   onConfirm: () => void;
   onDecline: () => void;
   footer?: ReactNode;

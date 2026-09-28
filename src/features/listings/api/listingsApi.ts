@@ -6,6 +6,23 @@ import type { GoldListing } from '@/features/listings/types/goldListing.types';
 
 export type ListingDto = EquipmentListing | ServiceListing | GoldListing;
 
+export type EquipmentStockHold = {
+  id: string;
+  kind: 'rent' | 'sale';
+  units: number;
+  status: 'active' | 'selected' | 'returned';
+  buyerName: string;
+  createdAt: number;
+};
+
+export type EquipmentStock = {
+  totalUnits: number;
+  availableUnits: number;
+  rentUnits: number;
+  saleUnits: number;
+  holds: EquipmentStockHold[];
+};
+
 export function isEquipmentListing(listing: ListingDto): listing is EquipmentListing {
   return listing.category === 'equipment';
 }
@@ -59,11 +76,28 @@ export const listingsApi = {
     return apiFetch('/listings', { method: 'POST', body });
   },
 
-  submitOffer(id: string, price: string, units?: number): Promise<ListingDto> {
+  submitOffer(
+    id: string,
+    price: string,
+    units?: number,
+    fulfillment?: 'rent' | 'sale',
+  ): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers`, {
       method: 'POST',
-      body: { price, ...(units != null ? { units } : {}) },
+      body: {
+        price,
+        ...(units != null ? { units } : {}),
+        ...(fulfillment ? { fulfillment } : {}),
+      },
     });
+  },
+
+  equipmentStock(id: string): Promise<EquipmentStock> {
+    return apiFetch(`/listings/${id}/stock`);
+  },
+
+  returnRentedUnits(id: string, holdId: string): Promise<EquipmentStock> {
+    return apiFetch(`/listings/${id}/stock/${holdId}/return`, { method: 'POST', body: {} });
   },
 
   acceptOffer(id: string, offerId: string): Promise<ListingDto> {
