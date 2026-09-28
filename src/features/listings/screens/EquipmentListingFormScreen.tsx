@@ -257,7 +257,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
   const handlePublish = async () => {
     if (publishing || !mode) return;
-    if (listedUntil.getTime() <= Date.now()) {
+    if (isBuyer && listedUntil.getTime() <= Date.now()) {
       showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
       return;
     }
@@ -282,7 +282,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         deliveryType,
         deliveryPricePerKm,
         neededDate: null,
-        expiryHours: expiryHoursUntil(listedUntil),
+        expiryHours: isBuyer ? expiryHoursUntil(listedUntil) : 24 * 365,
         postedAs: useMarketplaceRoleStore.getState().role,
       });
       if (isEquipmentListing(listing)) addListing(listing);
@@ -335,13 +335,17 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             : []),
         ]),
     { label: t('equipmentListing.units'), value: String(units) },
-    {
-      label: t('equipmentListing.listedUntil'),
-      value: new Intl.DateTimeFormat(currentLanguage, {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(listedUntil),
-    },
+    ...(isBuyer
+      ? [
+          {
+            label: t('equipmentListing.listedUntil'),
+            value: new Intl.DateTimeFormat(currentLanguage, {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            }).format(listedUntil),
+          },
+        ]
+      : []),
     { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
@@ -507,14 +511,16 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onBusyChange={setMediaBusy}
               required={!isBuyer}
             />
-            <DateTimeField
-              label={t('equipmentListing.listedUntil')}
-              value={listedUntil}
-              required
-              minimumDate={new Date()}
-              placeholder={t('equipmentListing.listedUntilPlaceholder')}
-              onChange={setListedUntil}
-            />
+            {isBuyer ? (
+              <DateTimeField
+                label={t('equipmentListing.listedUntil')}
+                value={listedUntil}
+                required
+                minimumDate={new Date()}
+                placeholder={t('equipmentListing.listedUntilPlaceholder')}
+                onChange={setListedUntil}
+              />
+            ) : null}
             <LocationField
               label={t('equipmentListing.location')}
               value={location}

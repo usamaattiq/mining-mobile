@@ -88,6 +88,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [unitsEditorOpen, setUnitsEditorOpen] = React.useState(false);
   const [editUnits, setEditUnits] = React.useState(1);
   const [savingUnits, setSavingUnits] = React.useState(false);
+  const [deletingListing, setDeletingListing] = React.useState(false);
 
   const applyListing = React.useCallback((listing: ListingDto) => {
     setFetchedListing(listing);
@@ -247,10 +248,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         label: t('common.postedOn'),
         value: formatListingDate(currentLanguage, equipmentListing.createdAt),
       },
-      {
-        label: t('equipmentListing.listedUntil'),
-        value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
-      },
+      ...(equipmentListing.postedAs === 'supplier'
+        ? []
+        : [
+            {
+              label: t('equipmentListing.listedUntil'),
+              value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
+            },
+          ]),
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
     if (equipmentListing.deliveryAvailable) {
@@ -461,7 +466,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       rfq?.myOfferStatus === 'active' ||
       rfq?.status === 'offer-submitted');
   const showOwnerOffers = isOwner && Boolean(rfq);
-  const showCountdown = countdownEnd != null && !isEndedRfqStatus(rfq?.status) && timeLeft != null;
+  const showCountdown =
+    equipmentListing?.postedAs !== 'supplier' &&
+    countdownEnd != null &&
+    !isEndedRfqStatus(rfq?.status) &&
+    timeLeft != null;
   const headerBadge =
     rfqStatusBadge(t, rfq) ??
     (equipmentListing && equipmentListing.postedAs !== 'buyer'
@@ -685,6 +694,80 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       </ScrollView>
 
       {backButton}
+
+      {isOwner ? (
+        <Pressable
+          onPress={() => {
+            showAppAlert(
+              t('equipmentListing.deleteListingTitle'),
+              t('equipmentListing.deleteListingMessage'),
+              [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                  text: t('common.delete'),
+                  style: 'destructive',
+                  onPress: () => {
+                    setDeletingListing(true);
+                    void listingsApi
+                      .remove(id)
+                      .then(() => {
+                        useListingsStore
+                          .getState()
+                          .setListings(
+                            useListingsStore.getState().listings.filter((item) => item.id !== id),
+                          );
+                        useServiceListingsStore
+                          .getState()
+                          .setListings(
+                            useServiceListingsStore
+                              .getState()
+                              .listings.filter((item) => item.id !== id),
+                          );
+                        useGoldListingsStore
+                          .getState()
+                          .setListings(
+                            useGoldListingsStore.getState().listings.filter((item) => item.id !== id),
+                          );
+                        useMarketListingsStore
+                          .getState()
+                          .setListings(
+                            useMarketListingsStore
+                              .getState()
+                              .listings.filter((item) => item.id !== id),
+                          );
+                        useOfferedListingsStore
+                          .getState()
+                          .setListings(
+                            useOfferedListingsStore
+                              .getState()
+                              .listings.filter((item) => item.id !== id),
+                          );
+                        navigation.goBack();
+                      })
+                      .catch((error: unknown) => {
+                        const message = error instanceof ApiError ? error.message : t('common.error');
+                        showAppAlert(message);
+                      })
+                      .finally(() => setDeletingListing(false));
+                  },
+                },
+              ],
+            );
+          }}
+          disabled={deletingListing}
+          hitSlop={12}
+          style={[
+            styles.overlayButton,
+            styles.deleteButton,
+            { top: insets.top + spacing.sm },
+            deletingListing && styles.withdrawDisabled,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.delete')}
+        >
+          <Ionicons name="trash-outline" size={18} color={palette.pureWhite} />
+        </Pressable>
+      ) : null}
 
       {canWithdraw ? (
         <Pressable
@@ -915,6 +998,9 @@ const styles = StyleSheet.create({
   },
   backButton: {
     left: spacing.md,
+  },
+  deleteButton: {
+    right: spacing.md,
   },
   withdrawButton: {
     right: spacing.md,

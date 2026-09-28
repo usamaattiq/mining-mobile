@@ -136,13 +136,16 @@ export function buildListingCards({
               ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
         priceText: listing.postedAs === 'buyer' ? undefined : price.priceText,
         priceUnit: price.priceUnit,
-        createdAt: listing.createdAt,
-        expiresAt: listing.rfq?.expiresAt ?? undefined,
-        ended: listingHasEnded({
-          rfqStatus: listing.rfq?.status,
-          expiresAt: listing.rfq?.expiresAt,
-          createdAt: listing.createdAt,
-        }),
+        createdAt: listing.postedAs === 'supplier' ? undefined : listing.createdAt,
+        expiresAt: listing.postedAs === 'supplier' ? undefined : listing.rfq?.expiresAt ?? undefined,
+        ended:
+          listing.postedAs === 'supplier'
+            ? Date.now() >= listing.createdAt + 365 * 24 * 60 * 60 * 1000
+            : listingHasEnded({
+                rfqStatus: listing.rfq?.status,
+                expiresAt: listing.rfq?.expiresAt,
+                createdAt: listing.createdAt,
+              }),
         onRepost: onRepost ? () => onRepost(listing.id, 'equipment') : undefined,
         onPress: () => onOpen(listing.id, 'equipment'),
       };

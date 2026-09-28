@@ -72,6 +72,10 @@ export const listingsApi = {
     return apiFetch(`/listings/${id}`);
   },
 
+  remove(id: string): Promise<{ deleted: boolean }> {
+    return apiFetch(`/listings/${id}`, { method: 'DELETE' });
+  },
+
   create(body: CreateListingBody): Promise<ListingDto> {
     return apiFetch('/listings', { method: 'POST', body });
   },
