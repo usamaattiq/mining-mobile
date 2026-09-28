@@ -21,6 +21,7 @@ import {
 import type { RootStackParamList } from '@/navigation/types';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { useAuthStore } from '@/store/authStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useDevicePrefsStore } from '@/store/devicePrefsStore';
 import { useProfileStore } from '@/store/profileStore';
 import { getDeviceId } from '@/shared/utils/deviceId';
@@ -254,6 +255,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       });
       await setAuthenticated(result.accessToken);
       setProfile(result.profile);
+      await useMarketplaceRoleStore.getState().setRole('supplier');
 
       if (avatarAsset) {
         try {
