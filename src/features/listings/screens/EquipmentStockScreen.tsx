@@ -15,6 +15,8 @@ import {
   type EquipmentStock,
   type EquipmentStockHold,
 } from '@/features/listings/api/listingsApi';
+import { useCurrency } from '@/shared/hooks/useCurrency';
+import { formatMoneyAmount, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { cardBackShadow, palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentStock'>;
@@ -22,6 +24,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentStock'>;
 export function EquipmentStockScreen({ navigation, route }: Props): React.ReactElement {
   const { id } = route.params;
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const currency = useCurrency();
   const [stock, setStock] = React.useState<EquipmentStock | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [returningId, setReturningId] = React.useState<string | null>(null);
@@ -104,6 +107,10 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
               dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
               kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
               unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
+              currencyCode={currency.code}
+              perUnitLabel={t('equipmentListing.stockPerUnit')}
+              unitsTileLabel={t('equipmentListing.stockDealUnits')}
+              totalLabel={t('equipmentListing.stockDealTotal')}
               action={
                 hold.kind === 'rent' && hold.status === 'active' ? (
                   <Button
@@ -126,6 +133,10 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
               dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
               kindLabel={t('equipmentListing.rent')}
               unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
+              currencyCode={currency.code}
+              perUnitLabel={t('equipmentListing.stockPerUnit')}
+              unitsTileLabel={t('equipmentListing.stockDealUnits')}
+              totalLabel={t('equipmentListing.stockDealTotal')}
               statusLabel={t('equipmentListing.stockReturned')}
             />
           ))}
@@ -164,6 +175,10 @@ function DealCard({
   dateLabel,
   kindLabel,
   unitsLabel,
+  currencyCode,
+  perUnitLabel,
+  unitsTileLabel,
+  totalLabel,
   statusLabel,
   muted = false,
   action,
@@ -172,10 +187,17 @@ function DealCard({
   dateLabel: string;
   kindLabel: string;
   unitsLabel: string;
+  currencyCode: string;
+  perUnitLabel: string;
+  unitsTileLabel: string;
+  totalLabel: string;
   statusLabel?: string;
   muted?: boolean;
   action?: React.ReactNode;
 }): React.ReactElement {
+  const total = parsePositiveAmount(hold.price);
+  const unitAmount =
+    total != null && hold.units > 0 ? Math.round((total / hold.units) * 100) / 100 : null;
   return (
     <View style={[styles.card, muted && styles.cardMuted]}>
       <View style={styles.cardRow}>
@@ -186,6 +208,11 @@ function DealCard({
           <AppText style={styles.cardMeta} numberOfLines={1}>
             {unitsLabel} · {dateLabel}
           </AppText>
+          {unitAmount != null ? (
+            <AppText weight="semibold" style={styles.cardPrice}>
+              {formatMoneyAmount(currencyCode, unitAmount)} {perUnitLabel}
+            </AppText>
+          ) : null}
         </View>
         <View style={[styles.chip, muted && styles.chipMuted]}>
           <AppText weight="semibold" style={[styles.chipText, muted && styles.chipTextMuted]}>
@@ -193,7 +220,27 @@ function DealCard({
           </AppText>
         </View>
       </View>
+      {unitAmount != null && total != null ? (
+        <View style={styles.calcRow}>
+          <CalcTile label={perUnitLabel} value={formatMoneyAmount(currencyCode, unitAmount)} />
+          <CalcTile label={unitsTileLabel} value={String(hold.units)} />
+          <CalcTile label={totalLabel} value={formatMoneyAmount(currencyCode, total)} />
+        </View>
+      ) : null}
       {action}
+    </View>
+  );
+}
+
+function CalcTile({ label, value }: { label: string; value: string }): React.ReactElement {
+  return (
+    <View style={styles.calcTile}>
+      <AppText weight="bold" style={styles.calcValue} numberOfLines={1}>
+        {value}
+      </AppText>
+      <AppText style={styles.calcLabel} numberOfLines={1}>
+        {label}
+      </AppText>
     </View>
   );
 }
@@ -240,6 +287,19 @@ const styles = StyleSheet.create({
   cardCopy: { flex: 1, gap: 2 },
   cardTitle: { fontSize: 15, color: palette.charcoal },
   cardMeta: { fontSize: 13, color: palette.muted },
+  cardPrice: { fontSize: 14, color: palette.goldDark, marginTop: 2 },
+  calcRow: { flexDirection: 'row', gap: spacing.xs },
+  calcTile: {
+    flex: 1,
+    backgroundColor: palette.warmWhite,
+    borderRadius: radius.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
+    alignItems: 'center',
+    gap: 2,
+  },
+  calcValue: { fontSize: 13, color: palette.charcoal },
+  calcLabel: { fontSize: 10, color: palette.muted, textAlign: 'center' },
   chip: {
     backgroundColor: palette.softGold,
     borderRadius: radius.pill,

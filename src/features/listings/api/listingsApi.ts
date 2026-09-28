@@ -12,6 +12,7 @@ export type EquipmentStockHold = {
   units: number;
   status: 'active' | 'selected' | 'returned';
   buyerName: string;
+  price: string;
   createdAt: number;
 };
 
