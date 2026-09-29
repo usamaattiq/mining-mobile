@@ -22,6 +22,7 @@ import type { AttachmentDocument } from '@/features/listings/types/attachmentsSe
 import type { ListingDto } from '@/features/listings/api/listingsApi';
 import { ListingMessageSheet } from '@/features/listings/components/ListingMessageSheet';
 import { ListingOfferComposer } from '@/features/listings/components/ListingOfferComposer';
+import { EquipmentDealsSection } from '@/features/listings/components/EquipmentDealsSection';
 import { ListingOffersPanel } from '@/features/listings/components/ListingOffersPanel';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { Button } from '@/shared/components/Button';
@@ -701,6 +702,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 setMessageOpen(true);
               }}
             />
+          ) : null}
+
+          {isOwner && equipmentListing?.postedAs === 'supplier' ? (
+            <EquipmentDealsSection listingId={id} />
           ) : null}
         </View>
       </ScrollView>
