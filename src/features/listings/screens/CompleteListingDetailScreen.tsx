@@ -460,10 +460,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     rfq?.myOfferStatus === 'selected' ||
     rfq?.status === 'awaiting-your-confirmation' ||
     Boolean(rfq?.canConfirmOffer);
+  const supplierBuyer =
+    !isOwner && category === 'equipment' && equipmentListing?.postedAs === 'supplier';
+  const mySupplierOffers = supplierBuyer
+    ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
+    : [];
   const showOfferInput =
-    !awaitingConfirm &&
-    (category !== 'equipment' || equipmentListing?.postedAs !== 'supplier' || unitsLeft > 0) &&
-    (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live'));
+    (supplierBuyer
+      ? unitsLeft > 0 && rfq?.canSubmitOffer !== false
+      : !awaitingConfirm &&
+        (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live')));
   const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
   const canWithdraw =
     !awaitingConfirm &&
@@ -555,8 +561,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       .finally(() => setActingOfferId(null));
   };
 
-  const handleResponderOffer = (action: 'confirm' | 'decline' | 'withdraw') => {
-    const offerId = rfq?.myOfferId;
+  const handleResponderOffer = (
+    action: 'confirm' | 'decline' | 'withdraw',
+    offerId = rfq?.myOfferId,
+  ) => {
     if (!offerId) return;
     const run = () => {
       setOfferSubmitting(true);
@@ -713,6 +721,64 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
 
+          {supplierBuyer && mySupplierOffers.length > 0 ? (
+            <View style={styles.myOffers}>
+              <AppText weight="bold" style={styles.myOffersTitle}>
+                {t('rfq.yourOffer')}
+              </AppText>
+              {mySupplierOffers.map((offer) => (
+                <View key={offer.id} style={styles.myOfferCard}>
+                  <View style={styles.myOfferRow}>
+                    <AppText weight="semibold" style={styles.myOfferTitle}>
+                      {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
+                      {offer.quantity
+                        ? ` · ${t('equipmentListing.unitsCount', { count: offer.quantity })}`
+                        : ''}
+                    </AppText>
+                    <AppText style={styles.myOfferStatus}>
+                      {t(
+                        `rfq.offerStatus.${
+                          offer.status === 'selected'
+                            ? 'selected'
+                            : offer.status === 'confirmed'
+                              ? 'confirmed'
+                              : 'active'
+                        }`,
+                      )}
+                    </AppText>
+                  </View>
+                  {offer.price ? (
+                    <AppText weight="bold" style={styles.myOfferPrice}>
+                      {currency.code} {formatAmountWithCommas(offer.price)}
+                    </AppText>
+                  ) : null}
+                  {offer.status === 'active' ? (
+                    <Button
+                      label={t('rfq.withdraw')}
+                      variant="outline"
+                      onPress={() => handleResponderOffer('withdraw', offer.id)}
+                    />
+                  ) : null}
+                  {offer.status === 'selected' ? (
+                    <View style={styles.myOfferActions}>
+                      <Button
+                        label={t('rfq.decline')}
+                        variant="outline"
+                        onPress={() => handleResponderOffer('decline', offer.id)}
+                        style={styles.myOfferAction}
+                      />
+                      <Button
+                        label={t('rfq.confirm')}
+                        onPress={() => handleResponderOffer('confirm', offer.id)}
+                        style={styles.myOfferAction}
+                      />
+                    </View>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+          ) : null}
+
           {isOwner && equipmentListing?.postedAs === 'supplier' ? (
             <EquipmentDealsSection
               listingId={id}
@@ -806,7 +872,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </Pressable>
       ) : null}
 
-      {canWithdraw ? (
+      {canWithdraw && !supplierBuyer ? (
         <Pressable
           onPress={() => handleResponderOffer('withdraw')}
           disabled={offerSubmitting}
@@ -836,7 +902,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </View>
       ) : null}
 
-      {showOfferInput || hasSentOffer ? (
+      {(supplierBuyer ? showOfferInput : showOfferInput || hasSentOffer) ? (
         <ListingOfferComposer
           currencyCode={currency.code}
           placeholder={
@@ -898,10 +964,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 ? t('serviceListing.online')
                 : undefined
           }
-          hasOffer={hasSentOffer}
+          hasOffer={supplierBuyer ? false : hasSentOffer}
           leading={category === 'gold' && Boolean(rfq?.isLeading)}
           showInput={showOfferInput}
-          awaitingConfirm={awaitingConfirm}
+          awaitingConfirm={supplierBuyer ? false : awaitingConfirm}
+          sendInline={supplierBuyer}
           submitting={offerSubmitting}
           onSubmit={handleSubmitOffer}
           onConfirm={() => handleResponderOffer('confirm')}
@@ -915,7 +982,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   onPress={() => setMessageOpen(true)}
                   style={styles.messageButton}
                 />
-                {rfq?.myOfferStatus === 'confirmed' && rfq.ownerPhone ? (
+                {(() => {
+                  const whatsappReady =
+                    supplierBuyer
+                      ? mySupplierOffers.some(
+                          (offer) => offer.status === 'selected' || offer.status === 'confirmed',
+                        )
+                      : rfq?.myOfferStatus === 'confirmed' || rfq?.myOfferStatus === 'selected';
+                  return whatsappReady && rfq?.ownerPhone ? (
                   <Button
                     label={t('common.whatsapp')}
                     icon="logo-whatsapp"
@@ -923,7 +997,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     onPress={() => openWhatsApp(rfq.ownerPhone!)}
                     style={styles.messageButton}
                   />
-                ) : null}
+                  ) : null;
+                })()}
               </View>
             ) : null
           }
@@ -1110,6 +1185,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: palette.charcoal,
   },
+  myOffers: { gap: spacing.sm },
+  myOffersTitle: { fontSize: 16, color: palette.charcoal },
+  myOfferCard: {
+    backgroundColor: palette.warmWhite,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  myOfferRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  myOfferTitle: { flex: 1, fontSize: 14, color: palette.charcoal },
+  myOfferStatus: { fontSize: 12, color: palette.goldDark },
+  myOfferPrice: { fontSize: 16, color: palette.charcoal },
+  myOfferActions: { flexDirection: 'row', gap: spacing.sm },
+  myOfferAction: { flex: 1 },
   priceAmount: {
     fontSize: 28,
     color: palette.charcoal,

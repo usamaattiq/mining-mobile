@@ -29,6 +29,7 @@ export function ListingOfferComposer({
   showInput,
   awaitingConfirm,
   submitting,
+  sendInline = false,
   fulfillmentModes,
   fulfillmentLabels,
   fulfillmentRentLabel,
@@ -174,7 +175,7 @@ export function ListingOfferComposer({
           ) : null}
           <View style={styles.row}>
             {maxUnits != null ? (
-              <View style={styles.unitsWrap}>
+              <View style={sendInline ? styles.unitsWrapInline : styles.unitsWrap}>
                 <CounterField
                   value={units}
                   onChange={setUnits}
@@ -199,6 +200,26 @@ export function ListingOfferComposer({
                 style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
               />
             </View>
+            {sendInline ? (
+              <Pressable
+                onPress={handleSend}
+                disabled={!canSend}
+                accessibilityRole="button"
+                accessibilityLabel={sendLabel}
+                style={({ pressed }) => [
+                  styles.send,
+                  styles.sendInline,
+                  !canSend && styles.sendDisabled,
+                  pressed && canSend && styles.sendPressed,
+                ]}
+              >
+                {submitting ? (
+                  <ActivityIndicator color={palette.pureWhite} size="small" />
+                ) : (
+                  <Ionicons name="send" size={16} color={palette.pureWhite} />
+                )}
+              </Pressable>
+            ) : null}
           </View>
           <KeyboardDoneBar nativeID={priceAccessoryId} />
           {draftUnitAmount != null && maxUnits != null ? (
@@ -209,6 +230,7 @@ export function ListingOfferComposer({
               compact
             />
           ) : null}
+          {sendInline ? null : (
           <View style={styles.actions}>
             {footer ? <View style={styles.actionButton}>{footer}</View> : null}
             <Pressable
@@ -235,10 +257,11 @@ export function ListingOfferComposer({
               )}
             </Pressable>
           </View>
+          )}
         </View>
       ) : null}
 
-      {!showInput ? footer : null}
+      {sendInline || !showInput ? footer : null}
     </View>
   );
 }
@@ -294,6 +317,14 @@ const styles = StyleSheet.create({
   unitsWrap: {
     flex: 1,
     maxWidth: 168,
+  },
+  unitsWrapInline: {
+    width: 128,
+    flexShrink: 0,
+  },
+  sendInline: {
+    width: 44,
+    paddingHorizontal: 0,
   },
   actions: {
     flexDirection: 'row',
