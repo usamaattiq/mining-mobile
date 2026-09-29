@@ -97,10 +97,10 @@ const styles = StyleSheet.create({
   },
   contextInHeader: {
     marginTop: 0,
-    marginHorizontal: spacing.lg,
+    marginHorizontal: spacing.md,
     marginBottom: spacing.xl,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
   },
   contextPressed: {
     opacity: 0.85,
