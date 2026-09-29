@@ -517,6 +517,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       .catch((error: unknown) => {
         const message =
           error instanceof ApiError ? error.message : t('rfq.offerFailed');
+        if (message === 'You already have an open offer of this type') return;
         showAppAlert(t('common.error'), message);
       })
       .finally(() => setOfferSubmitting(false));
@@ -957,6 +958,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }}
           fulfillmentRentLabel={t('equipmentListing.rent')}
           fulfillmentSaleLabel={t('equipmentListing.buy')}
+          blockedFulfillmentModes={
+            supplierBuyer
+              ? (['rent', 'sale'] as const).filter((kind) =>
+                  mySupplierOffers.some(
+                    (offer) =>
+                      offer.kind === kind &&
+                      (offer.status === 'active' || offer.status === 'selected'),
+                  ),
+                )
+              : undefined
+          }
           offerChoiceLabel={
             rfq?.myOfferDelivery === 'onsite'
               ? t('serviceListing.onsite')

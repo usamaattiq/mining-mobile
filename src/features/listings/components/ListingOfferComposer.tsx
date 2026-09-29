@@ -34,6 +34,7 @@ export function ListingOfferComposer({
   fulfillmentLabels,
   fulfillmentRentLabel,
   fulfillmentSaleLabel,
+  blockedFulfillmentModes,
   offerChoiceLabel,
   onSubmit,
   onConfirm,
@@ -50,10 +51,22 @@ export function ListingOfferComposer({
     fulfillmentModes?.[0] ?? 'sale',
   );
   const unitCap = Math.max(maxUnits ?? 1, 1);
+  const blockedModes = React.useMemo(
+    () => new Set(blockedFulfillmentModes ?? []),
+    [blockedFulfillmentModes],
+  );
   React.useEffect(() => {
     setUnits((current) => Math.min(Math.max(current, 1), unitCap));
   }, [unitCap]);
-  const canSend = /^\d+(\.\d{1,2})?$/.test(price.trim()) && Number(price) > 0 && !submitting;
+  React.useEffect(() => {
+    const open = (fulfillmentModes ?? []).filter((mode) => !blockedModes.has(mode));
+    if (open.length === 0) return;
+    const next = open[0];
+    if (next && !open.includes(fulfillment)) setFulfillment(next);
+  }, [blockedModes, fulfillment, fulfillmentModes]);
+  const kindBlocked = blockedModes.has(fulfillment);
+  const canSend =
+    /^\d+(\.\d{1,2})?$/.test(price.trim()) && Number(price) > 0 && !submitting && !kindBlocked;
   const draftUnitAmount = parsePositiveAmount(price);
   const submittedTotal = parsePositiveAmount(offerPrice);
   const submittedUnits = offerUnits != null && offerUnits > 0 ? offerUnits : null;
@@ -64,7 +77,7 @@ export function ListingOfferComposer({
 
   const handleSend = () => {
     const value = price.trim();
-    if (!canSend) return;
+    if (!canSend || kindBlocked) return;
     setPrice('');
     onSubmit(
       value,
@@ -151,19 +164,30 @@ export function ListingOfferComposer({
 
       {showInput ? (
           <View style={styles.form}>
-          {fulfillmentModes && fulfillmentModes.length > 1 ? (
+          {fulfillmentModes && fulfillmentModes.length > 0 ? (
             <View style={styles.fulfillmentRow}>
               {fulfillmentModes.map((mode) => {
                 const selected = fulfillment === mode;
+                const blocked = blockedModes.has(mode);
                 return (
                   <Pressable
                     key={mode}
                     onPress={() => setFulfillment(mode)}
-                    style={[styles.fulfillmentChip, selected && styles.fulfillmentChipSelected]}
+                    disabled={blocked}
+                    accessibilityState={{ disabled: blocked, selected }}
+                    style={[
+                      styles.fulfillmentChip,
+                      selected && !blocked && styles.fulfillmentChipSelected,
+                      blocked && styles.fulfillmentChipDisabled,
+                    ]}
                   >
                     <AppText
                       weight="semibold"
-                      style={[styles.fulfillmentLabel, selected && styles.fulfillmentLabelSelected]}
+                      style={[
+                        styles.fulfillmentLabel,
+                        selected && !blocked && styles.fulfillmentLabelSelected,
+                        blocked && styles.fulfillmentLabelDisabled,
+                      ]}
                     >
                       {fulfillmentLabels?.[mode] ??
                         (mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel)}
@@ -421,11 +445,18 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
     borderColor: palette.gold,
   },
+  fulfillmentChipDisabled: {
+    opacity: 0.4,
+    backgroundColor: palette.softGold,
+  },
   fulfillmentLabel: {
     fontSize: 13,
     color: palette.charcoal,
   },
   fulfillmentLabelSelected: {
     color: palette.pureWhite,
+  },
+  fulfillmentLabelDisabled: {
+    color: palette.muted,
   },
 });

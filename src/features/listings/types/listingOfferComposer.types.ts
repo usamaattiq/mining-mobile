@@ -24,6 +24,8 @@ export type ListingOfferComposerProps = {
   fulfillmentLabels?: Partial<Record<'rent' | 'sale' | 'onsite' | 'online', string>>;
   fulfillmentRentLabel?: string;
   fulfillmentSaleLabel?: string;
+  /** Rent/buy (or similar) chips that cannot be sent until an open offer of that kind is settled. */
+  blockedFulfillmentModes?: Array<'rent' | 'sale' | 'onsite' | 'online'>;
   offerChoiceLabel?: string;
   onSubmit: (
     price: string,
