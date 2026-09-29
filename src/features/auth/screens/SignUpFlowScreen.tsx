@@ -459,7 +459,11 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           <FormInput
             label={t('signUpPersonalInfo.emailOptional')}
             placeholder={t('signUpPersonalInfo.emailPlaceholder')}
-            error={emailError ?? undefined}
+            error={
+              email.trim().length > 0 && !EMAIL_REGEX.test(email.trim())
+                ? t('signUpPersonalInfo.emailInvalid')
+                : (emailError ?? undefined)
+            }
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}

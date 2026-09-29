@@ -123,6 +123,7 @@
     "companyName": "Company name",
     "emailOptional": "Email (optional)",
     "emailPlaceholder": "name@example.com",
+    "emailInvalid": "Enter a valid email address",
     "emailAlreadyExists": "This email already exists",
     "location": "Location",
     "panToSelect": "Move the map to select a location"
@@ -522,6 +523,7 @@
     "saveError": "Couldn't save your changes. Please try again.",
     "email": "Email (optional)",
     "emailPlaceholder": "name@example.com",
+    "emailInvalid": "Enter a valid email address",
     "phone": "Phone",
     "security": "Security settings",
     "securitySubtitle": "MPIN, biometrics, and device sessions",

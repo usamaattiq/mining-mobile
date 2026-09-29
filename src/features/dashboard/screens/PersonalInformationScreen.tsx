@@ -44,8 +44,11 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
     useLocationMapPicker();
 
   const trimmedEmail = email.trim();
-  const isEmailFormatValid = trimmedEmail.length === 0 || EMAIL_REGEX.test(trimmedEmail);
-  const emailError = emailServerError;
+  const emailFormatError =
+    trimmedEmail.length > 0 && !EMAIL_REGEX.test(trimmedEmail)
+      ? t('profile.emailInvalid')
+      : null;
+  const emailError = emailFormatError ?? emailServerError;
 
   const handleEmailChange = (next: string) => {
     setEmail(next);
@@ -86,7 +89,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
     avatarUrl !== (profile?.avatarUrl ?? null);
 
   const handleSave = async () => {
-    if (emailError || !isEmailFormatValid) return;
+    if (emailError) return;
 
     setSaving(true);
     try {
@@ -153,7 +156,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
           label={t('common.save')}
           onPress={() => void handleSave()}
           loading={saving}
-          disabled={!hasChanges || saving || !!emailError || !isEmailFormatValid}
+          disabled={!hasChanges || saving || !!emailError}
           style={styles.saveButton}
         />
       </GoldSheetScreen>
