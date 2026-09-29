@@ -30,7 +30,7 @@
     "yourOffer": "عرضك",
     "updateOfferPlaceholder": "حدّث عرضك",
     "unitPricePlaceholder": "سعر الوحدة",
-    "pricePerUnit": "للوحدة",
+    "pricePerUnit": "/ وحدة",
     "totalLabel": "الإجمالي",
     "unitsLabel": "وحدات",
     "offerCalculation": "{price} × {count}",

@@ -30,7 +30,7 @@
     "yourOffer": "Your Offer",
     "updateOfferPlaceholder": "Update Your Offer",
     "unitPricePlaceholder": "Price per unit",
-    "pricePerUnit": "per unit",
+    "pricePerUnit": "/ unit",
     "totalLabel": "Total",
     "unitsLabel": "Units",
     "offerCalculation": "{price} × {count}",

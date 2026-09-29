@@ -97,19 +97,19 @@ export function ListingOffersPanel({
                     </AppText>
                   </View>
                 ) : null}
+                {offer.delivery ? (
+                  <AppText style={styles.kind}>
+                    {offer.delivery === 'onsite'
+                      ? t('serviceListing.onsite')
+                      : t('serviceListing.online')}
+                  </AppText>
+                ) : null}
+                {showUnits && offer.kind ? (
+                  <AppText style={styles.kind}>
+                    {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+                  </AppText>
+                ) : null}
               </View>
-              {offer.delivery ? (
-                <AppText style={styles.kind}>
-                  {offer.delivery === 'onsite'
-                    ? t('serviceListing.onsite')
-                    : t('serviceListing.online')}
-                </AppText>
-              ) : null}
-              {showUnits && offer.kind ? (
-                <AppText style={styles.kind}>
-                  {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
-                </AppText>
-              ) : null}
               {showUnits && unitAmount != null && units ? (
                 <PriceTimesUnitsSummary
                   currencyCode={currencyCode}
@@ -139,10 +139,6 @@ export function ListingOffersPanel({
                     style={styles.actionButton}
                   />
                 </View>
-              ) : offer.status === 'selected' ? (
-                <AppText style={styles.waiting}>
-                  {t('rfq.waitingForConfirmation')}
-                </AppText>
               ) : null}
               {onMessage &&
               (messageEveryOffer ||
@@ -224,9 +220,5 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-  },
-  waiting: {
-    fontSize: 13,
-    color: palette.muted,
   },
 });
