@@ -152,8 +152,7 @@ export function ListingOffersPanel({
                     onPress={() => onMessage(offer)}
                     style={styles.actionButton}
                   />
-                  {(offer.status === 'confirmed' || offer.status === 'selected') &&
-                  offer.responderPhone ? (
+                  {offer.status === 'confirmed' && offer.responderPhone ? (
                     <Button
                       label={t('common.whatsapp')}
                       icon="logo-whatsapp"

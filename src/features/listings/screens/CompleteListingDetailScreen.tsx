@@ -978,12 +978,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   style={styles.messageButton}
                 />
                 {(() => {
-                  const whatsappReady =
-                    supplierBuyer
-                      ? mySupplierOffers.some(
-                          (offer) => offer.status === 'selected' || offer.status === 'confirmed',
-                        )
-                      : rfq?.myOfferStatus === 'confirmed' || rfq?.myOfferStatus === 'selected';
+                  const whatsappReady = supplierBuyer
+                    ? mySupplierOffers.some((offer) => offer.status === 'confirmed')
+                    : rfq?.myOfferStatus === 'confirmed';
                   return whatsappReady && rfq?.ownerPhone ? (
                   <Button
                     label={t('common.whatsapp')}
