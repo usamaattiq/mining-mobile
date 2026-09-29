@@ -50,25 +50,25 @@ function rentalPrice(
   if (listing.hourlyRental) {
     return {
       priceText: priceText(currencyCode, listing.hourlyRental),
-      priceUnit: t('equipmentListing.cardHourlyUnit'),
+      priceUnit: t('equipmentListing.hourlyUnit'),
     };
   }
   if (listing.weeklyRental) {
     return {
       priceText: priceText(currencyCode, listing.weeklyRental),
-      priceUnit: t('equipmentListing.cardWeeklyUnit'),
+      priceUnit: t('equipmentListing.weeklyUnit'),
     };
   }
   if (listing.monthlyRental) {
     return {
       priceText: priceText(currencyCode, listing.monthlyRental),
-      priceUnit: t('equipmentListing.cardMonthlyUnit'),
+      priceUnit: t('equipmentListing.monthlyUnit'),
     };
   }
   if (listing.yearlyRental) {
     return {
       priceText: priceText(currencyCode, listing.yearlyRental),
-      priceUnit: t('equipmentListing.cardYearlyUnit'),
+      priceUnit: t('equipmentListing.yearlyUnit'),
     };
   }
   return { priceText: undefined, priceUnit: undefined };

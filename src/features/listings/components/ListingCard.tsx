@@ -185,7 +185,7 @@ export function ListingCard({
                 {priceText ?? ' '}
               </AppText>
               {priceUnit ? (
-                <AppText weight="bold" style={styles.gridPriceUnit} numberOfLines={1}>
+                <AppText style={styles.gridPriceUnit}>
                   {priceUnit}
                 </AppText>
               ) : null}
@@ -288,9 +288,7 @@ export function ListingCard({
                 {priceText ?? ' '}
               </AppText>
               {priceUnit ? (
-                <AppText weight="bold" style={styles.priceUnit} numberOfLines={1}>
-                  {priceUnit}
-                </AppText>
+                <AppText style={styles.priceUnit}>{priceUnit}</AppText>
               ) : null}
             </View>
           </View>
@@ -493,8 +491,9 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 2,
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
     minHeight: 20,
   },
   price: {
@@ -504,9 +503,9 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   priceUnit: {
-    fontSize: 18,
-    lineHeight: 22,
-    color: palette.charcoal,
+    fontSize: 12,
+    lineHeight: 16,
+    color: palette.muted,
     includeFontPadding: false,
   },
   bottomRow: {
