@@ -225,7 +225,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         index: 1,
         routes: [
           { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'services' } } },
-          { name: 'Welcome', params: { next: 'listings', category: 'services' } },
+          { name: 'Welcome', params: { next: 'listings', category: 'services', listingId: listing.id } },
         ],
       });
     } catch (error) {

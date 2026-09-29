@@ -311,7 +311,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         index: 1,
         routes: [
           { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'equipment' } } },
-          { name: 'Welcome', params: { next: 'listings', category: 'equipment' } },
+          { name: 'Welcome', params: { next: 'listings', category: 'equipment', listingId: listing.id } },
         ],
       });
     } catch (error) {

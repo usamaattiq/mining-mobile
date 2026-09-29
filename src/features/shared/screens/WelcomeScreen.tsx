@@ -28,9 +28,29 @@ export function WelcomeScreen({ navigation, route }: Props): React.ReactElement 
   const progress = useSharedValue(0);
   const toListings = route.params?.next === 'listings';
   const listingCategory = route.params?.category;
+  const listingId = route.params?.listingId;
 
   const handleContinue = React.useCallback(() => {
     setContinuing(true);
+    if (toListings && listingId && listingCategory) {
+      navigation.reset({
+        index: 1,
+        routes: [
+          {
+            name: 'Dashboard',
+            params: {
+              screen: 'Requests',
+              params: { category: listingCategory },
+            },
+          },
+          {
+            name: 'CompleteListingDetail',
+            params: { id: listingId, category: listingCategory },
+          },
+        ],
+      });
+      return;
+    }
     if (toListings) {
       navigation.reset({
         index: 0,
@@ -47,7 +67,7 @@ export function WelcomeScreen({ navigation, route }: Props): React.ReactElement 
       return;
     }
     navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
-  }, [listingCategory, navigation, toListings]);
+  }, [listingCategory, listingId, navigation, toListings]);
 
   React.useEffect(() => {
     progress.value = withTiming(1, { duration: CONTINUE_DELAY_MS, easing: Easing.linear });

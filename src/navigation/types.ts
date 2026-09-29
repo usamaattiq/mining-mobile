@@ -20,7 +20,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
   SignUpFlow: undefined;
-  Welcome: { next?: 'listings'; category?: ListingCategory } | undefined;
+  Welcome: { next?: 'listings'; category?: ListingCategory; listingId?: string } | undefined;
   Dashboard: NavigatorScreenParams<DashboardTabParamList> | undefined;
   PersonalInformation: undefined;
   SecuritySettings: undefined;

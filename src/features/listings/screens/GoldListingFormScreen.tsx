@@ -192,7 +192,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         index: 1,
         routes: [
           { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'gold' } } },
-          { name: 'Welcome', params: { next: 'listings', category: 'gold' } },
+          { name: 'Welcome', params: { next: 'listings', category: 'gold', listingId: listing.id } },
         ],
       });
     } catch (error) {
