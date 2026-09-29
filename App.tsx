@@ -1,9 +1,9 @@
 import React from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { StatusBar, StyleSheet } from 'react-native';
+import { StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { KeyboardAvoidingView, KeyboardProvider } from 'react-native-keyboard-controller';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { AppAlertHost } from '@/shared/components/AppAlertHost';
@@ -88,20 +88,11 @@ export default function App() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
-        <KeyboardAvoidingView style={styles.root} behavior="padding">
-          <NavigationContainer ref={navigationRef} linking={navigationLinking} theme={navigationTheme}>
-            <AppNavigator />
-          </NavigationContainer>
-          <AppAlertHost />
-        </KeyboardAvoidingView>
+        <NavigationContainer ref={navigationRef} linking={navigationLinking} theme={navigationTheme}>
+          <AppNavigator />
+        </NavigationContainer>
+        <AppAlertHost />
       </KeyboardProvider>
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: palette.warmWhite,
-  },
-});

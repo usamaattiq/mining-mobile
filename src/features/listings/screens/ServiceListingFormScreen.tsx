@@ -311,8 +311,11 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
-        bottomOffset={24}
+        bounces={false}
+        overScrollMode="never"
+        bottomOffset={12}
         extraKeyboardSpace={0}
       >
         {step === 0 ? (
@@ -485,6 +488,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radius.lg + 4,
     borderTopRightRadius: radius.lg + 4,
     marginTop: -(radius.lg + 4),
+    overflow: 'hidden',
   },
   content: {
     padding: spacing.lg,
