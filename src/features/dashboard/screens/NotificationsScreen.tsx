@@ -77,6 +77,17 @@ export function NotificationsScreen({ navigation }: Props): React.ReactElement {
             t={t}
             onPress={() => {
               markRead(item.id);
+              if (item.conversationId) {
+                navigation.navigate('Conversation', { conversationId: item.conversationId });
+                return;
+              }
+              if (item.listingId && item.listingCategory) {
+                navigation.navigate('CompleteListingDetail', {
+                  id: item.listingId,
+                  category: item.listingCategory,
+                });
+                return;
+              }
               if (item.target === 'Messages') {
                 navigation.navigate('Messages');
                 return;

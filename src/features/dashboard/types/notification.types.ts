@@ -10,4 +10,7 @@ export type InAppNotification = {
   read: boolean;
   icon: keyof typeof Ionicons.glyphMap;
   target: NotificationTarget;
+  listingId?: string | null;
+  listingCategory?: 'equipment' | 'services' | 'gold' | null;
+  conversationId?: string | null;
 };
