@@ -41,7 +41,12 @@ export async function refreshOfferedListings(): Promise<void> {
 }
 
 export function cacheListing(listing: ListingDto): void {
-  if (listingHasMyOffer(listing)) {
+  const owned =
+    useListingsStore.getState().listings.some((item) => item.id === listing.id) ||
+    useServiceListingsStore.getState().listings.some((item) => item.id === listing.id) ||
+    useGoldListingsStore.getState().listings.some((item) => item.id === listing.id);
+
+  if (listingHasMyOffer(listing) && !owned) {
     useMarketListingsStore.getState().setListings(
       useMarketListingsStore.getState().listings.filter((item) => item.id !== listing.id),
     );

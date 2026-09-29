@@ -689,11 +689,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
           {showOwnerOffers &&
           (equipmentListing?.postedAs !== 'supplier' ||
-            (rfq?.offers ?? []).some((offer) => offer.status !== 'confirmed')) ? (
+            (rfq?.offers ?? []).some(
+              (offer) => offer.status === 'active' || offer.status === 'selected',
+            )) ? (
             <ListingOffersPanel
               offers={
                 equipmentListing?.postedAs === 'supplier'
-                  ? (rfq?.offers ?? []).filter((offer) => offer.status !== 'confirmed')
+                  ? (rfq?.offers ?? []).filter(
+                      (offer) => offer.status === 'active' || offer.status === 'selected',
+                    )
                   : (rfq?.offers ?? [])
               }
               currencyCode={currency.code}
@@ -777,6 +781,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           {isOwner && equipmentListing?.postedAs === 'supplier' ? (
             <EquipmentDealsSection
               listingId={id}
+              revision={(rfq?.offers ?? []).map((offer) => `${offer.id}:${offer.status}`).join('|')}
               buyerPhones={Object.fromEntries(
                 (rfq?.offers ?? [])
                   .filter((offer) => offer.responderPhone)

@@ -12,10 +12,12 @@ import { palette, radius, spacing } from '@/theme';
 
 export function EquipmentDealsSection({
   listingId,
+  revision,
   buyerPhones,
   onMessageBuyer,
 }: {
   listingId: string;
+  revision?: string;
   buyerPhones?: Record<string, string>;
   onMessageBuyer?: (buyer: { id: string; fullName: string }) => void;
 }): React.ReactElement | null {
@@ -31,11 +33,11 @@ export function EquipmentDealsSection({
     return () => {
       cancelled = true;
     };
-  }, [listingId]);
+  }, [listingId, revision]);
 
   const contactAction = (hold: EquipmentStockHold) => {
     if (!onMessageBuyer || !hold.buyerId) return null;
-    const phone = buyerPhones?.[hold.buyerId];
+    const phone = hold.status === 'active' ? buyerPhones?.[hold.buyerId] : undefined;
     return (
       <View style={styles.contactRow}>
         <Button
@@ -59,14 +61,30 @@ export function EquipmentDealsSection({
 
   if (!holds || holds.length === 0) return null;
 
+  const awaiting = holds.filter((hold) => hold.status === 'selected');
   const active = holds.filter((hold) => hold.status === 'active');
   const returned = holds.filter((hold) => hold.status === 'returned');
+
+  if (awaiting.length === 0 && active.length === 0 && returned.length === 0) return null;
 
   return (
     <View style={styles.section}>
       <AppText weight="bold" style={styles.title}>
         {t('equipmentListing.stockRecords')}
       </AppText>
+      {awaiting.map((hold) => (
+        <EquipmentDealCard
+          key={hold.id}
+          hold={hold}
+          dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
+          kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+          unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
+          currencyCode={currency.code}
+          perUnitLabel={t('rfq.pricePerUnit')}
+          statusLabel={t('rfq.offerStatus.selected')}
+          action={contactAction(hold)}
+        />
+      ))}
       {active.map((hold) => (
         <EquipmentDealCard
           key={hold.id}

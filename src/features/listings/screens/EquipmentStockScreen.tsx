@@ -69,6 +69,7 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
     );
   };
 
+  const awaiting = stock?.holds.filter((hold) => hold.status === 'selected') ?? [];
   const active = stock?.holds.filter((hold) => hold.status === 'active') ?? [];
   const returned = stock?.holds.filter((hold) => hold.status === 'returned') ?? [];
 
@@ -107,12 +108,25 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
             {t('equipmentListing.stockRecords')}
           </AppText>
 
-          {active.length === 0 && returned.length === 0 ? (
+          {awaiting.length === 0 && active.length === 0 && returned.length === 0 ? (
             <View style={styles.emptyCard}>
               <Ionicons name="file-tray-outline" size={28} color={palette.gold} />
               <AppText style={styles.empty}>{t('equipmentListing.stockEmpty')}</AppText>
             </View>
           ) : null}
+
+          {awaiting.map((hold) => (
+            <EquipmentDealCard
+              key={hold.id}
+              hold={hold}
+              dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
+              kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+              unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
+              currencyCode={currency.code}
+              perUnitLabel={t('rfq.pricePerUnit')}
+              statusLabel={t('rfq.offerStatus.selected')}
+            />
+          ))}
 
           {active.map((hold) => (
             <EquipmentDealCard
