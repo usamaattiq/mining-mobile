@@ -25,3 +25,16 @@ export function serviceTypeLabels(t: TFunction, type: ServiceType | null | undef
   if (flags.online) labels.push(t('serviceListing.online'));
   return labels;
 }
+
+export function resolveServicePrices(listing: {
+  serviceType: ServiceType;
+  price: string;
+  onsitePrice?: string;
+  onlinePrice?: string;
+}): { onsitePrice: string; onlinePrice: string } {
+  const flags = serviceTypeFlags(listing.serviceType);
+  return {
+    onsitePrice: listing.onsitePrice || (flags.onsite ? listing.price : '') || '',
+    onlinePrice: listing.onlinePrice || (flags.online ? listing.price : '') || '',
+  };
+}

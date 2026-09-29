@@ -96,6 +96,7 @@ export function ListingCard({
   statusBadges,
   priceText,
   priceUnit,
+  priceLines,
   createdAt,
   expiresAt,
   ended,
@@ -113,6 +114,12 @@ export function ListingCard({
   }, [thumbnailUri]);
   const showRepost = Boolean(ended && onRepost);
   const showTimer = Boolean(createdAt) && !ended;
+  const resolvedPriceLines =
+    priceLines && priceLines.length > 0
+      ? priceLines
+      : priceText || priceUnit
+        ? [{ text: priceText ?? ' ', unit: priceUnit }]
+        : [];
 
   const timer = showTimer ? (
     <View style={styles.timerBadge}>
@@ -179,16 +186,18 @@ export function ListingCard({
         </View>
 
         <View style={styles.gridBody}>
-          {(priceText || priceUnit) ? (
-            <View style={styles.gridPriceRow}>
-              <AppText weight="bold" style={styles.gridPrice} numberOfLines={1}>
-                {priceText ?? ' '}
-              </AppText>
-              {priceUnit ? (
-                <AppText style={styles.gridPriceUnit}>
-                  {priceUnit}
-                </AppText>
-              ) : null}
+          {resolvedPriceLines.length > 0 ? (
+            <View style={styles.gridPrices}>
+              {resolvedPriceLines.map((line, index) => (
+                <View key={`${line.text}-${line.unit ?? index}`} style={styles.gridPriceRow}>
+                  <AppText weight="bold" style={styles.gridPrice} numberOfLines={1}>
+                    {line.text}
+                  </AppText>
+                  {line.unit ? (
+                    <AppText style={styles.gridPriceUnit}>{line.unit}</AppText>
+                  ) : null}
+                </View>
+              ))}
             </View>
           ) : null}
 
@@ -283,14 +292,24 @@ export function ListingCard({
               </AppText>
             </View>
 
-            <View style={styles.priceRow}>
-              <AppText weight="bold" style={styles.price} numberOfLines={1}>
-                {priceText ?? ' '}
-              </AppText>
-              {priceUnit ? (
-                <AppText style={styles.priceUnit}>{priceUnit}</AppText>
-              ) : null}
-            </View>
+            {resolvedPriceLines.length > 0 ? (
+              <View style={styles.prices}>
+                {resolvedPriceLines.map((line, index) => (
+                  <View key={`${line.text}-${line.unit ?? index}`} style={styles.priceRow}>
+                    <AppText weight="bold" style={styles.price} numberOfLines={1}>
+                      {line.text}
+                    </AppText>
+                    {line.unit ? <AppText style={styles.priceUnit}>{line.unit}</AppText> : null}
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.priceRow}>
+                <AppText weight="bold" style={styles.price} numberOfLines={1}>
+                  {' '}
+                </AppText>
+              </View>
+            )}
           </View>
 
           <View style={styles.bottomRow}>
@@ -349,6 +368,9 @@ const styles = StyleSheet.create({
     top: spacing.xs + 2,
     right: spacing.xs + 2,
     zIndex: 1,
+  },
+  gridPrices: {
+    gap: 2,
   },
   gridPriceRow: {
     flexDirection: 'row',
@@ -487,6 +509,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 14,
     color: palette.muted,
+  },
+  prices: {
+    alignItems: 'flex-end',
+    gap: 2,
   },
   priceRow: {
     flexDirection: 'row',

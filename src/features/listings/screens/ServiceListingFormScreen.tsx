@@ -27,7 +27,7 @@ import { ApiError } from '@/shared/services/api';
 import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
-import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels } from '@/features/listings/utils/serviceType';
+import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -109,7 +109,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [yearsOfExperience, setYearsOfExperience] = React.useState(1);
-  const [price, setPrice] = React.useState('');
+  const [onsitePrice, setOnsitePrice] = React.useState('');
+  const [onlinePrice, setOnlinePrice] = React.useState('');
   const [listedUntil, setListedUntil] = React.useState(defaultListingEnd);
   const [location, setLocation] = React.useState('');
   const [locationCoords, setLocationCoords] = React.useState<{
@@ -144,7 +145,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setTitle(sourceListing.title);
     setDescription(sourceListing.description ?? '');
     setYearsOfExperience(Math.max(Number(sourceListing.yearsOfExperience) || 1, 1));
-    setPrice(isBuyer ? '' : sourceListing.price ?? '');
+    const prices = resolveServicePrices(sourceListing);
+    setOnsitePrice(isBuyer ? '' : prices.onsitePrice);
+    setOnlinePrice(isBuyer ? '' : prices.onlinePrice);
     setLocation(sourceListing.location ?? '');
     setMedia(
       cloneRepostMedia(
@@ -174,7 +177,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       serviceCategory &&
       title.trim() &&
       description.trim() &&
-      (isBuyer || price.trim()),
+      (isBuyer ||
+        ((onsite ? Boolean(onsitePrice.trim()) : true) &&
+          (online ? Boolean(onlinePrice.trim()) : true))),
   );
   const mediaValid =
     (isBuyer || media.length > 0) &&
@@ -213,7 +218,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         title,
         description,
         yearsOfExperience: String(yearsOfExperience),
-        price: isBuyer ? '' : price,
+        onsitePrice: isBuyer || !onsite ? '' : onsitePrice,
+        onlinePrice: isBuyer || !online ? '' : onlinePrice,
+        price: isBuyer ? '' : onsite ? onsitePrice : onlinePrice,
         serviceDate: null,
         expiryHours: expiryHoursUntil(listedUntil),
         location: isOnsite ? location : '',
@@ -250,14 +257,24 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     },
     {
       label: t('serviceListing.type'),
-      value: serviceTypeLabels(t, serviceType).join(' · '),
+      value: serviceTypeLabels(t, serviceType).join(' / '),
     },
     ...(isBuyer
       ? []
       : [
           {
-            label: t('serviceListing.price'),
-            value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
+            label: t('serviceListing.onsitePrice'),
+            value:
+              onsite && onsitePrice
+                ? `${currency.code} ${formatAmountWithCommas(onsitePrice)}`
+                : '',
+          },
+          {
+            label: t('serviceListing.onlinePrice'),
+            value:
+              online && onlinePrice
+                ? `${currency.code} ${formatAmountWithCommas(onlinePrice)}`
+                : '',
           },
         ]),
     ...(isOnsite ? [{ label: t('serviceListing.location'), value: location }] : []),
@@ -363,14 +380,28 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             {isBuyer ? null : (
-              <FormInput
-                label={t('serviceListing.price')}
-                value={price}
-                onChangeText={setPrice}
-                keyboardType="numeric"
-                placeholder={currency.code}
-                required
-              />
+              <>
+                {onsite ? (
+                  <FormInput
+                    label={t('serviceListing.onsitePrice')}
+                    value={onsitePrice}
+                    onChangeText={setOnsitePrice}
+                    keyboardType="numeric"
+                    placeholder={currency.code}
+                    required
+                  />
+                ) : null}
+                {online ? (
+                  <FormInput
+                    label={t('serviceListing.onlinePrice')}
+                    value={onlinePrice}
+                    onChangeText={setOnlinePrice}
+                    keyboardType="numeric"
+                    placeholder={currency.code}
+                    required
+                  />
+                ) : null}
+              </>
             )}
           </View>
         ) : null}

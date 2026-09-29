@@ -225,7 +225,9 @@ const styles = StyleSheet.create({
   triggerCompact: {
     gap: spacing.xs,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
+    paddingVertical: 0,
+    minHeight: 52,
+    height: 52,
   },
   triggerError: {
     borderColor: palette.danger,

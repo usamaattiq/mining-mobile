@@ -13,6 +13,8 @@ export type ServiceListing = {
   description: string;
   yearsOfExperience: string;
   price: string;
+  onsitePrice?: string;
+  onlinePrice?: string;
   /** Epoch ms of the requested service date/time, or null if not set. */
   serviceDate: number | null;
   location: string;

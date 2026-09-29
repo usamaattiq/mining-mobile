@@ -454,6 +454,8 @@
     "yearsOfExperiencePlaceholder": "e.g. 5",
     "yearsOfExperienceValue": "{years} years",
     "price": "Price",
+    "onsitePrice": "Onsite price",
+    "onlinePrice": "Online price",
     "listedUntil": "List until",
     "listedUntilPlaceholder": "Select date & time",
     "listedUntilPast": "Choose a listing end time in the future.",

@@ -30,8 +30,10 @@ export type ListingCardProps = {
   /** Rent, sell, online, onsite — bottom left. */
   statusBadges?: ListingCardBadge[];
   priceText?: string;
-  /** Rental unit shown after the amount (/hr, /w, /m) — same typeface as the price. */
+  /** Grey period/type label after the amount, same as details. */
   priceUnit?: string;
+  /** When set, each line is amount + grey unit (onsite/online or rent period). */
+  priceLines?: Array<{ text: string; unit?: string }>;
   /** Epoch ms the listing was created — countdown, bottom right. */
   createdAt?: number;
   /** RFQ expiry from RMS; used for the card countdown when present. */

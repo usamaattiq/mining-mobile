@@ -434,6 +434,8 @@
     "yearsOfExperiencePlaceholder": "مثال: 5",
     "yearsOfExperienceValue": "{years} سنوات",
     "price": "السعر",
+    "onsitePrice": "سعر في الموقع",
+    "onlinePrice": "سعر عن بُعد",
     "listedUntil": "يستمر الإعلان حتى",
     "listedUntilPlaceholder": "اختر التاريخ والوقت",
     "listedUntilPast": "اختر وقت انتهاء في المستقبل.",

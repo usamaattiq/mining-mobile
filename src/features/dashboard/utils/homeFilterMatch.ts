@@ -40,7 +40,10 @@ export function equipmentListingAmount(listing: EquipmentListing): number | null
 }
 
 export function serviceListingAmount(listing: ServiceListing): number | null {
-  return parseFilterNumber(listing.price);
+  const onsite = parseFilterNumber(listing.onsitePrice);
+  const online = parseFilterNumber(listing.onlinePrice);
+  if (onsite != null && online != null) return Math.min(onsite, online);
+  return onsite ?? online ?? parseFilterNumber(listing.price);
 }
 
 export function goldListingAmount(listing: GoldListing): number | null {

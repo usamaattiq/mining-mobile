@@ -39,7 +39,7 @@ import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
-import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
+import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { palette, radius, spacing } from '@/theme';
 
@@ -147,6 +147,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   );
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
+  const [servicePriceMode, setServicePriceMode] = React.useState<'online' | 'onsite'>('online');
   const [messageOpen, setMessageOpen] = React.useState(false);
   const [messagePeer, setMessagePeer] = React.useState<{
     id: string;
@@ -377,7 +378,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
       {
         label: t('serviceListing.type'),
-        value: serviceTypeLabels(t, serviceListing.serviceType).join(' · '),
+        value: serviceTypeLabels(t, serviceListing.serviceType).join(' / '),
       },
       {
         label: t('serviceListing.listedUntil'),
@@ -385,11 +386,60 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
+    const servicePrices = resolveServicePrices(serviceListing);
+    const servicePriceOptions = (
+      [
+        servicePrices.onlinePrice
+          ? {
+              key: 'online' as const,
+              amount: servicePrices.onlinePrice,
+              label: t('serviceListing.online'),
+            }
+          : null,
+        servicePrices.onsitePrice
+          ? {
+              key: 'onsite' as const,
+              amount: servicePrices.onsitePrice,
+              label: t('serviceListing.onsite'),
+            }
+          : null,
+      ] as const
+    ).filter((option): option is NonNullable<typeof option> => option !== null);
+    const activeServicePrice =
+      servicePriceOptions.find((option) => option.key === servicePriceMode) ??
+      servicePriceOptions[0];
     priceNode =
-      serviceListing.postedAs === 'buyer' || !serviceListing.price ? null : (
-      <AppText weight="bold" style={styles.priceAmount}>
-        {currency.code} {formatAmountWithCommas(serviceListing.price)}
-      </AppText>
+      serviceListing.postedAs === 'buyer' || !activeServicePrice ? null : (
+      <View style={styles.priceRow}>
+        <View style={styles.priceValueRow}>
+          <AppText weight="bold" style={styles.priceAmount}>
+            {currency.code} {formatAmountWithCommas(activeServicePrice.amount)}
+          </AppText>
+        </View>
+        {servicePriceOptions.length > 1 ? (
+          <View style={styles.serviceModeRow}>
+            {servicePriceOptions.map((option) => {
+              const selected = option.key === activeServicePrice.key;
+              return (
+                <Pressable
+                  key={option.key}
+                  onPress={() => setServicePriceMode(option.key)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  style={[styles.serviceModeButton, selected && styles.serviceModeButtonSelected]}
+                >
+                  <AppText
+                    weight="semibold"
+                    style={[styles.serviceModeLabel, selected && styles.serviceModeLabelSelected]}
+                  >
+                    {option.label}
+                  </AppText>
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : null}
+      </View>
     );
 
     extraSection = <AttachmentsSection documents={documents} />;
@@ -1176,6 +1226,9 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.xs,
   },
+  servicePrices: {
+    gap: spacing.xs,
+  },
   highestBid: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -1225,6 +1278,31 @@ const styles = StyleSheet.create({
   },
   durationDropdown: {
     width: 90,
+  },
+  serviceModeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  serviceModeButton: {
+    minHeight: 36,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  serviceModeButtonSelected: {
+    backgroundColor: palette.gold,
+    borderColor: palette.gold,
+  },
+  serviceModeLabel: {
+    fontSize: 13,
+    color: palette.charcoal,
+  },
+  serviceModeLabelSelected: {
+    color: palette.pureWhite,
   },
   titleBlock: {
     gap: spacing.xs,

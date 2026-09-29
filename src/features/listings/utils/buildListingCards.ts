@@ -7,7 +7,7 @@ import type { ListingCardProps } from '@/features/listings/types/listingCard.typ
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { rfqStatusBadge, isEndedRfqStatus } from '@/features/listings/utils/rfqStatus';
-import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
+import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 
 export type ListingCardItem = ListingCardProps & { id: string };
 
@@ -164,7 +164,19 @@ export function buildListingCards({
   }
 
   if (category === 'services') {
-    return serviceListings.map((listing) => ({
+    return serviceListings.map((listing) => {
+      const prices = resolveServicePrices(listing);
+      const shownPrice = prices.onlinePrice || prices.onsitePrice;
+      const priceLines =
+        listing.postedAs === 'buyer' || !shownPrice
+          ? undefined
+          : [
+              {
+                text: `${currencyCode} ${formatAmountWithCommas(shownPrice)}`,
+                unit: prices.onlinePrice ? undefined : t('serviceListing.onsite'),
+              },
+            ];
+      return {
       id: listing.id,
       title: listing.title,
       reference: listing.reference,
@@ -180,7 +192,7 @@ export function buildListingCards({
           label,
         })),
       ],
-      priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
+      priceLines,
       createdAt: listing.createdAt,
       expiresAt: listing.rfq?.expiresAt ?? undefined,
       ended: listingHasEnded({
@@ -190,7 +202,8 @@ export function buildListingCards({
       }),
       onRepost: onRepost ? () => onRepost(listing.id, 'services') : undefined,
       onPress: () => onOpen(listing.id, 'services'),
-    }));
+    };
+    });
   }
 
   return goldListings.map((listing) => ({
