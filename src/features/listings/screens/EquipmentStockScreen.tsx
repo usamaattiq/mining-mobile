@@ -77,30 +77,32 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
       title={t('equipmentListing.stockTitle')}
       left="back"
       onBackPress={() => navigation.goBack()}
+      headerStyle={styles.header}
+      headerExtra={
+        <View style={styles.tiles}>
+          <Tile
+            icon="cube-outline"
+            label={t('equipmentListing.stockAvailable')}
+            value={stock?.availableUnits ?? 0}
+          />
+          <Tile
+            icon="key-outline"
+            label={t('equipmentListing.stockOnRent')}
+            value={stock?.rentUnits ?? 0}
+          />
+          <Tile
+            icon="pricetag-outline"
+            label={t('equipmentListing.stockSold')}
+            value={stock?.saleUnits ?? 0}
+          />
+        </View>
+      }
       contentContainerStyle={styles.content}
     >
       {loading && !stock ? (
         <ActivityIndicator color={palette.gold} style={styles.loader} />
       ) : (
         <>
-          <View style={styles.tiles}>
-            <Tile
-              icon="cube-outline"
-              label={t('equipmentListing.stockAvailable')}
-              value={stock?.availableUnits ?? 0}
-            />
-            <Tile
-              icon="key-outline"
-              label={t('equipmentListing.stockOnRent')}
-              value={stock?.rentUnits ?? 0}
-            />
-            <Tile
-              icon="pricetag-outline"
-              label={t('equipmentListing.stockSold')}
-              value={stock?.saleUnits ?? 0}
-            />
-          </View>
-
           <AppText weight="bold" style={styles.sectionTitle}>
             {t('equipmentListing.stockRecords')}
           </AppText>
@@ -120,9 +122,7 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
               kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
               unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
               currencyCode={currency.code}
-              perUnitLabel={t('equipmentListing.stockPerUnit')}
-              unitsTileLabel={t('equipmentListing.stockDealUnits')}
-              totalLabel={t('equipmentListing.stockDealTotal')}
+              perUnitLabel={t('rfq.pricePerUnit')}
               action={
                 hold.kind === 'rent' && hold.status === 'active' ? (
                   <Button
@@ -146,9 +146,7 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
               kindLabel={t('equipmentListing.rent')}
               unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
               currencyCode={currency.code}
-              perUnitLabel={t('equipmentListing.stockPerUnit')}
-              unitsTileLabel={t('equipmentListing.stockDealUnits')}
-              totalLabel={t('equipmentListing.stockDealTotal')}
+              perUnitLabel={t('rfq.pricePerUnit')}
               statusLabel={t('equipmentListing.stockReturned')}
             />
           ))}
@@ -189,8 +187,6 @@ function DealCard({
   unitsLabel,
   currencyCode,
   perUnitLabel,
-  unitsTileLabel,
-  totalLabel,
   statusLabel,
   muted = false,
   action,
@@ -201,42 +197,42 @@ function DealCard({
   unitsLabel: string;
   currencyCode: string;
   perUnitLabel: string;
-  unitsTileLabel: string;
-  totalLabel: string;
   statusLabel?: string;
   muted?: boolean;
   action?: React.ReactNode;
 }): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
   const total = parsePositiveAmount(hold.price);
   const unitAmount =
     total != null && hold.units > 0 ? Math.round((total / hold.units) * 100) / 100 : null;
+  const unitText = unitAmount != null ? formatMoneyAmount(currencyCode, unitAmount) : null;
   return (
     <View style={[styles.card, muted && styles.cardMuted]}>
       <View style={styles.cardRow}>
-        <View style={styles.cardCopy}>
-          <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
-            {hold.buyerName}
-          </AppText>
-          <AppText style={styles.cardMeta} numberOfLines={1}>
-            {unitsLabel} · {dateLabel}
-          </AppText>
-          {unitAmount != null ? (
-            <AppText weight="semibold" style={styles.cardPrice}>
-              {formatMoneyAmount(currencyCode, unitAmount)} {perUnitLabel}
-            </AppText>
-          ) : null}
-        </View>
-        <View style={[styles.chip, muted && styles.chipMuted]}>
-          <AppText weight="semibold" style={[styles.chipText, muted && styles.chipTextMuted]}>
-            {statusLabel ?? kindLabel}
-          </AppText>
-        </View>
+        <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+          {hold.buyerName}
+        </AppText>
+        <AppText weight="semibold" style={[styles.kindLabel, muted && styles.kindLabelMuted]}>
+          {kindLabel}
+        </AppText>
       </View>
-      {unitAmount != null && total != null ? (
-        <View style={styles.calcRow}>
-          <CalcTile label={perUnitLabel} value={formatMoneyAmount(currencyCode, unitAmount)} />
-          <CalcTile label={unitsTileLabel} value={String(hold.units)} />
-          <CalcTile label={totalLabel} value={formatMoneyAmount(currencyCode, total)} />
+      <AppText style={styles.cardMeta} numberOfLines={1}>
+        {statusLabel ? `${statusLabel} · ` : ''}
+        {unitsLabel} · {dateLabel}
+      </AppText>
+      {unitText != null && total != null ? (
+        <View style={styles.priceBlock}>
+          <View style={styles.priceRow}>
+            <AppText weight="bold" style={styles.cardPrice}>
+              {unitText}
+            </AppText>
+            <AppText style={styles.perUnit}>{perUnitLabel}</AppText>
+          </View>
+          <AppText style={styles.calculation}>
+            {t('rfq.offerCalculation', { price: unitText, count: hold.units })}
+            {'  ·  '}
+            {t('rfq.offerTotal', { amount: formatMoneyAmount(currencyCode, total) })}
+          </AppText>
         </View>
       ) : null}
       {action}
@@ -244,23 +240,17 @@ function DealCard({
   );
 }
 
-function CalcTile({ label, value }: { label: string; value: string }): React.ReactElement {
-  return (
-    <View style={styles.calcTile}>
-      <AppText weight="bold" style={styles.calcValue} numberOfLines={1}>
-        {value}
-      </AppText>
-      <AppText style={styles.calcLabel} numberOfLines={1}>
-        {label}
-      </AppText>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
+  header: { paddingBottom: spacing.sm },
   loader: { marginTop: spacing.xxl },
   content: { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xxl },
-  tiles: { flexDirection: 'row', gap: spacing.sm },
+  tiles: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl + spacing.sm,
+    backgroundColor: palette.gold,
+  },
   tile: {
     flex: 1,
     backgroundColor: palette.pureWhite,
@@ -296,29 +286,13 @@ const styles = StyleSheet.create({
   },
   cardMuted: { backgroundColor: palette.warmWhite },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  cardCopy: { flex: 1, gap: 2 },
-  cardTitle: { fontSize: 15, color: palette.charcoal },
+  cardTitle: { flex: 1, fontSize: 15, color: palette.charcoal },
+  kindLabel: { fontSize: 13, color: palette.goldDark },
+  kindLabelMuted: { color: palette.muted },
   cardMeta: { fontSize: 13, color: palette.muted },
-  cardPrice: { fontSize: 14, color: palette.goldDark, marginTop: 2 },
-  calcRow: { flexDirection: 'row', gap: spacing.xs },
-  calcTile: {
-    flex: 1,
-    backgroundColor: palette.warmWhite,
-    borderRadius: radius.sm,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xs,
-    alignItems: 'center',
-    gap: 2,
-  },
-  calcValue: { fontSize: 13, color: palette.charcoal },
-  calcLabel: { fontSize: 10, color: palette.muted, textAlign: 'center' },
-  chip: {
-    backgroundColor: palette.softGold,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-  },
-  chipMuted: { backgroundColor: palette.pureWhite },
-  chipText: { fontSize: 12, color: palette.goldDark },
-  chipTextMuted: { color: palette.muted },
+  priceBlock: { gap: 2 },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
+  cardPrice: { fontSize: 18, color: palette.charcoal },
+  perUnit: { fontSize: 13, color: palette.muted },
+  calculation: { fontSize: 12, lineHeight: 16, color: palette.muted, marginTop: 2 },
 });
