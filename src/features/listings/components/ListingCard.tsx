@@ -13,7 +13,7 @@ const COUNTDOWN_TICK_MS = 1000;
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 const MINUTE_MS = 60 * 1000;
-const IMAGE_SIZE = 112;
+const IMAGE_SIZE = 128;
 const BADGE_ROW_HEIGHT = 20;
 const LINE_HEIGHT = 18;
 
@@ -399,7 +399,9 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    alignItems: 'stretch',
     gap: spacing.sm,
+    height: IMAGE_SIZE,
   },
   imageWrap: {
     width: IMAGE_SIZE,
@@ -418,7 +420,7 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
-    minHeight: IMAGE_SIZE,
+    height: IMAGE_SIZE,
     justifyContent: 'space-between',
     minWidth: 0,
   },
@@ -462,7 +464,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    lineHeight: LINE_HEIGHT + 4,
+    lineHeight: LINE_HEIGHT,
     color: palette.charcoal,
   },
   subtitleRow: {
@@ -485,14 +487,14 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
   price: {
-    fontSize: 19,
-    lineHeight: 26,
+    fontSize: 18,
+    lineHeight: 22,
     color: palette.charcoal,
     includeFontPadding: false,
   },
   priceUnit: {
-    fontSize: 19,
-    lineHeight: 26,
+    fontSize: 18,
+    lineHeight: 22,
     color: palette.charcoal,
     includeFontPadding: false,
   },
