@@ -384,6 +384,8 @@
     "stockOnRent": "Out on rent",
     "stockSold": "Sold",
     "returnToCatalog": "Return to catalog",
+    "returnToCatalogTitle": "Return these units to the catalog?",
+    "returnToCatalogMessage": "They will be available to offer again.",
     "stockEmpty": "No accepted rent or sale deals yet.",
     "stockRecords": "Deals",
     "stockPerUnit": "Per unit",

@@ -364,6 +364,8 @@
     "stockOnRent": "مؤجرة",
     "stockSold": "مباعة",
     "returnToCatalog": "إرجاع إلى الكتالوج",
+    "returnToCatalogTitle": "إرجاع هذه الوحدات إلى الكتالوج؟",
+    "returnToCatalogMessage": "ستصبح متاحة للعرض مرة أخرى.",
     "stockEmpty": "لا توجد صفقات إيجار أو بيع مقبولة بعد.",
     "stockRecords": "الصفقات",
     "stockPerUnit": "للوحدة",

@@ -46,15 +46,27 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
   }, [load]);
 
   const returnHold = (hold: EquipmentStockHold) => {
-    setReturningId(hold.id);
-    void listingsApi
-      .returnRentedUnits(id, hold.id)
-      .then(setStock)
-      .catch((error: unknown) => {
-        const message = error instanceof ApiError ? error.message : t('common.error');
-        showAppAlert(t('common.error'), message);
-      })
-      .finally(() => setReturningId(null));
+    showAppAlert(
+      t('equipmentListing.returnToCatalogTitle'),
+      t('equipmentListing.returnToCatalogMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('equipmentListing.returnToCatalog'),
+          onPress: () => {
+            setReturningId(hold.id);
+            void listingsApi
+              .returnRentedUnits(id, hold.id)
+              .then(setStock)
+              .catch((error: unknown) => {
+                const message = error instanceof ApiError ? error.message : t('common.error');
+                showAppAlert(t('common.error'), message);
+              })
+              .finally(() => setReturningId(null));
+          },
+        },
+      ],
+    );
   };
 
   const active = stock?.holds.filter((hold) => hold.status === 'active') ?? [];
