@@ -52,7 +52,7 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
       [
         { text: t('common.cancel'), style: 'cancel' },
         {
-          text: t('equipmentListing.returnToCatalog'),
+          text: t('common.confirm'),
           onPress: () => {
             setReturningId(hold.id);
             void listingsApi
@@ -207,14 +207,16 @@ function DealCard({
     total != null && hold.units > 0 ? Math.round((total / hold.units) * 100) / 100 : null;
   const unitText = unitAmount != null ? formatMoneyAmount(currencyCode, unitAmount) : null;
   return (
-    <View style={[styles.card, muted && styles.cardMuted]}>
+    <View style={[styles.card, cardBackShadow, muted && styles.cardMuted]}>
       <View style={styles.cardRow}>
         <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
           {hold.buyerName}
         </AppText>
-        <AppText weight="semibold" style={[styles.kindLabel, muted && styles.kindLabelMuted]}>
-          {kindLabel}
-        </AppText>
+        <View style={[styles.kindBadge, muted && styles.kindBadgeMuted]}>
+          <AppText weight="semibold" style={[styles.kindLabel, muted && styles.kindLabelMuted]}>
+            {kindLabel}
+          </AppText>
+        </View>
       </View>
       <AppText style={styles.cardMeta} numberOfLines={1}>
         {statusLabel ? `${statusLabel} · ` : ''}
@@ -254,7 +256,7 @@ const styles = StyleSheet.create({
   },
   tile: {
     flex: 1,
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: palette.softGold,
@@ -277,7 +279,7 @@ const styles = StyleSheet.create({
   },
   empty: { color: palette.muted, fontSize: 14, textAlign: 'center' },
   card: {
-    backgroundColor: palette.pureWhite,
+    backgroundColor: palette.warmWhite,
     borderWidth: 1,
     borderColor: palette.softGold,
     borderRadius: radius.md,
@@ -285,10 +287,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     gap: spacing.sm,
   },
-  cardMuted: { backgroundColor: palette.warmWhite },
+  cardMuted: { backgroundColor: palette.softGold },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   cardTitle: { flex: 1, fontSize: 15, color: palette.charcoal },
-  kindLabel: { fontSize: 13, color: palette.goldDark },
+  kindBadge: {
+    backgroundColor: palette.softGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  kindBadgeMuted: { backgroundColor: palette.pureWhite },
+  kindLabel: { fontSize: 11, color: palette.goldDark },
   kindLabelMuted: { color: palette.muted },
   cardMeta: { fontSize: 13, color: palette.muted },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },

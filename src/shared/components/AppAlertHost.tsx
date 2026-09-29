@@ -55,7 +55,6 @@ export function AppAlertHost(): React.ReactElement | null {
                 style={({ pressed }) => [
                   styles.button,
                   button.style === 'cancel' && styles.buttonCancel,
-                  button.style === 'destructive' && styles.buttonDestructive,
                   pressed && styles.buttonPressed,
                 ]}
                 accessibilityRole="button"
@@ -121,9 +120,6 @@ const styles = StyleSheet.create({
   },
   buttonCancel: {
     backgroundColor: palette.softGold,
-  },
-  buttonDestructive: {
-    backgroundColor: palette.danger,
   },
   buttonPressed: {
     opacity: 0.88,
