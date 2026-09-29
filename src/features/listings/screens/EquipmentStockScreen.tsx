@@ -221,18 +221,19 @@ function DealCard({
         {unitsLabel} · {dateLabel}
       </AppText>
       {unitText != null && total != null ? (
-        <View style={styles.priceBlock}>
-          <View style={styles.priceRow}>
-            <AppText weight="bold" style={styles.cardPrice}>
-              {unitText}
-            </AppText>
-            <AppText style={styles.perUnit}>{perUnitLabel}</AppText>
-          </View>
-          <AppText style={styles.calculation}>
-            {t('rfq.offerCalculation', { price: unitText, count: hold.units })}
-            {'  ·  '}
-            {t('rfq.offerTotal', { amount: formatMoneyAmount(currencyCode, total) })}
+        <View style={styles.priceRow}>
+          <AppText weight="bold" style={styles.cardPrice}>
+            {unitText}
           </AppText>
+          <AppText style={styles.perUnit}>{perUnitLabel}</AppText>
+          <View style={styles.calculation}>
+            <AppText style={styles.calculationLine} numberOfLines={1}>
+              {t('rfq.offerCalculation', { price: unitText, count: hold.units })}
+            </AppText>
+            <AppText style={styles.calculationLine} numberOfLines={1}>
+              {t('rfq.offerTotal', { amount: formatMoneyAmount(currencyCode, total) })}
+            </AppText>
+          </View>
         </View>
       ) : null}
       {action}
@@ -290,9 +291,18 @@ const styles = StyleSheet.create({
   kindLabel: { fontSize: 13, color: palette.goldDark },
   kindLabelMuted: { color: palette.muted },
   cardMeta: { fontSize: 13, color: palette.muted },
-  priceBlock: { gap: 2 },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
+  priceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   cardPrice: { fontSize: 18, color: palette.charcoal },
   perUnit: { fontSize: 13, color: palette.muted },
-  calculation: { fontSize: 12, lineHeight: 16, color: palette.muted, marginTop: 2 },
+  calculation: {
+    flex: 1,
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  calculationLine: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: palette.muted,
+    textAlign: 'right',
+  },
 });
