@@ -153,7 +153,12 @@ export function SelectField({
           </Pressable>
         </Modal>
       ) : (
-        <AppBottomSheet visible={open} onClose={() => setOpen(false)} heightRatio={0.45}>
+        <AppBottomSheet
+          visible={open}
+          onClose={() => setOpen(false)}
+          heightRatio={searchable ? 0.45 : 0.7}
+          fitContent={!searchable}
+        >
           <AppText weight="bold" style={styles.sheetTitle}>
             {sheetTitle}
           </AppText>
@@ -176,14 +181,18 @@ export function SelectField({
             </View>
           ) : null}
 
-          <KeyboardAwareScrollView
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            bottomOffset={16}
-            extraKeyboardSpace={0}
-          >
-            {optionList}
-          </KeyboardAwareScrollView>
+          {searchable ? (
+            <KeyboardAwareScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              bottomOffset={16}
+              extraKeyboardSpace={0}
+            >
+              {optionList}
+            </KeyboardAwareScrollView>
+          ) : (
+            <View>{optionList}</View>
+          )}
         </AppBottomSheet>
       )}
     </View>
