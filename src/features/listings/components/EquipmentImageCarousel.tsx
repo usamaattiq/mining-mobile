@@ -1,14 +1,15 @@
 import React from 'react';
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
+  useWindowDimensions,
   View,
   type LayoutChangeEvent,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { palette, radius, spacing } from '@/theme';
 import { ListingVideoThumb } from '@/features/listings/components/ListingVideoThumb';
@@ -22,9 +23,20 @@ export function EquipmentImageCarousel({
   onPressImage,
   style,
 }: EquipmentImageCarouselProps): React.ReactElement {
-  const [containerWidth, setContainerWidth] = React.useState(0);
+  const windowWidth = useWindowDimensions().width;
+  const [containerWidth, setContainerWidth] = React.useState(windowWidth);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const hasMedia = media.length > 0;
+
+  const photoUrls = media
+    .filter((item) => item.kind !== 'video')
+    .map((item) => item.uri)
+    .join('\n');
+
+  React.useEffect(() => {
+    const urls = photoUrls.split('\n').filter(Boolean);
+    if (urls.length > 0) void Image.prefetch(urls);
+  }, [photoUrls]);
 
   const handleLayout = (event: LayoutChangeEvent) => {
     setContainerWidth(event.nativeEvent.layout.width);
@@ -56,9 +68,11 @@ export function EquipmentImageCarousel({
                 />
               ) : (
                 <Image
-                  source={{ uri: item.uri }}
+                  source={item.uri}
                   style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
-                  resizeMode="cover"
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  recyclingKey={item.id}
                 />
               )}
             </Pressable>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Image, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
+import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { useTranslation } from 'react-i18next';
@@ -105,6 +106,11 @@ export function ListingCard({
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
   const windowWidth = useWindowDimensions().width;
+  const thumbnailUri = thumbnail;
+
+  React.useEffect(() => {
+    if (thumbnailUri) void ExpoImage.prefetch(thumbnailUri);
+  }, [thumbnailUri]);
   const showRepost = Boolean(ended && onRepost);
   const showTimer = Boolean(createdAt) && !ended;
 
@@ -149,7 +155,12 @@ export function ListingCard({
           ]}
         >
           {thumbnail ? (
-            <Image source={{ uri: thumbnail }} style={styles.gridImage} resizeMode="cover" />
+            <ExpoImage
+              source={thumbnail}
+              style={styles.gridImage}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+            />
           ) : (
             <View style={[styles.gridImage, styles.imagePlaceholder]}>
               <Ionicons name={placeholderIcon} size={36} color={palette.muted} />
@@ -232,7 +243,7 @@ export function ListingCard({
       <View style={styles.row}>
         <View style={styles.imageWrap}>
           {thumbnail ? (
-            <Image source={{ uri: thumbnail }} style={styles.image} />
+            <ExpoImage source={thumbnail} style={styles.image} contentFit="cover" cachePolicy="memory-disk" />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
               <Ionicons name={placeholderIcon} size={24} color={palette.muted} />

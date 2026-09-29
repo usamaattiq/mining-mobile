@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -10,6 +9,7 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -69,7 +69,13 @@ export function EquipmentImageViewerModal({
                 </View>
               ) : (
                 <Pressable key={item.id} onPress={onClose} style={{ width, height }}>
-                  <Image source={{ uri: item.uri }} style={styles.image} resizeMode="contain" />
+                  <Image
+                    source={item.uri}
+                    style={styles.image}
+                    contentFit="contain"
+                    cachePolicy="memory-disk"
+                    recyclingKey={item.id}
+                  />
                 </Pressable>
               ),
             )}
