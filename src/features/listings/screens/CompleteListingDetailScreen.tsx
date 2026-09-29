@@ -37,6 +37,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
@@ -705,7 +706,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           ) : null}
 
           {isOwner && equipmentListing?.postedAs === 'supplier' ? (
-            <EquipmentDealsSection listingId={id} />
+            <EquipmentDealsSection
+              listingId={id}
+              buyerPhones={Object.fromEntries(
+                (rfq?.offers ?? [])
+                  .filter((offer) => offer.responderPhone)
+                  .map((offer) => [offer.responderId, offer.responderPhone as string]),
+              )}
+              onMessageBuyer={(buyer) => {
+                setMessagePeer({ id: buyer.id, fullName: buyer.fullName, avatarUrl: null });
+                setMessageOpen(true);
+              }}
+            />
           ) : null}
         </View>
       </ScrollView>
@@ -888,12 +900,23 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           onDecline={() => handleResponderOffer('decline')}
           footer={
             canMessage ? (
-              <Button
-                label={t('messages.message')}
-                icon="chatbubble-ellipses-outline"
-                onPress={() => setMessageOpen(true)}
-                style={styles.messageButton}
-              />
+              <View style={styles.contactRow}>
+                <Button
+                  label={t('messages.message')}
+                  icon="chatbubble-ellipses-outline"
+                  onPress={() => setMessageOpen(true)}
+                  style={styles.messageButton}
+                />
+                {rfq?.myOfferStatus === 'confirmed' && rfq.ownerPhone ? (
+                  <Button
+                    label={t('common.whatsapp')}
+                    icon="logo-whatsapp"
+                    variant="whatsapp"
+                    onPress={() => openWhatsApp(rfq.ownerPhone!)}
+                    style={styles.messageButton}
+                  />
+                ) : null}
+              </View>
             ) : null
           }
         />
@@ -1146,6 +1169,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.gold,
     textDecorationLine: 'underline',
+  },
+  contactRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
   },
   messageButton: {
     flex: 1,

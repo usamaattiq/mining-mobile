@@ -7,6 +7,7 @@ import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { palette, radius, spacing } from '@/theme';
 import type { ListingRfqOffer } from '@/features/listings/types/listingRfq.types';
 
@@ -144,11 +145,23 @@ export function ListingOffersPanel({
               (messageEveryOffer ||
                 offer.status === 'selected' ||
                 offer.status === 'confirmed') ? (
-                <Button
-                  label={t('messages.message')}
-                  icon="chatbubble-ellipses-outline"
-                  onPress={() => onMessage(offer)}
-                />
+                <View style={styles.actions}>
+                  <Button
+                    label={t('messages.message')}
+                    icon="chatbubble-ellipses-outline"
+                    onPress={() => onMessage(offer)}
+                    style={styles.actionButton}
+                  />
+                  {offer.status === 'confirmed' && offer.responderPhone ? (
+                    <Button
+                      label={t('common.whatsapp')}
+                      icon="logo-whatsapp"
+                      variant="whatsapp"
+                      onPress={() => openWhatsApp(offer.responderPhone!)}
+                      style={styles.actionButton}
+                    />
+                  ) : null}
+                </View>
               ) : null}
             </View>
           );

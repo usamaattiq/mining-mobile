@@ -19,7 +19,7 @@ export function Button({
 }: ButtonProps): React.ReactElement {
   const isDisabled = disabled || loading;
   const iconColor =
-    variant === 'primary' || variant === 'secondary' ? palette.pureWhite : palette.gold;
+    variant === 'outline' || variant === 'link' ? palette.gold : palette.pureWhite;
   const iconElement = icon ? <Ionicons name={icon} size={16} color={iconColor} /> : null;
 
   return (
@@ -33,6 +33,7 @@ export function Button({
         variant === 'secondary' && styles.secondary,
         variant === 'outline' && styles.outline,
         variant === 'link' && styles.link,
+        variant === 'whatsapp' && styles.whatsapp,
         overlay ? styles.clip : null,
         isDisabled && styles.disabled,
         style,
@@ -41,7 +42,7 @@ export function Button({
     >
       {overlay}
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? palette.pureWhite : palette.gold} />
+        <ActivityIndicator color={variant === 'outline' || variant === 'link' ? palette.gold : palette.pureWhite} />
       ) : (
         <>
           {iconPosition === 'left' ? iconElement : null}
@@ -54,6 +55,7 @@ export function Button({
               variant === 'secondary' && styles.labelSecondary,
               variant === 'outline' && styles.labelOutline,
               variant === 'link' && styles.labelLink,
+              variant === 'whatsapp' && styles.labelPrimary,
             ]}
           >
             {label}
@@ -92,6 +94,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: palette.gold,
+  },
+  whatsapp: {
+    backgroundColor: '#25D366',
   },
   link: {
     backgroundColor: 'transparent',

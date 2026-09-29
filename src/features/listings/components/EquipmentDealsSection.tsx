@@ -5,10 +5,20 @@ import { i18n as appI18n } from '@/i18n';
 import { EquipmentDealCard } from '@/features/listings/components/EquipmentDealCard';
 import { listingsApi, type EquipmentStockHold } from '@/features/listings/api/listingsApi';
 import { AppText } from '@/shared/components/AppText';
+import { Button } from '@/shared/components/Button';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { palette, spacing } from '@/theme';
+import { openWhatsApp } from '@/shared/utils/openWhatsApp';
+import { palette, radius, spacing } from '@/theme';
 
-export function EquipmentDealsSection({ listingId }: { listingId: string }): React.ReactElement | null {
+export function EquipmentDealsSection({
+  listingId,
+  buyerPhones,
+  onMessageBuyer,
+}: {
+  listingId: string;
+  buyerPhones?: Record<string, string>;
+  onMessageBuyer?: (buyer: { id: string; fullName: string }) => void;
+}): React.ReactElement | null {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const currency = useCurrency();
   const [holds, setHolds] = React.useState<EquipmentStockHold[] | null>(null);
@@ -22,6 +32,30 @@ export function EquipmentDealsSection({ listingId }: { listingId: string }): Rea
       cancelled = true;
     };
   }, [listingId]);
+
+  const contactAction = (hold: EquipmentStockHold) => {
+    if (!onMessageBuyer || !hold.buyerId) return null;
+    const phone = buyerPhones?.[hold.buyerId];
+    return (
+      <View style={styles.contactRow}>
+        <Button
+          label={t('messages.message')}
+          icon="chatbubble-ellipses-outline"
+          onPress={() => onMessageBuyer({ id: hold.buyerId!, fullName: hold.buyerName })}
+          style={styles.contactButton}
+        />
+        {phone ? (
+          <Button
+            label={t('common.whatsapp')}
+            icon="logo-whatsapp"
+            variant="whatsapp"
+            onPress={() => openWhatsApp(phone)}
+            style={styles.contactButton}
+          />
+        ) : null}
+      </View>
+    );
+  };
 
   if (!holds || holds.length === 0) return null;
 
@@ -42,6 +76,7 @@ export function EquipmentDealsSection({ listingId }: { listingId: string }): Rea
           unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
           currencyCode={currency.code}
           perUnitLabel={t('rfq.pricePerUnit')}
+          action={contactAction(hold)}
         />
       ))}
       {returned.map((hold) => (
@@ -55,6 +90,7 @@ export function EquipmentDealsSection({ listingId }: { listingId: string }): Rea
           currencyCode={currency.code}
           perUnitLabel={t('rfq.pricePerUnit')}
           statusLabel={t('equipmentListing.stockReturned')}
+          action={contactAction(hold)}
         />
       ))}
     </View>
@@ -68,4 +104,11 @@ function formatDealDate(locale: string, epoch: number): string {
 const styles = StyleSheet.create({
   section: { gap: spacing.md },
   title: { fontSize: 16, color: palette.charcoal },
+  contactRow: { flexDirection: 'row', gap: spacing.sm },
+  contactButton: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: radius.md,
+    paddingVertical: 0,
+  },
 });

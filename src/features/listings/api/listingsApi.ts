@@ -11,6 +11,7 @@ export type EquipmentStockHold = {
   kind: 'rent' | 'sale';
   units: number;
   status: 'active' | 'selected' | 'returned';
+  buyerId?: string;
   buyerName: string;
   price: string;
   createdAt: number;

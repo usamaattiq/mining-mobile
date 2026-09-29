@@ -10,6 +10,7 @@ export type ListingRfqOffer = {
   rank?: number;
   kind?: 'rent' | 'sale';
   delivery?: 'onsite' | 'online';
+  responderPhone?: string;
 };
 
 export type ListingRfq = {
@@ -31,6 +32,7 @@ export type ListingRfq = {
   myOfferQuantity?: number;
   myOfferKind?: 'rent' | 'sale';
   myOfferDelivery?: 'onsite' | 'online';
+  ownerPhone?: string;
   isLeading?: boolean;
   offers?: ListingRfqOffer[];
 };
