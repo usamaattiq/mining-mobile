@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -44,6 +44,8 @@ const TAB_VISUALS: Record<string, TabVisual> = {
 
 export const FLOATING_TAB_BAR_HEIGHT = 72;
 export const FLOATING_TAB_BAR_MARGIN = 16;
+/** Extra space under the pill, on top of the device safe area. */
+const TAB_BAR_BOTTOM_GAP = spacing.sm;
 const PLUS_BUTTON_SIZE = 60;
 
 export const FloatingTabBarInsetContext = React.createContext(0);
@@ -52,12 +54,9 @@ export function useFloatingTabBarContentPadding(): number {
   return React.useContext(FloatingTabBarInsetContext);
 }
 
-/** Distance from the window bottom to the pill. Android 3-button nav is outside the window. */
+/** Distance from the window bottom to the pill — safe area plus the same gap on every device. */
 export function getFloatingTabBarBottomOffset(safeAreaBottom: number): number {
-  if (Platform.OS === 'android') {
-    return spacing.sm;
-  }
-  return Math.max(safeAreaBottom, spacing.sm) + spacing.sm;
+  return Math.max(safeAreaBottom, spacing.sm) + TAB_BAR_BOTTOM_GAP;
 }
 
 /** Space scroll content should keep clear so rows are not hidden behind the pill. */
