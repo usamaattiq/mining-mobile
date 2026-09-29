@@ -645,11 +645,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             {priceNode}
 
             <View style={styles.titleBlock}>
-              {equipmentListing?.reference || serviceListing?.reference || goldListing?.reference ? (
-                <AppText weight="semibold" style={styles.reference}>
-                  {equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference}
-                </AppText>
-              ) : null}
               <AppText weight="bold" style={styles.title}>
                 {title}
               </AppText>
@@ -1219,11 +1214,6 @@ const styles = StyleSheet.create({
   },
   titleBlock: {
     gap: spacing.xs,
-  },
-  reference: {
-    fontSize: 12,
-    color: palette.gold,
-    letterSpacing: 0.4,
   },
   title: {
     fontSize: 18,
