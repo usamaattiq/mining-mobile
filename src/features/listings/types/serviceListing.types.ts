@@ -9,6 +9,7 @@ export type ServiceListing = {
   serviceType: ServiceType;
   serviceCategoryLabel: string;
   title: string;
+  reference?: string;
   description: string;
   yearsOfExperience: string;
   price: string;

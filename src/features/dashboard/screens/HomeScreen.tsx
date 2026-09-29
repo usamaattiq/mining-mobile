@@ -297,6 +297,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     if (!needle) return true;
     return (
       card.title.toLowerCase().includes(needle) ||
+      (card.reference ?? '').toLowerCase().includes(needle) ||
       (card.subtitle ?? '').toLowerCase().includes(needle) ||
       (card.city ?? '').toLowerCase().includes(needle)
     );

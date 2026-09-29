@@ -7,6 +7,7 @@ export type GoldListing = {
   id: string;
   category: ListingCategory;
   title: string;
+  reference?: string;
   description: string;
   weight: string;
   purityLabel: string;

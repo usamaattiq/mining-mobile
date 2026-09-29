@@ -9,6 +9,7 @@ export type ListingCardBadge = {
 
 export type ListingCardProps = {
   title: string;
+  reference?: string;
   /** First photo's uri, if any — falls back to `placeholderIcon`. */
   thumbnail?: string;
   placeholderIcon: keyof typeof Ionicons.glyphMap;

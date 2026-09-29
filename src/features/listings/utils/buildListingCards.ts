@@ -113,6 +113,7 @@ export function buildListingCards({
       return {
         id: listing.id,
         title: listing.title,
+        reference: listing.reference,
         thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
         placeholderIcon: 'construct-outline',
         subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.postedAs === 'supplier' ? (listing.availableUnits ?? listing.units) : listing.units })}`,
@@ -166,6 +167,7 @@ export function buildListingCards({
     return serviceListings.map((listing) => ({
       id: listing.id,
       title: listing.title,
+      reference: listing.reference,
       thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
       placeholderIcon: 'briefcase-outline',
       subtitle: listing.serviceCategoryLabel,
@@ -194,6 +196,7 @@ export function buildListingCards({
   return goldListings.map((listing) => ({
     id: listing.id,
     title: listing.title,
+    reference: listing.reference,
     thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
     placeholderIcon: 'diamond-outline',
     subtitleIcon: 'diamond-outline',

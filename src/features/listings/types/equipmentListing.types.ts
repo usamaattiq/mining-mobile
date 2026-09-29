@@ -11,6 +11,7 @@ export type EquipmentListing = {
   mode: EquipmentListingMode;
   equipmentTypeLabel: string;
   title: string;
+  reference?: string;
   description: string;
   hourlyRental: string;
   monthlyRental: string;

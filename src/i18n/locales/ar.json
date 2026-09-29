@@ -23,7 +23,8 @@
     "daysAgo": "{count} ي",
     "stepOfTotal": "الخطوة {current} من {total}",
     "date": "التاريخ",
-    "postedOn": "تاريخ النشر"
+    "postedOn": "تاريخ النشر",
+    "reference": "المرجع"
   },
   "rfq": {
     "statusLabel": "الحالة",

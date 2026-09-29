@@ -23,7 +23,8 @@
     "daysAgo": "{count}d",
     "stepOfTotal": "Step {current} of {total}",
     "date": "Date",
-    "postedOn": "Posted on"
+    "postedOn": "Posted on",
+    "reference": "Reference"
   },
   "rfq": {
     "statusLabel": "Status",

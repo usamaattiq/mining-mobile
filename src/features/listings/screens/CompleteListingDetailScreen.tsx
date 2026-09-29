@@ -223,6 +223,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         profileId && (equipmentListing.ownerId ?? equipmentListing.owner?.id) === profileId,
       );
     detailRows = [
+      { label: t('common.reference'), value: equipmentListing.reference ?? '' },
       { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
       {
         label: t(
@@ -362,6 +363,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     description = serviceListing.description ?? '';
     location = serviceListing.location ?? '';
     detailRows = [
+      { label: t('common.reference'), value: serviceListing.reference ?? '' },
       { label: t('serviceListing.serviceCategory'), value: serviceListing.serviceCategoryLabel },
       {
         label: t(
@@ -398,6 +400,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     description = goldListing.description ?? '';
     location = goldListing.location ?? '';
     detailRows = [
+      { label: t('common.reference'), value: goldListing.reference ?? '' },
       { label: t('goldListing.purity'), value: goldListing.purityLabel },
       {
         label: t('goldListing.weight'),
@@ -634,6 +637,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             {priceNode}
 
             <View style={styles.titleBlock}>
+              {equipmentListing?.reference || serviceListing?.reference || goldListing?.reference ? (
+                <AppText weight="semibold" style={styles.reference}>
+                  {equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference}
+                </AppText>
+              ) : null}
               <AppText weight="bold" style={styles.title}>
                 {title}
               </AppText>
@@ -1115,6 +1123,11 @@ const styles = StyleSheet.create({
   },
   titleBlock: {
     gap: spacing.xs,
+  },
+  reference: {
+    fontSize: 12,
+    color: palette.gold,
+    letterSpacing: 0.4,
   },
   title: {
     fontSize: 18,
