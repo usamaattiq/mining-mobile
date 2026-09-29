@@ -33,8 +33,7 @@ import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
-import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
-import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
+import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { DeliveryType, EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 
@@ -233,15 +232,6 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     monthly: offerRent && rentPeriod === 'monthly' ? rentalAmount : '',
     yearly: offerRent && rentPeriod === 'yearly' ? rentalAmount : '',
   };
-
-  const supplierPriceLines = !isBuyer
-    ? [
-        offerRent ? { key: rentPeriod ?? 'rent', amount: parsePositiveAmount(rentalAmount) } : null,
-        offerSell ? { key: 'sale', amount: parsePositiveAmount(salePrice) } : null,
-      ].flatMap((line) =>
-        line && line.amount != null ? [{ key: line.key, amount: line.amount }] : [],
-      )
-    : [];
 
   const rentPeriodOptions = [
     { value: 'hourly' as const, label: t('equipmentListing.hourlyBadge') },
@@ -557,17 +547,6 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               min={1}
               required
             />
-
-            {!isBuyer
-              ? supplierPriceLines.map((line) => (
-                  <PriceTimesUnitsSummary
-                    key={line.key}
-                    currencyCode={currency.code}
-                    unitAmount={line.amount}
-                    units={units}
-                  />
-                ))
-              : null}
           </View>
         ) : null}
 
