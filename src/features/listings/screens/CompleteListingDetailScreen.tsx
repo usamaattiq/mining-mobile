@@ -1226,9 +1226,6 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.xs,
   },
-  servicePrices: {
-    gap: spacing.xs,
-  },
   highestBid: {
     flexDirection: 'row',
     alignItems: 'baseline',

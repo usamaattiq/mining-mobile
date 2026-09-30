@@ -46,13 +46,16 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
     };
   }, [conversationId, upsertConversation]);
 
+  const lastMessage = conversation?.messages.at(-1);
+  const lastMessageId = lastMessage?.id;
+  const lastMessageFromMe = lastMessage?.fromMe;
+
   React.useEffect(() => {
-    const last = conversation?.messages.at(-1);
-    if (!last || last.fromMe) return;
+    if (!lastMessageId || lastMessageFromMe) return;
     void messagesApi.markRead(conversationId).then((item) => {
       upsertConversation(item);
     });
-  }, [conversation?.messages.at(-1)?.id, conversationId, upsertConversation]);
+  }, [conversationId, lastMessageFromMe, lastMessageId, upsertConversation]);
 
   React.useEffect(() => {
     if (conversation?.messages.length) {

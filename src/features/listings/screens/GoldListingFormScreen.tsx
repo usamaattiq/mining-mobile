@@ -54,13 +54,16 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     </AppText>
   );
 
-  const purityOptions = [
-    ...Array.from({ length: 24 - 10 + 1 }, (_, index) => 24 - index).map((karat) => ({
-      value: `${karat}k`,
-      label: t('goldListing.karatValue', { karat }),
-    })),
-    { value: 'other', label: t('goldListing.purityOptions.other') },
-  ];
+  const purityOptions = React.useMemo(
+    () => [
+      ...Array.from({ length: 24 - 10 + 1 }, (_, index) => 24 - index).map((karat) => ({
+        value: `${karat}k`,
+        label: t('goldListing.karatValue', { karat }),
+      })),
+      { value: 'other', label: t('goldListing.purityOptions.other') },
+    ],
+    [t],
+  );
 
   const steps = [
     { key: 'details', label: t('goldListing.detailsStep') },

@@ -307,12 +307,6 @@ const styles = StyleSheet.create({
     padding: spacing.sm + 2,
     gap: spacing.sm,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-  },
   cardTitle: {
     flex: 1,
     fontSize: 13,

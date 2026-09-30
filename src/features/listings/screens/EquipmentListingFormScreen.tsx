@@ -83,34 +83,41 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [fetchedRepost, setFetchedRepost] = React.useState<EquipmentListing | undefined>(undefined);
   const sourceListing = repostListing ?? fetchedRepost;
 
-  const equipmentTypeOptions = [
-    {
-      value: 'excavator',
-      label: t('equipmentListing.type.excavator'),
-      icon: 'construct-outline' as const,
-    },
-    {
-      value: 'bulldozer',
-      label: t('equipmentListing.type.bulldozer'),
-      icon: 'construct-outline' as const,
-    },
-    {
-      value: 'drillRig',
-      label: t('equipmentListing.type.drillRig'),
-      icon: 'construct-outline' as const,
-    },
-    {
-      value: 'loader',
-      label: t('equipmentListing.type.loader'),
-      icon: 'construct-outline' as const,
-    },
-    {
-      value: 'crusher',
-      label: t('equipmentListing.type.crusher'),
-      icon: 'construct-outline' as const,
-    },
-    { value: 'other', label: t('equipmentListing.type.other'), icon: 'construct-outline' as const },
-  ];
+  const equipmentTypeOptions = React.useMemo(
+    () => [
+      {
+        value: 'excavator',
+        label: t('equipmentListing.type.excavator'),
+        icon: 'construct-outline' as const,
+      },
+      {
+        value: 'bulldozer',
+        label: t('equipmentListing.type.bulldozer'),
+        icon: 'construct-outline' as const,
+      },
+      {
+        value: 'drillRig',
+        label: t('equipmentListing.type.drillRig'),
+        icon: 'construct-outline' as const,
+      },
+      {
+        value: 'loader',
+        label: t('equipmentListing.type.loader'),
+        icon: 'construct-outline' as const,
+      },
+      {
+        value: 'crusher',
+        label: t('equipmentListing.type.crusher'),
+        icon: 'construct-outline' as const,
+      },
+      {
+        value: 'other',
+        label: t('equipmentListing.type.other'),
+        icon: 'construct-outline' as const,
+      },
+    ],
+    [t],
+  );
 
   const [equipmentType, setEquipmentType] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');
@@ -188,7 +195,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setDeliveryAvailable(Boolean(sourceListing.deliveryAvailable));
     setDeliveryType(sourceListing.deliveryType ?? 'free');
     setDeliveryPricePerKm(sourceListing.deliveryPricePerKm ?? '');
-  }, [equipmentTypeOptions, sourceListing]);
+  }, [equipmentTypeOptions, isBuyer, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();
