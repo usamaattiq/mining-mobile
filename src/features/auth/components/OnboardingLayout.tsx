@@ -78,7 +78,7 @@ export function OnboardingLayout({
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
           bounces={false}
-          bottomOffset={12}
+          bottomOffset={72}
           extraKeyboardSpace={0}
           enabled={avoidKeyboard}
         >

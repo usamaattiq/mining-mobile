@@ -1,18 +1,15 @@
 import React from 'react';
 import {
-  Dimensions,
-  Keyboard,
   Modal,
-  Platform,
   Pressable,
   StyleSheet,
   useWindowDimensions,
   View,
-  type KeyboardEvent,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import {
   initialWindowMetrics,
   SafeAreaProvider,
@@ -24,17 +21,6 @@ import type { AppBottomSheetProps } from '@/shared/types/appBottomSheet.types';
 
 /** Floor so 3-button / gesture nav never sits under sheet content when insets lag. */
 const MIN_BOTTOM_INSET = 24;
-
-/**
- * Distance from the top of the IME to the bottom of the physical screen.
- * Using `height` alone is wrong on Android 3-button nav: the IME sits *above*
- * the nav bar, so `height` undershoots and footers stay in the keyboard.
- */
-function keyboardOcclusion(event: KeyboardEvent): number {
-  const screenH = Dimensions.get('screen').height;
-  const { height, screenY } = event.endCoordinates;
-  return Math.max(0, height, screenH - screenY);
-}
 
 function BottomSheetFrame({
   onClose,
@@ -53,47 +39,13 @@ function BottomSheetFrame({
 }): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { width, height: windowHeight } = useWindowDimensions();
-  const keyboardOcclusionSv = useSharedValue(0);
+  const { height: keyboardHeight } = useReanimatedKeyboardAnimation();
   const layoutHeight = useSharedValue(windowHeight);
   const lastWidthRef = React.useRef(width);
   const clampedRatio = Math.min(0.95, Math.max(0.22, heightRatio));
   const fallbackBottom = initialWindowMetrics?.insets.bottom ?? 0;
   const closedPaddingBottom = Math.max(insets.bottom, fallbackBottom, MIN_BOTTOM_INSET, spacing.sm);
   const topReserve = Math.max(insets.top, spacing.md);
-
-  React.useEffect(() => {
-    if (!avoidKeyboard) {
-      keyboardOcclusionSv.value = 0;
-      return;
-    }
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-    const applyShow = (event: KeyboardEvent) => {
-      const next = keyboardOcclusion(event);
-      const duration = Math.max(event.duration ?? 0, Platform.OS === 'ios' ? 1 : 0);
-      keyboardOcclusionSv.value = duration > 0 ? withTiming(next, { duration }) : next;
-    };
-    const applyHide = (event: KeyboardEvent) => {
-      const duration = Math.max(event.duration ?? 0, Platform.OS === 'ios' ? 1 : 0);
-      keyboardOcclusionSv.value = duration > 0 ? withTiming(0, { duration }) : 0;
-    };
-
-    const show = Keyboard.addListener(showEvent, applyShow);
-    const hide = Keyboard.addListener(hideEvent, applyHide);
-    const frame =
-      Platform.OS === 'android'
-        ? Keyboard.addListener('keyboardDidChangeFrame', (event) => {
-            const next = keyboardOcclusion(event);
-            keyboardOcclusionSv.value = next < 1 ? 0 : next;
-          })
-        : null;
-
-    return () => {
-      show.remove();
-      hide.remove();
-      frame?.remove();
-    };
-  }, [avoidKeyboard, keyboardOcclusionSv]);
 
   React.useEffect(() => {
     if (lastWidthRef.current !== width) {
@@ -107,7 +59,7 @@ function BottomSheetFrame({
   }, [layoutHeight, width, windowHeight]);
 
   const animatedSheetStyle = useAnimatedStyle(() => {
-    const lift = Math.max(0, keyboardOcclusionSv.value);
+    const lift = avoidKeyboard ? Math.abs(keyboardHeight.value) : 0;
     const open = lift > 1;
     const fullH = layoutHeight.value;
     // Shrink the sheet into the remaining space so the inner content keeps

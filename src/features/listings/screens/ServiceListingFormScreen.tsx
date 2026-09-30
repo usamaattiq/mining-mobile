@@ -316,7 +316,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-        bottomOffset={12}
+        bottomOffset={72}
         extraKeyboardSpace={0}
       >
         {step === 0 ? (

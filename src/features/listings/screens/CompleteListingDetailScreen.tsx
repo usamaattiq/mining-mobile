@@ -1,5 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -681,10 +682,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      <ScrollView
+      <KeyboardAwareScrollView
+        style={styles.scroll}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        bottomOffset={120}
+        extraKeyboardSpace={24}
       >
         <EquipmentImageCarousel
           media={visualMedia}
@@ -925,7 +929,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {backButton}
 
@@ -1252,6 +1256,9 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: palette.pureWhite,
+  },
+  scroll: {
+    flex: 1,
   },
   content: {
     padding: spacing.lg,

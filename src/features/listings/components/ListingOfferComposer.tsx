@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { useKeyboardState } from 'react-native-keyboard-controller';
+import { KeyboardStickyView, useKeyboardState } from 'react-native-keyboard-controller';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CounterField } from '@/shared/components/CounterField';
@@ -87,6 +87,7 @@ export function ListingOfferComposer({
   };
 
   return (
+    <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
     <View
       style={[
         styles.bar,
@@ -287,6 +288,7 @@ export function ListingOfferComposer({
 
       {sendInline || !showInput ? footer : null}
     </View>
+    </KeyboardStickyView>
   );
 }
 

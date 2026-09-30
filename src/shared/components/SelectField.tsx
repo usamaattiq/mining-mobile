@@ -185,7 +185,7 @@ export function SelectField({
             <KeyboardAwareScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              bottomOffset={16}
+              bottomOffset={72}
               extraKeyboardSpace={0}
             >
               {optionList}

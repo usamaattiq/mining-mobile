@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useKeyboardState } from 'react-native-keyboard-controller';
+import { KeyboardStickyView, useKeyboardState } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { getFontFamily, palette, radius, spacing } from '@/theme';
@@ -22,6 +22,7 @@ export function MessageComposer({
   const paddingBottom = keyboardVisible ? spacing.sm : Math.max(insets.bottom, spacing.md);
 
   return (
+    <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
     <View style={[styles.composer, { paddingBottom }]}>
       <TextInput
         value={value}
@@ -50,6 +51,7 @@ export function MessageComposer({
         )}
       </Pressable>
     </View>
+    </KeyboardStickyView>
   );
 }
 
