@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { isPushAvailable } from '@/shared/services/pushNotifications';
 import { navigationRef } from '@/navigation/navigationRef';
 import type { ListingCategory } from '@/navigation/types';
@@ -65,6 +65,24 @@ export function usePushNotifications(): void {
 
     import('expo-notifications').then((Notifications) => {
       if (cancelled) return;
+
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowBanner: true,
+          shouldShowList: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+        }),
+      });
+
+      if (Platform.OS === 'android') {
+        void Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.HIGH,
+          vibrationPattern: [0, 250, 250, 250],
+          sound: 'default',
+        });
+      }
 
       receivedSub = Notifications.addNotificationReceivedListener((notification) => {
         console.log('[push] Notification received in foreground', notification.request.content);

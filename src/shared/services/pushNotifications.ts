@@ -67,12 +67,20 @@ export async function getExpoPushToken(): Promise<string | null> {
     });
   }
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
+  const existing = await Notifications.getPermissionsAsync();
+  const iosPresentationOn =
+    Platform.OS !== 'ios' || (existing.ios?.allowsAlert === true && existing.ios?.allowsSound === true);
+  let finalStatus = existing.status;
 
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
+  if (existing.status !== 'granted' || !iosPresentationOn) {
+    const requested = await Notifications.requestPermissionsAsync({
+      ios: {
+        allowAlert: true,
+        allowBadge: true,
+        allowSound: true,
+      },
+    });
+    finalStatus = requested.status;
   }
 
   if (finalStatus !== 'granted') {
