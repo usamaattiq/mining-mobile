@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -156,6 +156,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   } | null>(null);
   const [offerSubmitting, setOfferSubmitting] = React.useState(false);
   const [actingOfferId, setActingOfferId] = React.useState<string | null>(null);
+  const [editingOfferId, setEditingOfferId] = React.useState<string | null>(null);
+  const [editOfferPrice, setEditOfferPrice] = React.useState('');
+  const [editOfferUnits, setEditOfferUnits] = React.useState(1);
   const countdownEnd =
     (equipmentListing ?? serviceListing ?? goldListing)?.rfq?.expiresAt ??
     goldListing?.auctionEndDate ??
@@ -647,6 +650,33 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     run();
   };
 
+  const beginEditOffer = (offer: { id: string; price?: string; quantity?: number | null }) => {
+    const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : 1;
+    const total = Number(offer.price);
+    const unitPrice =
+      Number.isFinite(total) && total > 0 ? Math.round((total / units) * 100) / 100 : '';
+    setEditingOfferId(offer.id);
+    setEditOfferUnits(units);
+    setEditOfferPrice(unitPrice === '' ? '' : String(unitPrice));
+  };
+
+  const handleSaveOffer = (offerId: string) => {
+    const price = editOfferPrice.trim();
+    if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) return;
+    setOfferSubmitting(true);
+    void listingsApi
+      .updateOffer(id, offerId, price, editOfferUnits)
+      .then((listing) => {
+        applyListing(listing);
+        setEditingOfferId(null);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+        showAppAlert(t('common.error'), message);
+      })
+      .finally(() => setOfferSubmitting(false));
+  };
+
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
@@ -798,16 +828,66 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     </AppText>
                   </View>
                   {offer.price ? (
-                    <AppText weight="bold" style={styles.myOfferPrice}>
-                      {currency.code} {formatAmountWithCommas(offer.price)}
-                    </AppText>
+                    <View style={styles.myOfferPriceRow}>
+                      <AppText weight="bold" style={styles.myOfferPrice}>
+                        {currency.code}{' '}
+                        {formatAmountWithCommas(
+                          offer.quantity && Number(offer.price) > 0
+                            ? String(Math.round((Number(offer.price) / offer.quantity) * 100) / 100)
+                            : offer.price,
+                        )}
+                      </AppText>
+                      <AppText style={styles.myOfferPerUnit}>{t('rfq.pricePerUnit')}</AppText>
+                    </View>
                   ) : null}
-                  {offer.status === 'active' ? (
-                    <Button
-                      label={t('rfq.withdraw')}
-                      variant="outline"
-                      onPress={() => handleResponderOffer('withdraw', offer.id)}
-                    />
+                  {offer.status === 'active' && editingOfferId === offer.id ? (
+                    <View style={styles.myOfferEdit}>
+                      <TextInput
+                        value={editOfferPrice}
+                        onChangeText={setEditOfferPrice}
+                        keyboardType="decimal-pad"
+                        placeholder={t('rfq.unitPricePlaceholder')}
+                        placeholderTextColor={palette.muted}
+                        style={styles.myOfferPriceInput}
+                      />
+                      <CounterField
+                        label={t('rfq.unitsLabel')}
+                        value={editOfferUnits}
+                        min={1}
+                        max={Math.max(unitsLeft, offer.quantity ?? 1)}
+                        onChange={setEditOfferUnits}
+                      />
+                      <View style={styles.myOfferActions}>
+                        <Button
+                          label={t('common.cancel')}
+                          variant="outline"
+                          onPress={() => setEditingOfferId(null)}
+                          style={styles.myOfferAction}
+                        />
+                        <Button
+                          label={t('common.save')}
+                          loading={offerSubmitting}
+                          onPress={() => handleSaveOffer(offer.id)}
+                          style={styles.myOfferAction}
+                        />
+                      </View>
+                    </View>
+                  ) : null}
+                  {offer.status === 'active' && editingOfferId !== offer.id ? (
+                    <View style={styles.myOfferActions}>
+                      <Button
+                        label={t('rfq.update')}
+                        variant="outline"
+                        onPress={() => beginEditOffer(offer)}
+                        style={styles.myOfferAction}
+                      />
+                      <Button
+                        label={t('rfq.withdraw')}
+                        variant="outline"
+                        onPress={() => handleResponderOffer('withdraw', offer.id)}
+                        style={styles.myOfferAction}
+                      />
+                    </View>
                   ) : null}
                   {offer.status === 'selected' ? (
                     <View style={styles.myOfferActions}>
@@ -1262,9 +1342,21 @@ const styles = StyleSheet.create({
   },
   myOfferTitle: { flex: 1, fontSize: 14, color: palette.charcoal },
   myOfferStatus: { fontSize: 12, color: palette.goldDark },
+  myOfferPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
   myOfferPrice: { fontSize: 16, color: palette.charcoal },
+  myOfferPerUnit: { fontSize: 12, color: palette.muted },
   myOfferActions: { flexDirection: 'row', gap: spacing.sm },
   myOfferAction: { flex: 1 },
+  myOfferEdit: { gap: spacing.sm },
+  myOfferPriceInput: {
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    fontSize: 16,
+    color: palette.charcoal,
+  },
   priceAmount: {
     fontSize: 28,
     color: palette.charcoal,

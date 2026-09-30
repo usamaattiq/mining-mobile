@@ -47,6 +47,7 @@
     "reject": "Reject",
     "confirm": "Confirm",
     "decline": "Decline",
+    "update": "Update",
     "withdraw": "Withdraw",
     "withdrawConfirmTitle": "Withdraw offer?",
     "withdrawConfirmMessage": "This will remove your offer from this listing.",

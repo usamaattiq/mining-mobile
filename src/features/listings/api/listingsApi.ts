@@ -128,6 +128,13 @@ export const listingsApi = {
     return apiFetch(`/listings/${id}/offers/${offerId}/decline`, { method: 'POST', body: {} });
   },
 
+  updateOffer(id: string, offerId: string, price: string, units: number): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}/offers/${offerId}`, {
+      method: 'PATCH',
+      body: { price, units },
+    });
+  },
+
   withdrawOffer(id: string, offerId: string): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers/${offerId}/withdraw`, { method: 'POST', body: {} });
   },
