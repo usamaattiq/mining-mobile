@@ -165,7 +165,7 @@ export function ListingOfferComposer({
 
       {showInput ? (
           <View style={styles.form}>
-          {fulfillmentModes && fulfillmentModes.length > 0 ? (
+          {fulfillmentModes && fulfillmentModes.length > 1 ? (
             <View style={styles.fulfillmentRow}>
               {fulfillmentModes.map((mode) => {
                 const selected = fulfillment === mode;
