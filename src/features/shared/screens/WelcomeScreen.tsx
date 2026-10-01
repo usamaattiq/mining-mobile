@@ -1,0 +1,162 @@
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { i18n as appI18n } from '@/i18n';
+import type { RootStackParamList } from '@/navigation/types';
+import { Confetti } from '@/features/auth/components/Confetti';
+import { AppText } from '@/shared/components/AppText';
+import { Button } from '@/shared/components/Button';
+import { palette, radius, spacing } from '@/theme';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
+
+const CONTINUE_DELAY_MS = 5000;
+
+export function WelcomeScreen({ navigation, route }: Props): React.ReactElement {
+  const insets = useSafeAreaInsets();
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+  const [continuing, setContinuing] = React.useState(false);
+  const progress = useSharedValue(0);
+  const toListings = route.params?.next === 'listings';
+  const listingCategory = route.params?.category;
+  const listingId = route.params?.listingId;
+
+  const handleContinue = React.useCallback(() => {
+    setContinuing(true);
+    if (toListings && listingId && listingCategory) {
+      navigation.reset({
+        index: 1,
+        routes: [
+          {
+            name: 'Dashboard',
+            params: {
+              screen: 'Requests',
+              params: { category: listingCategory },
+            },
+          },
+          {
+            name: 'CompleteListingDetail',
+            params: { id: listingId, category: listingCategory },
+          },
+        ],
+      });
+      return;
+    }
+    if (toListings) {
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Dashboard',
+            params: {
+              screen: 'Requests',
+              params: listingCategory ? { category: listingCategory } : undefined,
+            },
+          },
+        ],
+      });
+      return;
+    }
+    navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
+  }, [listingCategory, listingId, navigation, toListings]);
+
+  React.useEffect(() => {
+    progress.value = withTiming(1, { duration: CONTINUE_DELAY_MS, easing: Easing.linear });
+    const timer = setTimeout(handleContinue, CONTINUE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [handleContinue, progress]);
+
+  const progressBarStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
+  return (
+    <View
+      style={[
+        styles.root,
+        { paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + spacing.xl },
+      ]}
+    >
+      <Confetti />
+
+      <View style={styles.content}>
+        <View style={styles.iconCircle}>
+          <Ionicons name="checkmark" size={40} color={palette.pureWhite} />
+        </View>
+        <AppText weight="bold" style={[styles.title, styles.titleSpacing]}>
+          {t(toListings ? 'welcome.listingTitle' : 'welcome.title')}
+        </AppText>
+        <AppText style={styles.subtitle}>
+          {t(toListings ? 'welcome.listingSubtitle' : 'welcome.subtitle')}
+        </AppText>
+
+        <Button
+          label={t(toListings ? 'welcome.listingContinue' : 'welcome.continue')}
+          onPress={handleContinue}
+          disabled={continuing}
+          size="lg"
+          style={styles.continueButton}
+          overlay={<Animated.View style={[styles.continueProgress, progressBarStyle]} />}
+        />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: palette.pureWhite,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+  },
+  iconCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: radius.pill,
+    backgroundColor: palette.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  title: {
+    fontSize: 24,
+    color: palette.charcoal,
+    textAlign: 'center',
+  },
+  titleSpacing: {
+    marginBottom: -spacing.sm,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: palette.muted,
+    textAlign: 'center',
+    maxWidth: '85%',
+    marginBottom: spacing.md,
+  },
+  continueButton: {
+    alignSelf: 'stretch',
+  },
+  continueProgress: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: palette.goldDark,
+  },
+});

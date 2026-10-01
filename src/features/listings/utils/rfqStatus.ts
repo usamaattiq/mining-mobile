@@ -1,0 +1,40 @@
+import type { TFunction } from 'i18next';
+import type { ListingRfq } from '@/features/listings/types/listingRfq.types';
+import type { ListingCardBadge } from '@/features/listings/types/listingCard.types';
+
+/** Auction display tags from the auction service, mapped to `rfq.status.*`. */
+const RFQ_STATUS_I18N: Record<string, string> = {
+  'coming-soon': 'comingSoon',
+  live: 'live',
+  'awaiting-confirmation': 'awaitingConfirmation',
+  'awaiting-action': 'awaitingAction',
+  'offer-submitted': 'offerSubmitted',
+  'awaiting-your-confirmation': 'awaitingYourConfirmation',
+  declined: 'declined',
+  'timed-out': 'timedOut',
+  confirmed: 'confirmed',
+  completed: 'completed',
+  closed: 'closed',
+  expired: 'expired',
+};
+
+export function rfqStatusLabel(t: TFunction, rfq: ListingRfq): string {
+  const key = RFQ_STATUS_I18N[rfq.status];
+  if (key) {
+    return t(`rfq.status.${key}`);
+  }
+  return rfq.statusLabel || rfq.status;
+}
+
+export function isEndedRfqStatus(status: string | undefined): boolean {
+  return status === 'completed' || status === 'closed' || status === 'expired';
+}
+
+export function rfqStatusBadge(t: TFunction, rfq: ListingRfq | undefined): ListingCardBadge | null {
+  if (!rfq) return null;
+  return {
+    key: 'rfq',
+    label: rfqStatusLabel(t, rfq),
+    variant: rfq.statusVariant,
+  };
+}

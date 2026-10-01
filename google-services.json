@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "709656232640",
+    "project_id": "mining-app-prod-65039",
+    "storage_bucket": "mining-app-prod-65039.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709656232640:android:677dad39a1257034fd2325",
+        "android_client_info": {
+          "package_name": "com.silveraxis.mining"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjbQGXK7kSEf5OeM4FeHSkxghQRLOIaSw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

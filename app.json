@@ -1,0 +1,80 @@
+{
+  "expo": {
+    "name": "Dahabi",
+    "slug": "mining",
+    "version": "1.0.2",
+    "orientation": "default",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#222222"
+    },
+    "scheme": "miningmobile",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "com.silveraxis.mining",
+      "buildNumber": "3",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Allow Dahabi to use Face ID to sign you in quickly and securely."
+      }
+    },
+    "android": {
+      "package": "com.silveraxis.mining",
+      "versionCode": 3,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#222222"
+      }
+    },
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#222222",
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#00000000",
+      "enforceContrast": false
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/6a8a7e38-8bcf-4186-91b8-6f503fdfb691",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "owner": "mycauses-organization",
+    "extra": {
+      "eas": {
+        "projectId": "6a8a7e38-8bcf-4186-91b8-6f503fdfb691"
+      }
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#222222",
+          "dark": {
+            "image": "./assets/images/icon.png",
+            "backgroundColor": "#222222"
+          }
+        }
+      ],
+      "expo-navigation-bar",
+      "react-native-edge-to-edge"
+    ]
+  }
+}

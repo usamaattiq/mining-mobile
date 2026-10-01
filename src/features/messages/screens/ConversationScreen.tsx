@@ -1,0 +1,169 @@
+import React from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
+import { useLanguage } from '@/i18n/hooks/useLanguage';
+import type { RootStackParamList } from '@/navigation/types';
+import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
+import { EmptyState } from '@/shared/components/EmptyState';
+import { useMessagesStore } from '@/store/messagesStore';
+import { messagesApi } from '@/features/messages/api/messagesApi';
+import type { ChatMessage } from '@/features/messages/types/conversation.types';
+import { ChatBubble } from '@/features/messages/components/ChatBubble';
+import { ListingContextChip } from '@/features/messages/components/ListingContextChip';
+import { MessageComposer } from '@/features/messages/components/MessageComposer';
+import { formatClockTime } from '@/shared/utils/formatRelativeTime';
+import { spacing } from '@/theme';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Conversation'>;
+
+export function ConversationScreen({ navigation, route }: Props): React.ReactElement {
+  const { conversationId } = route.params;
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+  const { currentLanguage } = useLanguage();
+  const conversation = useMessagesStore((state) =>
+    state.conversations.find((item) => item.id === conversationId),
+  );
+  const upsertConversation = useMessagesStore((state) => state.upsertConversation);
+  const [draft, setDraft] = React.useState('');
+  const [sending, setSending] = React.useState(false);
+  const listRef = React.useRef<FlatList<ChatMessage>>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void messagesApi
+      .getConversation(conversationId)
+      .then((item) => {
+        if (!cancelled) upsertConversation(item);
+      })
+      .catch(() => undefined);
+    void messagesApi.markRead(conversationId).then((item) => {
+      if (!cancelled) upsertConversation(item);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [conversationId, upsertConversation]);
+
+  const lastMessage = conversation?.messages.at(-1);
+  const lastMessageId = lastMessage?.id;
+  const lastMessageFromMe = lastMessage?.fromMe;
+
+  React.useEffect(() => {
+    if (!lastMessageId || lastMessageFromMe) return;
+    void messagesApi.markRead(conversationId).then((item) => {
+      upsertConversation(item);
+    });
+  }, [conversationId, lastMessageFromMe, lastMessageId, upsertConversation]);
+
+  React.useEffect(() => {
+    if (conversation?.messages.length) {
+      requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: false }));
+    }
+  }, [conversation?.messages.length]);
+
+  if (!conversation) {
+    return (
+      <GoldSheetScreen
+        title={t('messages.title')}
+        left="back"
+        onBackPress={navigation.goBack}
+        scroll={false}
+      >
+        <EmptyState title={t('messages.notFound')} />
+      </GoldSheetScreen>
+    );
+  }
+
+  const openListing = () => {
+    if (!conversation.listingId || !conversation.listingCategory) return;
+    navigation.navigate('CompleteListingDetail', {
+      id: conversation.listingId,
+      category: conversation.listingCategory,
+    });
+  };
+
+  const submit = async () => {
+    const text = draft.trim();
+    if (!text || sending) return;
+    setSending(true);
+    setDraft('');
+    try {
+      const updated = await messagesApi.sendMessage(conversationId, text);
+      upsertConversation(updated);
+    } catch {
+      setDraft(text);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <GoldSheetScreen
+      title={conversation.participantName}
+      left="back"
+      onBackPress={navigation.goBack}
+      headerStyle={styles.header}
+      sheetStyle={styles.sheet}
+      headerExtra={
+        <ListingContextChip
+          title={conversation.listingTitle}
+          category={conversation.listingCategory}
+          t={t}
+          onPress={openListing}
+          inHeader
+        />
+      }
+      scroll={false}
+    >
+      <View style={styles.threadClip}>
+        <FlatList
+          ref={listRef}
+          data={conversation.messages}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.thread}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
+          renderItem={({ item }) => (
+            <ChatBubble
+              text={item.text}
+              time={formatClockTime(item.sentAt, currentLanguage)}
+              fromMe={item.fromMe}
+              status={item.status}
+            />
+          )}
+        />
+      </View>
+      <MessageComposer
+          value={draft}
+          onChangeText={setDraft}
+          onSend={submit}
+          placeholder={t('messages.inputPlaceholder')}
+          sendLabel={t('messages.send')}
+          sending={sending}
+        />
+    </GoldSheetScreen>
+  );
+}
+
+const styles = StyleSheet.create({
+  sheet: {
+    overflow: 'visible',
+  },
+  threadClip: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  header: {
+    paddingBottom: spacing.sm,
+  },
+  thread: {
+    flexGrow: 1,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+});
