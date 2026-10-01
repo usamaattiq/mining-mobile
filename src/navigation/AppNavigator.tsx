@@ -6,6 +6,7 @@ import { OnboardingScreen } from '@/features/shared/screens/OnboardingScreen';
 import { WelcomeScreen } from '@/features/shared/screens/WelcomeScreen';
 import { DashboardTabNavigator } from '@/navigation/DashboardTabNavigator';
 import { PersonalInformationScreen } from '@/features/dashboard/screens/PersonalInformationScreen';
+import { AdminUserProfileScreen } from '@/features/admin/screens/AdminUserProfileScreen';
 import { SecuritySettingsScreen } from '@/features/dashboard/screens/SecuritySettingsScreen';
 import { EquipmentListingFormScreen } from '@/features/listings/screens/EquipmentListingFormScreen';
 import { ServiceListingFormScreen } from '@/features/listings/screens/ServiceListingFormScreen';
@@ -56,6 +57,7 @@ export function AppNavigator(): React.ReactElement {
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Dashboard" component={DashboardTabNavigator} />
       <Stack.Screen name="PersonalInformation" component={PersonalInformationScreen} />
+      <Stack.Screen name="AdminUserProfile" component={AdminUserProfileScreen} />
       <Stack.Screen name="SecuritySettings" component={SecuritySettingsScreen} />
       <Stack.Screen name="EquipmentListingForm" component={EquipmentListingFormScreen} />
       <Stack.Screen name="ServiceListingForm" component={ServiceListingFormScreen} />

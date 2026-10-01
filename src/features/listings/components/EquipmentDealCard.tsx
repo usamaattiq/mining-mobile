@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import type { EquipmentStockHold } from '@/features/listings/api/listingsApi';
@@ -17,6 +17,7 @@ export function EquipmentDealCard({
   statusLabel,
   muted = false,
   action,
+  onPressName,
 }: {
   hold: EquipmentStockHold;
   dateLabel: string;
@@ -27,6 +28,7 @@ export function EquipmentDealCard({
   statusLabel?: string;
   muted?: boolean;
   action?: React.ReactNode;
+  onPressName?: () => void;
 }): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const total = parsePositiveAmount(hold.price);
@@ -36,9 +38,11 @@ export function EquipmentDealCard({
   return (
     <View style={[styles.card, cardBackShadow, muted && styles.cardMuted]}>
       <View style={styles.cardRow}>
-        <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
-          {hold.buyerName}
-        </AppText>
+        <Pressable disabled={!onPressName} onPress={onPressName} style={styles.namePress}>
+          <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+            {hold.buyerName}
+          </AppText>
+        </Pressable>
         <View style={[styles.kindBadge, muted && styles.kindBadgeMuted]}>
           <AppText weight="semibold" style={[styles.kindLabel, muted && styles.kindLabelMuted]}>
             {kindLabel}
@@ -82,7 +86,8 @@ const styles = StyleSheet.create({
   },
   cardMuted: { backgroundColor: palette.softGold },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  cardTitle: { flex: 1, fontSize: 15, color: palette.charcoal },
+  namePress: { flex: 1 },
+  cardTitle: { fontSize: 15, color: palette.charcoal },
   kindBadge: {
     backgroundColor: palette.softGold,
     borderRadius: radius.pill,

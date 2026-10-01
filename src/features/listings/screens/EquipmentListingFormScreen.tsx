@@ -12,7 +12,7 @@ import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
 import { DurationSlider, formatAuctionDurationLabel } from '@/features/listings/components/DurationSlider';
-import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
+import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
@@ -83,41 +83,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [fetchedRepost, setFetchedRepost] = React.useState<EquipmentListing | undefined>(undefined);
   const sourceListing = repostListing ?? fetchedRepost;
 
-  const equipmentTypeOptions = React.useMemo(
-    () => [
-      {
-        value: 'excavator',
-        label: t('equipmentListing.type.excavator'),
-        icon: 'construct-outline' as const,
-      },
-      {
-        value: 'bulldozer',
-        label: t('equipmentListing.type.bulldozer'),
-        icon: 'construct-outline' as const,
-      },
-      {
-        value: 'drillRig',
-        label: t('equipmentListing.type.drillRig'),
-        icon: 'construct-outline' as const,
-      },
-      {
-        value: 'loader',
-        label: t('equipmentListing.type.loader'),
-        icon: 'construct-outline' as const,
-      },
-      {
-        value: 'crusher',
-        label: t('equipmentListing.type.crusher'),
-        icon: 'construct-outline' as const,
-      },
-      {
-        value: 'other',
-        label: t('equipmentListing.type.other'),
-        icon: 'construct-outline' as const,
-      },
-    ],
-    [t],
-  );
+  const equipmentTypeOptions = useCatalogOptions('equipment');
 
   const [equipmentType, setEquipmentType] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');

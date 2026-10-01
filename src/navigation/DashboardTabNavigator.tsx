@@ -14,8 +14,12 @@ import { HomeScreen } from '@/features/dashboard/screens/HomeScreen';
 import { RequestsScreen } from '@/features/dashboard/screens/RequestsScreen';
 import { MyOffersScreen } from '@/features/dashboard/screens/MyOffersScreen';
 import { ProfileScreen } from '@/features/dashboard/screens/ProfileScreen';
+import { AdminUsersScreen } from '@/features/admin/screens/AdminUsersScreen';
+import { AdminListingsScreen } from '@/features/admin/screens/AdminListingsScreen';
+import { AdminCategoriesScreen } from '@/features/admin/screens/AdminCategoriesScreen';
 import { tabNavigatorScreenOptions } from '@/navigation/tabScreenOptions';
 import type { DashboardTabParamList } from '@/navigation/types';
+import { useProfileStore } from '@/store/profileStore';
 
 const Tab = createBottomTabNavigator<DashboardTabParamList>();
 
@@ -36,20 +40,32 @@ export function DashboardTabNavigator(): React.ReactElement {
   const insets = useSafeAreaInsets();
   const contentPadding = getFloatingTabBarReservedHeight(insets.bottom);
   const [tabBarProps, setTabBarProps] = React.useState<BottomTabBarProps | null>(null);
+  const isAdmin = useProfileStore((state) => state.profile?.accountType === 'admin');
 
   return (
     <FloatingTabBarInsetContext.Provider value={contentPadding}>
       <View style={styles.root}>
         <Tab.Navigator
-          initialRouteName="HomeTab"
+          initialRouteName={isAdmin ? 'AdminUsers' : 'HomeTab'}
           safeAreaInsets={{ top: 0, right: 0, bottom: 0, left: 0 }}
           tabBar={(props) => <TabBarPropsSync {...props} onProps={setTabBarProps} />}
           screenOptions={tabNavigatorScreenOptions}
         >
-          <Tab.Screen name="HomeTab" component={HomeScreen} />
-          <Tab.Screen name="Requests" component={RequestsScreen} />
-          <Tab.Screen name="MyOffers" component={MyOffersScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
+          {isAdmin ? (
+            <>
+              <Tab.Screen name="AdminUsers" component={AdminUsersScreen} />
+              <Tab.Screen name="AdminListings" component={AdminListingsScreen} />
+              <Tab.Screen name="AdminCategories" component={AdminCategoriesScreen} />
+              <Tab.Screen name="Profile" component={ProfileScreen} />
+            </>
+          ) : (
+            <>
+              <Tab.Screen name="HomeTab" component={HomeScreen} />
+              <Tab.Screen name="Requests" component={RequestsScreen} />
+              <Tab.Screen name="MyOffers" component={MyOffersScreen} />
+              <Tab.Screen name="Profile" component={ProfileScreen} />
+            </>
+          )}
         </Tab.Navigator>
         {tabBarProps ? <FloatingTabBar {...tabBarProps} /> : null}
       </View>

@@ -33,6 +33,7 @@ type Props = CompositeScreenProps<
 export function ProfileScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const profile = useProfileStore((state) => state.profile);
+  const isAdmin = profile?.accountType === 'admin';
   const role = useMarketplaceRoleStore((state) => state.role);
   const { currentLanguage, setLanguage } = useLanguage();
   const languageOptions = React.useMemo(() => getLanguageOptions(t), [t]);
@@ -129,17 +130,19 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
       <CurvedSheetScrollView>
         <MenuListCard items={menuItems} />
 
-        <MenuRow
-          variant="gold"
-          icon="swap-horizontal-outline"
-          label={role === 'supplier' ? t('profile.switchToBuyer') : t('profile.switchToSupplier')}
-          subtitle={
-            role === 'supplier'
-              ? t('profile.switchToBuyerSubtitle')
-              : t('profile.switchToSupplierSubtitle')
-          }
-          onPress={handleSwitchRole}
-        />
+        {isAdmin ? null : (
+          <MenuRow
+            variant="gold"
+            icon="swap-horizontal-outline"
+            label={role === 'supplier' ? t('profile.switchToBuyer') : t('profile.switchToSupplier')}
+            subtitle={
+              role === 'supplier'
+                ? t('profile.switchToBuyerSubtitle')
+                : t('profile.switchToSupplierSubtitle')
+            }
+            onPress={handleSwitchRole}
+          />
+        )}
       </CurvedSheetScrollView>
 
       <LegalDocumentSheet

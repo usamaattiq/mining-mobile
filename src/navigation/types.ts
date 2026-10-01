@@ -13,6 +13,9 @@ export type DashboardTabParamList = {
   HomeTab: undefined;
   Requests: { requestId?: string; category?: ListingCategory } | undefined;
   MyOffers: undefined;
+  AdminUsers: undefined;
+  AdminListings: undefined;
+  AdminCategories: undefined;
   Profile: undefined;
 };
 
@@ -23,6 +26,7 @@ export type RootStackParamList = {
   Welcome: { next?: 'listings'; category?: ListingCategory; listingId?: string } | undefined;
   Dashboard: NavigatorScreenParams<DashboardTabParamList> | undefined;
   PersonalInformation: undefined;
+  AdminUserProfile: { userId: string };
   SecuritySettings: undefined;
   EquipmentListingForm: { repostId?: string } | undefined;
   ServiceListingForm: { repostId?: string } | undefined;

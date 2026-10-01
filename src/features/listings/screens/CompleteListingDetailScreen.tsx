@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -70,6 +70,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const currency = useCurrency();
 
   const profileId = useProfileStore((state) => state.profile?.id);
+  const isAdmin = useProfileStore((state) => state.profile?.accountType === 'admin');
   const marketListing = useMarketListingsStore((state) =>
     state.listings.find((item) => item.id === id),
   );
@@ -507,6 +508,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   ) || rfq?.status === 'offer-submitted';
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
   const canOffer =
+    !isAdmin &&
     Boolean(rfq) &&
     !isOwner &&
     (rfq?.canSubmitOffer ?? (!hasSentOffer && Boolean(postedAs)));
@@ -515,22 +517,27 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     rfq?.status === 'awaiting-your-confirmation' ||
     Boolean(rfq?.canConfirmOffer);
   const supplierBuyer =
-    !isOwner && category === 'equipment' && equipmentListing?.postedAs === 'supplier';
+    !isAdmin &&
+    !isOwner &&
+    category === 'equipment' &&
+    equipmentListing?.postedAs === 'supplier';
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
     : [];
   const showOfferInput =
+    !isAdmin &&
     (supplierBuyer
       ? unitsLeft > 0 && rfq?.canSubmitOffer !== false
       : !awaitingConfirm &&
         (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live')));
-  const canMessage = Boolean(owner) && !isOwner && hasSentOffer;
+  const canMessage = !isAdmin && Boolean(owner) && !isOwner && hasSentOffer;
   const canWithdraw =
+    !isAdmin &&
     !awaitingConfirm &&
     (Boolean(rfq?.canWithdrawOffer) ||
       rfq?.myOfferStatus === 'active' ||
       rfq?.status === 'offer-submitted');
-  const showOwnerOffers = isOwner && Boolean(rfq);
+  const showOwnerOffers = (isOwner || isAdmin) && Boolean(rfq);
   const showCountdown =
     equipmentListing?.postedAs !== 'supplier' &&
     countdownEnd != null &&
@@ -772,6 +779,31 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
 
+          {isAdmin && owner ? (
+            <View style={styles.creatorBlock}>
+              <AppText weight="semibold" style={styles.creatorLabel}>
+                {t('admin.createdBy')}
+              </AppText>
+              <Pressable
+                onPress={() => navigation.navigate('AdminUserProfile', { userId: owner.id })}
+                style={styles.creatorCard}
+              >
+                {owner.avatarUrl ? (
+                  <Image source={{ uri: owner.avatarUrl }} style={styles.creatorAvatar} />
+                ) : (
+                  <View style={styles.creatorAvatarFallback}>
+                    <AppText weight="semibold" style={styles.creatorInitial}>
+                      {owner.fullName.trim().charAt(0).toUpperCase() || '?'}
+                    </AppText>
+                  </View>
+                )}
+                <AppText weight="semibold" style={styles.creatorName} numberOfLines={1}>
+                  {owner.fullName}
+                </AppText>
+              </Pressable>
+            </View>
+          ) : null}
+
           {showOwnerOffers &&
           (equipmentListing?.postedAs !== 'supplier' ||
             (rfq?.offers ?? []).some(
@@ -787,13 +819,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               }
               currencyCode={currency.code}
               actingOfferId={actingOfferId}
-              canDecideOffers={rfq?.canDecideOffers !== false}
+              canDecideOffers={!isAdmin && rfq?.canDecideOffers !== false}
               rfqStatus={rfq?.status}
               showUnits={category === 'equipment'}
               showLeader={category === 'gold'}
               messageEveryOffer={category === 'gold'}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
+              onPressResponder={
+                isAdmin
+                  ? (offer) =>
+                      navigation.navigate('AdminUserProfile', { userId: offer.responderId })
+                  : undefined
+              }
               onMessage={(offer) => {
                 setMessagePeer({
                   id: offer.responderId,
@@ -913,7 +951,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             </View>
           ) : null}
 
-          {isOwner && equipmentListing?.postedAs === 'supplier' ? (
+          {(isOwner || isAdmin) && equipmentListing?.postedAs === 'supplier' ? (
             <EquipmentDealsSection
               listingId={id}
               revision={(rfq?.offers ?? []).map((offer) => `${offer.id}:${offer.status}`).join('|')}
@@ -926,6 +964,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 setMessagePeer({ id: buyer.id, fullName: buyer.fullName, avatarUrl: null });
                 setMessageOpen(true);
               }}
+              onPressBuyer={
+                isAdmin
+                  ? (buyerId) => navigation.navigate('AdminUserProfile', { userId: buyerId })
+                  : undefined
+              }
             />
           ) : null}
         </View>
@@ -1253,6 +1296,29 @@ function useCountdown(endsAt: number | null | undefined): string | null {
 }
 
 const styles = StyleSheet.create({
+  creatorBlock: { gap: spacing.xs, marginBottom: spacing.sm },
+  creatorLabel: { fontSize: 16, color: palette.charcoal },
+  creatorCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: palette.warmWhite,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    padding: spacing.sm,
+  },
+  creatorAvatar: { width: 40, height: 40, borderRadius: 20 },
+  creatorAvatarFallback: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.softGold,
+  },
+  creatorInitial: { color: palette.goldDark, fontSize: 16 },
+  creatorName: { flex: 1, fontSize: 16, color: palette.charcoal },
   root: {
     flex: 1,
     backgroundColor: palette.pureWhite,

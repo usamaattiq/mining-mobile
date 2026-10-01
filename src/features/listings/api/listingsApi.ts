@@ -138,4 +138,8 @@ export const listingsApi = {
   withdrawOffer(id: string, offerId: string): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers/${offerId}/withdraw`, { method: 'POST', body: {} });
   },
+
+  catalog(category: 'equipment' | 'services' | 'gold'): Promise<{ names: string[] }> {
+    return apiFetch(`/listings/catalog?category=${category}`);
+  },
 };

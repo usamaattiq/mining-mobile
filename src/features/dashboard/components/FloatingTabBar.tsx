@@ -40,6 +40,21 @@ const TAB_VISUALS: Record<string, TabVisual> = {
     icon: 'person-outline',
     iconFocused: 'person',
   },
+  AdminUsers: {
+    labelKey: 'tabs.users',
+    icon: 'people-outline',
+    iconFocused: 'people',
+  },
+  AdminListings: {
+    labelKey: 'tabs.listings',
+    icon: 'list-outline',
+    iconFocused: 'list',
+  },
+  AdminCategories: {
+    labelKey: 'tabs.categories',
+    icon: 'grid-outline',
+    iconFocused: 'grid',
+  },
 };
 
 export const FLOATING_TAB_BAR_HEIGHT = 72;
@@ -117,8 +132,9 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
   const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
   const routes = state.routes.filter((route) => TAB_VISUALS[route.name]);
-  const firstHalf = routes.slice(0, Math.ceil(routes.length / 2));
-  const secondHalf = routes.slice(Math.ceil(routes.length / 2));
+  const isAdminBar = routes.some((route) => route.name === 'AdminUsers');
+  const firstHalf = isAdminBar ? routes : routes.slice(0, Math.ceil(routes.length / 2));
+  const secondHalf = isAdminBar ? [] : routes.slice(Math.ceil(routes.length / 2));
 
   const renderTab = (route: (typeof routes)[number]) => {
     const visual = TAB_VISUALS[route.name];
@@ -154,18 +170,20 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
       <View pointerEvents="box-none" style={[styles.wrapper, { marginBottom: bottomOffset }]}>
         <View style={styles.bar}>
           {firstHalf.map(renderTab)}
-          <View style={styles.plusSlot} />
+          {isAdminBar ? null : <View style={styles.plusSlot} />}
           {secondHalf.map(renderTab)}
         </View>
 
-        <Pressable
-          onPress={() => rootNavigation?.navigate('QuickCreate')}
-          accessibilityRole="button"
-          accessibilityLabel={t('dashboardHome.quickCreateTitle')}
-          style={({ pressed }) => [styles.plusButton, pressed && styles.plusButtonPressed]}
-        >
-          <Ionicons name="add" size={28} color={palette.pureWhite} />
-        </Pressable>
+        {isAdminBar ? null : (
+          <Pressable
+            onPress={() => rootNavigation?.navigate('QuickCreate')}
+            accessibilityRole="button"
+            accessibilityLabel={t('dashboardHome.quickCreateTitle')}
+            style={({ pressed }) => [styles.plusButton, pressed && styles.plusButtonPressed]}
+          >
+            <Ionicons name="add" size={28} color={palette.pureWhite} />
+          </Pressable>
+        )}
       </View>
     </View>
   );

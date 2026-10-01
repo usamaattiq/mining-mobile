@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -26,6 +26,7 @@ export type ListingOffersPanelProps = {
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
   onMessage?: (offer: ListingRfqOffer) => void;
+  onPressResponder?: (offer: ListingRfqOffer) => void;
 };
 
 const OFFER_STATUS_KEY: Record<string, string> = {
@@ -50,6 +51,7 @@ export function ListingOffersPanel({
   onAccept,
   onReject,
   onMessage,
+  onPressResponder,
 }: ListingOffersPanelProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const orderedOffers = [...offers].sort((left, right) => {
@@ -83,11 +85,16 @@ export function ListingOffersPanel({
           return (
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
-                <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-                  {offer.status === 'confirmed'
-                    ? offer.responderName || t('messages.fallbackName')
-                    : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
-                </AppText>
+                <Pressable
+                  disabled={!onPressResponder || !offer.responderId}
+                  onPress={() => onPressResponder?.(offer)}
+                >
+                  <AppText weight="semibold" style={styles.name} numberOfLines={1}>
+                    {offer.status === 'confirmed'
+                      ? offer.responderName || t('messages.fallbackName')
+                      : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
+                  </AppText>
+                </Pressable>
                 {isLeader ? (
                   <Ionicons name="trophy" size={16} color={palette.gold} />
                 ) : null}

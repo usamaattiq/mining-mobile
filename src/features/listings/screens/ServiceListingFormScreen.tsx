@@ -27,6 +27,7 @@ import { ApiError } from '@/shared/services/api';
 import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
+import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
 import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
@@ -47,46 +48,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const serviceType = serviceTypeFromFlags(onsite, online);
   const isOnsite = onsite;
 
-  const serviceCategoryOptions = React.useMemo(
-    () => [
-      {
-        value: 'consulting',
-        label: t('serviceListing.category.consulting'),
-        icon: 'bulb-outline' as const,
-      },
-      {
-        value: 'drilling',
-        label: t('serviceListing.category.drilling'),
-        icon: 'construct-outline' as const,
-      },
-      {
-        value: 'assayTesting',
-        label: t('serviceListing.category.assayTesting'),
-        icon: 'flask-outline' as const,
-      },
-      {
-        value: 'transportLogistics',
-        label: t('serviceListing.category.transportLogistics'),
-        icon: 'car-outline' as const,
-      },
-      {
-        value: 'equipmentRepair',
-        label: t('serviceListing.category.equipmentRepair'),
-        icon: 'build-outline' as const,
-      },
-      {
-        value: 'environmentalPermitting',
-        label: t('serviceListing.category.environmentalPermitting'),
-        icon: 'leaf-outline' as const,
-      },
-      {
-        value: 'other',
-        label: t('serviceListing.category.other'),
-        icon: 'ellipsis-horizontal-outline' as const,
-      },
-    ],
-    [t],
-  );
+  const serviceCategoryOptions = useCatalogOptions('services');
 
   const steps = [
     { key: 'details', label: t('serviceListing.detailsStep') },

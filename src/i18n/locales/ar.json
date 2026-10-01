@@ -216,11 +216,38 @@
     "logoutConfirmTitle": "تسجيل الخروج؟",
     "logoutConfirmMessage": "ستحتاج إلى التحقق من رقم هاتفك أو إدخال الرمز السري لتسجيل الدخول مرة أخرى."
   },
+  "admin": {
+    "all": "الكل",
+    "individual": "فرد",
+    "company": "شركة",
+    "active": "نشط",
+    "suspended": "موقوف",
+    "archived": "مؤرشف",
+    "searchUsers": "ابحث بالاسم أو الهاتف",
+    "searchListings": "ابحث بالعنوان أو المرجع",
+    "emptyUsers": "لا يوجد مستخدمون",
+    "emptyListings": "لا توجد إعلانات",
+    "emptyCategory": "لا توجد إعلانات نشطة",
+    "loadFailed": "تعذر تحميل بيانات الإدارة",
+    "suspendUser": "إيقاف هذا المستخدم؟",
+    "activateUser": "تفعيل هذا المستخدم؟",
+    "archiveListing": "أرشفة هذا الإعلان؟",
+    "restoreListing": "استعادة هذا الإعلان؟",
+    "addLabel": "إضافة",
+    "labelName": "الاسم",
+    "searchTypes": "ابحث في الأنواع",
+    "delete": "حذف",
+    "deleteLabel": "حذف هذا التصنيف؟",
+    "createdBy": "أنشأه"
+  },
   "tabs": {
     "home": "الرئيسية",
     "requests": "الإعلانات",
     "offers": "عروضي",
-    "profile": "الملف الشخصي"
+    "profile": "الملف الشخصي",
+    "users": "المستخدمون",
+    "listings": "الإعلانات",
+    "categories": "التصنيفات"
   },
   "requests": {
     "title": "الإعلانات",

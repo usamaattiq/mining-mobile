@@ -216,11 +216,38 @@
     "logoutConfirmTitle": "Log out?",
     "logoutConfirmMessage": "You'll need to verify your phone number or enter your MPIN to log back in."
   },
+  "admin": {
+    "all": "All",
+    "individual": "Individual",
+    "company": "Company",
+    "active": "Active",
+    "suspended": "Suspended",
+    "archived": "Archived",
+    "searchUsers": "Search name or phone",
+    "searchListings": "Search title or reference",
+    "emptyUsers": "No users yet",
+    "emptyListings": "No listings yet",
+    "emptyCategory": "No active listings",
+    "loadFailed": "Could not load admin data",
+    "suspendUser": "Suspend this user?",
+    "activateUser": "Activate this user?",
+    "archiveListing": "Archive this listing?",
+    "restoreListing": "Restore this listing?",
+    "addLabel": "Add",
+    "labelName": "Name",
+    "searchTypes": "Search types",
+    "delete": "Delete",
+    "deleteLabel": "Delete this category?",
+    "createdBy": "Created by"
+  },
   "tabs": {
     "home": "Home",
     "requests": "Listing",
     "offers": "My offers",
-    "profile": "Profile"
+    "profile": "Profile",
+    "users": "User",
+    "listings": "Listing",
+    "categories": "Categories"
   },
   "requests": {
     "title": "Listing",

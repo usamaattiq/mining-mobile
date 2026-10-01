@@ -15,11 +15,13 @@ export function EquipmentDealsSection({
   revision,
   buyerPhones,
   onMessageBuyer,
+  onPressBuyer,
 }: {
   listingId: string;
   revision?: string;
   buyerPhones?: Record<string, string>;
   onMessageBuyer?: (buyer: { id: string; fullName: string }) => void;
+  onPressBuyer?: (buyerId: string) => void;
 }): React.ReactElement | null {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const currency = useCurrency();
@@ -83,6 +85,7 @@ export function EquipmentDealsSection({
           perUnitLabel={t('rfq.pricePerUnit')}
           statusLabel={t('rfq.offerStatus.selected')}
           action={contactAction(hold)}
+          onPressName={hold.buyerId && onPressBuyer ? () => onPressBuyer(hold.buyerId!) : undefined}
         />
       ))}
       {active.map((hold) => (
@@ -95,6 +98,7 @@ export function EquipmentDealsSection({
           currencyCode={currency.code}
           perUnitLabel={t('rfq.pricePerUnit')}
           action={contactAction(hold)}
+          onPressName={hold.buyerId && onPressBuyer ? () => onPressBuyer(hold.buyerId!) : undefined}
         />
       ))}
       {returned.map((hold) => (
@@ -109,6 +113,7 @@ export function EquipmentDealsSection({
           perUnitLabel={t('rfq.pricePerUnit')}
           statusLabel={t('equipmentListing.stockReturned')}
           action={contactAction(hold)}
+          onPressName={hold.buyerId && onPressBuyer ? () => onPressBuyer(hold.buyerId!) : undefined}
         />
       ))}
     </View>

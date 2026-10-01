@@ -5,7 +5,7 @@ export interface PhoneIdentity {
 }
 
 export type LoginOtpPurpose = 'login' | 'mpin_reset';
-export type AccountType = 'individual' | 'company';
+export type AccountType = 'individual' | 'company' | 'admin';
 
 export interface UserProfileDto {
   id: string;

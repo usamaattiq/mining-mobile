@@ -26,6 +26,7 @@ import { ApiError } from '@/shared/services/api';
 import { listingsApi, isGoldListing } from '@/features/listings/api/listingsApi';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
+import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -54,16 +55,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     </AppText>
   );
 
-  const purityOptions = React.useMemo(
-    () => [
-      ...Array.from({ length: 24 - 10 + 1 }, (_, index) => 24 - index).map((karat) => ({
-        value: `${karat}k`,
-        label: t('goldListing.karatValue', { karat }),
-      })),
-      { value: 'other', label: t('goldListing.purityOptions.other') },
-    ],
-    [t],
-  );
+  const purityOptions = useCatalogOptions('gold');
 
   const steps = [
     { key: 'details', label: t('goldListing.detailsStep') },
