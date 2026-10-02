@@ -209,7 +209,7 @@ export function SelectField({
         <AppBottomSheet
           visible={open}
           onClose={() => setOpen(false)}
-          heightRatio={searchable || hierarchical ? 0.55 : 0.7}
+          heightRatio={searchable || hierarchical ? 0.4 : 0.55}
           fitContent={!searchable && !hierarchical}
         >
           <AppText weight="bold" style={styles.sheetTitle}>
@@ -333,11 +333,12 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   option: {
-    minHeight: 52,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
     paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
     borderRadius: radius.sm,
   },
   expandSpacer: { width: 16 },
@@ -350,8 +351,8 @@ const styles = StyleSheet.create({
     backgroundColor: palette.softGold,
   },
   optionIconWrap: {
-    width: 32,
-    height: 32,
+    width: 24,
+    height: 24,
     borderRadius: radius.sm,
     backgroundColor: palette.softGold,
     alignItems: 'center',

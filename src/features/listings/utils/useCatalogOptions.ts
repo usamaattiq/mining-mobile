@@ -2,6 +2,12 @@ import React from 'react';
 import { listingsApi } from '@/features/listings/api/listingsApi';
 import type { SelectFieldOption } from '@/shared/types/selectField.types';
 
+const CATEGORY_ICON = {
+  equipment: 'construct-outline',
+  services: 'briefcase-outline',
+  gold: 'diamond-outline',
+} as const;
+
 export function useCatalogOptions(category: 'equipment' | 'services' | 'gold'): SelectFieldOption[] {
   const [options, setOptions] = React.useState<SelectFieldOption[]>([]);
 
@@ -15,6 +21,7 @@ export function useCatalogOptions(category: 'equipment' | 'services' | 'gold'): 
         items.map((item) => ({
           value: item.name,
           label: item.name,
+          icon: CATEGORY_ICON[category],
           parentValue: item.parentId ? nameById.get(item.parentId) ?? null : null,
         })),
       );
