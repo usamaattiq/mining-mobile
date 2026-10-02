@@ -128,6 +128,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   };
 
+  const autoLocated = React.useRef(false);
+  React.useEffect(() => {
+    if (step !== 1 || !isOnsite || autoLocated.current || location.trim()) return;
+    autoLocated.current = true;
+    void handleUseCurrentLocation();
+  }, [step, isOnsite, location]);
+
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
       setLocation(selection.label);
