@@ -235,6 +235,8 @@
     "archiveListing": "Archive this listing?",
     "restoreListing": "Restore this listing?",
     "addLabel": "Add",
+    "addSubcategory": "Add subcategory",
+    "deleteChildrenFirst": "Delete subcategories first",
     "labelName": "Name",
     "searchTypes": "Search types",
     "delete": "Delete",

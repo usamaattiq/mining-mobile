@@ -13,6 +13,7 @@ import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
 import { DurationSlider, formatAuctionDurationLabel } from '@/features/listings/components/DurationSlider';
 import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
+import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';

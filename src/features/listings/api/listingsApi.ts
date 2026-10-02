@@ -139,7 +139,10 @@ export const listingsApi = {
     return apiFetch(`/listings/${id}/offers/${offerId}/withdraw`, { method: 'POST', body: {} });
   },
 
-  catalog(category: 'equipment' | 'services' | 'gold'): Promise<{ names: string[] }> {
+  catalog(category: 'equipment' | 'services' | 'gold'): Promise<{
+    names: string[];
+    items?: { id: string; name: string; parentId: string | null }[];
+  }> {
     return apiFetch(`/listings/catalog?category=${category}`);
   },
 };

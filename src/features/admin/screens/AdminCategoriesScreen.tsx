@@ -16,6 +16,31 @@ import { showAppAlert } from '@/shared/services/appAlert';
 import { palette, radius, spacing } from '@/theme';
 
 type CategoryKey = AdminCategoryItem['key'];
+type Label = AdminCategoryItem['labels'][number];
+type LabelNode = Label & { children: LabelNode[] };
+
+function buildTree(labels: Label[]): LabelNode[] {
+  const nodes = new Map<string, LabelNode>();
+  for (const label of labels) nodes.set(label.id, { ...label, children: [] });
+  const roots: LabelNode[] = [];
+  for (const node of nodes.values()) {
+    const parent = node.parentId ? nodes.get(node.parentId) : undefined;
+    if (parent) parent.children.push(node);
+    else roots.push(node);
+  }
+  return roots;
+}
+
+function filterTree(nodes: LabelNode[], query: string): LabelNode[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return nodes;
+  return nodes.flatMap((node) => {
+    const children = filterTree(node.children, query);
+    if (node.name.toLowerCase().includes(q)) return [{ ...node, children: node.children }];
+    if (children.length > 0) return [{ ...node, children }];
+    return [];
+  });
+}
 
 export function AdminCategoriesScreen(): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -23,7 +48,8 @@ export function AdminCategoriesScreen(): React.ReactElement {
   const [domain, setDomain] = React.useState<CategoryKey>('equipment');
   const [query, setQuery] = React.useState('');
   const [loading, setLoading] = React.useState(true);
-  const [draft, setDraft] = React.useState<{ id: string | null; name: string } | null>(null);
+  const [draft, setDraft] = React.useState<{ id: string | null; name: string; parentId: string | null } | null>(null);
+  const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
   const [saving, setSaving] = React.useState(false);
 
   const load = React.useCallback(async () => {
@@ -38,16 +64,14 @@ export function AdminCategoriesScreen(): React.ReactElement {
   }, [load, t]);
 
   const labels = items.find((item) => item.key === domain)?.labels ?? [];
-  const visible = labels.filter((label) =>
-    label.name.toLowerCase().includes(query.trim().toLowerCase()),
-  );
+  const visible = filterTree(buildTree(labels), query);
 
   const saveDraft = async () => {
     if (!draft?.name.trim()) return;
     setSaving(true);
     try {
       if (draft.id) await adminApi.renameCategory(draft.id, draft.name.trim());
-      else await adminApi.createCategory(domain, draft.name.trim());
+      else await adminApi.createCategory(domain, draft.name.trim(), draft.parentId);
       setDraft(null);
       await load();
     } catch {
@@ -64,7 +88,10 @@ export function AdminCategoriesScreen(): React.ReactElement {
         text: t('common.confirm'),
         style: 'destructive',
         onPress: () => {
-          void adminApi.deleteCategory(id).then(() => load());
+          void adminApi
+            .deleteCategory(id)
+            .then(() => load())
+            .catch(() => showAppAlert(t('admin.deleteChildrenFirst')));
         },
       },
     ]);
@@ -79,7 +106,7 @@ export function AdminCategoriesScreen(): React.ReactElement {
         headerStyle={styles.header}
         rightSlot={
           <Pressable
-            onPress={() => setDraft({ id: null, name: '' })}
+            onPress={() => setDraft({ id: null, name: '', parentId: null })}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={t('admin.addLabel')}
@@ -113,26 +140,26 @@ export function AdminCategoriesScreen(): React.ReactElement {
             <EmptyState title={t('admin.emptyCategory')} subtitle={t('admin.addLabel')} />
           ) : (
             <View style={styles.card}>
-              {visible.map((label, index) => (
-                <View
-                  key={label.id}
-                  style={[styles.row, index < visible.length - 1 && styles.rowDivider]}
-                >
-                  <Ionicons name="pricetag-outline" size={16} color={palette.gold} />
-                  <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-                    {label.name}
-                  </AppText>
-                  <Pressable
-                    onPress={() => setDraft({ id: label.id, name: label.name })}
-                    hitSlop={8}
-                    style={styles.action}
-                  >
-                    <Ionicons name="create-outline" size={20} color={palette.muted} />
-                  </Pressable>
-                  <Pressable onPress={() => removeLabel(label.id, label.name)} hitSlop={8} style={styles.action}>
-                    <Ionicons name="trash-outline" size={20} color={palette.danger} />
-                  </Pressable>
-                </View>
+              {visible.map((node, index) => (
+                <CategoryBranch
+                  key={node.id}
+                  node={node}
+                  depth={0}
+                  expanded={expanded}
+                  onToggle={(id) =>
+                    setExpanded((current) => {
+                      const next = new Set(current);
+                      if (next.has(id)) next.delete(id);
+                      else next.add(id);
+                      return next;
+                    })
+                  }
+                  onAdd={domain === 'gold' ? undefined : (parentId) => setDraft({ id: null, name: '', parentId })}
+                  onEdit={(label) => setDraft({ id: label.id, name: label.name, parentId: label.parentId })}
+                  onDelete={removeLabel}
+                  forceExpand={query.trim().length > 0}
+                  showDivider={index < visible.length - 1}
+                />
               ))}
             </View>
           )}
@@ -141,7 +168,7 @@ export function AdminCategoriesScreen(): React.ReactElement {
 
       <AppBottomSheet visible={draft !== null} onClose={() => setDraft(null)} fitContent>
         <AppText weight="bold" style={styles.sheetTitle}>
-          {draft?.id ? t('admin.labelName') : t('admin.addLabel')}
+          {draft?.id ? t('admin.labelName') : draft?.parentId ? t('admin.addSubcategory') : t('admin.addLabel')}
         </AppText>
         <FormInput
           label={t('admin.labelName')}
@@ -151,6 +178,75 @@ export function AdminCategoriesScreen(): React.ReactElement {
         <Button label={t('common.save')} onPress={() => void saveDraft()} loading={saving} />
       </AppBottomSheet>
     </>
+  );
+}
+
+function CategoryBranch({
+  node,
+  depth,
+  expanded,
+  forceExpand,
+  onToggle,
+  onAdd,
+  onEdit,
+  onDelete,
+  showDivider,
+}: {
+  node: LabelNode;
+  depth: number;
+  expanded: Set<string>;
+  forceExpand: boolean;
+  onToggle: (id: string) => void;
+  onAdd?: (parentId: string) => void;
+  onEdit: (label: Label) => void;
+  onDelete: (id: string, name: string) => void;
+  showDivider: boolean;
+}): React.ReactElement {
+  const open = forceExpand || expanded.has(node.id);
+  const hasChildren = node.children.length > 0;
+  return (
+    <View>
+      <View style={[styles.row, showDivider && styles.rowDivider, { paddingStart: spacing.md + depth * 16 }]}>
+        {hasChildren ? (
+          <Pressable onPress={() => onToggle(node.id)} hitSlop={6} style={styles.action}>
+            <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={16} color={palette.gold} />
+          </Pressable>
+        ) : (
+          <View style={styles.expandSpacer} />
+        )}
+        <Ionicons name="pricetag-outline" size={16} color={palette.gold} />
+        <AppText weight="semibold" style={styles.name} numberOfLines={1}>
+          {node.name}
+        </AppText>
+        {onAdd ? (
+          <Pressable onPress={() => onAdd(node.id)} hitSlop={8} style={styles.action}>
+            <Ionicons name="add" size={20} color={palette.gold} />
+          </Pressable>
+        ) : null}
+        <Pressable onPress={() => onEdit(node)} hitSlop={8} style={styles.action}>
+          <Ionicons name="create-outline" size={20} color={palette.muted} />
+        </Pressable>
+        <Pressable onPress={() => onDelete(node.id, node.name)} hitSlop={8} style={styles.action}>
+          <Ionicons name="trash-outline" size={20} color={palette.danger} />
+        </Pressable>
+      </View>
+      {open
+        ? node.children.map((child, index) => (
+            <CategoryBranch
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              expanded={expanded}
+              forceExpand={forceExpand}
+              onToggle={onToggle}
+              onAdd={onAdd}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              showDivider={index < node.children.length - 1 || showDivider}
+            />
+          ))
+        : null}
+    </View>
   );
 }
 
@@ -193,6 +289,7 @@ const styles = StyleSheet.create({
   },
   name: { flex: 1, fontSize: 15, color: palette.charcoal },
   action: { padding: 2 },
+  expandSpacer: { width: 20 },
   sheetTitle: {
     fontSize: 18,
     color: palette.charcoal,
