@@ -220,6 +220,7 @@
     "all": "All",
     "individual": "Individual",
     "company": "Company",
+    "accountType": "Account type",
     "active": "Active",
     "suspended": "Suspended",
     "archived": "Archived",
@@ -238,7 +239,11 @@
     "searchTypes": "Search types",
     "delete": "Delete",
     "deleteLabel": "Delete this category?",
-    "createdBy": "Created by"
+    "createdBy": "Created by",
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "blockUserConfirm": "Block this user? They will not be able to sign in.",
+    "unblockUserConfirm": "Unblock this user so they can sign in again?"
   },
   "tabs": {
     "home": "Home",

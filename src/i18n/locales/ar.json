@@ -220,6 +220,7 @@
     "all": "الكل",
     "individual": "فرد",
     "company": "شركة",
+    "accountType": "نوع الحساب",
     "active": "نشط",
     "suspended": "موقوف",
     "archived": "مؤرشف",
@@ -238,7 +239,11 @@
     "searchTypes": "ابحث في الأنواع",
     "delete": "حذف",
     "deleteLabel": "حذف هذا التصنيف؟",
-    "createdBy": "أنشأه"
+    "createdBy": "أنشأه",
+    "blockUser": "حظر المستخدم",
+    "unblockUser": "إلغاء الحظر",
+    "blockUserConfirm": "حظر هذا المستخدم؟ لن يتمكن من تسجيل الدخول.",
+    "unblockUserConfirm": "إلغاء حظر هذا المستخدم ليتمكن من تسجيل الدخول؟"
   },
   "tabs": {
     "home": "الرئيسية",

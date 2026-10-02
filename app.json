@@ -3,7 +3,7 @@
     "name": "Dahabi",
     "slug": "mining",
     "version": "1.0.2",
-    "orientation": "default",
+    "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/images/icon.png",
     "splash": {
