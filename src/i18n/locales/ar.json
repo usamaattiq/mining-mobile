@@ -323,13 +323,13 @@
     "emptyTitle": "لا توجد إشعارات جديدة",
     "emptySubtitle": "ستظهر هنا العروض والرسائل وتحديثات الإعلانات.",
     "offerReceivedTitle": "عرض جديد",
-    "offerReceivedBody": "تم تقديم عرض على إعلان CAT 336 الخاص بك.",
+    "offerReceivedBody": "وصلك عرض جديد.",
     "messageTitle": "رسالة جديدة",
-    "messageBody": "عمر الراشد سأل عن التوصيل إلى رأس الخير.",
-    "auctionTitle": "تحديث المزاد",
-    "auctionBody": "تم تقديم مزايدة جديدة على مزاد سبيكة الذهب عيار 22.",
-    "listingLiveTitle": "الإعلان منشور",
-    "listingLiveBody": "مسحكم الجيولوجي الميداني ظاهر الآن للمشترين."
+    "messageBody": "لديك رسالة جديدة.",
+    "auctionTitle": "مزايدة جديدة",
+    "auctionBody": "قدّم أحدهم مزايدة على مزادك.",
+    "listingLiveTitle": "إعلانك منشور",
+    "listingLiveBody": "يمكن للمشترين رؤية إعلانك الآن."
   },
   "equipmentListing": {
     "modeTitle": "عرض معدات",

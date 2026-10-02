@@ -322,14 +322,14 @@
     "markAllRead": "Read all",
     "emptyTitle": "You're all caught up",
     "emptySubtitle": "Offers, messages, and listing updates will appear here.",
-    "offerReceivedTitle": "New offer received",
-    "offerReceivedBody": "Someone submitted an offer on your CAT 336 listing.",
+    "offerReceivedTitle": "New offer",
+    "offerReceivedBody": "You received a new offer.",
     "messageTitle": "New message",
-    "messageBody": "Omar Al-Rashid asked about delivery to Ras Al-Khair.",
-    "auctionTitle": "Auction update",
-    "auctionBody": "A new bid was placed on your 22K gold bar auction.",
-    "listingLiveTitle": "Listing is live",
-    "listingLiveBody": "Your on-site geological survey is now visible to buyers."
+    "messageBody": "You have a new message.",
+    "auctionTitle": "New bid",
+    "auctionBody": "Someone placed a bid on your auction.",
+    "listingLiveTitle": "Your listing is live",
+    "listingLiveBody": "Buyers can see your listing now."
   },
   "offers": {
     "title": "My offers",
