@@ -80,7 +80,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   const [weight, setWeight] = React.useState('');
   const [purity, setPurity] = React.useState<string | null>(null);
   const [price, setPrice] = React.useState('');
-  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(null);
+  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(() => new Date());
   const [durationHours, setDurationHours] = React.useState(24);
   const [location, setLocation] = React.useState('');
   const [locationCoords, setLocationCoords] = React.useState<{
@@ -159,10 +159,9 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
 
   const handlePublish = async () => {
     if (publishing) return;
-    if (!auctionStartDate || auctionStartDate.getTime() <= Date.now()) {
-      showAppAlert(t('common.error'), t('goldListing.auctionStartPast'));
-      return;
-    }
+    const start = !auctionStartDate || auctionStartDate.getTime() <= Date.now()
+      ? new Date()
+      : auctionStartDate;
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
@@ -173,11 +172,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         weight,
         purityLabel: purityLabel ?? '',
         price,
-        auctionStartDate: auctionStartDate?.getTime() ?? null,
-        auctionEndDate:
-          auctionStartDate != null
-            ? auctionStartDate.getTime() + durationHours * 60 * 60 * 1000
-            : null,
+        auctionStartDate: start.getTime(),
+        auctionEndDate: start.getTime() + durationHours * 60 * 60 * 1000,
         location,
         media: persistedMedia,
         postedAs: useMarketplaceRoleStore.getState().role,

@@ -95,7 +95,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [units, setUnits] = React.useState(1);
   const [location, setLocation] = React.useState('');
   const [listedUntil, setListedUntil] = React.useState(defaultListingEnd);
-  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(null);
+  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(() => new Date());
   const [durationHours, setDurationHours] = React.useState(24);
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
@@ -236,14 +236,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
       return;
     }
-    if (
-      isBuyer &&
-      requestMode === 'auction' &&
-      (!auctionStartDate || auctionStartDate.getTime() <= Date.now())
-    ) {
-      showAppAlert(t('common.error'), t('goldListing.auctionStartPast'));
-      return;
-    }
+    const auctionStart =
+      isBuyer && requestMode === 'auction'
+        ? !auctionStartDate || auctionStartDate.getTime() <= Date.now()
+          ? new Date()
+          : auctionStartDate
+        : auctionStartDate;
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
@@ -273,10 +271,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               : 24 * 365,
         postedAs: useMarketplaceRoleStore.getState().role,
         requestMode: isBuyer ? requestMode : 'rfq',
-        ...(isBuyer && requestMode === 'auction' && auctionStartDate
+        ...(isBuyer && requestMode === 'auction' && auctionStart
           ? {
-              auctionStartDate: auctionStartDate.getTime(),
-              auctionEndDate: auctionStartDate.getTime() + durationHours * 60 * 60 * 1000,
+              auctionStartDate: auctionStart.getTime(),
+              auctionEndDate: auctionStart.getTime() + durationHours * 60 * 60 * 1000,
             }
           : {}),
       });
