@@ -89,9 +89,14 @@ export function AdminUsersScreen(): React.ReactElement {
                 </AppText>
               </View>
             )}
-            <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-              {item.fullName}
-            </AppText>
+            <View style={styles.copy}>
+              <AppText weight="semibold" style={styles.name} numberOfLines={1}>
+                {item.fullName}
+              </AppText>
+              <AppText style={styles.phone} numberOfLines={1}>
+                {item.phoneE164}
+              </AppText>
+            </View>
           </Pressable>
         ))
       )}
@@ -116,31 +121,38 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: palette.softGold,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
+    padding: spacing.sm,
     marginBottom: spacing.xs,
     ...cardBackShadow,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 108,
+    height: 108,
+    borderRadius: 54,
   },
   avatarFallback: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 108,
+    height: 108,
+    borderRadius: 54,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.softGold,
   },
   initial: {
     color: palette.goldDark,
-    fontSize: 18,
+    fontSize: 36,
+  },
+  copy: {
+    flex: 1,
+    gap: 4,
+    minWidth: 0,
   },
   name: {
-    flex: 1,
     fontSize: 16,
     color: palette.charcoal,
+  },
+  phone: {
+    fontSize: 14,
+    color: palette.muted,
   },
 });

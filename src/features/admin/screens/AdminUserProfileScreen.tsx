@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -9,6 +10,7 @@ import { adminApi, type AdminUserDetail } from '@/features/admin/api/adminApi';
 import { Button } from '@/shared/components/Button';
 import { AppText } from '@/shared/components/AppText';
 import { showAppAlert } from '@/shared/services/appAlert';
+import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { cardBackShadow, palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdminUserProfile'>;
@@ -54,17 +56,18 @@ export function AdminUserProfileScreen({ navigation, route }: Props): React.Reac
   const initial = detail?.fullName.trim().charAt(0).toUpperCase() || '?';
   const rows = detail
     ? [
-        { label: t('profile.fullName'), value: detail.fullName },
+        { icon: 'person-outline' as const, label: t('profile.fullName'), value: detail.fullName },
         {
+          icon: 'id-card-outline' as const,
           label: t('admin.accountType'),
           value: detail.accountType === 'company' ? t('admin.company') : t('admin.individual'),
         },
         ...(detail.accountType === 'company'
-          ? [{ label: t('profile.companyName'), value: detail.companyName }]
+          ? [{ icon: 'business-outline' as const, label: t('profile.companyName'), value: detail.companyName }]
           : []),
-        { label: t('profile.email'), value: detail.email },
-        { label: t('profile.phone'), value: detail.phoneE164 },
-        { label: t('profile.address'), value: detail.address },
+        { icon: 'mail-outline' as const, label: t('profile.email'), value: detail.email },
+        { icon: 'call-outline' as const, label: t('profile.phone'), value: detail.phoneE164 },
+        { icon: 'location-outline' as const, label: t('profile.address'), value: detail.address },
       ].filter((row) => row.value)
     : [];
 
@@ -86,10 +89,6 @@ export function AdminUserProfileScreen({ navigation, route }: Props): React.Reac
                 </AppText>
               )}
             </View>
-            <AppText weight="bold" style={styles.heroName} numberOfLines={1}>
-              {detail.fullName}
-            </AppText>
-            <AppText style={styles.heroPhone}>{detail.phoneE164}</AppText>
           </View>
         ) : null
       }
@@ -100,20 +99,33 @@ export function AdminUserProfileScreen({ navigation, route }: Props): React.Reac
         <View style={[styles.card, cardBackShadow]}>
           {rows.map((row, index) => (
             <View key={row.label} style={[styles.row, index > 0 && styles.rowDivider]}>
-              <AppText style={styles.label}>{row.label}</AppText>
-              <AppText weight="semibold" style={styles.value}>
-                {row.value}
-              </AppText>
+              <View style={styles.iconWrap}>
+                <Ionicons name={row.icon} size={18} color={palette.gold} />
+              </View>
+              <View style={styles.rowCopy}>
+                <AppText style={styles.label}>{row.label}</AppText>
+                <AppText weight="semibold" style={styles.value}>
+                  {row.value}
+                </AppText>
+              </View>
             </View>
           ))}
           <Button
-            label={blocked ? t('admin.unblockUser') : t('admin.blockUser')}
-            variant="outline"
-            onPress={blockUser}
-            loading={blocking}
+            label={t('common.whatsapp')}
+            icon="logo-whatsapp"
+            variant="whatsapp"
+            onPress={() => openWhatsApp(detail.phoneE164)}
           />
         </View>
       )}
+      {detail ? (
+        <Button
+          label={blocked ? t('admin.unblockUser') : t('admin.blockUser')}
+          variant="outline"
+          onPress={blockUser}
+          loading={blocking}
+        />
+      ) : null}
     </GoldSheetScreen>
   );
 }
@@ -141,8 +153,6 @@ const styles = StyleSheet.create({
   },
   avatar: { width: '100%', height: '100%' },
   initial: { fontSize: 40, color: palette.pureWhite },
-  heroName: { fontSize: 22, color: palette.pureWhite, textAlign: 'center' },
-  heroPhone: { fontSize: 14, color: 'rgba(255, 255, 255, 0.9)', textAlign: 'center' },
   loader: { marginTop: spacing.xl },
   card: {
     backgroundColor: palette.warmWhite,
@@ -152,7 +162,16 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.sm,
   },
-  row: { gap: 2, paddingVertical: spacing.xs },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.xs },
+  iconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.softGold,
+  },
+  rowCopy: { flex: 1, gap: 2, minWidth: 0 },
   rowDivider: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: palette.softGold,
