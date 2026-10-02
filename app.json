@@ -2,7 +2,7 @@
   "expo": {
     "name": "Dahabi",
     "slug": "mining",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/images/icon.png",
@@ -15,14 +15,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.silveraxis.mining",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Allow Dahabi to use Face ID to sign you in quickly and securely."
       }
     },
     "android": {
       "package": "com.silveraxis.mining",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#222222"
