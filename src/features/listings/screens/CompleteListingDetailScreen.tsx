@@ -851,23 +851,31 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               {mySupplierOffers.map((offer) => (
                 <View key={offer.id} style={styles.myOfferCard}>
                   <View style={styles.myOfferRow}>
-                    <AppText weight="semibold" style={styles.myOfferTitle}>
-                      {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
-                      {offer.quantity
-                        ? ` · ${t('equipmentListing.unitsCount', { count: offer.quantity })}`
-                        : ''}
-                    </AppText>
-                    <AppText style={styles.myOfferStatus}>
-                      {t(
-                        `rfq.offerStatus.${
-                          offer.status === 'selected'
-                            ? 'selected'
-                            : offer.status === 'confirmed'
-                              ? 'confirmed'
-                              : 'active'
-                        }`,
-                      )}
-                    </AppText>
+                    <View style={styles.myOfferBadges}>
+                      <View style={styles.myOfferKindBadge}>
+                        <AppText weight="semibold" style={styles.myOfferKindText}>
+                          {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
+                        </AppText>
+                      </View>
+                      <View style={styles.myOfferStatusBadge}>
+                        <AppText weight="semibold" style={styles.myOfferStatusText}>
+                          {t(
+                            `rfq.offerStatus.${
+                              offer.status === 'selected'
+                                ? 'selected'
+                                : offer.status === 'confirmed'
+                                  ? 'confirmed'
+                                  : 'active'
+                            }`,
+                          )}
+                        </AppText>
+                      </View>
+                    </View>
+                    {offer.quantity ? (
+                      <AppText style={styles.myOfferUnits} numberOfLines={1}>
+                        {t('equipmentListing.unitsCount', { count: offer.quantity })}
+                      </AppText>
+                    ) : null}
                   </View>
                   {offer.price ? (
                     <View style={styles.myOfferPriceRow}>
@@ -1410,11 +1418,28 @@ const styles = StyleSheet.create({
   myOfferRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: spacing.sm,
   },
-  myOfferTitle: { flex: 1, fontSize: 14, color: palette.charcoal },
-  myOfferStatus: { fontSize: 12, color: palette.goldDark },
+  myOfferBadges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  myOfferKindBadge: {
+    backgroundColor: palette.softGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  myOfferKindText: { fontSize: 11, color: palette.goldDark },
+  myOfferStatusBadge: {
+    backgroundColor: palette.lightGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  myOfferStatusText: { fontSize: 11, color: palette.charcoal },
+  myOfferUnits: { flex: 1, fontSize: 13, color: palette.muted },
   myOfferPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
   myOfferPrice: { fontSize: 16, color: palette.charcoal },
   myOfferPerUnit: { fontSize: 12, color: palette.muted },

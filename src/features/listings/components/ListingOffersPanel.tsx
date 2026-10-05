@@ -85,9 +85,35 @@ export function ListingOffersPanel({
           return (
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
+                <View style={styles.badges}>
+                  {showUnits && offer.kind ? (
+                    <View style={styles.kindBadge}>
+                      <AppText weight="semibold" style={styles.kindBadgeText}>
+                        {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+                      </AppText>
+                    </View>
+                  ) : null}
+                  {offer.delivery ? (
+                    <View style={styles.kindBadge}>
+                      <AppText weight="semibold" style={styles.kindBadgeText}>
+                        {offer.delivery === 'onsite'
+                          ? t('serviceListing.onsite')
+                          : t('serviceListing.online')}
+                      </AppText>
+                    </View>
+                  ) : null}
+                  {statusKey !== 'active' ? (
+                    <View style={styles.statusBadge}>
+                      <AppText weight="semibold" style={styles.statusBadgeText}>
+                        {t(`rfq.offerStatus.${statusKey}`)}
+                      </AppText>
+                    </View>
+                  ) : null}
+                </View>
                 <Pressable
                   disabled={!onPressResponder || !offer.responderId}
                   onPress={() => onPressResponder?.(offer)}
+                  style={styles.namePress}
                 >
                   <AppText weight="semibold" style={styles.name} numberOfLines={1}>
                     {offer.status === 'confirmed'
@@ -97,25 +123,6 @@ export function ListingOffersPanel({
                 </Pressable>
                 {isLeader ? (
                   <Ionicons name="trophy" size={16} color={palette.gold} />
-                ) : null}
-                {statusKey !== 'active' ? (
-                  <View style={styles.tag}>
-                    <AppText weight="semibold" style={styles.tagText}>
-                      {t(`rfq.offerStatus.${statusKey}`)}
-                    </AppText>
-                  </View>
-                ) : null}
-                {offer.delivery ? (
-                  <AppText style={styles.kind}>
-                    {offer.delivery === 'onsite'
-                      ? t('serviceListing.onsite')
-                      : t('serviceListing.online')}
-                  </AppText>
-                ) : null}
-                {showUnits && offer.kind ? (
-                  <AppText style={styles.kind}>
-                    {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
-                  </AppText>
                 ) : null}
               </View>
               {showUnits && unitAmount != null && units ? (
@@ -208,28 +215,33 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: spacing.sm,
   },
+  badges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+  },
+  namePress: { flex: 1 },
   name: {
-    flex: 1,
     fontSize: 14,
     color: palette.charcoal,
   },
-  tag: {
+  kindBadge: {
     backgroundColor: palette.softGold,
-    borderRadius: radius.sm,
+    borderRadius: radius.pill,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 4,
   },
-  tagText: {
-    fontSize: 11,
-    color: palette.gold,
+  kindBadgeText: { fontSize: 11, color: palette.goldDark },
+  statusBadge: {
+    backgroundColor: palette.lightGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
   },
-  kind: {
-    fontSize: 12,
-    color: palette.muted,
-  },
+  statusBadgeText: { fontSize: 11, color: palette.charcoal },
   price: {
     fontSize: 18,
     color: palette.charcoal,
