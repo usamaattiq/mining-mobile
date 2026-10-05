@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { showAppAlert } from '@/shared/services/appAlert';
-import * as LocalAuthentication from 'expo-local-authentication';
+import { confirmBiometric } from '@/shared/utils/confirmBiometric';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -181,14 +181,9 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       setBiometricEnabled(false);
       return;
     }
-    const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: t('signUpSecurity.biometricPrompt'),
-      cancelLabel: t('common.cancel'),
-      disableDeviceFallback: true,
-    });
-    if (result.success) {
-      setBiometricEnabled(true);
-    }
+    setBiometricEnabled(true);
+    const result = await confirmBiometric(t('signUpSecurity.biometricPrompt'), t('common.cancel'));
+    setBiometricEnabled(result.success);
   };
 
   const handleSendSignupOtp = async () => {

@@ -180,10 +180,11 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       setProfile(result.profile);
       await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();
-      if (result.profile.biometricEnabled) {
-        await setCachedMpin(mpinValue);
-      }
-      await setDeviceBiometricEnabled(result.profile.biometricEnabled);
+      const keepBiometric =
+        result.profile.biometricEnabled || useDevicePrefsStore.getState().biometricEnabled;
+      if (keepBiometric) await setCachedMpin(mpinValue);
+      else await clearCachedMpin();
+      await setDeviceBiometricEnabled(keepBiometric);
       navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
     } catch (error) {
       setMpin('');
@@ -249,13 +250,11 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       setProfile(result.profile);
       await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();
-      // The old cached MPIN (if any) is now stale — refresh or drop it.
-      if (result.profile.biometricEnabled) {
-        await setCachedMpin(newMpin);
-      } else {
-        await clearCachedMpin();
-      }
-      await setDeviceBiometricEnabled(result.profile.biometricEnabled);
+      const keepBiometric =
+        result.profile.biometricEnabled || useDevicePrefsStore.getState().biometricEnabled;
+      if (keepBiometric) await setCachedMpin(newMpin);
+      else await clearCachedMpin();
+      await setDeviceBiometricEnabled(keepBiometric);
       navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
     } catch (error) {
       showAppAlert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));

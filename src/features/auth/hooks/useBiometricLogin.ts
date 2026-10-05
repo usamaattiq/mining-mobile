@@ -47,7 +47,7 @@ export function useBiometricLogin(options: {
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: t('loginMpin.biometricPrompt'),
       cancelLabel: t('common.cancel'),
-      disableDeviceFallback: true,
+      disableDeviceFallback: false,
     });
 
     if (result.success) {
