@@ -208,19 +208,26 @@ function CategoryBranch({
   return (
     <View>
       <View style={[styles.row, showDivider && styles.rowDivider, { paddingStart: spacing.sm +2 + depth * 12 }]}>
-        <View style={styles.lead}>
-          {hasChildren ? (
-            <Pressable onPress={() => onToggle(node.id)} hitSlop={6} style={styles.chevron}>
-              <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={14} color={palette.gold} />
-            </Pressable>
-          ) : (
-            <View style={styles.expandSpacer} />
-          )}
-          <Ionicons name="pricetag-outline" size={16} color={palette.gold} />
-        </View>
-        <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-          {node.name}
-        </AppText>
+        <Pressable
+          onPress={hasChildren ? () => onToggle(node.id) : undefined}
+          disabled={!hasChildren}
+          style={styles.labelHit}
+          accessibilityRole={hasChildren ? 'button' : undefined}
+        >
+          <View style={styles.lead}>
+            {hasChildren ? (
+              <View style={styles.chevron}>
+                <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={14} color={palette.gold} />
+              </View>
+            ) : (
+              <View style={styles.expandSpacer} />
+            )}
+            <Ionicons name="pricetag-outline" size={16} color={palette.gold} />
+          </View>
+          <AppText weight="semibold" style={styles.name} numberOfLines={1}>
+            {node.name}
+          </AppText>
+        </Pressable>
         {onAdd ? (
           <Pressable onPress={() => onAdd(node.id)} hitSlop={8} style={styles.action}>
             <Ionicons name="add" size={20} color={palette.gold} />
@@ -290,6 +297,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: palette.softGold,
   },
+  labelHit: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   name: { flex: 1, fontSize: 15, color: palette.charcoal },
   action: { padding: 2 },
   lead: { flexDirection: 'row', alignItems: 'center', gap: 2 },
