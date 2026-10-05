@@ -170,12 +170,13 @@ export function AdminCategoriesScreen(): React.ReactElement {
         <AppText weight="bold" style={styles.sheetTitle}>
           {draft?.id ? t('admin.labelName') : draft?.parentId ? t('admin.addSubcategory') : t('admin.addLabel')}
         </AppText>
-        <FormInput
-          label={t('admin.labelName')}
-          value={draft?.name ?? ''}
-          onChangeText={(name) => setDraft((current) => (current ? { ...current, name } : current))}
-        />
-        <Button label={t('common.save')} onPress={() => void saveDraft()} loading={saving} />
+        <View style={styles.sheetForm}>
+          <FormInput
+            value={draft?.name ?? ''}
+            onChangeText={(name) => setDraft((current) => (current ? { ...current, name } : current))}
+          />
+          <Button label={t('common.save')} onPress={() => void saveDraft()} loading={saving} />
+        </View>
       </AppBottomSheet>
     </>
   );
@@ -206,15 +207,17 @@ function CategoryBranch({
   const hasChildren = node.children.length > 0;
   return (
     <View>
-      <View style={[styles.row, showDivider && styles.rowDivider, { paddingStart: spacing.md + depth * 16 }]}>
-        {hasChildren ? (
-          <Pressable onPress={() => onToggle(node.id)} hitSlop={6} style={styles.action}>
-            <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={16} color={palette.gold} />
-          </Pressable>
-        ) : (
-          <View style={styles.expandSpacer} />
-        )}
-        <Ionicons name="pricetag-outline" size={16} color={palette.gold} />
+      <View style={[styles.row, showDivider && styles.rowDivider, { paddingStart: spacing.sm +2 + depth * 12 }]}>
+        <View style={styles.lead}>
+          {hasChildren ? (
+            <Pressable onPress={() => onToggle(node.id)} hitSlop={6} style={styles.chevron}>
+              <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={14} color={palette.gold} />
+            </Pressable>
+          ) : (
+            <View style={styles.expandSpacer} />
+          )}
+          <Ionicons name="pricetag-outline" size={16} color={palette.gold} />
+        </View>
         <AppText weight="semibold" style={styles.name} numberOfLines={1}>
           {node.name}
         </AppText>
@@ -289,11 +292,16 @@ const styles = StyleSheet.create({
   },
   name: { flex: 1, fontSize: 15, color: palette.charcoal },
   action: { padding: 2 },
-  expandSpacer: { width: 20 },
+  lead: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  chevron: { width: 14, alignItems: 'center' },
+  expandSpacer: { width: 14 },
   sheetTitle: {
     fontSize: 18,
     color: palette.charcoal,
     textAlign: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  sheetForm: {
+    gap: spacing.sm,
   },
 });
