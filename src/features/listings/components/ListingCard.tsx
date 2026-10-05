@@ -170,7 +170,7 @@ export function ListingCard({
             />
           ) : (
             <View style={[styles.gridImage, styles.imagePlaceholder]}>
-              <Ionicons name={placeholderIcon} size={36} color={palette.muted} />
+              <Ionicons name={placeholderIcon} size={56} color={palette.goldDark} />
             </View>
           )}
           {requestBadge ? (
@@ -255,7 +255,7 @@ export function ListingCard({
             <ExpoImage source={thumbnail} style={styles.image} contentFit="cover" cachePolicy="memory-disk" />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
-              <Ionicons name={placeholderIcon} size={24} color={palette.muted} />
+              <Ionicons name={placeholderIcon} size={48} color={palette.goldDark} />
             </View>
           )}
         </View>

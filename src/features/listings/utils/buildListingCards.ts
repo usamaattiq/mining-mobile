@@ -148,13 +148,17 @@ export function buildListingCards({
         priceText: listing.postedAs === 'buyer' ? undefined : price.priceText,
         priceUnit: price.priceUnit,
         createdAt: listing.postedAs === 'supplier' ? undefined : listing.createdAt,
-        expiresAt: listing.postedAs === 'supplier' ? undefined : listing.rfq?.expiresAt ?? undefined,
+        expiresAt:
+          listing.postedAs === 'supplier'
+            ? undefined
+            : listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,
         ended:
           listing.postedAs === 'supplier'
             ? Date.now() >= listing.createdAt + 365 * 24 * 60 * 60 * 1000
             : listingHasEnded({
                 rfqStatus: listing.rfq?.status,
                 expiresAt: listing.rfq?.expiresAt,
+                auctionEndDate: listing.auctionEndDate,
                 createdAt: listing.createdAt,
               }),
         onRepost: onRepost ? () => onRepost(listing.id, 'equipment') : undefined,

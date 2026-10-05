@@ -19,6 +19,8 @@ export type ListingOffersPanelProps = {
   /** Accept and reject stay hidden unless the request is still live. */
   rfqStatus?: string;
   showUnits?: boolean;
+  /** Shown on the left when the offer has no photo. */
+  placeholderIcon?: keyof typeof Ionicons.glyphMap;
   /** Gold auctions: trophy on the rank-1 bid. */
   showLeader?: boolean;
   /** Gold auctions: message every bidder, not only the selected one. */
@@ -46,6 +48,7 @@ export function ListingOffersPanel({
   canDecideOffers = true,
   rfqStatus,
   showUnits = false,
+  placeholderIcon,
   showLeader = false,
   messageEveryOffer = false,
   onAccept,
@@ -85,6 +88,11 @@ export function ListingOffersPanel({
           return (
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
+                {placeholderIcon ? (
+                  <View style={styles.logo}>
+                    <Ionicons name={placeholderIcon} size={22} color={palette.goldDark} />
+                  </View>
+                ) : null}
                 <Pressable
                   disabled={!onPressResponder || !offer.responderId}
                   onPress={() => onPressResponder?.(offer)}
@@ -216,6 +224,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   badges: {
     flexDirection: 'row',
