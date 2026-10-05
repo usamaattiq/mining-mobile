@@ -94,12 +94,11 @@ export function AdminListingsScreen(): React.ReactElement {
     >
       <SearchField value={query} onChangeText={setQuery} placeholder={t('admin.searchListings')} />
       <FilterBadges
-        value={statusFilter}
+        value={statusFilter === 'past' ? 'all' : statusFilter}
         onChange={setStatusFilter}
         options={[
           { id: 'all', label: t('admin.all') },
           { id: 'live', label: t('admin.live') },
-          { id: 'past', label: t('admin.past') },
         ]}
       />
       {loading ? (
