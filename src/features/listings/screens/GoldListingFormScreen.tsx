@@ -30,7 +30,7 @@ import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
 
@@ -315,10 +315,13 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             <FormInput
               label={t('goldListing.price', { currency: currency.code })}
               value={price}
-              onChangeText={setPrice}
+              onChangeText={(value) => setPrice(sanitizeStepPrice(value))}
               keyboardType="numeric"
               placeholder={currency.code}
               required
+              error={
+                price && !parsePositiveAmount(price) ? t('common.priceGreaterThanZero') : undefined
+              }
             />
           </View>
         ) : null}

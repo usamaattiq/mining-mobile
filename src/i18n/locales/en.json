@@ -15,6 +15,7 @@
     "save": "Save",
     "reset": "Reset",
     "error": "Something went wrong",
+    "priceGreaterThanZero": "Price must be greater than 0",
     "delete": "Delete",
     "justNow": "Just now",
     "minutesAgo": "{count}m",

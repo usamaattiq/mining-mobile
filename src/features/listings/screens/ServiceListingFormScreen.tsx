@@ -32,7 +32,7 @@ import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels, resolveServi
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 
@@ -358,20 +358,30 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                   <FormInput
                     label={t('serviceListing.onsitePrice')}
                     value={onsitePrice}
-                    onChangeText={setOnsitePrice}
+                    onChangeText={(value) => setOnsitePrice(sanitizeStepPrice(value))}
                     keyboardType="numeric"
                     placeholder={currency.code}
                     required
+                    error={
+                      onsitePrice && !parsePositiveAmount(onsitePrice)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
                   />
                 ) : null}
                 {online ? (
                   <FormInput
                     label={t('serviceListing.onlinePrice')}
                     value={onlinePrice}
-                    onChangeText={setOnlinePrice}
+                    onChangeText={(value) => setOnlinePrice(sanitizeStepPrice(value))}
                     keyboardType="numeric"
                     placeholder={currency.code}
                     required
+                    error={
+                      onlinePrice && !parsePositiveAmount(onlinePrice)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
                   />
                 ) : null}
               </>

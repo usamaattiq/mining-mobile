@@ -15,6 +15,7 @@
     "save": "حفظ",
     "reset": "إعادة تعيين",
     "error": "حدث خطأ ما",
+    "priceGreaterThanZero": "يجب أن يكون السعر أكبر من 0",
     "delete": "حذف",
     "justNow": "الآن",
     "minutesAgo": "{count} د",

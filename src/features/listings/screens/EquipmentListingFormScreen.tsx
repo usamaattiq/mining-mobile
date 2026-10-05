@@ -34,7 +34,7 @@ import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
-import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { DeliveryType, EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 
@@ -496,10 +496,15 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   <FormInput
                     label={t('equipmentListing.rentalAmount', { currency: currency.code })}
                     value={rentalAmount}
-                    onChangeText={setRentalAmount}
+                    onChangeText={(value) => setRentalAmount(sanitizeStepPrice(value))}
                     keyboardType="numeric"
                     placeholder={currency.code}
                     required
+                    error={
+                      rentalAmount && !parsePositiveAmount(rentalAmount)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
                     rightAdornment={
                       <AppText style={styles.priceAdornment}>{t('rfq.pricePerUnit')}</AppText>
                     }
@@ -512,10 +517,15 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               <FormInput
                 label={t('equipmentListing.salePriceWithCurrency', { currency: currency.code })}
                 value={salePrice}
-                onChangeText={setSalePrice}
+                onChangeText={(value) => setSalePrice(sanitizeStepPrice(value))}
                 keyboardType="numeric"
                 placeholder={currency.code}
                 required
+                error={
+                  salePrice && !parsePositiveAmount(salePrice)
+                    ? t('common.priceGreaterThanZero')
+                    : undefined
+                }
                 rightAdornment={
                   <AppText style={styles.priceAdornment}>{t('rfq.pricePerUnit')}</AppText>
                 }
@@ -600,7 +610,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   <FormInput
                     label={t('equipmentListing.deliveryPricePerKm', { currency: currency.code })}
                     value={deliveryPricePerKm}
-                    onChangeText={setDeliveryPricePerKm}
+                    onChangeText={(value) => setDeliveryPricePerKm(sanitizeStepPrice(value))}
+                    error={
+                      deliveryPricePerKm && !parsePositiveAmount(deliveryPricePerKm)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
                     placeholder={currency.code}
                     keyboardType="numeric"
                     required
