@@ -694,8 +694,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        bottomOffset={180}
-        extraKeyboardSpace={72}
+        bottomOffset={96}
+        extraKeyboardSpace={0}
+        disableScrollOnKeyboardHide
       >
         <EquipmentImageCarousel
           media={visualMedia}

@@ -138,7 +138,8 @@ export function HomeFilterSheet({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
-        bottomOffset={72}
+        bottomOffset={96}
+        disableScrollOnKeyboardHide
         extraKeyboardSpace={0}
       >
         <View style={styles.titleRow}>

@@ -4,7 +4,6 @@ import { KeyboardStickyView, useKeyboardState } from 'react-native-keyboard-cont
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CounterField } from '@/shared/components/CounterField';
-import { KeyboardDoneBar } from '@/shared/components/KeyboardDoneBar';
 import { AppText } from '@/shared/components/AppText';
 import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
@@ -42,7 +41,6 @@ export function ListingOfferComposer({
   footer,
 }: ListingOfferComposerProps): React.ReactElement {
   const insets = useSafeAreaInsets();
-  const priceAccessoryId = React.useId();
   const { currentLanguage } = useLanguage();
   const keyboardVisible = useKeyboardState((state) => state.isVisible);
   const [price, setPrice] = React.useState('');
@@ -220,7 +218,6 @@ export function ListingOfferComposer({
                 placeholder={unitPricePlaceholder ?? placeholder}
                 placeholderTextColor={palette.muted}
                 keyboardType="decimal-pad"
-                inputAccessoryViewID={priceAccessoryId}
                 editable={!submitting}
                 style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
               />
@@ -246,7 +243,6 @@ export function ListingOfferComposer({
               </Pressable>
             ) : null}
           </View>
-          <KeyboardDoneBar nativeID={priceAccessoryId} />
           {draftUnitAmount != null && maxUnits != null ? (
             <PriceTimesUnitsSummary
               currencyCode={currencyCode}

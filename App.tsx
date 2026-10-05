@@ -3,7 +3,7 @@ import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { KeyboardProvider, KeyboardToolbar, useKeyboardState } from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { AppAlertHost } from '@/shared/components/AppAlertHost';
@@ -21,6 +21,15 @@ import { useProfileStore } from '@/store/profileStore';
 import { authApi } from '@/features/auth/api/authApi';
 
 void SplashScreen.preventAutoHideAsync();
+
+const NUMBER_KEYBOARDS = new Set(['numeric', 'number-pad', 'decimal-pad', 'phone-pad']);
+
+/** Number pads have no return key, so Done is shown only for those keyboards. */
+function NumericKeyboardToolbar(): React.ReactElement | null {
+  const keyboardType = useKeyboardState((state) => state.type);
+  if (!NUMBER_KEYBOARDS.has(keyboardType)) return null;
+  return <KeyboardToolbar />;
+}
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -91,6 +100,7 @@ export default function App() {
         <NavigationContainer ref={navigationRef} linking={navigationLinking} theme={navigationTheme}>
           <AppNavigator />
         </NavigationContainer>
+        <NumericKeyboardToolbar />
         <AppAlertHost />
       </KeyboardProvider>
     </SafeAreaProvider>

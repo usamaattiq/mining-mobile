@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
-import { KeyboardDoneBar } from '@/shared/components/KeyboardDoneBar';
 import { palette, radius, spacing, getFontFamily } from '@/theme';
 import type { FormInputProps } from '@/shared/types/formInput.types';
 
@@ -20,12 +19,6 @@ export function FormInput({
 }: FormInputProps): React.ReactElement {
   const { currentLanguage } = useLanguage();
   const disabled = editable === false;
-  const accessoryId = React.useId();
-  const showsDone =
-    keyboardType === 'numeric' ||
-    keyboardType === 'number-pad' ||
-    keyboardType === 'decimal-pad' ||
-    keyboardType === 'phone-pad';
 
   return (
     <View style={styles.container}>
@@ -53,14 +46,11 @@ export function FormInput({
           placeholderTextColor={palette.muted}
           editable={editable}
           keyboardType={keyboardType}
-          inputAccessoryViewID={
-            showsDone ? inputAccessoryViewID ?? accessoryId : inputAccessoryViewID
-          }
+          inputAccessoryViewID={inputAccessoryViewID}
           {...rest}
         />
         {rightAdornment}
       </View>
-      {showsDone ? <KeyboardDoneBar nativeID={inputAccessoryViewID ?? accessoryId} /> : null}
       {error ? <AppText style={styles.error}>{error}</AppText> : null}
     </View>
   );

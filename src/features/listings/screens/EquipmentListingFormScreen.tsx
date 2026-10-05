@@ -403,8 +403,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-        bottomOffset={72}
+        bottomOffset={96}
         extraKeyboardSpace={0}
+        disableScrollOnKeyboardHide
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>

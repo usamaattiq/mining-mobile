@@ -31,8 +31,9 @@ export function CurvedSheetScrollView({
       bounces={Boolean(refreshControl) || rest.bounces}
       alwaysBounceVertical={Boolean(refreshControl)}
       keyboardShouldPersistTaps="handled"
-      bottomOffset={72}
+      bottomOffset={96}
       extraKeyboardSpace={0}
+      disableScrollOnKeyboardHide
       refreshControl={refreshControl}
       {...rest}
     >

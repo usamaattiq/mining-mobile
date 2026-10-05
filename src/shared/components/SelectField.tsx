@@ -209,7 +209,7 @@ export function SelectField({
         <AppBottomSheet
           visible={open}
           onClose={() => setOpen(false)}
-          heightRatio={searchable || hierarchical ? 0.4 : 0.55}
+          heightRatio={searchable || hierarchical ? 0.34 : 0.55}
           fitContent={!searchable && !hierarchical}
         >
           <AppText weight="bold" style={styles.sheetTitle}>
@@ -238,7 +238,8 @@ export function SelectField({
             <KeyboardAwareScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              bottomOffset={72}
+              bottomOffset={96}
+              disableScrollOnKeyboardHide
               extraKeyboardSpace={0}
             >
               {optionList}
