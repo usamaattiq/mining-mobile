@@ -34,7 +34,7 @@ import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { DeliveryType, EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 
@@ -191,14 +191,14 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     title.trim() &&
     units > 0 &&
     (isBuyer ||
-      ((offerRent ? Boolean(rentPeriod && rentalAmount.trim()) : true) &&
-        (offerSell ? Boolean(salePrice.trim()) : true))),
+      ((offerRent ? Boolean(rentPeriod && parsePositiveAmount(rentalAmount)) : true) &&
+        (offerSell ? Boolean(parsePositiveAmount(salePrice)) : true))),
   );
   const deliveryValid =
     isBuyer ||
     !deliveryAvailable ||
     deliveryType === 'free' ||
-    deliveryPricePerKm.trim().length > 0;
+    Boolean(parsePositiveAmount(deliveryPricePerKm));
   const mediaValid =
     (isBuyer || media.length > 0) &&
     !mediaBusy &&

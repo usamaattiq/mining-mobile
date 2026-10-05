@@ -32,7 +32,7 @@ import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels, resolveServi
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 
@@ -148,8 +148,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       title.trim() &&
       description.trim() &&
       (isBuyer ||
-        ((onsite ? Boolean(onsitePrice.trim()) : true) &&
-          (online ? Boolean(onlinePrice.trim()) : true))),
+        ((onsite ? Boolean(parsePositiveAmount(onsitePrice)) : true) &&
+          (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
   );
   const mediaValid =
     (isBuyer || media.length > 0) &&

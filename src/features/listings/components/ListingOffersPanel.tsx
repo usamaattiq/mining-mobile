@@ -85,7 +85,28 @@ export function ListingOffersPanel({
           return (
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
+                <Pressable
+                  disabled={!onPressResponder || !offer.responderId}
+                  onPress={() => onPressResponder?.(offer)}
+                  style={styles.namePress}
+                >
+                  <AppText weight="semibold" style={styles.name} numberOfLines={1}>
+                    {offer.status === 'confirmed'
+                      ? offer.responderName || t('messages.fallbackName')
+                      : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
+                  </AppText>
+                </Pressable>
+                {isLeader ? (
+                  <Ionicons name="trophy" size={16} color={palette.gold} />
+                ) : null}
                 <View style={styles.badges}>
+                  {statusKey !== 'active' ? (
+                    <View style={styles.statusBadge}>
+                      <AppText weight="semibold" style={styles.statusBadgeText}>
+                        {t(`rfq.offerStatus.${statusKey}`)}
+                      </AppText>
+                    </View>
+                  ) : null}
                   {showUnits && offer.kind ? (
                     <View style={styles.kindBadge}>
                       <AppText weight="semibold" style={styles.kindBadgeText}>
@@ -102,28 +123,7 @@ export function ListingOffersPanel({
                       </AppText>
                     </View>
                   ) : null}
-                  {statusKey !== 'active' ? (
-                    <View style={styles.statusBadge}>
-                      <AppText weight="semibold" style={styles.statusBadgeText}>
-                        {t(`rfq.offerStatus.${statusKey}`)}
-                      </AppText>
-                    </View>
-                  ) : null}
                 </View>
-                <Pressable
-                  disabled={!onPressResponder || !offer.responderId}
-                  onPress={() => onPressResponder?.(offer)}
-                  style={styles.namePress}
-                >
-                  <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-                    {offer.status === 'confirmed'
-                      ? offer.responderName || t('messages.fallbackName')
-                      : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
-                  </AppText>
-                </Pressable>
-                {isLeader ? (
-                  <Ionicons name="trophy" size={16} color={palette.gold} />
-                ) : null}
               </View>
               {showUnits && unitAmount != null && units ? (
                 <PriceTimesUnitsSummary

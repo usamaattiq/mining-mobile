@@ -851,12 +851,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               {mySupplierOffers.map((offer) => (
                 <View key={offer.id} style={styles.myOfferCard}>
                   <View style={styles.myOfferRow}>
+                    <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
+                      {offer.quantity
+                        ? t('equipmentListing.unitsCount', { count: offer.quantity })
+                        : t('rfq.yourOffer')}
+                    </AppText>
                     <View style={styles.myOfferBadges}>
-                      <View style={styles.myOfferKindBadge}>
-                        <AppText weight="semibold" style={styles.myOfferKindText}>
-                          {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
-                        </AppText>
-                      </View>
                       <View style={styles.myOfferStatusBadge}>
                         <AppText weight="semibold" style={styles.myOfferStatusText}>
                           {t(
@@ -870,12 +870,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           )}
                         </AppText>
                       </View>
+                      <View style={styles.myOfferKindBadge}>
+                        <AppText weight="semibold" style={styles.myOfferKindText}>
+                          {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
+                        </AppText>
+                      </View>
                     </View>
-                    {offer.quantity ? (
-                      <AppText style={styles.myOfferUnits} numberOfLines={1}>
-                        {t('equipmentListing.unitsCount', { count: offer.quantity })}
-                      </AppText>
-                    ) : null}
                   </View>
                   {offer.price ? (
                     <View style={styles.myOfferPriceRow}>

@@ -30,7 +30,7 @@ import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
 
@@ -145,7 +145,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   };
 
   const detailsValid = Boolean(
-    title.trim() && description.trim() && weight.trim() && purity && price.trim(),
+    title.trim() && description.trim() && weight.trim() && purity && parsePositiveAmount(price),
   );
   const mediaValid = media.length > 0 && Boolean(auctionStartDate) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
