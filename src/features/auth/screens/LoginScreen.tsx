@@ -99,7 +99,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       phoneDigits: phoneDigits.trim(),
     });
 
-  useBiometricLogin({
+  const biometricLogin = useBiometricLogin({
     enabled: step === 'mpin' && isReturningDeviceRef.current,
     onAutoSubmit: (cachedMpin) => void handleLogIn(cachedMpin),
   });
@@ -405,7 +405,13 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
               {t('loginMpin.loggingInAs')} {phone}
             </AppText>
           ) : null}
-          <CodeInput length={MPIN_LENGTH} value={mpin} onChangeValue={setMpin} secure autoFocus />
+          <CodeInput
+            length={MPIN_LENGTH}
+            value={mpin}
+            onChangeValue={setMpin}
+            secure
+            autoFocus={!biometricLogin.available}
+          />
           <Button
             label={t('loginMpin.forgotMpin')}
             variant="link"

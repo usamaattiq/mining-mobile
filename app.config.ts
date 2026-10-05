@@ -21,9 +21,7 @@ if (process.env.NODE_ENV === 'production' && !androidMapsKey && !iosMapsKey) {
 // production (ad hoc / TestFlight / App Store) must use the production APNs
 // environment or iOS silently drops the notification. Android has no equivalent.
 const notificationMode =
-  process.env.EAS_BUILD_PROFILE === 'preview' || process.env.EAS_BUILD_PROFILE === 'production'
-    ? 'production'
-    : 'development';
+  process.env.EAS_BUILD_PROFILE === 'development' ? 'development' : 'production';
 
 const config: ExpoConfig = {
   ...baseExpo,

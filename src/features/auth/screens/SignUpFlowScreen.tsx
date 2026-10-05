@@ -183,6 +183,8 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     }
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: t('signUpSecurity.biometricPrompt'),
+      cancelLabel: t('common.cancel'),
+      disableDeviceFallback: true,
     });
     if (result.success) {
       setBiometricEnabled(true);
