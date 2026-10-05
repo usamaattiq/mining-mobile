@@ -6,7 +6,7 @@ export type AdminUserItem = {
   fullName: string;
   phoneE164: string;
   avatarUrl: string | null;
-  accountType: 'individual' | 'company';
+  accountType: 'individual' | 'company' | 'admin';
   companyName: string | null;
   status: 'active' | 'suspended';
   createdAt: string;
@@ -29,7 +29,7 @@ export type AdminUserDetail = {
   latitude: number | null;
   longitude: number | null;
   avatarUrl: string | null;
-  accountType: 'individual' | 'company';
+  accountType: 'individual' | 'company' | 'admin';
   companyName: string | null;
   status: 'active' | 'suspended';
   listings: { id: string; title: string; reference: string; category: 'equipment' | 'services' | 'gold'; status: string }[];
