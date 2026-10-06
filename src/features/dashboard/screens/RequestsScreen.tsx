@@ -26,6 +26,8 @@ import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { palette, spacing } from '@/theme';
 
+const noListingImage = require('@/assets/images/noItem.png');
+
 type Props = CompositeScreenProps<
   BottomTabScreenProps<DashboardTabParamList, 'Requests'>,
   NativeStackScreenProps<RootStackParamList>
@@ -180,7 +182,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
       </View>
 
       {visibleCards.length === 0 ? (
-        <EmptyState title={emptyTitle} subtitle={emptySubtitle} />
+        <EmptyState title={emptyTitle} subtitle={emptySubtitle} image={noListingImage} />
       ) : (
         visibleCards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
       )}

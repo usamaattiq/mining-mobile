@@ -1,12 +1,13 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { AppText } from '@/shared/components/AppText';
 import { palette, spacing } from '@/theme';
 import type { EmptyStateProps } from '@/shared/types/emptyState.types';
 
-export function EmptyState({ title, subtitle }: EmptyStateProps): React.ReactElement {
+export function EmptyState({ title, subtitle, image }: EmptyStateProps): React.ReactElement {
   return (
     <View style={styles.empty}>
+      {image ? <Image source={image} style={styles.image} resizeMode="contain" /> : null}
       <AppText weight="semibold" style={styles.title}>
         {title}
       </AppText>
@@ -20,6 +21,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxl,
     alignItems: 'center',
     gap: spacing.xs,
+  },
+  image: {
+    width: 160,
+    height: 160,
+    marginBottom: spacing.sm,
   },
   title: {
     fontSize: 15,

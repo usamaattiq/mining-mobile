@@ -33,7 +33,7 @@ const config: ExpoConfig = {
       {
         // Use the tracked app icon so EAS always has this file (a separate
         // notification-icon.png was easy to miss in the upload archive).
-        icon: './assets/images/icon.png',
+        icon: './assets/images/splash-logo.png',
         color: '#222222',
         defaultChannel: 'default',
         mode: notificationMode,

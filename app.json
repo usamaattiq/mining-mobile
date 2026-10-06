@@ -5,9 +5,9 @@
     "version": "1.0.4",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/splash-logo.png",
     "splash": {
-      "image": "./assets/images/icon.png",
+      "image": "./assets/images/splash-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#222222"
     },
@@ -24,7 +24,7 @@
       "package": "com.silveraxis.mining",
       "versionCode": 5,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/splash-logo.png",
         "backgroundColor": "#222222"
       }
     },
@@ -39,7 +39,7 @@
       "enforceContrast": false
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/splash-logo.png"
     },
     "experiments": {
       "tsconfigPaths": true
@@ -61,12 +61,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/icon.png",
+          "image": "./assets/images/splash-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#222222",
           "dark": {
-            "image": "./assets/images/icon.png",
+            "image": "./assets/images/splash-logo.png",
             "backgroundColor": "#222222"
           }
         }

@@ -21,6 +21,8 @@ import {
   dayKeyFromEpoch,
   type HomeTypeFilter,
 } from '@/features/dashboard/components/HomeFilterSheet';
+
+const noListingImage = require('@/assets/images/noItem.png');
 import {
   equipmentListingAmount,
   goldListingAmount,
@@ -406,7 +408,11 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       </View>
 
       {cards.length === 0 ? (
-        <EmptyState title={t('requests.emptyTitle')} subtitle={t('requests.emptySubtitle')} />
+        <EmptyState
+          title={t('requests.emptyTitle')}
+          subtitle={t('requests.emptySubtitle')}
+          image={noListingImage}
+        />
       ) : viewMode === 'grid' ? (
         <View style={styles.listingGrid}>
           {cards.map(({ id, ...card }) => (
