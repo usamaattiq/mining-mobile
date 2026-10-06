@@ -64,13 +64,9 @@ export function ProfileScreen({ navigation }: Props): React.ReactElement {
     } catch {
       // Best-effort — still clear local session even if the server call fails.
     } finally {
+      // clear() resets navigation to Onboarding and clears profileStore itself.
       await useAuthStore.getState().clear();
-      useProfileStore.getState().clear();
       setLoggingOut(false);
-      navigation.getParent<NativeStackScreenProps<RootStackParamList>['navigation']>()?.reset({
-        index: 0,
-        routes: [{ name: 'Onboarding' }],
-      });
     }
   };
 

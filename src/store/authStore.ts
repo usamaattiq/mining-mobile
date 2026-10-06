@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
+import { navigationRef } from '@/navigation/navigationRef';
 import { setAuthTokenProvider, setSessionRevokedHandler } from '@/shared/services/api';
 import {
   registerForPushNotifications,
@@ -11,6 +12,7 @@ import { useMarketListingsStore } from '@/store/marketListingsStore';
 import { useMessagesStore } from '@/store/messagesStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { useOfferedListingsStore } from '@/store/offeredListingsStore';
+import { useProfileStore } from '@/store/profileStore';
 import { chatSocket } from '@/shared/services/chatSocket';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 
@@ -55,8 +57,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useNotificationsStore.getState().setItems([]);
     useMarketListingsStore.getState().setListings([]);
     useOfferedListingsStore.getState().setListings([]);
+    useProfileStore.getState().clear();
     chatSocket.disconnect();
     set({ accessToken: null, status: 'unauthenticated' });
+    // Every clear() caller (manual logout, a revoked/expired session hit
+    // mid-use, a stale token found at startup) must end up back at
+    // Onboarding. navigationRef isn't ready yet during the startup check
+    // (the navigator hasn't mounted), which is fine — AppNavigator picks
+    // its initial route from `status` at mount in that case.
+    if (navigationRef.isReady()) {
+      navigationRef.reset({ index: 0, routes: [{ name: 'Onboarding' }] });
+    }
   },
 }));
 
