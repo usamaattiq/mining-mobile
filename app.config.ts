@@ -8,8 +8,7 @@ const baseExpo = appJson.expo as ExpoConfig;
 const legacyMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
 const androidMapsKey =
   process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_ANDROID?.trim() || legacyMapsKey || '';
-const iosMapsKey =
-  process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS?.trim() || legacyMapsKey || '';
+const iosMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY_IOS?.trim() || legacyMapsKey || '';
 
 if (process.env.NODE_ENV === 'production' && !androidMapsKey && !iosMapsKey) {
   console.warn(

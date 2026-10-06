@@ -45,9 +45,7 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
 
   const trimmedEmail = email.trim();
   const emailFormatError =
-    trimmedEmail.length > 0 && !EMAIL_REGEX.test(trimmedEmail)
-      ? t('profile.emailInvalid')
-      : null;
+    trimmedEmail.length > 0 && !EMAIL_REGEX.test(trimmedEmail) ? t('profile.emailInvalid') : null;
   const emailError = emailFormatError ?? emailServerError;
 
   const handleEmailChange = (next: string) => {

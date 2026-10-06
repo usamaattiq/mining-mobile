@@ -47,9 +47,7 @@ export type CreateServiceListingBody = Omit<
 > & { expiryHours?: number };
 export type CreateGoldListingBody = Omit<GoldListing, 'id' | 'createdAt' | 'ownerId' | 'owner'>;
 export type CreateListingBody =
-  | CreateEquipmentListingBody
-  | CreateServiceListingBody
-  | CreateGoldListingBody;
+  CreateEquipmentListingBody | CreateServiceListingBody | CreateGoldListingBody;
 
 type FetchOptions = { signal?: AbortSignal };
 

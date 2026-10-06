@@ -1,5 +1,12 @@
 import React from 'react';
-import { ActivityIndicator, Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
@@ -26,22 +33,28 @@ export function AdminUsersScreen(): React.ReactElement {
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const load = React.useCallback(async (search: string, type: string, status: 'all' | 'blocked') => {
-    const result = await adminApi.listUsers({
-      search,
-      accountType: type === 'all' ? undefined : type,
-      status: status === 'blocked' ? 'suspended' : undefined,
-    });
-    setItems(result.items);
-  }, []);
+  const load = React.useCallback(
+    async (search: string, type: string, status: 'all' | 'blocked') => {
+      const result = await adminApi.listUsers({
+        search,
+        accountType: type === 'all' ? undefined : type,
+        status: status === 'blocked' ? 'suspended' : undefined,
+      });
+      setItems(result.items);
+    },
+    [],
+  );
 
   React.useEffect(() => {
-    const handle = setTimeout(() => {
-      setLoading(true);
-      void load(query, accountType, statusFilter)
-        .catch(() => showAppAlert(t('admin.loadFailed')))
-        .finally(() => setLoading(false));
-    }, query ? 300 : 0);
+    const handle = setTimeout(
+      () => {
+        setLoading(true);
+        void load(query, accountType, statusFilter)
+          .catch(() => showAppAlert(t('admin.loadFailed')))
+          .finally(() => setLoading(false));
+      },
+      query ? 300 : 0,
+    );
     return () => clearTimeout(handle);
   }, [query, accountType, statusFilter, load, t]);
 

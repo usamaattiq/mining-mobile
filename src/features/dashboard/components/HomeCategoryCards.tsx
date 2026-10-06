@@ -16,10 +16,7 @@ export function HomeCategoryCards({
       {options.map((option) => {
         const selected = option.key === value;
         return (
-          <View
-            key={option.key}
-            style={[styles.shadowWrap, selected && styles.shadowWrapSelected]}
-          >
+          <View key={option.key} style={[styles.shadowWrap, selected && styles.shadowWrapSelected]}>
             <Pressable
               onPress={() => onChange(option.key)}
               accessibilityRole="button"

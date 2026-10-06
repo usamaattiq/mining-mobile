@@ -11,9 +11,16 @@ import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
-import { DurationSlider, formatAuctionDurationLabel } from '@/features/listings/components/DurationSlider';
+import {
+  DurationSlider,
+  formatAuctionDurationLabel,
+} from '@/features/listings/components/DurationSlider';
 import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
-import { clampAuctionHours, defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
+import {
+  clampAuctionHours,
+  defaultListingEnd,
+  expiryHoursUntil,
+} from '@/features/listings/utils/listingExpiry';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
@@ -35,13 +42,20 @@ import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
-import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  formatAmountWithCommas,
+  parsePositiveAmount,
+  sanitizeStepPrice,
+} from '@/shared/utils/formatAmount';
 import {
   LISTING_DESCRIPTION_MAX_LENGTH,
   LISTING_TITLE_MAX_LENGTH,
 } from '@/features/listings/constants/listingFieldLimits';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
-import type { DeliveryType, EquipmentListing } from '@/features/listings/types/equipmentListing.types';
+import type {
+  DeliveryType,
+  EquipmentListing,
+} from '@/features/listings/types/equipmentListing.types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EquipmentListingForm'>;
 
@@ -132,9 +146,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     filledRepost.current = true;
     const period = isBuyer ? null : rentPeriodFromListing(sourceListing);
     setOfferRent(!isBuyer && (sourceListing.mode === 'rent' || sourceListing.mode === 'both'));
-    setOfferSell(
-      isBuyer || sourceListing.mode === 'sell' || sourceListing.mode === 'both',
-    );
+    setOfferSell(isBuyer || sourceListing.mode === 'sell' || sourceListing.mode === 'both');
     setEquipmentType(
       matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel) ??
         (sourceListing.equipmentTypeLabel.trim() || null),
@@ -155,7 +167,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 ? (sourceListing.yearlyRental ?? '')
                 : '',
     );
-    setSalePrice(isBuyer ? '' : sourceListing.salePrice ?? '');
+    setSalePrice(isBuyer ? '' : (sourceListing.salePrice ?? ''));
     setUnits(Math.max(sourceListing.units ?? 1, 1));
     if (sourceListing.requestMode === 'auction' || sourceListing.requestMode === 'rfq') {
       setRequestMode(sourceListing.requestMode);
@@ -195,19 +207,19 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     if (matched) setEquipmentType(matched);
   }, [equipmentTypeOptions, sourceListing]);
 
-  const handleUseCurrentLocation = async () => {
+  const handleUseCurrentLocation = React.useCallback(async () => {
     const selection = await getCurrentLocation();
     if (!selection) return;
     setLocation(selection.label);
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
-  };
+  }, [getCurrentLocation]);
 
   const autoLocated = React.useRef(false);
   React.useEffect(() => {
     if (step !== 1 || autoLocated.current || location.trim()) return;
     autoLocated.current = true;
     void handleUseCurrentLocation();
-  }, [step, location]);
+  }, [step, location, handleUseCurrentLocation]);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -335,7 +347,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         index: 1,
         routes: [
           { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'equipment' } } },
-          { name: 'Welcome', params: { next: 'listings', category: 'equipment', listingId: listing.id } },
+          {
+            name: 'Welcome',
+            params: { next: 'listings', category: 'equipment', listingId: listing.id },
+          },
         ],
       });
     } catch (error) {
@@ -413,11 +428,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     { label: t('equipmentListing.location'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
-  const deliverySubtitle = !isBuyer && deliveryAvailable
-    ? deliveryType === 'free'
-      ? t('equipmentListing.deliveryFree')
-      : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(deliveryPricePerKm)}`
-    : undefined;
+  const deliverySubtitle =
+    !isBuyer && deliveryAvailable
+      ? deliveryType === 'free'
+        ? t('equipmentListing.deliveryFree')
+        : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(deliveryPricePerKm)}`
+      : undefined;
 
   return (
     <View style={styles.root}>
@@ -641,12 +657,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onSelectOnMap={handleSelectOnMap}
             />
             {!isBuyer ? (
-            <ToggleRow
-              title={t('equipmentListing.deliveryAvailable')}
-              subtitle={t('equipmentListing.deliveryAvailableSubtitle')}
-              enabled={deliveryAvailable}
-              onToggle={setDeliveryAvailable}
-            />
+              <ToggleRow
+                title={t('equipmentListing.deliveryAvailable')}
+                subtitle={t('equipmentListing.deliveryAvailableSubtitle')}
+                enabled={deliveryAvailable}
+                onToggle={setDeliveryAvailable}
+              />
             ) : null}
 
             {!isBuyer && deliveryAvailable ? (

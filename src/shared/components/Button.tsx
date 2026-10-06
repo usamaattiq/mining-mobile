@@ -18,8 +18,7 @@ export function Button({
   ...rest
 }: ButtonProps): React.ReactElement {
   const isDisabled = disabled || loading;
-  const iconColor =
-    variant === 'outline' || variant === 'link' ? palette.gold : palette.pureWhite;
+  const iconColor = variant === 'outline' || variant === 'link' ? palette.gold : palette.pureWhite;
   const iconElement = icon ? <Ionicons name={icon} size={16} color={iconColor} /> : null;
 
   return (
@@ -42,7 +41,9 @@ export function Button({
     >
       {overlay}
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' || variant === 'link' ? palette.gold : palette.pureWhite} />
+        <ActivityIndicator
+          color={variant === 'outline' || variant === 'link' ? palette.gold : palette.pureWhite}
+        />
       ) : (
         <>
           {iconPosition === 'left' ? iconElement : null}

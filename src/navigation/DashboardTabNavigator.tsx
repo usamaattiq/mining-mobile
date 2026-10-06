@@ -1,9 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import {
-  createBottomTabNavigator,
-  type BottomTabBarProps,
-} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   FloatingTabBar,

@@ -63,7 +63,13 @@ export function AdminUserProfileScreen({ navigation, route }: Props): React.Reac
           value: detail.accountType === 'company' ? t('admin.company') : t('admin.individual'),
         },
         ...(detail.accountType === 'company'
-          ? [{ icon: 'business-outline' as const, label: t('profile.companyName'), value: detail.companyName }]
+          ? [
+              {
+                icon: 'business-outline' as const,
+                label: t('profile.companyName'),
+                value: detail.companyName,
+              },
+            ]
           : []),
         { icon: 'mail-outline' as const, label: t('profile.email'), value: detail.email },
         { icon: 'call-outline' as const, label: t('profile.phone'), value: detail.phoneE164 },

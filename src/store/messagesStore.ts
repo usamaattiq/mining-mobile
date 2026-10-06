@@ -55,7 +55,12 @@ interface MessagesState {
     senderId: string;
     message: ChatMessage;
   }) => void;
-  applyReadReceipt: (input: { conversationId: string; readerId: string; readAt: number; viewerId: string }) => void;
+  applyReadReceipt: (input: {
+    conversationId: string;
+    readerId: string;
+    readAt: number;
+    viewerId: string;
+  }) => void;
 }
 
 function withPeerRead(messages: ChatMessage[], readAt: number | undefined): ChatMessage[] {
@@ -63,7 +68,12 @@ function withPeerRead(messages: ChatMessage[], readAt: number | undefined): Chat
     return messages;
   }
   return messages.map((message) => {
-    if (!message.fromMe || message.sentAt > readAt || message.status === 'read' || message.status === 'failed') {
+    if (
+      !message.fromMe ||
+      message.sentAt > readAt ||
+      message.status === 'read' ||
+      message.status === 'failed'
+    ) {
       return message;
     }
     return { ...message, status: 'read' as const };

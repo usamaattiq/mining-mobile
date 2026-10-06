@@ -228,114 +228,114 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.menuCard}>
-          <BiometricToggleRow
-            enabled={biometricEnabled}
-            onToggle={(enabled) => void handleToggleBiometric(enabled)}
-            available={biometricAvailable}
-            kind={biometricKind}
-            title={t('securitySettings.biometricTitle')}
-            subtitle={t('securitySettings.biometricSubtitle')}
-          />
-          {step === 'enableMpin' ? (
-            <View style={styles.enableMpin}>
-              <AppText style={styles.changeMpinSubtitle}>{t('loginMpin.title')}</AppText>
-              <CodeInput
-                length={MPIN_LENGTH}
-                value={enableMpin}
-                onChangeValue={setEnableMpin}
-                secure
-                autoFocus
-              />
-              <Button
-                label={t('common.confirm')}
-                disabled={enableMpin.length !== MPIN_LENGTH}
-                loading={submitting}
-                onPress={() => void handleConfirmEnableMpin()}
-              />
-            </View>
-          ) : null}
-        </View>
+        <BiometricToggleRow
+          enabled={biometricEnabled}
+          onToggle={(enabled) => void handleToggleBiometric(enabled)}
+          available={biometricAvailable}
+          kind={biometricKind}
+          title={t('securitySettings.biometricTitle')}
+          subtitle={t('securitySettings.biometricSubtitle')}
+        />
+        {step === 'enableMpin' ? (
+          <View style={styles.enableMpin}>
+            <AppText style={styles.changeMpinSubtitle}>{t('loginMpin.title')}</AppText>
+            <CodeInput
+              length={MPIN_LENGTH}
+              value={enableMpin}
+              onChangeValue={setEnableMpin}
+              secure
+              autoFocus
+            />
+            <Button
+              label={t('common.confirm')}
+              disabled={enableMpin.length !== MPIN_LENGTH}
+              loading={submitting}
+              onPress={() => void handleConfirmEnableMpin()}
+            />
+          </View>
+        ) : null}
+      </View>
 
-        <View style={styles.card}>
-          {step === 'idle' || step === 'enableMpin' ? (
-            <View style={styles.changeMpinRow}>
-              <View style={styles.changeMpinCopy}>
-                <AppText weight="semibold" style={styles.changeMpinTitle}>
-                  {t('securitySettings.mpinTitle')}
-                </AppText>
-                <AppText style={styles.changeMpinSubtitle}>
-                  {t('securitySettings.mpinSubtitle')}
-                </AppText>
-              </View>
+      <View style={styles.card}>
+        {step === 'idle' || step === 'enableMpin' ? (
+          <View style={styles.changeMpinRow}>
+            <View style={styles.changeMpinCopy}>
+              <AppText weight="semibold" style={styles.changeMpinTitle}>
+                {t('securitySettings.mpinTitle')}
+              </AppText>
+              <AppText style={styles.changeMpinSubtitle}>
+                {t('securitySettings.mpinSubtitle')}
+              </AppText>
+            </View>
+            <Button
+              label={t('securitySettings.changeMpin')}
+              variant="outline"
+              onPress={() => void handleStartChangeMpin()}
+              loading={submitting}
+              disabled={!phoneIdentity}
+            />
+          </View>
+        ) : step === 'otp' ? (
+          <View style={styles.stepGap}>
+            <AppText weight="bold" style={styles.stepTitle}>
+              {t('loginOtp.title')}
+            </AppText>
+            <AppText style={styles.stepSubtitle}>
+              {t('loginOtp.subtitleTemplate', {
+                length: OTP_LENGTH,
+                phone: `${profile?.countryCallingCode}${phoneIdentity?.phoneDigits ?? ''}`,
+              })}
+            </AppText>
+            <CodeInput length={OTP_LENGTH} value={otp} onChangeValue={setOtp} />
+            <Button
+              label={
+                secondsLeft > 0
+                  ? t('loginOtp.resendIn', { seconds: secondsLeft })
+                  : t('loginOtp.resend')
+              }
+              variant="link"
+              onPress={() => void handleResendOtp()}
+              disabled={secondsLeft > 0 || submitting}
+            />
+            <View style={styles.stepActionsRow}>
+              <Button label={t('common.cancel')} variant="outline" onPress={resetMpinFlow} />
               <Button
-                label={t('securitySettings.changeMpin')}
-                variant="outline"
-                onPress={() => void handleStartChangeMpin()}
+                label={t('loginOtp.verify')}
+                onPress={() => void handleVerifyOtp()}
                 loading={submitting}
-                disabled={!phoneIdentity}
+                disabled={otp.length !== OTP_LENGTH}
+                style={styles.stepPrimaryAction}
               />
             </View>
-          ) : step === 'otp' ? (
-            <View style={styles.stepGap}>
-              <AppText weight="bold" style={styles.stepTitle}>
-                {t('loginOtp.title')}
-              </AppText>
-              <AppText style={styles.stepSubtitle}>
-                {t('loginOtp.subtitleTemplate', {
-                  length: OTP_LENGTH,
-                  phone: `${profile?.countryCallingCode}${phoneIdentity?.phoneDigits ?? ''}`,
-                })}
-              </AppText>
-              <CodeInput length={OTP_LENGTH} value={otp} onChangeValue={setOtp} />
+          </View>
+        ) : (
+          <View style={styles.stepGap}>
+            <AppText weight="bold" style={styles.stepTitle}>
+              {t('securitySettings.newMpinTitle')}
+            </AppText>
+            <AppText style={styles.fieldLabel}>{t('signUpSecurity.createLabel')}</AppText>
+            <CodeInput length={MPIN_LENGTH} value={newMpin} onChangeValue={setNewMpin} secure />
+            <AppText style={styles.fieldLabel}>{t('signUpSecurity.confirmLabel')}</AppText>
+            <CodeInput
+              length={MPIN_LENGTH}
+              value={confirmMpin}
+              onChangeValue={setConfirmMpin}
+              secure
+              autoFocus={false}
+            />
+            <View style={styles.stepActionsRow}>
+              <Button label={t('common.cancel')} variant="outline" onPress={resetMpinFlow} />
               <Button
-                label={
-                  secondsLeft > 0
-                    ? t('loginOtp.resendIn', { seconds: secondsLeft })
-                    : t('loginOtp.resend')
-                }
-                variant="link"
-                onPress={() => void handleResendOtp()}
-                disabled={secondsLeft > 0 || submitting}
+                label={t('common.save')}
+                onPress={() => void handleSaveMpin()}
+                loading={submitting}
+                disabled={newMpin.length !== MPIN_LENGTH || confirmMpin.length !== MPIN_LENGTH}
+                style={styles.stepPrimaryAction}
               />
-              <View style={styles.stepActionsRow}>
-                <Button label={t('common.cancel')} variant="outline" onPress={resetMpinFlow} />
-                <Button
-                  label={t('loginOtp.verify')}
-                  onPress={() => void handleVerifyOtp()}
-                  loading={submitting}
-                  disabled={otp.length !== OTP_LENGTH}
-                  style={styles.stepPrimaryAction}
-                />
-              </View>
             </View>
-          ) : (
-            <View style={styles.stepGap}>
-              <AppText weight="bold" style={styles.stepTitle}>
-                {t('securitySettings.newMpinTitle')}
-              </AppText>
-              <AppText style={styles.fieldLabel}>{t('signUpSecurity.createLabel')}</AppText>
-              <CodeInput length={MPIN_LENGTH} value={newMpin} onChangeValue={setNewMpin} secure />
-              <AppText style={styles.fieldLabel}>{t('signUpSecurity.confirmLabel')}</AppText>
-              <CodeInput
-                length={MPIN_LENGTH}
-                value={confirmMpin}
-                onChangeValue={setConfirmMpin}
-                secure
-                autoFocus={false}
-              />
-              <View style={styles.stepActionsRow}>
-                <Button label={t('common.cancel')} variant="outline" onPress={resetMpinFlow} />
-                <Button
-                  label={t('common.save')}
-                  onPress={() => void handleSaveMpin()}
-                  loading={submitting}
-                  disabled={newMpin.length !== MPIN_LENGTH || confirmMpin.length !== MPIN_LENGTH}
-                  style={styles.stepPrimaryAction}
-                />
-              </View>
-            </View>
-          )}
-        </View>
+          </View>
+        )}
+      </View>
     </GoldSheetScreen>
   );
 }

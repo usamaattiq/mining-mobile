@@ -32,13 +32,24 @@ export type AdminUserDetail = {
   accountType: 'individual' | 'company' | 'admin';
   companyName: string | null;
   status: 'active' | 'suspended';
-  listings: { id: string; title: string; reference: string; category: 'equipment' | 'services' | 'gold'; status: string }[];
+  listings: {
+    id: string;
+    title: string;
+    reference: string;
+    category: 'equipment' | 'services' | 'gold';
+    status: string;
+  }[];
 };
 
 type Page<T> = { total: number; page: number; items: T[] };
 
 export const adminApi = {
-  listUsers(params: { search?: string; accountType?: string; status?: string; page?: number }): Promise<Page<AdminUserItem>> {
+  listUsers(params: {
+    search?: string;
+    accountType?: string;
+    status?: string;
+    page?: number;
+  }): Promise<Page<AdminUserItem>> {
     const query = new URLSearchParams();
     if (params.search) query.set('search', params.search);
     if (params.accountType) query.set('accountType', params.accountType);
@@ -63,10 +74,18 @@ export const adminApi = {
   ): Promise<{ id: string }> {
     return apiFetch(`/admin/users/${id}`, { method: 'PATCH', body });
   },
-  setUserStatus(id: string, status: 'active' | 'suspended'): Promise<{ id: string; status: string }> {
+  setUserStatus(
+    id: string,
+    status: 'active' | 'suspended',
+  ): Promise<{ id: string; status: string }> {
     return apiFetch(`/admin/users/${id}/status`, { method: 'PATCH', body: { status } });
   },
-  listListings(params: { search?: string; category?: string; status?: string; page?: number }): Promise<Page<AdminListingItem>> {
+  listListings(params: {
+    search?: string;
+    category?: string;
+    status?: string;
+    page?: number;
+  }): Promise<Page<AdminListingItem>> {
     const query = new URLSearchParams();
     if (params.search) query.set('search', params.search);
     if (params.category) query.set('category', params.category);
@@ -75,7 +94,10 @@ export const adminApi = {
     const suffix = query.toString() ? `?${query.toString()}` : '';
     return apiFetch(`/admin/listings${suffix}`);
   },
-  setListingStatus(id: string, status: 'active' | 'archived'): Promise<{ id: string; status: string }> {
+  setListingStatus(
+    id: string,
+    status: 'active' | 'archived',
+  ): Promise<{ id: string; status: string }> {
     return apiFetch(`/admin/listings/${id}/status`, { method: 'PATCH', body: { status } });
   },
   categories(): Promise<{ items: AdminCategoryItem[] }> {

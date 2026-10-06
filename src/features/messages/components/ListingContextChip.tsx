@@ -73,7 +73,11 @@ export function ListingContextChip({
         <Ionicons name={theme.icon} size={12} color={theme.text} />
       </View>
       <View style={styles.contextCopy}>
-        <AppText weight="semibold" style={[styles.contextTitle, { color: theme.text }]} numberOfLines={1}>
+        <AppText
+          weight="semibold"
+          style={[styles.contextTitle, { color: theme.text }]}
+          numberOfLines={1}
+        >
           {title}
         </AppText>
         <AppText style={styles.contextSubtitle} numberOfLines={1}>

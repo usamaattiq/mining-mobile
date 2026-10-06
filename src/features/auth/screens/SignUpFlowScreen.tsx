@@ -324,9 +324,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
       title={header.title}
       subtitle={header.subtitle}
       avoidKeyboard={step !== 'security'}
-      onBack={
-        step === 'phone' || step === 'otp' || step === 'face' ? goToPreviousStep : undefined
-      }
+      onBack={step === 'phone' || step === 'otp' || step === 'face' ? goToPreviousStep : undefined}
       canContinue={
         (step === 'phone'
           ? isPhoneValid

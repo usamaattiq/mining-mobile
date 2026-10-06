@@ -138,13 +138,13 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
         />
       </View>
       <MessageComposer
-          value={draft}
-          onChangeText={setDraft}
-          onSend={submit}
-          placeholder={t('messages.inputPlaceholder')}
-          sendLabel={t('messages.send')}
-          sending={sending}
-        />
+        value={draft}
+        onChangeText={setDraft}
+        onSend={submit}
+        placeholder={t('messages.inputPlaceholder')}
+        sendLabel={t('messages.send')}
+        sending={sending}
+      />
     </GoldSheetScreen>
   );
 }

@@ -186,7 +186,7 @@ export function buildListingCards({
         expiresAt:
           listing.postedAs === 'supplier'
             ? undefined
-            : listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,
+            : (listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined),
         ended:
           listing.postedAs === 'supplier'
             ? Date.now() >= listing.createdAt + 365 * 24 * 60 * 60 * 1000
@@ -215,33 +215,33 @@ export function buildListingCards({
               },
             ];
       return {
-      id: listing.id,
-      title: listing.title,
-      reference: listing.reference,
-      thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
-      placeholderIcon: 'briefcase-outline',
-      subtitle: listing.serviceCategoryLabel,
-      subtitleIcon: 'briefcase-outline',
-      typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
-      titleBelowStatus: titleBelowStatus(listing.rfq?.status),
-      city: cityFromLocation(listing.location),
-      statusBadges: [
-        ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
-          key: label,
-          label,
-        })),
-      ],
-      priceLines,
-      createdAt: listing.createdAt,
-      expiresAt: listing.rfq?.expiresAt ?? undefined,
-      ended: listingHasEnded({
-        rfqStatus: listing.rfq?.status,
-        expiresAt: listing.rfq?.expiresAt,
+        id: listing.id,
+        title: listing.title,
+        reference: listing.reference,
+        thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
+        placeholderIcon: 'briefcase-outline',
+        subtitle: listing.serviceCategoryLabel,
+        subtitleIcon: 'briefcase-outline',
+        typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+        titleBelowStatus: titleBelowStatus(listing.rfq?.status),
+        city: cityFromLocation(listing.location),
+        statusBadges: [
+          ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
+            key: label,
+            label,
+          })),
+        ],
+        priceLines,
         createdAt: listing.createdAt,
-      }),
-      onRepost: onRepost ? () => onRepost(listing.id, 'services') : undefined,
-      onPress: () => onOpen(listing.id, 'services'),
-    };
+        expiresAt: listing.rfq?.expiresAt ?? undefined,
+        ended: listingHasEnded({
+          rfqStatus: listing.rfq?.status,
+          expiresAt: listing.rfq?.expiresAt,
+          createdAt: listing.createdAt,
+        }),
+        onRepost: onRepost ? () => onRepost(listing.id, 'services') : undefined,
+        onPress: () => onOpen(listing.id, 'services'),
+      };
     });
   }
 

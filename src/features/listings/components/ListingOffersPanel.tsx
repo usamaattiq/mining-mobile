@@ -81,9 +81,7 @@ export function ListingOffersPanel({
           const totalAmount = parsePositiveAmount(offer.price);
           const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : null;
           const unitAmount =
-            totalAmount != null && units
-              ? Math.round((totalAmount / units) * 100) / 100
-              : null;
+            totalAmount != null && units ? Math.round((totalAmount / units) * 100) / 100 : null;
           return (
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
@@ -103,9 +101,7 @@ export function ListingOffersPanel({
                       : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
                   </AppText>
                 </Pressable>
-                {isLeader ? (
-                  <Ionicons name="trophy" size={16} color={palette.gold} />
-                ) : null}
+                {isLeader ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
                 <View style={styles.badges}>
                   {statusKey !== 'active' ? (
                     <View style={styles.statusBadge}>
@@ -117,7 +113,9 @@ export function ListingOffersPanel({
                   {showUnits && offer.kind ? (
                     <View style={styles.kindBadge}>
                       <AppText weight="semibold" style={styles.kindBadgeText}>
-                        {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+                        {offer.kind === 'rent'
+                          ? t('equipmentListing.rent')
+                          : t('equipmentListing.sell')}
                       </AppText>
                     </View>
                   ) : null}
@@ -163,9 +161,7 @@ export function ListingOffersPanel({
                 </View>
               ) : null}
               {onMessage &&
-              (messageEveryOffer ||
-                offer.status === 'selected' ||
-                offer.status === 'confirmed') ? (
+              (messageEveryOffer || offer.status === 'selected' || offer.status === 'confirmed') ? (
                 <View style={styles.actions}>
                   <Button
                     label={t('messages.message')}

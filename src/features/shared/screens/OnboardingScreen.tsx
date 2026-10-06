@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   brand: {
     fontSize: 24,
     lineHeight: 30,
-    display: 'none'
+    display: 'none',
   },
   brandMine: {
     fontFamily: BRAND_FONT_BOLD,

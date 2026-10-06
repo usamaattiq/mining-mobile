@@ -13,7 +13,8 @@ import { HomeCitySearchField } from '@/features/dashboard/components/HomeCitySea
 import { MultiSelectDropdown } from '@/features/dashboard/components/MultiSelectDropdown';
 import { palette, radius, spacing } from '@/theme';
 
-export type HomeTypeFilter = 'all' | 'rent' | 'sell' | 'onsite' | 'online' | '18k' | '21k' | '22k' | '24k';
+export type HomeTypeFilter =
+  'all' | 'rent' | 'sell' | 'onsite' | 'online' | '18k' | '21k' | '22k' | '24k';
 
 export type HomeFilterSheetOption = {
   key: string;
@@ -133,168 +134,168 @@ export function HomeFilterSheet({
       avoidKeyboard={!(Platform.OS === 'ios' && pickingDate)}
     >
       <View style={styles.sheetBody}>
-      <KeyboardAwareScrollView
-        style={styles.scroll}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        bottomOffset={96}
-        disableScrollOnKeyboardHide
-        extraKeyboardSpace={0}
-      >
-        <View style={styles.titleRow}>
-          <AppText weight="bold" style={styles.sheetTitle}>
-            {t('dashboardHome.filterTitle')}
+        <KeyboardAwareScrollView
+          style={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          bottomOffset={96}
+          disableScrollOnKeyboardHide
+          extraKeyboardSpace={0}
+        >
+          <View style={styles.titleRow}>
+            <AppText weight="bold" style={styles.sheetTitle}>
+              {t('dashboardHome.filterTitle')}
+            </AppText>
+            <Pressable
+              onPress={onReset}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.reset')}
+            >
+              <AppText weight="semibold" style={styles.reset}>
+                {t('common.reset')}
+              </AppText>
+            </Pressable>
+          </View>
+
+          <AppText weight="semibold" style={styles.sectionTitleFirst}>
+            {typeTitle}
+          </AppText>
+          <View style={styles.badgeRow}>
+            {typeOptions.map((option) => {
+              const selected = draftType === option.key;
+              return (
+                <Pressable
+                  key={option.key}
+                  onPress={() => onChangeType(option.key as HomeTypeFilter)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  style={({ pressed }) => [
+                    styles.typeBadge,
+                    selected && styles.typeBadgeSelected,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <AppText
+                    weight="semibold"
+                    style={[styles.typeBadgeLabel, selected && styles.typeBadgeLabelSelected]}
+                  >
+                    {option.label}
+                  </AppText>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <HomeCitySearchField value={draftCity} onChange={onChangeCity} />
+
+          {kindOptions && kindOptions.length > 0 && kindTitle ? (
+            <MultiSelectDropdown
+              label={kindTitle}
+              placeholder={kindPlaceholder ?? kindTitle}
+              options={kindOptions}
+              values={draftKind}
+              onChange={onChangeKind}
+            />
+          ) : null}
+
+          {showWeight ? (
+            <>
+              <AppText weight="semibold" style={styles.sectionTitle}>
+                {t('dashboardHome.filterWeight')}
+              </AppText>
+              <View style={styles.rangeRow}>
+                <View style={styles.rangeField}>
+                  <FormInput
+                    label={t('dashboardHome.filterMin')}
+                    value={draftWeightMin}
+                    onChangeText={onChangeWeightMin}
+                    keyboardType="numeric"
+                    placeholder={t('goldListing.weightUnit')}
+                  />
+                </View>
+                <View style={styles.rangeField}>
+                  <FormInput
+                    label={t('dashboardHome.filterMax')}
+                    value={draftWeightMax}
+                    onChangeText={onChangeWeightMax}
+                    keyboardType="numeric"
+                    placeholder={t('goldListing.weightUnit')}
+                  />
+                </View>
+              </View>
+            </>
+          ) : null}
+
+          <AppText weight="semibold" style={styles.sectionTitle}>
+            {t('dashboardHome.filterPriceRange')}
+          </AppText>
+          <View style={styles.rangeRow}>
+            <View style={styles.rangeField}>
+              <FormInput
+                label={t('dashboardHome.filterMin')}
+                value={draftPriceMin}
+                onChangeText={onChangePriceMin}
+                keyboardType="numeric"
+                placeholder={currencyCode}
+              />
+            </View>
+            <View style={styles.rangeField}>
+              <FormInput
+                label={t('dashboardHome.filterMax')}
+                value={draftPriceMax}
+                onChangeText={onChangePriceMax}
+                keyboardType="numeric"
+                placeholder={currencyCode}
+              />
+            </View>
+          </View>
+
+          <AppText weight="semibold" style={styles.sectionTitle}>
+            {t('dashboardHome.filterDate')}
           </AppText>
           <Pressable
-            onPress={onReset}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.reset')}
+            onPress={() => {
+              Keyboard.dismiss();
+              setPickingDate(true);
+            }}
+            style={({ pressed }) => [styles.dateRow, pressed && styles.pressed]}
           >
-            <AppText weight="semibold" style={styles.reset}>
-              {t('common.reset')}
+            <Ionicons name="calendar-outline" size={18} color={palette.gold} />
+            <AppText style={[styles.dateValue, !draftDateKey && styles.placeholder]}>
+              {draftDateKey ? formatDayKey(draftDateKey, locale) : t('dashboardHome.filterAnyDate')}
             </AppText>
           </Pressable>
-        </View>
+          {Platform.OS === 'android' && pickingDate ? (
+            <DateTimePicker
+              value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          ) : null}
 
-        <AppText weight="semibold" style={styles.sectionTitleFirst}>
-          {typeTitle}
-        </AppText>
-        <View style={styles.badgeRow}>
-          {typeOptions.map((option) => {
-            const selected = draftType === option.key;
-            return (
-              <Pressable
-                key={option.key}
-                onPress={() => onChangeType(option.key as HomeTypeFilter)}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                style={({ pressed }) => [
-                  styles.typeBadge,
-                  selected && styles.typeBadgeSelected,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <AppText
-                  weight="semibold"
-                  style={[styles.typeBadgeLabel, selected && styles.typeBadgeLabelSelected]}
-                >
-                  {option.label}
-                </AppText>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <HomeCitySearchField value={draftCity} onChange={onChangeCity} />
-
-        {kindOptions && kindOptions.length > 0 && kindTitle ? (
-          <MultiSelectDropdown
-            label={kindTitle}
-            placeholder={kindPlaceholder ?? kindTitle}
-            options={kindOptions}
-            values={draftKind}
-            onChange={onChangeKind}
-          />
-        ) : null}
-
-        {showWeight ? (
-          <>
-            <AppText weight="semibold" style={styles.sectionTitle}>
-              {t('dashboardHome.filterWeight')}
-            </AppText>
-            <View style={styles.rangeRow}>
-              <View style={styles.rangeField}>
-                <FormInput
-                  label={t('dashboardHome.filterMin')}
-                  value={draftWeightMin}
-                  onChangeText={onChangeWeightMin}
-                  keyboardType="numeric"
-                  placeholder={t('goldListing.weightUnit')}
-                />
-              </View>
-              <View style={styles.rangeField}>
-                <FormInput
-                  label={t('dashboardHome.filterMax')}
-                  value={draftWeightMax}
-                  onChangeText={onChangeWeightMax}
-                  keyboardType="numeric"
-                  placeholder={t('goldListing.weightUnit')}
-                />
-              </View>
-            </View>
-          </>
-        ) : null}
-
-        <AppText weight="semibold" style={styles.sectionTitle}>
-          {t('dashboardHome.filterPriceRange')}
-        </AppText>
-        <View style={styles.rangeRow}>
-          <View style={styles.rangeField}>
-            <FormInput
-              label={t('dashboardHome.filterMin')}
-              value={draftPriceMin}
-              onChangeText={onChangePriceMin}
-              keyboardType="numeric"
-              placeholder={currencyCode}
+          <Button label={t('dashboardHome.apply')} onPress={onApply} style={styles.applyButton} />
+        </KeyboardAwareScrollView>
+        {Platform.OS === 'ios' && pickingDate ? (
+          <View style={styles.iosPickerDock}>
+            <DateTimePicker
+              value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
+              mode="date"
+              display="spinner"
+              themeVariant="light"
+              textColor={palette.charcoal}
+              style={styles.iosPicker}
+              onChange={handleDateChange}
+            />
+            <Button
+              label={t('common.done')}
+              onPress={() => setPickingDate(false)}
+              style={styles.doneButton}
             />
           </View>
-          <View style={styles.rangeField}>
-            <FormInput
-              label={t('dashboardHome.filterMax')}
-              value={draftPriceMax}
-              onChangeText={onChangePriceMax}
-              keyboardType="numeric"
-              placeholder={currencyCode}
-            />
-          </View>
-        </View>
-
-        <AppText weight="semibold" style={styles.sectionTitle}>
-          {t('dashboardHome.filterDate')}
-        </AppText>
-        <Pressable
-          onPress={() => {
-            Keyboard.dismiss();
-            setPickingDate(true);
-          }}
-          style={({ pressed }) => [styles.dateRow, pressed && styles.pressed]}
-        >
-          <Ionicons name="calendar-outline" size={18} color={palette.gold} />
-          <AppText style={[styles.dateValue, !draftDateKey && styles.placeholder]}>
-            {draftDateKey ? formatDayKey(draftDateKey, locale) : t('dashboardHome.filterAnyDate')}
-          </AppText>
-        </Pressable>
-        {Platform.OS === 'android' && pickingDate ? (
-          <DateTimePicker
-            value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-          />
         ) : null}
-
-        <Button label={t('dashboardHome.apply')} onPress={onApply} style={styles.applyButton} />
-      </KeyboardAwareScrollView>
-      {Platform.OS === 'ios' && pickingDate ? (
-        <View style={styles.iosPickerDock}>
-          <DateTimePicker
-            value={draftDateKey ? dateFromDayKey(draftDateKey) : new Date()}
-            mode="date"
-            display="spinner"
-            themeVariant="light"
-            textColor={palette.charcoal}
-            style={styles.iosPicker}
-            onChange={handleDateChange}
-          />
-          <Button
-            label={t('common.done')}
-            onPress={() => setPickingDate(false)}
-            style={styles.doneButton}
-          />
-        </View>
-      ) : null}
       </View>
     </AppBottomSheet>
   );

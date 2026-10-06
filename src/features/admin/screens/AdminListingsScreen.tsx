@@ -41,12 +41,15 @@ export function AdminListingsScreen(): React.ReactElement {
   }, []);
 
   React.useEffect(() => {
-    const handle = setTimeout(() => {
-      setLoading(true);
-      void load(query, category)
-        .catch(() => showAppAlert(t('admin.loadFailed')))
-        .finally(() => setLoading(false));
-    }, query ? 300 : 0);
+    const handle = setTimeout(
+      () => {
+        setLoading(true);
+        void load(query, category)
+          .catch(() => showAppAlert(t('admin.loadFailed')))
+          .finally(() => setLoading(false));
+      },
+      query ? 300 : 0,
+    );
     return () => clearTimeout(handle);
   }, [query, category, load, t]);
 

@@ -46,7 +46,9 @@ export function EquipmentListingSummaryCard({
                 index === detailRows.length - 1 && !descriptionText && styles.rowLast,
               ]}
             >
-              <AppText weight="bold" style={styles.rowLabel}>{row.label}</AppText>
+              <AppText weight="bold" style={styles.rowLabel}>
+                {row.label}
+              </AppText>
               <View style={styles.rowValueWrap}>
                 <AppText style={styles.rowValue} numberOfLines={1}>
                   {row.value}
@@ -79,7 +81,9 @@ export function EquipmentListingSummaryCard({
                 accessibilityState={{ expanded: descriptionOpen }}
                 accessibilityLabel={t('equipmentListing.description')}
               >
-                <AppText weight="bold" style={styles.rowLabel}>{t('equipmentListing.description')}</AppText>
+                <AppText weight="bold" style={styles.rowLabel}>
+                  {t('equipmentListing.description')}
+                </AppText>
                 <Ionicons
                   name={descriptionOpen ? 'chevron-up' : 'chevron-down'}
                   size={18}

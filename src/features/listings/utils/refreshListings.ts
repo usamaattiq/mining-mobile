@@ -21,7 +21,9 @@ type RefreshOptions = { signal?: AbortSignal };
 export function applyListings(listings: ListingDto[]): void {
   useListingsStore
     .getState()
-    .setListings(listings.filter((item): item is EquipmentListing => item.category === 'equipment'));
+    .setListings(
+      listings.filter((item): item is EquipmentListing => item.category === 'equipment'),
+    );
   useServiceListingsStore
     .getState()
     .setListings(listings.filter((item): item is ServiceListing => item.category === 'services'));
@@ -41,7 +43,9 @@ export async function refreshMarketListings(
   postedAs: MarketplaceRole,
   options?: RefreshOptions,
 ): Promise<void> {
-  useMarketListingsStore.getState().setListings(await listingsApi.feed(postedAs, undefined, options));
+  useMarketListingsStore
+    .getState()
+    .setListings(await listingsApi.feed(postedAs, undefined, options));
 }
 
 export async function refreshOfferedListings(options?: RefreshOptions): Promise<void> {
@@ -55,16 +59,20 @@ export function cacheListing(listing: ListingDto): void {
     useGoldListingsStore.getState().listings.some((item) => item.id === listing.id);
 
   if (listingHasMyOffer(listing) && !owned) {
-    useMarketListingsStore.getState().setListings(
-      useMarketListingsStore.getState().listings.filter((item) => item.id !== listing.id),
-    );
+    useMarketListingsStore
+      .getState()
+      .setListings(
+        useMarketListingsStore.getState().listings.filter((item) => item.id !== listing.id),
+      );
     useOfferedListingsStore.getState().upsertListing(listing);
     return;
   }
 
-  useOfferedListingsStore.getState().setListings(
-    useOfferedListingsStore.getState().listings.filter((item) => item.id !== listing.id),
-  );
+  useOfferedListingsStore
+    .getState()
+    .setListings(
+      useOfferedListingsStore.getState().listings.filter((item) => item.id !== listing.id),
+    );
   useMarketListingsStore.getState().upsertListing(listing);
   if (isEquipmentListing(listing)) {
     useListingsStore.getState().addListing(listing);

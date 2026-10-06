@@ -15,7 +15,11 @@ import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { ListingCard } from '@/features/listings/components/ListingCard';
-import { isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
+import {
+  isEquipmentListing,
+  isGoldListing,
+  isServiceListing,
+} from '@/features/listings/api/listingsApi';
 import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshOfferedListings } from '@/features/listings/utils/refreshListings';

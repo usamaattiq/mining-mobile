@@ -113,15 +113,18 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const [viewMode, setViewMode] = React.useState<'list' | 'grid'>('list');
   const hasCachedData = marketListings.length > 0;
 
-  const { loadError, refreshing, onRefresh, retry } = useAbortableFocusLoad(async (signal) => {
-    const postedAs = oppositeMarketplaceRole(role);
-    await Promise.all([
-      refreshMarketListings(postedAs, { signal }),
-      notificationsApi.list({ signal }).then((items) => {
-        useNotificationsStore.getState().setItems(items);
-      }),
-    ]);
-  }, [role]);
+  const { loadError, refreshing, onRefresh, retry } = useAbortableFocusLoad(
+    async (signal) => {
+      const postedAs = oppositeMarketplaceRole(role);
+      await Promise.all([
+        refreshMarketListings(postedAs, { signal }),
+        notificationsApi.list({ signal }).then((items) => {
+          useNotificationsStore.getState().setItems(items);
+        }),
+      ]);
+    },
+    [role],
+  );
 
   const openProfile = () => {
     navigation.navigate('Profile');

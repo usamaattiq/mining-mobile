@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -116,7 +117,9 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
               key={hold.id}
               hold={hold}
               dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
-              kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+              kindLabel={
+                hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')
+              }
               unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
               currencyCode={currency.code}
               perUnitLabel={t('rfq.pricePerUnit')}

@@ -23,34 +23,34 @@ export function MessageComposer({
 
   return (
     <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
-    <View style={[styles.composer, { paddingBottom }]}>
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={palette.muted}
-        multiline
-        maxLength={2000}
-        style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
-      />
-      <Pressable
-        onPress={onSend}
-        disabled={!canSend}
-        accessibilityRole="button"
-        accessibilityLabel={sendLabel}
-        style={({ pressed }) => [
-          styles.sendButton,
-          !canSend && styles.sendButtonDisabled,
-          pressed && canSend && styles.sendButtonPressed,
-        ]}
-      >
-        {sending ? (
-          <ActivityIndicator color={palette.pureWhite} size="small" />
-        ) : (
-          <Ionicons name="send" size={16} color={palette.pureWhite} />
-        )}
-      </Pressable>
-    </View>
+      <View style={[styles.composer, { paddingBottom }]}>
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={palette.muted}
+          multiline
+          maxLength={2000}
+          style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
+        />
+        <Pressable
+          onPress={onSend}
+          disabled={!canSend}
+          accessibilityRole="button"
+          accessibilityLabel={sendLabel}
+          style={({ pressed }) => [
+            styles.sendButton,
+            !canSend && styles.sendButtonDisabled,
+            pressed && canSend && styles.sendButtonPressed,
+          ]}
+        >
+          {sending ? (
+            <ActivityIndicator color={palette.pureWhite} size="small" />
+          ) : (
+            <Ionicons name="send" size={16} color={palette.pureWhite} />
+          )}
+        </Pressable>
+      </View>
     </KeyboardStickyView>
   );
 }

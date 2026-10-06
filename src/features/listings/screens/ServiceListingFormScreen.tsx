@@ -29,11 +29,20 @@ import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
 import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
-import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
+import {
+  serviceTypeFlags,
+  serviceTypeFromFlags,
+  serviceTypeLabels,
+  resolveServicePrices,
+} from '@/features/listings/utils/serviceType';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  formatAmountWithCommas,
+  parsePositiveAmount,
+  sanitizeStepPrice,
+} from '@/shared/utils/formatAmount';
 import {
   LISTING_DESCRIPTION_MAX_LENGTH,
   LISTING_TITLE_MAX_LENGTH,
@@ -138,19 +147,19 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     if (matched) setServiceCategory(matched);
   }, [serviceCategoryOptions, sourceListing]);
 
-  const handleUseCurrentLocation = async () => {
+  const handleUseCurrentLocation = React.useCallback(async () => {
     const selection = await getCurrentLocation();
     if (!selection) return;
     setLocation(selection.label);
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
-  };
+  }, [getCurrentLocation]);
 
   const autoLocated = React.useRef(false);
   React.useEffect(() => {
     if (step !== 1 || autoLocated.current || location.trim()) return;
     autoLocated.current = true;
     void handleUseCurrentLocation();
-  }, [step, location]);
+  }, [step, location, handleUseCurrentLocation]);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -161,15 +170,14 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
   const detailsValid = Boolean(
     serviceType &&
-      serviceCategory &&
-      title.trim() &&
-      description.trim() &&
-      (isBuyer ||
-        ((onsite ? Boolean(parsePositiveAmount(onsitePrice)) : true) &&
-          (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
+    serviceCategory &&
+    title.trim() &&
+    description.trim() &&
+    (isBuyer ||
+      ((onsite ? Boolean(parsePositiveAmount(onsitePrice)) : true) &&
+        (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
   );
-  const mediaValid =
-    (isBuyer || media.length > 0) && location.trim().length > 0;
+  const mediaValid = (isBuyer || media.length > 0) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -232,7 +240,10 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         index: 1,
         routes: [
           { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'services' } } },
-          { name: 'Welcome', params: { next: 'listings', category: 'services', listingId: listing.id } },
+          {
+            name: 'Welcome',
+            params: { next: 'listings', category: 'services', listingId: listing.id },
+          },
         ],
       });
     } catch (error) {

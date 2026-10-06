@@ -12,7 +12,10 @@ import { AppText } from '@/shared/components/AppText';
 import { FormInput } from '@/shared/components/FormInput';
 import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
-import { DurationSlider, formatAuctionDurationLabel } from '@/features/listings/components/DurationSlider';
+import {
+  DurationSlider,
+  formatAuctionDurationLabel,
+} from '@/features/listings/components/DurationSlider';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { Button } from '@/shared/components/Button';
@@ -32,7 +35,11 @@ import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  formatAmountWithCommas,
+  parsePositiveAmount,
+  sanitizeStepPrice,
+} from '@/shared/utils/formatAmount';
 import {
   LISTING_DESCRIPTION_MAX_LENGTH,
   LISTING_TITLE_MAX_LENGTH,
@@ -149,19 +156,19 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     if (matched) setPurity(matched);
   }, [purityOptions, sourceListing]);
 
-  const handleUseCurrentLocation = async () => {
+  const handleUseCurrentLocation = React.useCallback(async () => {
     const selection = await getCurrentLocation();
     if (!selection) return;
     setLocation(selection.label);
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
-  };
+  }, [getCurrentLocation]);
 
   const autoLocated = React.useRef(false);
   React.useEffect(() => {
     if (step !== 1 || autoLocated.current || location.trim()) return;
     autoLocated.current = true;
     void handleUseCurrentLocation();
-  }, [step, location]);
+  }, [step, location, handleUseCurrentLocation]);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -193,9 +200,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   const handlePublish = async () => {
     if (publishing) return;
     if (editingId && !sourceListing) return;
-    const start = !auctionStartDate || auctionStartDate.getTime() <= Date.now()
-      ? new Date()
-      : auctionStartDate;
+    const start =
+      !auctionStartDate || auctionStartDate.getTime() <= Date.now() ? new Date() : auctionStartDate;
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
@@ -227,7 +233,10 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         index: 1,
         routes: [
           { name: 'Dashboard', params: { screen: 'Requests', params: { category: 'gold' } } },
-          { name: 'Welcome', params: { next: 'listings', category: 'gold', listingId: listing.id } },
+          {
+            name: 'Welcome',
+            params: { next: 'listings', category: 'gold', listingId: listing.id },
+          },
         ],
       });
     } catch (error) {

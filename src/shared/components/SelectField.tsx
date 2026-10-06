@@ -73,7 +73,13 @@ export function SelectField({
 
   React.useEffect(() => {
     if (!open || !hierarchical) return;
-    setExpanded(new Set(options.filter((option) => options.some((child) => child.parentValue === option.value)).map((option) => option.value)));
+    setExpanded(
+      new Set(
+        options
+          .filter((option) => options.some((child) => child.parentValue === option.value))
+          .map((option) => option.value),
+      ),
+    );
   }, [open, hierarchical, options]);
 
   const handleSelect = (next: string) => {

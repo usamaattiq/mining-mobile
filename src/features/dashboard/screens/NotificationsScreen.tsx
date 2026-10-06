@@ -28,18 +28,20 @@ export function NotificationsScreen({ navigation }: Props): React.ReactElement {
   }, []);
 
   const markRead = (id: string) => {
-    useNotificationsStore.getState().setItems(
-      useNotificationsStore.getState().items.map((item) =>
-        item.id === id ? { ...item, read: true } : item,
-      ),
-    );
+    useNotificationsStore
+      .getState()
+      .setItems(
+        useNotificationsStore
+          .getState()
+          .items.map((item) => (item.id === id ? { ...item, read: true } : item)),
+      );
     void notificationsApi.markRead(id);
   };
 
   const markAllRead = () => {
-    useNotificationsStore.getState().setItems(
-      useNotificationsStore.getState().items.map((item) => ({ ...item, read: true })),
-    );
+    useNotificationsStore
+      .getState()
+      .setItems(useNotificationsStore.getState().items.map((item) => ({ ...item, read: true })));
     void notificationsApi.markAllRead();
   };
 

@@ -44,7 +44,12 @@ export async function persistListingMedia<T extends ListingMediaInput>(media: T[
 
       if (item.kind === 'video') {
         const info = await FileSystem.getInfoAsync(item.uri);
-        if (info.exists && 'size' in info && typeof info.size === 'number' && info.size > MAX_VIDEO_BYTES) {
+        if (
+          info.exists &&
+          'size' in info &&
+          typeof info.size === 'number' &&
+          info.size > MAX_VIDEO_BYTES
+        ) {
           throw new Error('Video must be 20 MB or smaller.');
         }
         const uploaded = await uploadMedia({

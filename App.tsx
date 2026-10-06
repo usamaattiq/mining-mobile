@@ -3,7 +3,11 @@ import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { KeyboardProvider, KeyboardToolbar, useKeyboardState } from 'react-native-keyboard-controller';
+import {
+  KeyboardProvider,
+  KeyboardToolbar,
+  useKeyboardState,
+} from 'react-native-keyboard-controller';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from '@/navigation/AppNavigator';
 import { AppAlertHost } from '@/shared/components/AppAlertHost';
@@ -133,7 +137,11 @@ export default function App() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
-        <NavigationContainer ref={navigationRef} linking={navigationLinking} theme={navigationTheme}>
+        <NavigationContainer
+          ref={navigationRef}
+          linking={navigationLinking}
+          theme={navigationTheme}
+        >
           <AppNavigator />
         </NavigationContainer>
         <NumericKeyboardToolbar />

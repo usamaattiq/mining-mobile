@@ -86,204 +86,198 @@ export function ListingOfferComposer({
 
   return (
     <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
-    <View
-      style={[
-        styles.bar,
-        { paddingBottom: keyboardVisible ? spacing.sm : Math.max(insets.bottom, spacing.md) },
-      ]}
-    >
-      {hasOffer ? (
-        <View style={styles.card}>
-          <View style={styles.cardPriceRow}>
-            <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
-              {submittedLabel}
-            </AppText>
-            {submittedUnitAmount != null && submittedUnits ? (
-              <PriceTimesUnitsSummary
-                currencyCode={currencyCode}
-                unitAmount={submittedUnitAmount}
-                units={submittedUnits}
-                compact
-              />
-            ) : offerPrice ? (
-              <AppText weight="bold" style={styles.cardPrice}>
-                {currencyCode} {formatAmountWithCommas(offerPrice)}
+      <View
+        style={[
+          styles.bar,
+          { paddingBottom: keyboardVisible ? spacing.sm : Math.max(insets.bottom, spacing.md) },
+        ]}
+      >
+        {hasOffer ? (
+          <View style={styles.card}>
+            <View style={styles.cardPriceRow}>
+              <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+                {submittedLabel}
               </AppText>
-            ) : null}
-            {offerUnitsLabel && !(submittedUnitAmount != null && submittedUnits) ? (
-              <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
-            ) : null}
-            {offerChoiceLabel ? (
-              <AppText style={styles.cardUnits}>{offerChoiceLabel}</AppText>
-            ) : null}
-            {leading ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
-          </View>
-
-          {awaitingConfirm ? (
-            <View style={styles.confirmRow}>
-              <Pressable
-                onPress={onDecline}
-                disabled={submitting}
-                accessibilityRole="button"
-                accessibilityLabel={declineLabel}
-                style={({ pressed }) => [
-                  styles.decline,
-                  submitting && styles.sendDisabled,
-                  pressed && !submitting && styles.declinePressed,
-                ]}
-              >
-                <AppText weight="bold" style={styles.declineLabel}>
-                  {declineLabel}
-                </AppText>
-              </Pressable>
-              <Pressable
-                onPress={onConfirm}
-                disabled={submitting}
-                accessibilityRole="button"
-                accessibilityLabel={confirmLabel}
-                style={({ pressed }) => [
-                  styles.send,
-                  styles.confirm,
-                  submitting && styles.sendDisabled,
-                  pressed && !submitting && styles.sendPressed,
-                ]}
-              >
-                {submitting ? (
-                  <ActivityIndicator color={palette.pureWhite} size="small" />
-                ) : (
-                  <AppText weight="bold" style={styles.sendLabel}>
-                    {confirmLabel}
-                  </AppText>
-                )}
-              </Pressable>
-            </View>
-          ) : null}
-        </View>
-      ) : null}
-
-      {showInput ? (
-          <View style={styles.form}>
-          {fulfillmentModes && fulfillmentModes.length > 1 ? (
-            <View style={styles.fulfillmentRow}>
-              {fulfillmentModes.map((mode) => {
-                const selected = fulfillment === mode;
-                const blocked = blockedModes.has(mode);
-                return (
-                  <Pressable
-                    key={mode}
-                    onPress={() => setFulfillment(mode)}
-                    disabled={blocked}
-                    accessibilityState={{ disabled: blocked, selected }}
-                    style={[
-                      styles.fulfillmentChip,
-                      selected && !blocked && styles.fulfillmentChipSelected,
-                      blocked && styles.fulfillmentChipDisabled,
-                    ]}
-                  >
-                    <AppText
-                      weight="semibold"
-                      style={[
-                        styles.fulfillmentLabel,
-                        selected && !blocked && styles.fulfillmentLabelSelected,
-                        blocked && styles.fulfillmentLabelDisabled,
-                      ]}
-                    >
-                      {fulfillmentLabels?.[mode] ??
-                        (mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel)}
-                    </AppText>
-                  </Pressable>
-                );
-              })}
-            </View>
-          ) : null}
-          <View style={styles.row}>
-            {maxUnits != null ? (
-              <View style={sendInline ? styles.unitsWrapInline : styles.unitsWrap}>
-                <CounterField
-                  value={units}
-                  onChange={setUnits}
-                  min={1}
-                  max={unitCap}
-                  required
+              {submittedUnitAmount != null && submittedUnits ? (
+                <PriceTimesUnitsSummary
+                  currencyCode={currencyCode}
+                  unitAmount={submittedUnitAmount}
+                  units={submittedUnits}
+                  compact
                 />
+              ) : offerPrice ? (
+                <AppText weight="bold" style={styles.cardPrice}>
+                  {currencyCode} {formatAmountWithCommas(offerPrice)}
+                </AppText>
+              ) : null}
+              {offerUnitsLabel && !(submittedUnitAmount != null && submittedUnits) ? (
+                <AppText style={styles.cardUnits}>· {offerUnitsLabel}</AppText>
+              ) : null}
+              {offerChoiceLabel ? (
+                <AppText style={styles.cardUnits}>{offerChoiceLabel}</AppText>
+              ) : null}
+              {leading ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
+            </View>
+
+            {awaitingConfirm ? (
+              <View style={styles.confirmRow}>
+                <Pressable
+                  onPress={onDecline}
+                  disabled={submitting}
+                  accessibilityRole="button"
+                  accessibilityLabel={declineLabel}
+                  style={({ pressed }) => [
+                    styles.decline,
+                    submitting && styles.sendDisabled,
+                    pressed && !submitting && styles.declinePressed,
+                  ]}
+                >
+                  <AppText weight="bold" style={styles.declineLabel}>
+                    {declineLabel}
+                  </AppText>
+                </Pressable>
+                <Pressable
+                  onPress={onConfirm}
+                  disabled={submitting}
+                  accessibilityRole="button"
+                  accessibilityLabel={confirmLabel}
+                  style={({ pressed }) => [
+                    styles.send,
+                    styles.confirm,
+                    submitting && styles.sendDisabled,
+                    pressed && !submitting && styles.sendPressed,
+                  ]}
+                >
+                  {submitting ? (
+                    <ActivityIndicator color={palette.pureWhite} size="small" />
+                  ) : (
+                    <AppText weight="bold" style={styles.sendLabel}>
+                      {confirmLabel}
+                    </AppText>
+                  )}
+                </Pressable>
               </View>
             ) : null}
-            <View style={styles.inputWrap}>
-              <AppText weight="semibold" style={styles.currency}>
-                {currencyCode}
-              </AppText>
-              <TextInput
-                value={price}
-                onChangeText={setPrice}
-                placeholder={unitPricePlaceholder ?? placeholder}
-                placeholderTextColor={palette.muted}
-                keyboardType="decimal-pad"
-                editable={!submitting}
-                style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
-              />
-            </View>
-            {sendInline ? (
-              <Pressable
-                onPress={handleSend}
-                disabled={!canSend}
-                accessibilityRole="button"
-                accessibilityLabel={sendLabel}
-                style={({ pressed }) => [
-                  styles.send,
-                  styles.sendInline,
-                  !canSend && styles.sendDisabled,
-                  pressed && canSend && styles.sendPressed,
-                ]}
-              >
-                {submitting ? (
-                  <ActivityIndicator color={palette.pureWhite} size="small" />
-                ) : (
-                  <Ionicons name="send" size={16} color={palette.pureWhite} />
-                )}
-              </Pressable>
-            ) : null}
           </View>
-          {draftUnitAmount != null && maxUnits != null ? (
-            <PriceTimesUnitsSummary
-              currencyCode={currencyCode}
-              unitAmount={draftUnitAmount}
-              units={units}
-              compact
-            />
-          ) : null}
-          {sendInline ? null : (
-          <View style={styles.actions}>
-            {footer ? <View style={styles.actionButton}>{footer}</View> : null}
-            <Pressable
-              onPress={handleSend}
-              disabled={!canSend}
-              accessibilityRole="button"
-              accessibilityLabel={sendLabel}
-              style={({ pressed }) => [
-                styles.send,
-                styles.actionButton,
-                !canSend && styles.sendDisabled,
-                pressed && canSend && styles.sendPressed,
-              ]}
-            >
-              {submitting ? (
-                <ActivityIndicator color={palette.pureWhite} size="small" />
-              ) : (
-                <>
-                  <Ionicons name="send" size={14} color={palette.pureWhite} />
-                  <AppText weight="bold" style={styles.sendLabel} numberOfLines={1}>
-                    {sendLabel}
-                  </AppText>
-                </>
-              )}
-            </Pressable>
-          </View>
-          )}
-        </View>
-      ) : null}
+        ) : null}
 
-      {sendInline || !showInput ? footer : null}
-    </View>
+        {showInput ? (
+          <View style={styles.form}>
+            {fulfillmentModes && fulfillmentModes.length > 1 ? (
+              <View style={styles.fulfillmentRow}>
+                {fulfillmentModes.map((mode) => {
+                  const selected = fulfillment === mode;
+                  const blocked = blockedModes.has(mode);
+                  return (
+                    <Pressable
+                      key={mode}
+                      onPress={() => setFulfillment(mode)}
+                      disabled={blocked}
+                      accessibilityState={{ disabled: blocked, selected }}
+                      style={[
+                        styles.fulfillmentChip,
+                        selected && !blocked && styles.fulfillmentChipSelected,
+                        blocked && styles.fulfillmentChipDisabled,
+                      ]}
+                    >
+                      <AppText
+                        weight="semibold"
+                        style={[
+                          styles.fulfillmentLabel,
+                          selected && !blocked && styles.fulfillmentLabelSelected,
+                          blocked && styles.fulfillmentLabelDisabled,
+                        ]}
+                      >
+                        {fulfillmentLabels?.[mode] ??
+                          (mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel)}
+                      </AppText>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : null}
+            <View style={styles.row}>
+              {maxUnits != null ? (
+                <View style={sendInline ? styles.unitsWrapInline : styles.unitsWrap}>
+                  <CounterField value={units} onChange={setUnits} min={1} max={unitCap} required />
+                </View>
+              ) : null}
+              <View style={styles.inputWrap}>
+                <AppText weight="semibold" style={styles.currency}>
+                  {currencyCode}
+                </AppText>
+                <TextInput
+                  value={price}
+                  onChangeText={setPrice}
+                  placeholder={unitPricePlaceholder ?? placeholder}
+                  placeholderTextColor={palette.muted}
+                  keyboardType="decimal-pad"
+                  editable={!submitting}
+                  style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
+                />
+              </View>
+              {sendInline ? (
+                <Pressable
+                  onPress={handleSend}
+                  disabled={!canSend}
+                  accessibilityRole="button"
+                  accessibilityLabel={sendLabel}
+                  style={({ pressed }) => [
+                    styles.send,
+                    styles.sendInline,
+                    !canSend && styles.sendDisabled,
+                    pressed && canSend && styles.sendPressed,
+                  ]}
+                >
+                  {submitting ? (
+                    <ActivityIndicator color={palette.pureWhite} size="small" />
+                  ) : (
+                    <Ionicons name="send" size={16} color={palette.pureWhite} />
+                  )}
+                </Pressable>
+              ) : null}
+            </View>
+            {draftUnitAmount != null && maxUnits != null ? (
+              <PriceTimesUnitsSummary
+                currencyCode={currencyCode}
+                unitAmount={draftUnitAmount}
+                units={units}
+                compact
+              />
+            ) : null}
+            {sendInline ? null : (
+              <View style={styles.actions}>
+                {footer ? <View style={styles.actionButton}>{footer}</View> : null}
+                <Pressable
+                  onPress={handleSend}
+                  disabled={!canSend}
+                  accessibilityRole="button"
+                  accessibilityLabel={sendLabel}
+                  style={({ pressed }) => [
+                    styles.send,
+                    styles.actionButton,
+                    !canSend && styles.sendDisabled,
+                    pressed && canSend && styles.sendPressed,
+                  ]}
+                >
+                  {submitting ? (
+                    <ActivityIndicator color={palette.pureWhite} size="small" />
+                  ) : (
+                    <>
+                      <Ionicons name="send" size={14} color={palette.pureWhite} />
+                      <AppText weight="bold" style={styles.sendLabel} numberOfLines={1}>
+                        {sendLabel}
+                      </AppText>
+                    </>
+                  )}
+                </Pressable>
+              </View>
+            )}
+          </View>
+        ) : null}
+
+        {sendInline || !showInput ? footer : null}
+      </View>
     </KeyboardStickyView>
   );
 }

@@ -6,8 +6,7 @@ export function matchSelectOption(
   if (!stored?.trim()) return null;
   const needle = stored.trim().toLowerCase();
   const match = options.find(
-    (option) =>
-      option.value.toLowerCase() === needle || option.label.toLowerCase() === needle,
+    (option) => option.value.toLowerCase() === needle || option.label.toLowerCase() === needle,
   );
   return match?.value ?? (options.some((option) => option.value === 'other') ? 'other' : null);
 }

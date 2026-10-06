@@ -84,46 +84,46 @@ export function CountryPickerSheet({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView style={styles.avoid} behavior="padding">
-      <Pressable style={styles.backdrop} onPress={onClose} />
-      <View style={[styles.sheet, { height: sheetHeight }]}>
-        <View style={styles.header}>
-          <View style={styles.headerSpacer} />
-          <AppText weight="bold" style={styles.title}>
-            {t('signUpPhone.selectCountryCode')}
-          </AppText>
-          <Pressable onPress={onClose} hitSlop={8} style={styles.headerSpacer}>
-            <AppText weight="semibold" style={styles.doneLabel}>
-              {t('common.done')}
+        <Pressable style={styles.backdrop} onPress={onClose} />
+        <View style={[styles.sheet, { height: sheetHeight }]}>
+          <View style={styles.header}>
+            <View style={styles.headerSpacer} />
+            <AppText weight="bold" style={styles.title}>
+              {t('signUpPhone.selectCountryCode')}
             </AppText>
-          </Pressable>
-        </View>
+            <Pressable onPress={onClose} hitSlop={8} style={styles.headerSpacer}>
+              <AppText weight="semibold" style={styles.doneLabel}>
+                {t('common.done')}
+              </AppText>
+            </Pressable>
+          </View>
 
-        <View style={styles.searchRow}>
-          <Ionicons name="search-outline" size={16} color={palette.muted} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder={t('signUpPhone.searchCountry')}
-            placeholderTextColor={palette.muted}
-            style={[styles.searchInput, { fontFamily: getFontFamily(currentLanguage) }]}
+          <View style={styles.searchRow}>
+            <Ionicons name="search-outline" size={16} color={palette.muted} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder={t('signUpPhone.searchCountry')}
+              placeholderTextColor={palette.muted}
+              style={[styles.searchInput, { fontFamily: getFontFamily(currentLanguage) }]}
+            />
+          </View>
+
+          <FlatList
+            data={filteredCountries}
+            keyExtractor={(country) => country.iso2}
+            style={styles.list}
+            renderItem={({ item }) => (
+              <CountryRow
+                country={item}
+                selected={item.iso2 === selected.iso2}
+                onPress={() => onSelect(item)}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           />
         </View>
-
-        <FlatList
-          data={filteredCountries}
-          keyExtractor={(country) => country.iso2}
-          style={styles.list}
-          renderItem={({ item }) => (
-            <CountryRow
-              country={item}
-              selected={item.iso2 === selected.iso2}
-              onPress={() => onSelect(item)}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        />
-      </View>
       </KeyboardAvoidingView>
     </Modal>
   );

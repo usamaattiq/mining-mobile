@@ -1,5 +1,13 @@
 import React from 'react';
-import { ActivityIndicator, Image, Linking, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Linking,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,7 +24,12 @@ import { EquipmentImageCarousel } from '@/features/listings/components/Equipment
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { EquipmentListingSummaryCard } from '@/features/listings/components/EquipmentListingSummaryCard';
 import { AttachmentsSection } from '@/features/listings/components/AttachmentsSection';
-import { listingsApi, isEquipmentListing, isGoldListing, isServiceListing } from '@/features/listings/api/listingsApi';
+import {
+  listingsApi,
+  isEquipmentListing,
+  isGoldListing,
+  isServiceListing,
+} from '@/features/listings/api/listingsApi';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { AttachmentDocument } from '@/features/listings/types/attachmentsSection.types';
@@ -225,9 +238,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     location = equipmentListing.location ?? '';
     const ownerCanEditUnits =
       equipmentListing.postedAs === 'supplier' &&
-      Boolean(
-        profileId && (equipmentListing.ownerId ?? equipmentListing.owner?.id) === profileId,
-      );
+      Boolean(profileId && (equipmentListing.ownerId ?? equipmentListing.owner?.id) === profileId);
     detailRows = [
       { label: t('common.reference'), value: equipmentListing.reference ?? '' },
       { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
@@ -265,7 +276,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               value: formatListingDate(
                 currentLanguage,
                 equipmentListing.requestMode === 'auction'
-                  ? equipmentListing.auctionEndDate ?? equipmentListing.rfq?.expiresAt
+                  ? (equipmentListing.auctionEndDate ?? equipmentListing.rfq?.expiresAt)
                   : equipmentListing.rfq?.expiresAt,
               ),
             },
@@ -340,33 +351,32 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
     priceNode =
       equipmentListing.postedAs === 'buyer' || !price ? null : (
-      <View style={styles.priceRow}>
-        <View style={styles.priceValueRow}>
-          <AppText weight="bold" style={styles.priceAmount}>
-            {currency.code} {formatAmountWithCommas(price.amount)}
-          </AppText>
-          {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
-        </View>
-
-        {durationOptions.length > 1 ? (
-          <View style={styles.durationDropdown}>
-            <SelectField
-              placeholder={t('equipmentListing.durationPlaceholder')}
-              sheetTitle={t('equipmentListing.durationPlaceholder')}
-              options={durationOptions.map((option) => ({
-                value: option.key,
-                label: option.label,
-              }))}
-              value={activeDuration?.key ?? null}
-              onChange={(next) => setSelectedDuration(next as RentalDuration)}
-              compact
-              dropdown
-            />
+        <View style={styles.priceRow}>
+          <View style={styles.priceValueRow}>
+            <AppText weight="bold" style={styles.priceAmount}>
+              {currency.code} {formatAmountWithCommas(price.amount)}
+            </AppText>
+            {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
           </View>
-        ) : null}
-      </View>
-    );
 
+          {durationOptions.length > 1 ? (
+            <View style={styles.durationDropdown}>
+              <SelectField
+                placeholder={t('equipmentListing.durationPlaceholder')}
+                sheetTitle={t('equipmentListing.durationPlaceholder')}
+                options={durationOptions.map((option) => ({
+                  value: option.key,
+                  label: option.label,
+                }))}
+                value={activeDuration?.key ?? null}
+                onChange={(next) => setSelectedDuration(next as RentalDuration)}
+                compact
+                dropdown
+              />
+            </View>
+          ) : null}
+        </View>
+      );
   } else if (category === 'services' && serviceListing) {
     title = serviceListing.title;
     media = serviceListing.media;
@@ -420,37 +430,37 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       servicePriceOptions[0];
     priceNode =
       serviceListing.postedAs === 'buyer' || !activeServicePrice ? null : (
-      <View style={styles.priceRow}>
-        <View style={styles.priceValueRow}>
-          <AppText weight="bold" style={styles.priceAmount}>
-            {currency.code} {formatAmountWithCommas(activeServicePrice.amount)}
-          </AppText>
-        </View>
-        {servicePriceOptions.length > 1 ? (
-          <View style={styles.serviceModeRow}>
-            {servicePriceOptions.map((option) => {
-              const selected = option.key === activeServicePrice.key;
-              return (
-                <Pressable
-                  key={option.key}
-                  onPress={() => setServicePriceMode(option.key)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  style={[styles.serviceModeButton, selected && styles.serviceModeButtonSelected]}
-                >
-                  <AppText
-                    weight="semibold"
-                    style={[styles.serviceModeLabel, selected && styles.serviceModeLabelSelected]}
-                  >
-                    {option.label}
-                  </AppText>
-                </Pressable>
-              );
-            })}
+        <View style={styles.priceRow}>
+          <View style={styles.priceValueRow}>
+            <AppText weight="bold" style={styles.priceAmount}>
+              {currency.code} {formatAmountWithCommas(activeServicePrice.amount)}
+            </AppText>
           </View>
-        ) : null}
-      </View>
-    );
+          {servicePriceOptions.length > 1 ? (
+            <View style={styles.serviceModeRow}>
+              {servicePriceOptions.map((option) => {
+                const selected = option.key === activeServicePrice.key;
+                return (
+                  <Pressable
+                    key={option.key}
+                    onPress={() => setServicePriceMode(option.key)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    style={[styles.serviceModeButton, selected && styles.serviceModeButtonSelected]}
+                  >
+                    <AppText
+                      weight="semibold"
+                      style={[styles.serviceModeLabel, selected && styles.serviceModeLabelSelected]}
+                    >
+                      {option.label}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : null}
+        </View>
+      );
 
     extraSection = <AttachmentsSection documents={documents} />;
   } else if (category === 'gold' && goldListing) {
@@ -479,10 +489,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
     priceNode =
       goldListing.postedAs === 'buyer' || !goldListing.price ? null : (
-      <AppText weight="bold" style={styles.priceAmount}>
-        {currency.code} {formatAmountWithCommas(goldListing.price)}
-      </AppText>
-    );
+        <AppText weight="bold" style={styles.priceAmount}>
+          {currency.code} {formatAmountWithCommas(goldListing.price)}
+        </AppText>
+      );
 
     extraSection = <AttachmentsSection documents={documents} />;
   }
@@ -508,9 +518,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     equipmentListing?.ownerId ?? serviceListing?.ownerId ?? goldListing?.ownerId ?? owner?.id;
   const postedAs = equipmentListing?.postedAs ?? serviceListing?.postedAs ?? goldListing?.postedAs;
   const rfq = equipmentListing?.rfq ?? serviceListing?.rfq ?? goldListing?.rfq;
-  const hasSentOffer = Boolean(
-    rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
-  ) || rfq?.status === 'offer-submitted';
+  const hasSentOffer =
+    Boolean(
+      rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
+    ) || rfq?.status === 'offer-submitted';
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
   const canEditListing = isOwner && !listingIsEngaged(rfq);
   const canOffer =
@@ -523,10 +534,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     rfq?.status === 'awaiting-your-confirmation' ||
     Boolean(rfq?.canConfirmOffer);
   const supplierBuyer =
-    !isAdmin &&
-    !isOwner &&
-    category === 'equipment' &&
-    equipmentListing?.postedAs === 'supplier';
+    !isAdmin && !isOwner && category === 'equipment' && equipmentListing?.postedAs === 'supplier';
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
     : [];
@@ -582,8 +590,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         applyListing(listing);
       })
       .catch((error: unknown) => {
-        const message =
-          error instanceof ApiError ? error.message : t('rfq.offerFailed');
+        const message = error instanceof ApiError ? error.message : t('rfq.offerFailed');
         if (message === 'You already have an open offer of this type') return;
         showAppAlert(t('common.error'), message);
       })
@@ -596,8 +603,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       category === 'equipment' &&
       equipmentListing?.postedAs === 'supplier'
     ) {
-      const requested =
-        rfq?.offers?.find((offer) => offer.id === offerId)?.quantity ?? 1;
+      const requested = rfq?.offers?.find((offer) => offer.id === offerId)?.quantity ?? 1;
       if (unitsLeft <= 0) {
         showAppAlert(t('rfq.noUnitsAvailable'));
         return;
@@ -608,8 +614,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       }
     }
     setActingOfferId(offerId);
-    const request =
-      action === 'accept' ? listingsApi.acceptOffer : listingsApi.rejectOffer;
+    const request = action === 'accept' ? listingsApi.acceptOffer : listingsApi.rejectOffer;
     void request(id, offerId)
       .then((listing) => {
         applyListing(listing);
@@ -893,7 +898,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                       <View style={styles.myOfferKindBadge}>
                         <AppText weight="semibold" style={styles.myOfferKindText}>
-                          {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
+                          {offer.kind === 'sale'
+                            ? t('equipmentListing.sell')
+                            : t('equipmentListing.rent')}
                         </AppText>
                       </View>
                     </View>
@@ -1062,7 +1069,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         useGoldListingsStore
                           .getState()
                           .setListings(
-                            useGoldListingsStore.getState().listings.filter((item) => item.id !== id),
+                            useGoldListingsStore
+                              .getState()
+                              .listings.filter((item) => item.id !== id),
                           );
                         useMarketListingsStore
                           .getState()
@@ -1081,7 +1090,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         navigation.goBack();
                       })
                       .catch((error: unknown) => {
-                        const message = error instanceof ApiError ? error.message : t('common.error');
+                        const message =
+                          error instanceof ApiError ? error.message : t('common.error');
                         showAppAlert(message);
                       })
                       .finally(() => setDeletingListing(false));
@@ -1231,13 +1241,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     ? mySupplierOffers.some((offer) => offer.status === 'confirmed')
                     : rfq?.myOfferStatus === 'confirmed';
                   return whatsappReady && rfq?.ownerPhone ? (
-                  <Button
-                    label={t('common.whatsapp')}
-                    icon="logo-whatsapp"
-                    variant="whatsapp"
-                    onPress={() => openWhatsApp(rfq.ownerPhone!)}
-                    style={styles.messageButton}
-                  />
+                    <Button
+                      label={t('common.whatsapp')}
+                      icon="logo-whatsapp"
+                      variant="whatsapp"
+                      onPress={() => openWhatsApp(rfq.ownerPhone!)}
+                      style={styles.messageButton}
+                    />
                   ) : null;
                 })()}
               </View>
@@ -1322,7 +1332,9 @@ const ENGAGED_LISTING_STATUSES = new Set([
 ]);
 
 /** True once a counterparty is awaiting confirmation, accepted, or confirmed. */
-function listingIsEngaged(rfq: { status?: string; offers?: { status: string }[] } | undefined): boolean {
+function listingIsEngaged(
+  rfq: { status?: string; offers?: { status: string }[] } | undefined,
+): boolean {
   if (!rfq) return false;
   if (ENGAGED_LISTING_STATUSES.has(rfq.status ?? '')) return true;
   return (rfq.offers ?? []).some(
@@ -1330,10 +1342,7 @@ function listingIsEngaged(rfq: { status?: string; offers?: { status: string }[] 
   );
 }
 
-function supplierUnitsLeft(
-  id: string,
-  sources: Array<ListingDto | null | undefined>,
-): number {
+function supplierUnitsLeft(id: string, sources: Array<ListingDto | null | undefined>): number {
   for (const listing of sources) {
     if (!listing || !isEquipmentListing(listing) || listing.id !== id) continue;
     if (listing.postedAs === 'supplier' && listing.availableUnits != null) {

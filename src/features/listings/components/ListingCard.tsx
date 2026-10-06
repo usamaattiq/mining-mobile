@@ -7,7 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
-import type { ListingCardBadge, ListingCardProps } from '@/features/listings/types/listingCard.types';
+import type {
+  ListingCardBadge,
+  ListingCardProps,
+} from '@/features/listings/types/listingCard.types';
 
 const LISTING_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const COUNTDOWN_TICK_MS = 1000;
@@ -205,9 +208,7 @@ export function ListingCard({
                   <AppText weight="bold" style={styles.gridPrice} numberOfLines={1}>
                     {line.text}
                   </AppText>
-                  {line.unit ? (
-                    <AppText style={styles.gridPriceUnit}>{line.unit}</AppText>
-                  ) : null}
+                  {line.unit ? <AppText style={styles.gridPriceUnit}>{line.unit}</AppText> : null}
                 </View>
               ))}
             </View>
@@ -266,7 +267,12 @@ export function ListingCard({
       <View style={styles.row}>
         <View style={styles.imageWrap}>
           {thumbnail ? (
-            <ExpoImage source={thumbnail} style={styles.image} contentFit="cover" cachePolicy="memory-disk" />
+            <ExpoImage
+              source={thumbnail}
+              style={styles.image}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+            />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
               <Ionicons name={placeholderIcon} size={48} color={palette.goldDark} />

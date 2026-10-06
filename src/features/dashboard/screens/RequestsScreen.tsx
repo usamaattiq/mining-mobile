@@ -52,8 +52,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
   }, [route.params?.category]);
   const [lifeFilter, setLifeFilter] = React.useState<LifeFilter>('live');
   const [lifeRowWidth, setLifeRowWidth] = React.useState(0);
-  const hasCachedData =
-    equipmentListings.length + serviceListings.length + goldListings.length > 0;
+  const hasCachedData = equipmentListings.length + serviceListings.length + goldListings.length > 0;
 
   const { loadError, refreshing, onRefresh, retry } = useAbortableFocusLoad(
     (signal) => refreshListings(role, { signal }),
@@ -147,29 +146,29 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
           style={styles.lifeTrack}
           onLayout={(event) => setLifeRowWidth(event.nativeEvent.layout.width)}
         >
-        {lifeOptions.map((option) => {
-          const selected = option.key === lifeFilter;
-          return (
-            <Pressable
-              key={option.key}
-              onPress={() => setLifeFilter(option.key)}
-              accessibilityRole="tab"
-              accessibilityState={{ selected }}
-              style={({ pressed }) => [styles.lifeTab, pressed && styles.lifeTabPressed]}
-            >
-              <AppText
-                weight={selected ? 'bold' : 'medium'}
-                style={[styles.lifeTabLabel, selected && styles.lifeTabLabelSelected]}
-                numberOfLines={1}
+          {lifeOptions.map((option) => {
+            const selected = option.key === lifeFilter;
+            return (
+              <Pressable
+                key={option.key}
+                onPress={() => setLifeFilter(option.key)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected }}
+                style={({ pressed }) => [styles.lifeTab, pressed && styles.lifeTabPressed]}
               >
-                {option.label}
-              </AppText>
-            </Pressable>
-          );
-        })}
-        {lifeTabWidth > 0 ? (
-          <Animated.View style={[styles.lifeTabLine, lifeIndicatorStyle]} />
-        ) : null}
+                <AppText
+                  weight={selected ? 'bold' : 'medium'}
+                  style={[styles.lifeTabLabel, selected && styles.lifeTabLabelSelected]}
+                  numberOfLines={1}
+                >
+                  {option.label}
+                </AppText>
+              </Pressable>
+            );
+          })}
+          {lifeTabWidth > 0 ? (
+            <Animated.View style={[styles.lifeTabLine, lifeIndicatorStyle]} />
+          ) : null}
         </View>
       </View>
 

@@ -14,7 +14,11 @@ export function sanitizeStepPrice(raw: string): string {
 }
 
 export function parsePositiveAmount(value: string | null | undefined): number | null {
-  const n = Number(String(value ?? '').replace(/,/g, '').trim());
+  const n = Number(
+    String(value ?? '')
+      .replace(/,/g, '')
+      .trim(),
+  );
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 

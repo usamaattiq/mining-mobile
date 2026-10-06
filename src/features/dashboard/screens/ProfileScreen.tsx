@@ -31,8 +31,7 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-const APP_VERSION =
-  Constants.expoConfig?.version ?? Constants.nativeAppVersion ?? '1.0.0';
+const APP_VERSION = Constants.expoConfig?.version ?? Constants.nativeAppVersion ?? '1.0.0';
 
 export function ProfileScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });

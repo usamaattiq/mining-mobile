@@ -48,7 +48,11 @@ export function AdminCategoriesScreen(): React.ReactElement {
   const [domain, setDomain] = React.useState<CategoryKey>('equipment');
   const [query, setQuery] = React.useState('');
   const [loading, setLoading] = React.useState(true);
-  const [draft, setDraft] = React.useState<{ id: string | null; name: string; parentId: string | null } | null>(null);
+  const [draft, setDraft] = React.useState<{
+    id: string | null;
+    name: string;
+    parentId: string | null;
+  } | null>(null);
   const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
   const [saving, setSaving] = React.useState(false);
 
@@ -154,8 +158,14 @@ export function AdminCategoriesScreen(): React.ReactElement {
                       return next;
                     })
                   }
-                  onAdd={domain === 'gold' ? undefined : (parentId) => setDraft({ id: null, name: '', parentId })}
-                  onEdit={(label) => setDraft({ id: label.id, name: label.name, parentId: label.parentId })}
+                  onAdd={
+                    domain === 'gold'
+                      ? undefined
+                      : (parentId) => setDraft({ id: null, name: '', parentId })
+                  }
+                  onEdit={(label) =>
+                    setDraft({ id: label.id, name: label.name, parentId: label.parentId })
+                  }
                   onDelete={removeLabel}
                   forceExpand={query.trim().length > 0}
                   showDivider={index < visible.length - 1}
@@ -168,12 +178,18 @@ export function AdminCategoriesScreen(): React.ReactElement {
 
       <AppBottomSheet visible={draft !== null} onClose={() => setDraft(null)} fitContent>
         <AppText weight="bold" style={styles.sheetTitle}>
-          {draft?.id ? t('admin.labelName') : draft?.parentId ? t('admin.addSubcategory') : t('admin.addLabel')}
+          {draft?.id
+            ? t('admin.labelName')
+            : draft?.parentId
+              ? t('admin.addSubcategory')
+              : t('admin.addLabel')}
         </AppText>
         <View style={styles.sheetForm}>
           <FormInput
             value={draft?.name ?? ''}
-            onChangeText={(name) => setDraft((current) => (current ? { ...current, name } : current))}
+            onChangeText={(name) =>
+              setDraft((current) => (current ? { ...current, name } : current))
+            }
           />
           <Button label={t('common.save')} onPress={() => void saveDraft()} loading={saving} />
         </View>
@@ -207,7 +223,13 @@ function CategoryBranch({
   const hasChildren = node.children.length > 0;
   return (
     <View>
-      <View style={[styles.row, showDivider && styles.rowDivider, { paddingStart: spacing.sm +2 + depth * 12 }]}>
+      <View
+        style={[
+          styles.row,
+          showDivider && styles.rowDivider,
+          { paddingStart: spacing.sm + 2 + depth * 12 },
+        ]}
+      >
         <Pressable
           onPress={hasChildren ? () => onToggle(node.id) : undefined}
           disabled={!hasChildren}
@@ -217,7 +239,11 @@ function CategoryBranch({
           <View style={styles.lead}>
             {hasChildren ? (
               <View style={styles.chevron}>
-                <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={14} color={palette.gold} />
+                <Ionicons
+                  name={open ? 'chevron-down' : 'chevron-forward'}
+                  size={14}
+                  color={palette.gold}
+                />
               </View>
             ) : (
               <View style={styles.expandSpacer} />
