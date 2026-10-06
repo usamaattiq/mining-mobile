@@ -89,6 +89,8 @@ export function ListingCard({
   placeholderIcon,
   subtitle,
   subtitleIcon,
+  unitsLabel,
+  unitsIcon = 'layers-outline',
   typeBadge,
   city,
   deliveryBadge,
@@ -221,6 +223,15 @@ export function ListingCard({
             </AppText>
           ) : null}
 
+          {unitsLabel ? (
+            <View style={styles.gridMetaRow}>
+              <Ionicons name={unitsIcon} size={12} color={palette.gold} />
+              <AppText style={styles.gridMeta} numberOfLines={1}>
+                {unitsLabel}
+              </AppText>
+            </View>
+          ) : null}
+
           {city ? (
             <View style={styles.gridMetaRow}>
               <Ionicons name="location-outline" size={12} color={palette.gold} />
@@ -294,6 +305,15 @@ export function ListingCard({
                 ) : null}
                 <AppText style={styles.subtitle} numberOfLines={1}>
                   {subtitle ?? ' '}
+                </AppText>
+              </View>
+            ) : null}
+
+            {unitsLabel ? (
+              <View style={styles.subtitleRow}>
+                <Ionicons name={unitsIcon} size={12} color={palette.gold} />
+                <AppText style={styles.subtitle} numberOfLines={1}>
+                  {unitsLabel}
                 </AppText>
               </View>
             ) : null}

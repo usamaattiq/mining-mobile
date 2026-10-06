@@ -17,6 +17,10 @@ export type ListingCardProps = {
   subtitle?: string;
   /** Icon shown before the type / units line. */
   subtitleIcon?: keyof typeof Ionicons.glyphMap;
+  /** Units count shown on its own row under the category. */
+  unitsLabel?: string;
+  /** Icon for the units row — defaults to layers-outline when unitsLabel is set. */
+  unitsIcon?: keyof typeof Ionicons.glyphMap;
   /** RFQ / listing status — top right, inline with the title. */
   typeBadge?: ListingCardBadge;
   /** City line under the type. */

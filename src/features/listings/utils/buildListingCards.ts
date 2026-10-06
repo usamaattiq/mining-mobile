@@ -139,8 +139,15 @@ export function buildListingCards({
         reference: listing.reference,
         thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
         placeholderIcon: 'construct-outline',
-        subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.postedAs === 'supplier' ? (listing.availableUnits ?? listing.units) : listing.units })}`,
+        subtitle: listing.equipmentTypeLabel,
         subtitleIcon: 'construct-outline',
+        unitsLabel: t('equipmentListing.unitsCount', {
+          count:
+            listing.postedAs === 'supplier'
+              ? (listing.availableUnits ?? listing.units)
+              : listing.units,
+        }),
+        unitsIcon: 'layers-outline',
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
         titleBelowStatus: titleBelowStatus(listing.rfq?.status),
         requestBadge:

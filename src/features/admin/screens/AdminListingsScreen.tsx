@@ -18,7 +18,6 @@ import { useCurrency } from '@/shared/hooks/useCurrency';
 import { adminApi, type AdminListingItem } from '@/features/admin/api/adminApi';
 import { AppText } from '@/shared/components/AppText';
 import { SearchField } from '@/shared/components/SearchField';
-import { FilterBadges } from '@/features/admin/components/FilterBadges';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { palette, spacing } from '@/theme';
 
@@ -27,17 +26,16 @@ export function AdminListingsScreen(): React.ReactElement {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const currency = useCurrency();
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
-  const [statusFilter, setStatusFilter] = React.useState<'all' | 'live' | 'past'>('all');
   const [query, setQuery] = React.useState('');
   const [items, setItems] = React.useState<AdminListingItem[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const load = React.useCallback(async (search: string, nextCategory: string, status: 'all' | 'live' | 'past') => {
+  const load = React.useCallback(async (search: string, nextCategory: string) => {
     const result = await adminApi.listListings({
       search,
       category: nextCategory === 'all' ? undefined : nextCategory,
-      status: status === 'all' ? undefined : status,
+      status: 'live',
     });
     setItems(result.items);
   }, []);
@@ -45,12 +43,12 @@ export function AdminListingsScreen(): React.ReactElement {
   React.useEffect(() => {
     const handle = setTimeout(() => {
       setLoading(true);
-      void load(query, category, statusFilter)
+      void load(query, category)
         .catch(() => showAppAlert(t('admin.loadFailed')))
         .finally(() => setLoading(false));
     }, query ? 300 : 0);
     return () => clearTimeout(handle);
-  }, [query, category, statusFilter, load, t]);
+  }, [query, category, load, t]);
 
   const cards = buildListingCards({
     category,
@@ -87,20 +85,12 @@ export function AdminListingsScreen(): React.ReactElement {
           refreshing={refreshing}
           onRefresh={() => {
             setRefreshing(true);
-            void load(query, category, statusFilter).finally(() => setRefreshing(false));
+            void load(query, category).finally(() => setRefreshing(false));
           }}
         />
       }
     >
       <SearchField value={query} onChangeText={setQuery} placeholder={t('admin.searchListings')} />
-      <FilterBadges
-        value={statusFilter === 'past' ? 'all' : statusFilter}
-        onChange={setStatusFilter}
-        options={[
-          { id: 'all', label: t('admin.all') },
-          { id: 'live', label: t('admin.live') },
-        ]}
-      />
       {loading ? (
         <ActivityIndicator color={palette.gold} style={styles.loader} />
       ) : items.length === 0 ? (
