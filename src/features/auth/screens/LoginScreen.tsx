@@ -176,7 +176,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
     try {
       const deviceId = await getDeviceId();
       const result = await authApi.loginWithMpin(phoneIdentity, mpinValue, deviceId);
-      await setAuthenticated(result.accessToken);
+      await setAuthenticated(result.accessToken, result.refreshToken);
       setProfile(result.profile);
       await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();
@@ -246,7 +246,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
     try {
       const deviceId = await getDeviceId();
       const result = await authApi.resetMpin(phoneIdentity, newMpin, deviceId);
-      await setAuthenticated(result.accessToken);
+      await setAuthenticated(result.accessToken, result.refreshToken);
       setProfile(result.profile);
       await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();

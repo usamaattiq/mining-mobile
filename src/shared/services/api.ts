@@ -14,6 +14,16 @@ export function setSessionRevokedHandler(handler: () => void): void {
   sessionRevokedHandler = handler;
 }
 
+// Set by authStore — attempts to silently renew the access token using the
+// stored refresh token. Resolves true if the retry should go ahead with a
+// fresh token, false if the session is actually gone (bad/expired refresh
+// token too) and sessionRevokedHandler should run instead.
+let refreshHandler: (() => Promise<boolean>) | null = null;
+
+export function setRefreshHandler(handler: () => Promise<boolean>): void {
+  refreshHandler = handler;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -34,7 +44,7 @@ const REQUEST_TIMEOUT_MS = 20_000;
 
 export async function apiFetch<T>(
   path: string,
-  options: { method?: string; body?: unknown } = {},
+  options: { method?: string; body?: unknown; skipRefresh?: boolean } = {},
 ): Promise<T> {
   const token = authTokenProvider?.();
 
@@ -78,6 +88,12 @@ export async function apiFetch<T>(
     const errorPayload = payload && payload.success === false ? payload.error : undefined;
 
     if (res.status === 401 && errorPayload?.code === 'UNAUTHORIZED') {
+      if (!options.skipRefresh && refreshHandler) {
+        const refreshed = await refreshHandler();
+        if (refreshed) {
+          return apiFetch<T>(path, { ...options, skipRefresh: true });
+        }
+      }
       sessionRevokedHandler?.();
     }
 
