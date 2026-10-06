@@ -26,9 +26,11 @@ export function EmptyState({
 
 const styles = StyleSheet.create({
   empty: {
-    paddingVertical: spacing.xxl,
+    flexGrow: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.md,
+    paddingVertical: spacing.xl,
+    gap: spacing.xs,
   },
   textBlock: {
     alignItems: 'center',
@@ -36,17 +38,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   title: {
-    fontSize: 12,
+    fontSize: 14,
     color: palette.charcoal,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 12,
     color: palette.muted,
     textAlign: 'center',
   },
   image: {
-    width: 120,
-    height: 120,
+    width: 110,
+    height: 110,
   },
 });

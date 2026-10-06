@@ -30,12 +30,35 @@ function NumericKeyboardToolbar(): React.ReactElement | null {
   const [routeName, setRouteName] = React.useState<string | undefined>();
 
   React.useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+    let raf = 0;
+    let cancelled = false;
+
     const sync = () => {
       setRouteName(navigationRef.getCurrentRoute()?.name);
     };
-    sync();
-    const unsubscribe = navigationRef.addListener('state', sync);
-    return unsubscribe;
+
+    const attach = (): boolean => {
+      if (!navigationRef.isReady()) return false;
+      sync();
+      unsubscribe = navigationRef.addListener('state', sync);
+      return true;
+    };
+
+    if (!attach()) {
+      const wait = () => {
+        if (cancelled) return;
+        if (attach()) return;
+        raf = requestAnimationFrame(wait);
+      };
+      raf = requestAnimationFrame(wait);
+    }
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      unsubscribe?.();
+    };
   }, []);
 
   // Offer composer already has Send; skip the Done toolbar on listing detail.
