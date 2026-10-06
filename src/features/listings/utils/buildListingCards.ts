@@ -212,7 +212,6 @@ export function buildListingCards({
           : [
               {
                 text: `${currencyCode} ${formatAmountWithCommas(shownPrice)}`,
-                unit: prices.onlinePrice ? undefined : t('serviceListing.onsite'),
               },
             ];
       return {
