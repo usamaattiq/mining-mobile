@@ -21,8 +21,6 @@ import { SearchField } from '@/shared/components/SearchField';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { palette, spacing } from '@/theme';
 
-const noListingImage = require('@/assets/images/noItem.png');
-
 export function AdminListingsScreen(): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -96,7 +94,7 @@ export function AdminListingsScreen(): React.ReactElement {
       {loading ? (
         <ActivityIndicator color={palette.gold} style={styles.loader} />
       ) : items.length === 0 ? (
-        <EmptyState title={t('admin.emptyListings')} image={noListingImage} />
+        <EmptyState title={t('admin.emptyListings')} />
       ) : (
         cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
       )}

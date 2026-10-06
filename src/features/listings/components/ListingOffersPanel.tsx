@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
@@ -70,9 +71,7 @@ export function ListingOffersPanel({
         {t('rfq.offersTitle')}
       </AppText>
       {offers.length === 0 ? (
-        <View style={styles.empty}>
-          <AppText style={styles.emptyText}>{t('rfq.noOffers')}</AppText>
-        </View>
+        <EmptyState title={t('rfq.noOffers')} />
       ) : (
         orderedOffers.map((offer) => {
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
@@ -200,17 +199,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     color: palette.charcoal,
-  },
-  empty: {
-    backgroundColor: palette.warmWhite,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: palette.softGold,
-    padding: spacing.md,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: palette.muted,
   },
   card: {
     backgroundColor: palette.warmWhite,

@@ -16,6 +16,7 @@ import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { AppText } from '@/shared/components/AppText';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { messagesApi } from '@/features/messages/api/messagesApi';
 import { ChatBubble } from '@/features/messages/components/ChatBubble';
 import type { ChatMessage } from '@/features/messages/types/conversation.types';
@@ -202,9 +203,7 @@ export function ListingMessageSheet({
             <AppText style={styles.errorText}>{error}</AppText>
           </View>
         ) : messages.length === 0 ? (
-          <View style={styles.centered}>
-            <AppText style={styles.emptyText}>{t('messages.chatEmpty')}</AppText>
-          </View>
+          <EmptyState title={t('messages.chatEmpty')} />
         ) : (
           <FlatList
             style={styles.list}
@@ -303,12 +302,6 @@ const styles = StyleSheet.create({
   listContent: {
     flexGrow: 1,
     paddingVertical: spacing.sm,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: palette.muted,
-    fontSize: 13,
-    paddingVertical: spacing.xl,
   },
   composer: {
     flexDirection: 'row',

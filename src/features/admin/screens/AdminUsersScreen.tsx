@@ -9,6 +9,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import { AdminChipRow } from '@/features/admin/components/AdminChipRow';
 import { adminApi, type AdminUserItem } from '@/features/admin/api/adminApi';
 import { AppText } from '@/shared/components/AppText';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { SearchField } from '@/shared/components/SearchField';
 import { FilterBadges } from '@/features/admin/components/FilterBadges';
 import { showAppAlert } from '@/shared/services/appAlert';
@@ -83,7 +84,7 @@ export function AdminUsersScreen(): React.ReactElement {
       {loading ? (
         <ActivityIndicator color={palette.gold} style={styles.loader} />
       ) : items.length === 0 ? (
-        <AppText style={styles.empty}>{t('admin.emptyUsers')}</AppText>
+        <EmptyState title={t('admin.emptyUsers')} />
       ) : (
         items.map((item) => (
           <Pressable
@@ -130,7 +131,6 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
   },
   loader: { marginTop: spacing.xl },
-  empty: { color: palette.muted, textAlign: 'center', marginTop: spacing.xl },
   card: {
     position: 'relative',
     flexDirection: 'row',
