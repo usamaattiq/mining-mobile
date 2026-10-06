@@ -27,6 +27,19 @@ const NUMBER_KEYBOARDS = new Set(['numeric', 'number-pad', 'decimal-pad', 'phone
 /** Number pads have no return key, so Done is shown only for those keyboards. */
 function NumericKeyboardToolbar(): React.ReactElement | null {
   const keyboardType = useKeyboardState((state) => state.type);
+  const [routeName, setRouteName] = React.useState<string | undefined>();
+
+  React.useEffect(() => {
+    const sync = () => {
+      setRouteName(navigationRef.getCurrentRoute()?.name);
+    };
+    sync();
+    const unsubscribe = navigationRef.addListener('state', sync);
+    return unsubscribe;
+  }, []);
+
+  // Offer composer already has Send; skip the Done toolbar on listing detail.
+  if (routeName === 'CompleteListingDetail') return null;
   if (!NUMBER_KEYBOARDS.has(keyboardType)) return null;
   return <KeyboardToolbar />;
 }
