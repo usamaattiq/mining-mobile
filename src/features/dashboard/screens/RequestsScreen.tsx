@@ -3,7 +3,6 @@ import { I18nManager, Pressable, RefreshControl, StyleSheet, View } from 'react-
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CompositeScreenProps } from '@react-navigation/native';
-import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -15,6 +14,7 @@ import type {
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { EmptyState } from '@/shared/components/EmptyState';
+import { ErrorState } from '@/shared/components/ErrorState';
 import { ListingCard } from '@/features/listings/components/ListingCard';
 import { AppText } from '@/shared/components/AppText';
 import { useListingsStore } from '@/store/listingsStore';
@@ -24,6 +24,7 @@ import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshListings } from '@/features/listings/utils/refreshListings';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
+import { useAbortableFocusLoad } from '@/shared/hooks/useAbortableFocusLoad';
 import { palette, spacing } from '@/theme';
 
 type Props = CompositeScreenProps<
@@ -51,20 +52,13 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
   }, [route.params?.category]);
   const [lifeFilter, setLifeFilter] = React.useState<LifeFilter>('live');
   const [lifeRowWidth, setLifeRowWidth] = React.useState(0);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const hasCachedData =
+    equipmentListings.length + serviceListings.length + goldListings.length > 0;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      void refreshListings(role).catch(() => undefined);
-    }, [role]),
+  const { loadError, refreshing, onRefresh, retry } = useAbortableFocusLoad(
+    (signal) => refreshListings(role, { signal }),
+    [role],
   );
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    void refreshListings(role)
-      .catch(() => undefined)
-      .finally(() => setRefreshing(false));
-  }, [role]);
 
   const categoryOptions = [
     { key: 'equipment' as const, label: t('requests.categoryEquipment') },
@@ -179,7 +173,14 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
         </View>
       </View>
 
-      {visibleCards.length === 0 ? (
+      {loadError && !hasCachedData ? (
+        <ErrorState
+          title={t('common.loadFailed')}
+          subtitle={t('common.loadFailedSubtitle')}
+          retryLabel={t('common.retry')}
+          onRetry={retry}
+        />
+      ) : visibleCards.length === 0 ? (
         <EmptyState title={emptyTitle} subtitle={emptySubtitle} />
       ) : (
         visibleCards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)

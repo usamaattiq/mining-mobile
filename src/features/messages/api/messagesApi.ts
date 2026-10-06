@@ -2,8 +2,8 @@ import { apiFetch } from '@/shared/services/api';
 import type { Conversation } from '@/features/messages/types/conversation.types';
 
 export const messagesApi = {
-  listConversations(): Promise<Conversation[]> {
-    return apiFetch('/messages/conversations');
+  listConversations(options?: { signal?: AbortSignal }): Promise<Conversation[]> {
+    return apiFetch('/messages/conversations', { signal: options?.signal });
   },
 
   getConversation(id: string): Promise<Conversation> {

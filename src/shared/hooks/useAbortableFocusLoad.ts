@@ -1,0 +1,67 @@
+import React from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { isAbortError } from '@/shared/utils/isAbortError';
+
+type Loader = (signal: AbortSignal) => Promise<void>;
+
+/**
+ * Runs `loader` on focus (and on pull-to-refresh / retry), aborting the prior
+ * in-flight call when the screen blurs or deps change so a stale response
+ * cannot overwrite fresher state.
+ */
+export function useAbortableFocusLoad(
+  loader: Loader,
+  deps: React.DependencyList,
+): {
+  loadError: boolean;
+  refreshing: boolean;
+  onRefresh: () => void;
+  retry: () => void;
+} {
+  const [loadError, setLoadError] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const loaderRef = React.useRef(loader);
+  loaderRef.current = loader;
+  const pullAbortRef = React.useRef<AbortController | null>(null);
+
+  const run = React.useCallback(async (signal: AbortSignal, asPull = false) => {
+    if (asPull) setRefreshing(true);
+    try {
+      await loaderRef.current(signal);
+      if (!signal.aborted) setLoadError(false);
+    } catch (error) {
+      if (isAbortError(error) || signal.aborted) return;
+      setLoadError(true);
+    } finally {
+      if (asPull && !signal.aborted) setRefreshing(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const ac = new AbortController();
+      void run(ac.signal);
+      return () => {
+        ac.abort();
+      };
+      // Intentionally tied to caller-provided deps (role, etc.).
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, deps),
+  );
+
+  const onRefresh = React.useCallback(() => {
+    pullAbortRef.current?.abort();
+    const ac = new AbortController();
+    pullAbortRef.current = ac;
+    void run(ac.signal, true);
+  }, [run]);
+
+  const retry = React.useCallback(() => {
+    pullAbortRef.current?.abort();
+    const ac = new AbortController();
+    pullAbortRef.current = ac;
+    void run(ac.signal);
+  }, [run]);
+
+  return { loadError, refreshing, onRefresh, retry };
+}

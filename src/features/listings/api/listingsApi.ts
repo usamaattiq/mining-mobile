@@ -51,23 +51,33 @@ export type CreateListingBody =
   | CreateServiceListingBody
   | CreateGoldListingBody;
 
+type FetchOptions = { signal?: AbortSignal };
+
 export const listingsApi = {
-  list(category?: ListingCategory, postedAs?: MarketplaceRole): Promise<ListingDto[]> {
+  list(
+    category?: ListingCategory,
+    postedAs?: MarketplaceRole,
+    options?: FetchOptions,
+  ): Promise<ListingDto[]> {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
     if (postedAs) params.set('postedAs', postedAs);
     const query = params.toString();
-    return apiFetch(`/listings${query ? `?${query}` : ''}`);
+    return apiFetch(`/listings${query ? `?${query}` : ''}`, { signal: options?.signal });
   },
 
-  feed(postedAs: MarketplaceRole, category?: ListingCategory): Promise<ListingDto[]> {
+  feed(
+    postedAs: MarketplaceRole,
+    category?: ListingCategory,
+    options?: FetchOptions,
+  ): Promise<ListingDto[]> {
     const params = new URLSearchParams({ postedAs });
     if (category) params.set('category', category);
-    return apiFetch(`/listings/feed?${params.toString()}`);
+    return apiFetch(`/listings/feed?${params.toString()}`, { signal: options?.signal });
   },
 
-  myOffers(): Promise<ListingDto[]> {
-    return apiFetch('/listings/my-offers');
+  myOffers(options?: FetchOptions): Promise<ListingDto[]> {
+    return apiFetch('/listings/my-offers', { signal: options?.signal });
   },
 
   get(id: string): Promise<ListingDto> {

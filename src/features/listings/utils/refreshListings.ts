@@ -16,6 +16,8 @@ import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import type { MarketplaceRole } from '@/navigation/types';
 import { listingHasMyOffer } from '@/features/listings/utils/listingOfferState';
 
+type RefreshOptions = { signal?: AbortSignal };
+
 export function applyListings(listings: ListingDto[]): void {
   useListingsStore
     .getState()
@@ -28,16 +30,22 @@ export function applyListings(listings: ListingDto[]): void {
     .setListings(listings.filter((item): item is GoldListing => item.category === 'gold'));
 }
 
-export async function refreshListings(postedAs?: MarketplaceRole): Promise<void> {
-  applyListings(await listingsApi.list(undefined, postedAs));
+export async function refreshListings(
+  postedAs?: MarketplaceRole,
+  options?: RefreshOptions,
+): Promise<void> {
+  applyListings(await listingsApi.list(undefined, postedAs, options));
 }
 
-export async function refreshMarketListings(postedAs: MarketplaceRole): Promise<void> {
-  useMarketListingsStore.getState().setListings(await listingsApi.feed(postedAs));
+export async function refreshMarketListings(
+  postedAs: MarketplaceRole,
+  options?: RefreshOptions,
+): Promise<void> {
+  useMarketListingsStore.getState().setListings(await listingsApi.feed(postedAs, undefined, options));
 }
 
-export async function refreshOfferedListings(): Promise<void> {
-  useOfferedListingsStore.getState().setListings(await listingsApi.myOffers());
+export async function refreshOfferedListings(options?: RefreshOptions): Promise<void> {
+  useOfferedListingsStore.getState().setListings(await listingsApi.myOffers(options));
 }
 
 export function cacheListing(listing: ListingDto): void {

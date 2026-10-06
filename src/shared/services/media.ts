@@ -20,8 +20,22 @@ export function resolveMediaUrl(key: string | null | undefined): string | null {
   return `${base.replace(/\/$/, '')}/${key.replace(/^\//, '')}`;
 }
 
-async function presignUpload(contentType: UploadableContentType): Promise<PresignUploadResult> {
-  return apiFetch('/uploads/presign', { method: 'POST', body: { contentType } });
+async function presignUpload(
+  contentType: UploadableContentType,
+  contentLength: number,
+): Promise<PresignUploadResult> {
+  return apiFetch('/uploads/presign', {
+    method: 'POST',
+    body: { contentType, contentLength },
+  });
+}
+
+async function localFileSize(uri: string): Promise<number> {
+  const info = await FileSystem.getInfoAsync(uri);
+  if (!info.exists || typeof info.size !== 'number' || info.size <= 0) {
+    throw new Error('Could not determine file size for upload');
+  }
+  return info.size;
 }
 
 /**
@@ -38,12 +52,16 @@ export async function uploadMedia(file: {
   uri: string;
   contentType: UploadableContentType;
 }): Promise<{ key: string; url: string }> {
-  const { uploadUrl, key, publicUrl } = await presignUpload(file.contentType);
+  const contentLength = await localFileSize(file.uri);
+  const { uploadUrl, key, publicUrl } = await presignUpload(file.contentType, contentLength);
 
   const res = await FileSystem.uploadAsync(uploadUrl, file.uri, {
     httpMethod: 'PUT',
     uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
-    headers: { 'Content-Type': file.contentType },
+    headers: {
+      'Content-Type': file.contentType,
+      'Content-Length': String(contentLength),
+    },
   });
 
   if (res.status < 200 || res.status >= 300) {
@@ -67,14 +85,21 @@ export async function uploadDocument(file: {
   uri: string;
   contentType: 'application/pdf';
 }): Promise<{ key: string; url: string }> {
-  const { uploadUrl, key, publicUrl } = await presignUpload(file.contentType);
-
   const fileResponse = await fetch(file.uri);
   const bytes = await fileResponse.arrayBuffer();
+  const contentLength = bytes.byteLength;
+  if (contentLength <= 0) {
+    throw new Error('Could not determine file size for upload');
+  }
+
+  const { uploadUrl, key, publicUrl } = await presignUpload(file.contentType, contentLength);
 
   const uploadResponse = await fetch(uploadUrl, {
     method: 'PUT',
-    headers: { 'Content-Type': file.contentType },
+    headers: {
+      'Content-Type': file.contentType,
+      'Content-Length': String(contentLength),
+    },
     body: bytes,
   });
 

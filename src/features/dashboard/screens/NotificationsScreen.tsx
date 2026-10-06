@@ -1,16 +1,17 @@
 import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, RefreshControl, StyleSheet } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
-import { useFocusEffect } from '@react-navigation/native';
 import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { AppText } from '@/shared/components/AppText';
 import { EmptyState } from '@/shared/components/EmptyState';
+import { ErrorState } from '@/shared/components/ErrorState';
 import { NotificationRow } from '@/features/dashboard/components/NotificationRow';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { notificationsApi } from '@/features/dashboard/api/notificationsApi';
+import { useAbortableFocusLoad } from '@/shared/hooks/useAbortableFocusLoad';
 import { palette } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notifications'>;
@@ -19,14 +20,12 @@ export function NotificationsScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const items = useNotificationsStore((state) => state.items);
   const hasUnread = items.some((item) => !item.read);
+  const hasCachedData = items.length > 0;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      void notificationsApi.list().then((next) => {
-        useNotificationsStore.getState().setItems(next);
-      });
-    }, []),
-  );
+  const { loadError, refreshing, onRefresh, retry } = useAbortableFocusLoad(async (signal) => {
+    const next = await notificationsApi.list({ signal });
+    useNotificationsStore.getState().setItems(next);
+  }, []);
 
   const markRead = (id: string) => {
     useNotificationsStore.getState().setItems(
@@ -49,6 +48,9 @@ export function NotificationsScreen({ navigation }: Props): React.ReactElement {
       title={t('notifications.title')}
       left="back"
       onBackPress={navigation.goBack}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.gold} />
+      }
       rightSlot={
         hasUnread ? (
           <Pressable
@@ -64,7 +66,14 @@ export function NotificationsScreen({ navigation }: Props): React.ReactElement {
         ) : null
       }
     >
-      {items.length === 0 ? (
+      {loadError && !hasCachedData ? (
+        <ErrorState
+          title={t('common.loadFailed')}
+          subtitle={t('common.loadFailedSubtitle')}
+          retryLabel={t('common.retry')}
+          onRetry={retry}
+        />
+      ) : items.length === 0 ? (
         <EmptyState
           title={t('notifications.emptyTitle')}
           subtitle={t('notifications.emptySubtitle')}

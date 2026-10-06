@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useFocusEffect, type CompositeScreenProps } from '@react-navigation/native';
+import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ import { NotificationBellButton } from '@/features/dashboard/components/Notifica
 import { SearchField } from '@/shared/components/SearchField';
 import { HomeCategoryCards } from '@/features/dashboard/components/HomeCategoryCards';
 import { EmptyState } from '@/shared/components/EmptyState';
+import { ErrorState } from '@/shared/components/ErrorState';
 import {
   HomeFilterSheet,
   dayKeyFromEpoch,
@@ -53,6 +54,7 @@ import { listingHasMyOffer } from '@/features/listings/utils/listingOfferState';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { AppText } from '@/shared/components/AppText';
 import { useCurrency } from '@/shared/hooks/useCurrency';
+import { useAbortableFocusLoad } from '@/shared/hooks/useAbortableFocusLoad';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { palette, radius, spacing } from '@/theme';
 
@@ -109,30 +111,16 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const [draftFilters, setDraftFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [filterOpen, setFilterOpen] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<'list' | 'grid'>('list');
-  const [refreshing, setRefreshing] = React.useState(false);
+  const hasCachedData = marketListings.length > 0;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      void notificationsApi
-        .list()
-        .then((items) => {
-          useNotificationsStore.getState().setItems(items);
-        })
-        .catch(() => undefined);
-      void refreshMarketListings(oppositeMarketplaceRole(role)).catch(() => undefined);
-    }, [role]),
-  );
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    void Promise.all([
-      refreshMarketListings(oppositeMarketplaceRole(role)),
-      notificationsApi.list().then((items) => {
+  const { loadError, refreshing, onRefresh, retry } = useAbortableFocusLoad(async (signal) => {
+    const postedAs = oppositeMarketplaceRole(role);
+    await Promise.all([
+      refreshMarketListings(postedAs, { signal }),
+      notificationsApi.list({ signal }).then((items) => {
         useNotificationsStore.getState().setItems(items);
       }),
-    ])
-      .catch(() => undefined)
-      .finally(() => setRefreshing(false));
+    ]);
   }, [role]);
 
   const openProfile = () => {
@@ -405,7 +393,14 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         </Pressable>
       </View>
 
-      {cards.length === 0 ? (
+      {loadError && !hasCachedData ? (
+        <ErrorState
+          title={t('common.loadFailed')}
+          subtitle={t('common.loadFailedSubtitle')}
+          retryLabel={t('common.retry')}
+          onRetry={retry}
+        />
+      ) : cards.length === 0 ? (
         <EmptyState
           title={t('dashboardHome.emptyTitle')}
           subtitle={t('dashboardHome.emptySubtitle')}
