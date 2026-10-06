@@ -35,6 +35,10 @@ import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  LISTING_DESCRIPTION_MAX_LENGTH,
+  LISTING_TITLE_MAX_LENGTH,
+} from '@/features/listings/constants/listingFieldLimits';
 import type { EquipmentMediaAsset } from '@/features/listings/types/equipmentMedia.types';
 import type { DeliveryType, EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 
@@ -130,8 +134,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       isBuyer || sourceListing.mode === 'sell' || sourceListing.mode === 'both',
     );
     setEquipmentType(matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel));
-    setTitle(sourceListing.title);
-    setDescription(sourceListing.description ?? '');
+    setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
+    setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setRentPeriod(period);
     setRentalAmount(
       isBuyer
@@ -468,6 +472,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onChangeText={setTitle}
               placeholder={t('equipmentListing.titlePlaceholder')}
               required
+              maxLength={LISTING_TITLE_MAX_LENGTH}
+              showCounter
             />
 
             <FormInput
@@ -478,6 +484,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               multiline
               numberOfLines={4}
               style={styles.descriptionInput}
+              maxLength={LISTING_DESCRIPTION_MAX_LENGTH}
+              showCounter
             />
 
             {!isBuyer && offerRent ? (

@@ -33,6 +33,10 @@ import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  LISTING_DESCRIPTION_MAX_LENGTH,
+  LISTING_TITLE_MAX_LENGTH,
+} from '@/features/listings/constants/listingFieldLimits';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 
@@ -105,8 +109,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setServiceCategory(
       matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel),
     );
-    setTitle(sourceListing.title);
-    setDescription(sourceListing.description ?? '');
+    setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
+    setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setYearsOfExperience(Math.max(Number(sourceListing.yearsOfExperience) || 1, 1));
     const prices = resolveServicePrices(sourceListing);
     setOnsitePrice(isBuyer ? '' : prices.onsitePrice);
@@ -328,6 +332,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               onChangeText={setTitle}
               placeholder={t('serviceListing.titlePlaceholder')}
               required
+              maxLength={LISTING_TITLE_MAX_LENGTH}
+              showCounter
             />
 
             <FormInput
@@ -339,6 +345,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               numberOfLines={4}
               style={styles.descriptionInput}
               required
+              maxLength={LISTING_DESCRIPTION_MAX_LENGTH}
+              showCounter
             />
 
             <CounterField

@@ -31,6 +31,10 @@ import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  LISTING_DESCRIPTION_MAX_LENGTH,
+  LISTING_TITLE_MAX_LENGTH,
+} from '@/features/listings/constants/listingFieldLimits';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
 
@@ -106,8 +110,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   React.useEffect(() => {
     if (!sourceListing || filledRepost.current) return;
     filledRepost.current = true;
-    setTitle(sourceListing.title);
-    setDescription(sourceListing.description ?? '');
+    setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
+    setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setWeight(sourceListing.weight ?? '');
     setPurity(matchSelectOption(purityOptions, sourceListing.purityLabel));
     setPrice(sourceListing.price ?? '');
@@ -275,6 +279,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
               onChangeText={setTitle}
               placeholder={t('goldListing.titlePlaceholder')}
               required
+              maxLength={LISTING_TITLE_MAX_LENGTH}
+              showCounter
             />
 
             <FormInput
@@ -286,6 +292,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
               numberOfLines={4}
               style={styles.descriptionInput}
               required
+              maxLength={LISTING_DESCRIPTION_MAX_LENGTH}
+              showCounter
             />
 
             <View style={styles.rowFields}>

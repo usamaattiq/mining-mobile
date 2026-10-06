@@ -15,18 +15,34 @@ export function FormInput({
   editable,
   keyboardType,
   inputAccessoryViewID,
+  maxLength,
+  value,
+  showCounter,
   ...rest
 }: FormInputProps): React.ReactElement {
   const { currentLanguage } = useLanguage();
   const disabled = editable === false;
+  const valueLength = typeof value === 'string' ? value.length : 0;
+  const shouldShowCounter = Boolean(showCounter && maxLength != null);
 
   return (
     <View style={styles.container}>
-      {label ? (
-        <AppText weight="semibold" style={styles.label}>
-          {label}
-          {required ? <AppText style={styles.required}> *</AppText> : null}
-        </AppText>
+      {label || shouldShowCounter ? (
+        <View style={styles.labelRow}>
+          {label ? (
+            <AppText weight="semibold" style={styles.label}>
+              {label}
+              {required ? <AppText style={styles.required}> *</AppText> : null}
+            </AppText>
+          ) : (
+            <View />
+          )}
+          {shouldShowCounter ? (
+            <AppText style={styles.counter}>
+              {valueLength}/{maxLength}
+            </AppText>
+          ) : null}
+        </View>
       ) : null}
       <View
         style={[
@@ -47,6 +63,8 @@ export function FormInput({
           editable={editable}
           keyboardType={keyboardType}
           inputAccessoryViewID={inputAccessoryViewID}
+          maxLength={maxLength}
+          value={value}
           {...rest}
         />
         {rightAdornment}
@@ -60,9 +78,20 @@ const styles = StyleSheet.create({
   container: {
     gap: spacing.xs,
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
   label: {
+    flexShrink: 1,
     fontSize: 13,
     color: palette.charcoal,
+  },
+  counter: {
+    fontSize: 12,
+    color: palette.muted,
   },
   required: {
     fontSize: 13,

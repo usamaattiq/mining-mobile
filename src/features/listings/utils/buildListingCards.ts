@@ -5,7 +5,7 @@ import type { ServiceListing } from '@/features/listings/types/serviceListing.ty
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
 import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { rfqStatusBadge, isEndedRfqStatus } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 
@@ -131,13 +131,17 @@ export function buildListingCards({
             : undefined,
         city: cityFromLocation(listing.location),
         durationBadges,
-        deliveryBadge: listing.postedAs !== 'buyer' && listing.deliveryAvailable
-          ? {
-              key: 'delivery',
-              label: t('equipmentListing.deliveryBadge'),
-              icon: 'car-outline',
-            }
-          : undefined,
+        deliveryBadge:
+          listing.postedAs !== 'buyer' &&
+          listing.deliveryAvailable &&
+          listing.deliveryType === 'perKm' &&
+          Boolean(parsePositiveAmount(listing.deliveryPricePerKm))
+            ? {
+                key: 'delivery',
+                label: t('equipmentListing.deliveryBadge'),
+                icon: 'car-outline',
+              }
+            : undefined,
         statusBadges:
           listing.postedAs === 'buyer'
             ? []

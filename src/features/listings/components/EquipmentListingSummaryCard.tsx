@@ -46,9 +46,9 @@ export function EquipmentListingSummaryCard({
                 index === detailRows.length - 1 && !descriptionText && styles.rowLast,
               ]}
             >
-              <AppText style={styles.rowLabel}>{row.label}</AppText>
+              <AppText weight="bold" style={styles.rowLabel}>{row.label}</AppText>
               <View style={styles.rowValueWrap}>
-                <AppText weight="semibold" style={styles.rowValue} numberOfLines={1}>
+                <AppText style={styles.rowValue} numberOfLines={1}>
                   {row.value}
                 </AppText>
                 {row.hint ? (
@@ -79,11 +79,11 @@ export function EquipmentListingSummaryCard({
                 accessibilityState={{ expanded: descriptionOpen }}
                 accessibilityLabel={t('equipmentListing.description')}
               >
-                <AppText style={styles.rowLabel}>{t('equipmentListing.description')}</AppText>
+                <AppText weight="bold" style={styles.rowLabel}>{t('equipmentListing.description')}</AppText>
                 <Ionicons
                   name={descriptionOpen ? 'chevron-up' : 'chevron-down'}
                   size={18}
-                  color={palette.muted}
+                  color={palette.charcoal}
                 />
               </Pressable>
               {descriptionOpen ? (
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     fontSize: 13,
-    color: palette.muted,
+    color: palette.charcoal,
   },
   rowValueWrap: {
     flex: 1,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   rowValue: {
     flexShrink: 1,
     fontSize: 14,
-    color: palette.charcoal,
+    color: palette.muted,
     textAlign: 'right',
   },
   editButton: {
