@@ -587,7 +587,8 @@
     "switchToSupplierConfirmMessage": "Home will show buyer listings, and new posts will be created as a supplier.",
     "switchToBuyerUnavailable": "The buyer app isn't installed on this device yet.",
     "logout": "Log out",
-    "logoutSubtitle": "You'll need to verify to log back in"
+    "logoutSubtitle": "You'll need to verify to log back in",
+    "version": "Version {version}"
   },
   "securitySettings": {
     "title": "Security settings",

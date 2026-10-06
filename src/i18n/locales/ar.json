@@ -587,7 +587,8 @@
     "switchToSupplierConfirmMessage": "ستظهر إعلانات المشترين في الرئيسية، وستُنشأ المنشورات الجديدة كمورد.",
     "switchToBuyerUnavailable": "تطبيق المشتري غير مثبّت على هذا الجهاز بعد.",
     "logout": "تسجيل الخروج",
-    "logoutSubtitle": "ستحتاج إلى التحقق لتسجيل الدخول مرة أخرى"
+    "logoutSubtitle": "ستحتاج إلى التحقق لتسجيل الدخول مرة أخرى",
+    "version": "الإصدار {version}"
   },
   "securitySettings": {
     "title": "إعدادات الأمان",
