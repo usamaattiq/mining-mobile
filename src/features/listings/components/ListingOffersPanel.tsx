@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
@@ -19,6 +20,8 @@ export type ListingOffersPanelProps = {
   /** Accept and reject stay hidden unless the request is still live. */
   rfqStatus?: string;
   showUnits?: boolean;
+  /** Shown on the left when the offer has no photo. */
+  placeholderIcon?: keyof typeof Ionicons.glyphMap;
   /** Gold auctions: trophy on the rank-1 bid. */
   showLeader?: boolean;
   /** Gold auctions: message every bidder, not only the selected one. */
@@ -46,6 +49,7 @@ export function ListingOffersPanel({
   canDecideOffers = true,
   rfqStatus,
   showUnits = false,
+  placeholderIcon,
   showLeader = false,
   messageEveryOffer = false,
   onAccept,
@@ -67,9 +71,7 @@ export function ListingOffersPanel({
         {t('rfq.offersTitle')}
       </AppText>
       {offers.length === 0 ? (
-        <View style={styles.empty}>
-          <AppText style={styles.emptyText}>{t('rfq.noOffers')}</AppText>
-        </View>
+        <EmptyState title={t('rfq.noOffers')} />
       ) : (
         orderedOffers.map((offer) => {
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
@@ -85,9 +87,15 @@ export function ListingOffersPanel({
           return (
             <View key={offer.id} style={styles.card}>
               <View style={styles.row}>
+                {placeholderIcon ? (
+                  <View style={styles.logo}>
+                    <Ionicons name={placeholderIcon} size={22} color={palette.goldDark} />
+                  </View>
+                ) : null}
                 <Pressable
                   disabled={!onPressResponder || !offer.responderId}
                   onPress={() => onPressResponder?.(offer)}
+                  style={styles.namePress}
                 >
                   <AppText weight="semibold" style={styles.name} numberOfLines={1}>
                     {offer.status === 'confirmed'
@@ -98,25 +106,31 @@ export function ListingOffersPanel({
                 {isLeader ? (
                   <Ionicons name="trophy" size={16} color={palette.gold} />
                 ) : null}
-                {statusKey !== 'active' ? (
-                  <View style={styles.tag}>
-                    <AppText weight="semibold" style={styles.tagText}>
-                      {t(`rfq.offerStatus.${statusKey}`)}
-                    </AppText>
-                  </View>
-                ) : null}
-                {offer.delivery ? (
-                  <AppText style={styles.kind}>
-                    {offer.delivery === 'onsite'
-                      ? t('serviceListing.onsite')
-                      : t('serviceListing.online')}
-                  </AppText>
-                ) : null}
-                {showUnits && offer.kind ? (
-                  <AppText style={styles.kind}>
-                    {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
-                  </AppText>
-                ) : null}
+                <View style={styles.badges}>
+                  {statusKey !== 'active' ? (
+                    <View style={styles.statusBadge}>
+                      <AppText weight="semibold" style={styles.statusBadgeText}>
+                        {t(`rfq.offerStatus.${statusKey}`)}
+                      </AppText>
+                    </View>
+                  ) : null}
+                  {showUnits && offer.kind ? (
+                    <View style={styles.kindBadge}>
+                      <AppText weight="semibold" style={styles.kindBadgeText}>
+                        {offer.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
+                      </AppText>
+                    </View>
+                  ) : null}
+                  {offer.delivery ? (
+                    <View style={styles.kindBadge}>
+                      <AppText weight="semibold" style={styles.kindBadgeText}>
+                        {offer.delivery === 'onsite'
+                          ? t('serviceListing.onsite')
+                          : t('serviceListing.online')}
+                      </AppText>
+                    </View>
+                  ) : null}
+                </View>
               </View>
               {showUnits && unitAmount != null && units ? (
                 <PriceTimesUnitsSummary
@@ -186,17 +200,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: palette.charcoal,
   },
-  empty: {
-    backgroundColor: palette.warmWhite,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: palette.softGold,
-    padding: spacing.md,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: palette.muted,
-  },
   card: {
     backgroundColor: palette.warmWhite,
     borderRadius: radius.md,
@@ -208,28 +211,41 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: spacing.sm,
   },
+  logo: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+  },
+  namePress: { flex: 1 },
   name: {
-    flex: 1,
     fontSize: 14,
     color: palette.charcoal,
   },
-  tag: {
+  kindBadge: {
     backgroundColor: palette.softGold,
-    borderRadius: radius.sm,
+    borderRadius: radius.pill,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 4,
   },
-  tagText: {
-    fontSize: 11,
-    color: palette.gold,
+  kindBadgeText: { fontSize: 11, color: palette.goldDark },
+  statusBadge: {
+    backgroundColor: palette.lightGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
   },
-  kind: {
-    fontSize: 12,
-    color: palette.muted,
-  },
+  statusBadgeText: { fontSize: 11, color: palette.charcoal },
   price: {
     fontSize: 18,
     color: palette.charcoal,

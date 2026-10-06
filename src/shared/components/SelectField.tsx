@@ -32,6 +32,7 @@ export function SelectField({
   const { currentLanguage } = useLanguage();
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
+  const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
   const [anchor, setAnchor] = React.useState<{
     x: number;
     y: number;
@@ -41,9 +42,39 @@ export function SelectField({
   const triggerRef = React.useRef<View>(null);
   const selectedOption = options.find((option) => option.value === value);
 
+  const hierarchical = options.some((option) => option.parentValue);
+  const searching = searchable && query.trim().length > 0;
   const filteredOptions = searchable
     ? options.filter((option) => option.label.toLowerCase().includes(query.trim().toLowerCase()))
     : options;
+
+  const visibleOptions = React.useMemo(() => {
+    if (!hierarchical || searching || dropdown) {
+      return filteredOptions.map((option) => ({ ...option, depth: 0, hasChildren: false }));
+    }
+    const childrenOf = new Map<string | null, SelectFieldProps['options']>();
+    for (const option of options) {
+      const parent = option.parentValue ?? null;
+      const list = childrenOf.get(parent);
+      if (list) list.push(option);
+      else childrenOf.set(parent, [option]);
+    }
+    const rows: Array<(typeof options)[number] & { depth: number; hasChildren: boolean }> = [];
+    const walk = (parent: string | null, depth: number) => {
+      for (const option of childrenOf.get(parent) ?? []) {
+        const kids = childrenOf.get(option.value) ?? [];
+        rows.push({ ...option, depth, hasChildren: kids.length > 0 });
+        if (kids.length > 0 && expanded.has(option.value)) walk(option.value, depth + 1);
+      }
+    };
+    walk(null, 0);
+    return rows;
+  }, [hierarchical, searching, dropdown, filteredOptions, options, expanded]);
+
+  React.useEffect(() => {
+    if (!open || !hierarchical) return;
+    setExpanded(new Set(options.filter((option) => options.some((child) => child.parentValue === option.value)).map((option) => option.value)));
+  }, [open, hierarchical, options]);
 
   const handleSelect = (next: string) => {
     onChange(next);
@@ -62,7 +93,7 @@ export function SelectField({
     setOpen(true);
   };
 
-  const optionList = filteredOptions.map((option) => {
+  const optionList = visibleOptions.map((option) => {
     const selected = option.value === value;
     return (
       <Pressable
@@ -73,8 +104,30 @@ export function SelectField({
           dropdown && styles.optionCompact,
           selected && styles.optionSelected,
           pressed && styles.pressed,
+          option.depth > 0 && { paddingStart: spacing.md + option.depth * 16 },
         ]}
       >
+        {option.hasChildren ? (
+          <Pressable
+            onPress={() =>
+              setExpanded((current) => {
+                const next = new Set(current);
+                if (next.has(option.value)) next.delete(option.value);
+                else next.add(option.value);
+                return next;
+              })
+            }
+            hitSlop={6}
+          >
+            <Ionicons
+              name={expanded.has(option.value) ? 'chevron-down' : 'chevron-forward'}
+              size={16}
+              color={palette.gold}
+            />
+          </Pressable>
+        ) : hierarchical && !dropdown && !searching ? (
+          <View style={styles.expandSpacer} />
+        ) : null}
         {option.icon ? (
           <View style={styles.optionIconWrap}>
             <Ionicons name={option.icon} size={18} color={palette.gold} />
@@ -156,8 +209,8 @@ export function SelectField({
         <AppBottomSheet
           visible={open}
           onClose={() => setOpen(false)}
-          heightRatio={searchable ? 0.45 : 0.7}
-          fitContent={!searchable}
+          heightRatio={searchable || hierarchical ? 0.34 : 0.55}
+          fitContent={!searchable && !hierarchical}
         >
           <AppText weight="bold" style={styles.sheetTitle}>
             {sheetTitle}
@@ -185,7 +238,8 @@ export function SelectField({
             <KeyboardAwareScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              bottomOffset={72}
+              bottomOffset={96}
+              disableScrollOnKeyboardHide
               extraKeyboardSpace={0}
             >
               {optionList}
@@ -280,13 +334,15 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   option: {
-    minHeight: 52,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
     paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
     borderRadius: radius.sm,
   },
+  expandSpacer: { width: 16 },
   optionCompact: {
     minHeight: 0,
     paddingVertical: spacing.xs + 2,
@@ -296,8 +352,8 @@ const styles = StyleSheet.create({
     backgroundColor: palette.softGold,
   },
   optionIconWrap: {
-    width: 32,
-    height: 32,
+    width: 24,
+    height: 24,
     borderRadius: radius.sm,
     backgroundColor: palette.softGold,
     alignItems: 'center',

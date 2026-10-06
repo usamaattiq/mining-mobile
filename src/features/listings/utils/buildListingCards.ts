@@ -5,7 +5,7 @@ import type { ServiceListing } from '@/features/listings/types/serviceListing.ty
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
 import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { rfqStatusBadge, isEndedRfqStatus } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 
@@ -38,8 +38,30 @@ function cityFromLocation(location: string | undefined): string | undefined {
   return city || undefined;
 }
 
+/** Long owner statuses that need the title on its own row under the badge. */
+function titleBelowStatus(status: string | undefined): boolean {
+  return (
+    status === 'awaiting-your-confirmation' ||
+    status === 'awaiting-confirmation' ||
+    status === 'awaiting-action'
+  );
+}
+
 function priceText(currencyCode: string, amount: string): string | undefined {
   return amount ? `${currencyCode} ${formatAmountWithCommas(amount)}` : undefined;
+}
+
+/** When multiple units: `/ unit / hr` (etc.). Single unit keeps `/ hr`. */
+function priceUnitLabel(
+  periodUnit: string | undefined,
+  units: number,
+  t: TFunction,
+): string | undefined {
+  if (units <= 1) return periodUnit;
+  const perUnit = t('rfq.pricePerUnit');
+  if (!periodUnit) return perUnit;
+  const period = periodUnit.replace(/^\/\s*/, '').trim();
+  return period ? `${perUnit} / ${period}` : perUnit;
 }
 
 function rentalPrice(
@@ -93,6 +115,7 @@ export function buildListingCards({
       const price = rental.priceText
         ? rental
         : { priceText: priceText(currencyCode, listing.salePrice), priceUnit: undefined };
+      const displayUnit = priceUnitLabel(price.priceUnit, listing.units, t);
       const durationBadges = offersRent
         ? [
             listing.hourlyRental
@@ -116,9 +139,17 @@ export function buildListingCards({
         reference: listing.reference,
         thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
         placeholderIcon: 'construct-outline',
-        subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.postedAs === 'supplier' ? (listing.availableUnits ?? listing.units) : listing.units })}`,
+        subtitle: listing.equipmentTypeLabel,
         subtitleIcon: 'construct-outline',
+        unitsLabel: t('equipmentListing.unitsCount', {
+          count:
+            listing.postedAs === 'supplier'
+              ? (listing.availableUnits ?? listing.units)
+              : listing.units,
+        }),
+        unitsIcon: 'layers-outline',
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+        titleBelowStatus: titleBelowStatus(listing.rfq?.status),
         requestBadge:
           listing.postedAs === 'buyer'
             ? {
@@ -131,13 +162,17 @@ export function buildListingCards({
             : undefined,
         city: cityFromLocation(listing.location),
         durationBadges,
-        deliveryBadge: listing.postedAs !== 'buyer' && listing.deliveryAvailable
-          ? {
-              key: 'delivery',
-              label: t('equipmentListing.deliveryBadge'),
-              icon: 'car-outline',
-            }
-          : undefined,
+        deliveryBadge:
+          listing.postedAs !== 'buyer' &&
+          listing.deliveryAvailable &&
+          listing.deliveryType === 'perKm' &&
+          Boolean(parsePositiveAmount(listing.deliveryPricePerKm))
+            ? {
+                key: 'delivery',
+                label: t('equipmentListing.deliveryBadge'),
+                icon: 'car-outline',
+              }
+            : undefined,
         statusBadges:
           listing.postedAs === 'buyer'
             ? []
@@ -146,15 +181,19 @@ export function buildListingCards({
                 offersSell ? { key: 'sell', label: t('equipmentListing.sell') } : null,
               ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
         priceText: listing.postedAs === 'buyer' ? undefined : price.priceText,
-        priceUnit: price.priceUnit,
+        priceUnit: listing.postedAs === 'buyer' ? undefined : displayUnit,
         createdAt: listing.postedAs === 'supplier' ? undefined : listing.createdAt,
-        expiresAt: listing.postedAs === 'supplier' ? undefined : listing.rfq?.expiresAt ?? undefined,
+        expiresAt:
+          listing.postedAs === 'supplier'
+            ? undefined
+            : listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,
         ended:
           listing.postedAs === 'supplier'
             ? Date.now() >= listing.createdAt + 365 * 24 * 60 * 60 * 1000
             : listingHasEnded({
                 rfqStatus: listing.rfq?.status,
                 expiresAt: listing.rfq?.expiresAt,
+                auctionEndDate: listing.auctionEndDate,
                 createdAt: listing.createdAt,
               }),
         onRepost: onRepost ? () => onRepost(listing.id, 'equipment') : undefined,
@@ -173,7 +212,6 @@ export function buildListingCards({
           : [
               {
                 text: `${currencyCode} ${formatAmountWithCommas(shownPrice)}`,
-                unit: prices.onlinePrice ? undefined : t('serviceListing.onsite'),
               },
             ];
       return {
@@ -185,6 +223,7 @@ export function buildListingCards({
       subtitle: listing.serviceCategoryLabel,
       subtitleIcon: 'briefcase-outline',
       typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+      titleBelowStatus: titleBelowStatus(listing.rfq?.status),
       city: cityFromLocation(listing.location),
       statusBadges: [
         ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
@@ -222,6 +261,7 @@ export function buildListingCards({
         .join(' · ') || undefined,
     city: cityFromLocation(listing.location),
     typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+    titleBelowStatus: titleBelowStatus(listing.rfq?.status),
     priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
     expiresAt: listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,

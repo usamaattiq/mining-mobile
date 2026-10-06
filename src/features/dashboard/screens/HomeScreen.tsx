@@ -190,18 +190,15 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const filterOptions =
     category === 'equipment'
       ? [
-          { key: 'all' as const, label: t('dashboardHome.filterAll') },
           { key: 'rent' as const, label: t('equipmentListing.rent') },
           { key: 'sell' as const, label: t('equipmentListing.sell') },
         ]
       : category === 'services'
         ? [
-            { key: 'all' as const, label: t('dashboardHome.filterAll') },
             { key: 'onsite' as const, label: t('serviceListing.onsite') },
             { key: 'online' as const, label: t('serviceListing.online') },
           ]
         : [
-            { key: 'all' as const, label: t('dashboardHome.filterAll') },
             { key: '18k' as const, label: t('goldListing.karatValue', { karat: 18 }) },
             { key: '21k' as const, label: t('goldListing.karatValue', { karat: 21 }) },
             { key: '22k' as const, label: t('goldListing.karatValue', { karat: 22 }) },
@@ -409,7 +406,10 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       </View>
 
       {cards.length === 0 ? (
-        <EmptyState title={t('requests.emptyTitle')} subtitle={t('requests.emptySubtitle')} />
+        <EmptyState
+          title={t('dashboardHome.emptyTitle')}
+          subtitle={t('dashboardHome.emptySubtitle')}
+        />
       ) : viewMode === 'grid' ? (
         <View style={styles.listingGrid}>
           {cards.map(({ id, ...card }) => (

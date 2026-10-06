@@ -1,3 +1,18 @@
+/** Keeps a lone 0 so the field can show an error, and drops it once another digit is typed. */
+export function sanitizeStepPrice(raw: string): string {
+  const cleaned = raw.replace(/[^\d.]/g, '');
+  const dot = cleaned.indexOf('.');
+  const wholeRaw = dot === -1 ? cleaned : cleaned.slice(0, dot);
+  const fraction = dot === -1 ? null : cleaned.slice(dot + 1).replace(/\./g, '');
+  if (fraction != null) {
+    const whole = wholeRaw.replace(/^0+(?=\d)/, '') || '0';
+    return `${whole}.${fraction}`;
+  }
+  if (wholeRaw === '') return '';
+  if (/^0+$/.test(wholeRaw)) return '0';
+  return wholeRaw.replace(/^0+/, '');
+}
+
 export function parsePositiveAmount(value: string | null | undefined): number | null {
   const n = Number(String(value ?? '').replace(/,/g, '').trim());
   return Number.isFinite(n) && n > 0 ? n : null;

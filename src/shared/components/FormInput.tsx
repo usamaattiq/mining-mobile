@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
-import { KeyboardDoneBar } from '@/shared/components/KeyboardDoneBar';
 import { palette, radius, spacing, getFontFamily } from '@/theme';
 import type { FormInputProps } from '@/shared/types/formInput.types';
 
@@ -16,24 +15,34 @@ export function FormInput({
   editable,
   keyboardType,
   inputAccessoryViewID,
+  maxLength,
+  value,
+  showCounter,
   ...rest
 }: FormInputProps): React.ReactElement {
   const { currentLanguage } = useLanguage();
   const disabled = editable === false;
-  const accessoryId = React.useId();
-  const showsDone =
-    keyboardType === 'numeric' ||
-    keyboardType === 'number-pad' ||
-    keyboardType === 'decimal-pad' ||
-    keyboardType === 'phone-pad';
+  const valueLength = typeof value === 'string' ? value.length : 0;
+  const shouldShowCounter = Boolean(showCounter && maxLength != null);
 
   return (
     <View style={styles.container}>
-      {label ? (
-        <AppText weight="semibold" style={styles.label}>
-          {label}
-          {required ? <AppText style={styles.required}> *</AppText> : null}
-        </AppText>
+      {label || shouldShowCounter ? (
+        <View style={styles.labelRow}>
+          {label ? (
+            <AppText weight="semibold" style={styles.label}>
+              {label}
+              {required ? <AppText style={styles.required}> *</AppText> : null}
+            </AppText>
+          ) : (
+            <View />
+          )}
+          {shouldShowCounter ? (
+            <AppText style={styles.counter}>
+              {valueLength}/{maxLength}
+            </AppText>
+          ) : null}
+        </View>
       ) : null}
       <View
         style={[
@@ -53,14 +62,13 @@ export function FormInput({
           placeholderTextColor={palette.muted}
           editable={editable}
           keyboardType={keyboardType}
-          inputAccessoryViewID={
-            showsDone ? inputAccessoryViewID ?? accessoryId : inputAccessoryViewID
-          }
+          inputAccessoryViewID={inputAccessoryViewID}
+          maxLength={maxLength}
+          value={value}
           {...rest}
         />
         {rightAdornment}
       </View>
-      {showsDone ? <KeyboardDoneBar nativeID={inputAccessoryViewID ?? accessoryId} /> : null}
       {error ? <AppText style={styles.error}>{error}</AppText> : null}
     </View>
   );
@@ -70,9 +78,20 @@ const styles = StyleSheet.create({
   container: {
     gap: spacing.xs,
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
   label: {
+    flexShrink: 1,
     fontSize: 13,
     color: palette.charcoal,
+  },
+  counter: {
+    fontSize: 12,
+    color: palette.muted,
   },
   required: {
     fontSize: 13,

@@ -63,31 +63,16 @@ export function EquipmentDealsSection({
 
   if (!holds || holds.length === 0) return null;
 
-  const awaiting = holds.filter((hold) => hold.status === 'selected');
   const active = holds.filter((hold) => hold.status === 'active');
   const returned = holds.filter((hold) => hold.status === 'returned');
 
-  if (awaiting.length === 0 && active.length === 0 && returned.length === 0) return null;
+  if (active.length === 0 && returned.length === 0) return null;
 
   return (
     <View style={styles.section}>
       <AppText weight="bold" style={styles.title}>
         {t('equipmentListing.stockRecords')}
       </AppText>
-      {awaiting.map((hold) => (
-        <EquipmentDealCard
-          key={hold.id}
-          hold={hold}
-          dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
-          kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
-          unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
-          currencyCode={currency.code}
-          perUnitLabel={t('rfq.pricePerUnit')}
-          statusLabel={t('rfq.offerStatus.selected')}
-          action={contactAction(hold)}
-          onPressName={hold.buyerId && onPressBuyer ? () => onPressBuyer(hold.buyerId!) : undefined}
-        />
-      ))}
       {active.map((hold) => (
         <EquipmentDealCard
           key={hold.id}

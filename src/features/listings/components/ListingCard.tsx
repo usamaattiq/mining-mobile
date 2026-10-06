@@ -89,6 +89,8 @@ export function ListingCard({
   placeholderIcon,
   subtitle,
   subtitleIcon,
+  unitsLabel,
+  unitsIcon = 'layers-outline',
   typeBadge,
   city,
   deliveryBadge,
@@ -103,11 +105,13 @@ export function ListingCard({
   onRepost,
   onPress,
   layout = 'row',
+  titleBelowStatus = false,
 }: ListingCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
   const windowWidth = useWindowDimensions().width;
   const thumbnailUri = thumbnail;
+  const titleInlineWithStatus = !titleBelowStatus;
 
   React.useEffect(() => {
     if (thumbnailUri) void ExpoImage.prefetch(thumbnailUri);
@@ -145,9 +149,17 @@ export function ListingCard({
     </Pressable>
   ) : null;
 
-  if (layout === 'grid') {
-    const extraBadges = deliveryBadge ? [deliveryBadge] : [];
+  const bottomBadges = (
+    <>
+      {requestBadge && titleInlineWithStatus ? <SmallBadge badge={requestBadge} /> : null}
+      {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
+      {(statusBadges ?? []).map((badge) => (
+        <StatusBadge key={badge.key} badge={badge} />
+      ))}
+    </>
+  );
 
+  if (layout === 'grid') {
     return (
       <Pressable
         onPress={onPress}
@@ -170,7 +182,7 @@ export function ListingCard({
             />
           ) : (
             <View style={[styles.gridImage, styles.imagePlaceholder]}>
-              <Ionicons name={placeholderIcon} size={36} color={palette.muted} />
+              <Ionicons name={placeholderIcon} size={56} color={palette.goldDark} />
             </View>
           )}
           {requestBadge ? (
@@ -211,6 +223,15 @@ export function ListingCard({
             </AppText>
           ) : null}
 
+          {unitsLabel ? (
+            <View style={styles.gridMetaRow}>
+              <Ionicons name={unitsIcon} size={12} color={palette.gold} />
+              <AppText style={styles.gridMeta} numberOfLines={1}>
+                {unitsLabel}
+              </AppText>
+            </View>
+          ) : null}
+
           {city ? (
             <View style={styles.gridMetaRow}>
               <Ionicons name="location-outline" size={12} color={palette.gold} />
@@ -220,16 +241,9 @@ export function ListingCard({
             </View>
           ) : null}
 
-          {extraBadges.length > 0 ? (
-            <View style={styles.gridBadges}>
-              {extraBadges.map((badge) => (
-                <SmallBadge key={badge.key} badge={badge} />
-              ))}
-            </View>
-          ) : null}
-
           <View style={styles.gridFooter}>
             <View style={styles.gridFooterLeft}>
+              {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
               {(statusBadges ?? []).map((badge) => (
                 <StatusBadge key={badge.key} badge={badge} />
               ))}
@@ -255,24 +269,34 @@ export function ListingCard({
             <ExpoImage source={thumbnail} style={styles.image} contentFit="cover" cachePolicy="memory-disk" />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
-              <Ionicons name={placeholderIcon} size={24} color={palette.muted} />
+              <Ionicons name={placeholderIcon} size={48} color={palette.goldDark} />
             </View>
           )}
         </View>
 
         <View style={styles.copy}>
-          <View style={styles.topRow}>
-            <View style={styles.topLeft}>
-              {requestBadge ? <SmallBadge badge={requestBadge} /> : null}
-              {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
+          {titleInlineWithStatus ? (
+            <View style={styles.topRow}>
+              <AppText weight="bold" style={[styles.title, styles.titleInline]} numberOfLines={1}>
+                {title}
+              </AppText>
+              {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
             </View>
-            {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
-          </View>
+          ) : (
+            <View style={styles.topRow}>
+              <View style={styles.topLeft}>
+                {requestBadge ? <SmallBadge badge={requestBadge} /> : null}
+              </View>
+              {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
+            </View>
+          )}
 
           <View style={styles.body}>
-            <AppText weight="bold" style={styles.title} numberOfLines={1}>
-              {title}
-            </AppText>
+            {titleInlineWithStatus ? null : (
+              <AppText weight="bold" style={styles.title} numberOfLines={1}>
+                {title}
+              </AppText>
+            )}
 
             {subtitle || subtitleIcon ? (
               <View style={styles.subtitleRow}>
@@ -281,6 +305,15 @@ export function ListingCard({
                 ) : null}
                 <AppText style={styles.subtitle} numberOfLines={1}>
                   {subtitle ?? ' '}
+                </AppText>
+              </View>
+            ) : null}
+
+            {unitsLabel ? (
+              <View style={styles.subtitleRow}>
+                <Ionicons name={unitsIcon} size={12} color={palette.gold} />
+                <AppText style={styles.subtitle} numberOfLines={1}>
+                  {unitsLabel}
                 </AppText>
               </View>
             ) : null}
@@ -313,11 +346,7 @@ export function ListingCard({
           </View>
 
           <View style={styles.bottomRow}>
-            <View style={styles.topLeft}>
-              {(statusBadges ?? []).map((badge) => (
-                <StatusBadge key={badge.key} badge={badge} />
-              ))}
-            </View>
+            <View style={styles.topLeft}>{bottomBadges}</View>
             <View style={styles.bottomRight}>
               {timer}
               {repostButton}
@@ -403,12 +432,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 12,
     color: palette.muted,
-  },
-  gridBadges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
-    display: 'none',
   },
   gridFooter: {
     // marginTop: 4,
@@ -497,6 +520,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: LINE_HEIGHT,
     color: palette.charcoal,
+  },
+  titleInline: {
+    flex: 1,
+    minWidth: 0,
   },
   subtitleRow: {
     flexDirection: 'row',

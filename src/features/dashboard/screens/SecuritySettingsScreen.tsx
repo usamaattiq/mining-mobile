@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { confirmBiometric } from '@/shared/utils/confirmBiometric';
 import { showAppAlert } from '@/shared/services/appAlert';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +22,7 @@ import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SecuritySettings'>;
 
-type MpinChangeStep = 'idle' | 'otp' | 'newMpin';
+type MpinChangeStep = 'idle' | 'otp' | 'newMpin' | 'enableMpin';
 
 const OTP_LENGTH = 6;
 const MPIN_LENGTH = 4;
@@ -38,12 +39,14 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
   const setProfile = useProfileStore((state) => state.setProfile);
   const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
   const biometricEnabled = useDevicePrefsStore((state) => state.biometricEnabled);
+  const cachedMpin = useDevicePrefsStore((state) => state.cachedMpin);
   const setDeviceBiometricEnabled = useDevicePrefsStore((state) => state.setBiometricEnabled);
   const setCachedMpin = useDevicePrefsStore((state) => state.setCachedMpin);
   const clearCachedMpin = useDevicePrefsStore((state) => state.clearCachedMpin);
   const { available: biometricAvailable, kind: biometricKind } = useDeviceBiometric();
 
   const [step, setStep] = React.useState<MpinChangeStep>('idle');
+  const [enableMpin, setEnableMpin] = React.useState('');
   const [otp, setOtp] = React.useState('');
   const [newMpin, setNewMpin] = React.useState('');
   const [confirmMpin, setConfirmMpin] = React.useState('');
@@ -72,12 +75,78 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
     setConfirmMpin('');
   };
 
-  const handleToggleBiometric = async (enabled: boolean) => {
+  const promptingRef = React.useRef(false);
+
+  const persistBiometric = async (enabled: boolean, mpin?: string) => {
+    await setDeviceBiometricEnabled(enabled);
+    if (enabled && mpin) await setCachedMpin(mpin);
+    if (!enabled) await clearCachedMpin();
     try {
-      await setDeviceBiometricEnabled(enabled);
-      if (!enabled) await clearCachedMpin();
+      const updated = await authApi.updateMe({ biometricEnabled: enabled });
+      setProfile(updated);
     } catch {
-      showAppAlert(t('common.error'), t('securitySettings.biometricToggleFailed'));
+      // Face ID is a device setting. A profile sync failure should not undo it.
+    }
+  };
+
+  const handleToggleBiometric = async (enabled: boolean) => {
+    if (promptingRef.current) return;
+    if (!enabled) {
+      try {
+        await persistBiometric(false);
+        setStep('idle');
+      } catch {
+        showAppAlert(t('common.error'), t('securitySettings.biometricToggleFailed'));
+      }
+      return;
+    }
+
+    promptingRef.current = true;
+    await setDeviceBiometricEnabled(true);
+    const result = await confirmBiometric(t('signUpSecurity.biometricPrompt'), t('common.cancel'));
+    promptingRef.current = false;
+
+    if (!result.success) {
+      await setDeviceBiometricEnabled(false);
+      if (
+        result.error !== 'user_cancel' &&
+        result.error !== 'system_cancel' &&
+        result.error !== 'app_cancel'
+      ) {
+        showAppAlert(t('common.error'), t('securitySettings.biometricToggleFailed'));
+      }
+      return;
+    }
+
+    if (cachedMpin) {
+      try {
+        await persistBiometric(true, cachedMpin);
+      } catch {
+        showAppAlert(t('common.error'), t('securitySettings.biometricToggleFailed'));
+      }
+      return;
+    }
+
+    setEnableMpin('');
+    setStep('enableMpin');
+  };
+
+  const handleConfirmEnableMpin = async () => {
+    if (!phoneIdentity || enableMpin.length !== MPIN_LENGTH) return;
+    setSubmitting(true);
+    try {
+      const deviceId = await getDeviceId();
+      const result = await authApi.loginWithMpin(phoneIdentity, enableMpin, deviceId);
+      await setAuthenticated(result.accessToken);
+      setProfile(result.profile);
+      await persistBiometric(true, enableMpin);
+      setStep('idle');
+      setEnableMpin('');
+    } catch (error) {
+      showAppAlert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
+      setEnableMpin('');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -136,12 +205,11 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
       const result = await authApi.resetMpin(phoneIdentity, newMpin, deviceId);
       await setAuthenticated(result.accessToken);
       setProfile(result.profile);
-      if (result.profile.biometricEnabled) {
-        await setCachedMpin(newMpin);
-      } else {
-        await clearCachedMpin();
-      }
-      await setDeviceBiometricEnabled(result.profile.biometricEnabled);
+      const keepBiometric =
+        result.profile.biometricEnabled || useDevicePrefsStore.getState().biometricEnabled;
+      if (keepBiometric) await setCachedMpin(newMpin);
+      else await clearCachedMpin();
+      await setDeviceBiometricEnabled(keepBiometric);
       resetMpinFlow();
       showAppAlert(t('securitySettings.mpinSavedTitle'), t('securitySettings.mpinSavedMessage'));
     } catch (error) {
@@ -168,10 +236,28 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
             title={t('securitySettings.biometricTitle')}
             subtitle={t('securitySettings.biometricSubtitle')}
           />
+          {step === 'enableMpin' ? (
+            <View style={styles.enableMpin}>
+              <AppText style={styles.changeMpinSubtitle}>{t('loginMpin.title')}</AppText>
+              <CodeInput
+                length={MPIN_LENGTH}
+                value={enableMpin}
+                onChangeValue={setEnableMpin}
+                secure
+                autoFocus
+              />
+              <Button
+                label={t('common.confirm')}
+                disabled={enableMpin.length !== MPIN_LENGTH}
+                loading={submitting}
+                onPress={() => void handleConfirmEnableMpin()}
+              />
+            </View>
+          ) : null}
         </View>
 
         <View style={styles.card}>
-          {step === 'idle' ? (
+          {step === 'idle' || step === 'enableMpin' ? (
             <View style={styles.changeMpinRow}>
               <View style={styles.changeMpinCopy}>
                 <AppText weight="semibold" style={styles.changeMpinTitle}>
@@ -259,6 +345,11 @@ const styles = StyleSheet.create({
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     overflow: 'hidden',
+  },
+  enableMpin: {
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
   },
   card: {
     backgroundColor: palette.warmWhite,

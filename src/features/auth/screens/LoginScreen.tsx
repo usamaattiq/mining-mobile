@@ -99,7 +99,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       phoneDigits: phoneDigits.trim(),
     });
 
-  useBiometricLogin({
+  const biometricLogin = useBiometricLogin({
     enabled: step === 'mpin' && isReturningDeviceRef.current,
     onAutoSubmit: (cachedMpin) => void handleLogIn(cachedMpin),
   });
@@ -180,10 +180,11 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       setProfile(result.profile);
       await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();
-      if (result.profile.biometricEnabled) {
-        await setCachedMpin(mpinValue);
-      }
-      await setDeviceBiometricEnabled(result.profile.biometricEnabled);
+      const keepBiometric =
+        result.profile.biometricEnabled || useDevicePrefsStore.getState().biometricEnabled;
+      if (keepBiometric) await setCachedMpin(mpinValue);
+      else await clearCachedMpin();
+      await setDeviceBiometricEnabled(keepBiometric);
       navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
     } catch (error) {
       setMpin('');
@@ -249,13 +250,11 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       setProfile(result.profile);
       await useMarketplaceRoleStore.getState().setRole('supplier');
       await rememberPhone();
-      // The old cached MPIN (if any) is now stale — refresh or drop it.
-      if (result.profile.biometricEnabled) {
-        await setCachedMpin(newMpin);
-      } else {
-        await clearCachedMpin();
-      }
-      await setDeviceBiometricEnabled(result.profile.biometricEnabled);
+      const keepBiometric =
+        result.profile.biometricEnabled || useDevicePrefsStore.getState().biometricEnabled;
+      if (keepBiometric) await setCachedMpin(newMpin);
+      else await clearCachedMpin();
+      await setDeviceBiometricEnabled(keepBiometric);
       navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
     } catch (error) {
       showAppAlert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
@@ -405,7 +404,13 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
               {t('loginMpin.loggingInAs')} {phone}
             </AppText>
           ) : null}
-          <CodeInput length={MPIN_LENGTH} value={mpin} onChangeValue={setMpin} secure autoFocus />
+          <CodeInput
+            length={MPIN_LENGTH}
+            value={mpin}
+            onChangeValue={setMpin}
+            secure
+            autoFocus={!biometricLogin.available}
+          />
           <Button
             label={t('loginMpin.forgotMpin')}
             variant="link"

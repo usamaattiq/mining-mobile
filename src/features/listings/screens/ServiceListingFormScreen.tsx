@@ -25,6 +25,7 @@ import { palette, radius, spacing } from '@/theme';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
+import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
 import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
@@ -32,7 +33,11 @@ import { serviceTypeFlags, serviceTypeFromFlags, serviceTypeLabels, resolveServi
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  LISTING_DESCRIPTION_MAX_LENGTH,
+  LISTING_TITLE_MAX_LENGTH,
+} from '@/features/listings/constants/listingFieldLimits';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 
@@ -42,11 +47,12 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
-  const isBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
+  const editingId = route.params?.editId;
+  const sourceId = editingId ?? route.params?.repostId;
+  const roleIsBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const [onsite, setOnsite] = React.useState(false);
   const [online, setOnline] = React.useState(false);
   const serviceType = serviceTypeFromFlags(onsite, online);
-  const isOnsite = onsite;
 
   const serviceCategoryOptions = useCatalogOptions('services');
 
@@ -60,13 +66,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useServiceListingsStore((state) => state.addListing);
   const storedRepost = useServiceListingsStore((state) =>
-    route.params?.repostId
-      ? state.listings.find((item) => item.id === route.params?.repostId)
-      : undefined,
+    sourceId ? state.listings.find((item) => item.id === sourceId) : undefined,
   );
   const filledRepost = React.useRef(false);
+  const originalListedUntil = React.useRef<number | null>(null);
   const [fetchedRepost, setFetchedRepost] = React.useState<ServiceListing | undefined>(undefined);
   const sourceListing = storedRepost ?? fetchedRepost;
+  const isBuyer = editingId ? sourceListing?.postedAs === 'buyer' : roleIsBuyer;
 
   const [serviceCategory, setServiceCategory] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');
@@ -85,7 +91,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     useLocationMapPicker();
 
   React.useEffect(() => {
-    const id = route.params?.repostId;
+    const id = sourceId;
     if (!id || storedRepost) return;
     let cancelled = false;
     void listingsApi.get(id).then((listing) => {
@@ -94,7 +100,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     return () => {
       cancelled = true;
     };
-  }, [route.params?.repostId, storedRepost]);
+  }, [sourceId, storedRepost]);
 
   React.useEffect(() => {
     if (!sourceListing || filledRepost.current) return;
@@ -103,15 +109,20 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setOnsite(flags.onsite);
     setOnline(flags.online);
     setServiceCategory(
-      matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel),
+      matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel) ??
+        (sourceListing.serviceCategoryLabel.trim() || null),
     );
-    setTitle(sourceListing.title);
-    setDescription(sourceListing.description ?? '');
+    setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
+    setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setYearsOfExperience(Math.max(Number(sourceListing.yearsOfExperience) || 1, 1));
     const prices = resolveServicePrices(sourceListing);
     setOnsitePrice(isBuyer ? '' : prices.onsitePrice);
     setOnlinePrice(isBuyer ? '' : prices.onlinePrice);
     setLocation(sourceListing.location ?? '');
+    if (editingId && sourceListing.rfq?.expiresAt) {
+      originalListedUntil.current = sourceListing.rfq.expiresAt;
+      setListedUntil(new Date(sourceListing.rfq.expiresAt));
+    }
     setMedia(
       cloneRepostMedia(
         (sourceListing.media ?? []).filter(
@@ -119,7 +130,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         ),
       ),
     );
-  }, [isBuyer, serviceCategoryOptions, sourceListing]);
+  }, [editingId, isBuyer, serviceCategoryOptions, sourceListing]);
+
+  React.useEffect(() => {
+    if (!sourceListing || serviceCategoryOptions.length === 0) return;
+    const matched = matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel);
+    if (matched) setServiceCategory(matched);
+  }, [serviceCategoryOptions, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();
@@ -127,6 +144,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setLocation(selection.label);
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   };
+
+  const autoLocated = React.useRef(false);
+  React.useEffect(() => {
+    if (step !== 1 || autoLocated.current || location.trim()) return;
+    autoLocated.current = true;
+    void handleUseCurrentLocation();
+  }, [step, location]);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -141,12 +165,11 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       title.trim() &&
       description.trim() &&
       (isBuyer ||
-        ((onsite ? Boolean(onsitePrice.trim()) : true) &&
-          (online ? Boolean(onlinePrice.trim()) : true))),
+        ((onsite ? Boolean(parsePositiveAmount(onsitePrice)) : true) &&
+          (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
   );
   const mediaValid =
-    (isBuyer || media.length > 0) &&
-    (!isOnsite || location.trim().length > 0);
+    (isBuyer || media.length > 0) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -167,15 +190,19 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
   const handlePublish = async () => {
     if (publishing || !serviceType) return;
+    if (editingId && !sourceListing) return;
     if (listedUntil.getTime() <= Date.now()) {
-      showAppAlert(t('common.error'), t('serviceListing.listedUntilPast'));
-      return;
+      const keptOriginal = originalListedUntil.current === listedUntil.getTime();
+      if (!keptOriginal) {
+        showAppAlert(t('common.error'), t('serviceListing.listedUntilPast'));
+        return;
+      }
     }
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
-      const listing = await listingsApi.create({
-        category: 'services',
+      const body = {
+        category: 'services' as const,
         serviceType,
         serviceCategoryLabel: serviceCategoryLabel ?? '',
         title,
@@ -186,10 +213,20 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         price: isBuyer ? '' : onsite ? onsitePrice : onlinePrice,
         serviceDate: null,
         expiryHours: expiryHoursUntil(listedUntil),
-        location: isOnsite ? location : '',
+        location,
         media: persistedMedia,
-        postedAs: useMarketplaceRoleStore.getState().role,
-      });
+        postedAs: editingId
+          ? (sourceListing?.postedAs ?? 'supplier')
+          : useMarketplaceRoleStore.getState().role,
+      };
+      const listing = editingId
+        ? await listingsApi.update(editingId, body)
+        : await listingsApi.create(body);
+      if (editingId) {
+        cacheListing(listing);
+        navigation.goBack();
+        return;
+      }
       if (isServiceListing(listing)) addListing(listing);
       navigation.reset({
         index: 1,
@@ -240,7 +277,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                 : '',
           },
         ]),
-    ...(isOnsite ? [{ label: t('serviceListing.location'), value: location }] : []),
+    { label: t('serviceListing.location'), value: location },
     {
       label: t('serviceListing.listedUntil'),
       value: new Intl.DateTimeFormat(currentLanguage, {
@@ -262,7 +299,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       <AppTopBar
         left="back"
         variant="gold"
-        title={t('serviceListing.formTitle')}
+        title={editingId ? t('serviceListing.editFormTitle') : t('serviceListing.formTitle')}
         onBackPress={handleBack}
         style={styles.header}
       />
@@ -278,8 +315,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-        bottomOffset={72}
+        bottomOffset={96}
         extraKeyboardSpace={0}
+        disableScrollOnKeyboardHide
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>
@@ -320,6 +358,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               onChangeText={setTitle}
               placeholder={t('serviceListing.titlePlaceholder')}
               required
+              maxLength={LISTING_TITLE_MAX_LENGTH}
+              showCounter
             />
 
             <FormInput
@@ -331,6 +371,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               numberOfLines={4}
               style={styles.descriptionInput}
               required
+              maxLength={LISTING_DESCRIPTION_MAX_LENGTH}
+              showCounter
             />
 
             <CounterField
@@ -351,20 +393,30 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                   <FormInput
                     label={t('serviceListing.onsitePrice')}
                     value={onsitePrice}
-                    onChangeText={setOnsitePrice}
+                    onChangeText={(value) => setOnsitePrice(sanitizeStepPrice(value))}
                     keyboardType="numeric"
                     placeholder={currency.code}
                     required
+                    error={
+                      onsitePrice && !parsePositiveAmount(onsitePrice)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
                   />
                 ) : null}
                 {online ? (
                   <FormInput
                     label={t('serviceListing.onlinePrice')}
                     value={onlinePrice}
-                    onChangeText={setOnlinePrice}
+                    onChangeText={(value) => setOnlinePrice(sanitizeStepPrice(value))}
                     keyboardType="numeric"
                     placeholder={currency.code}
                     required
+                    error={
+                      onlinePrice && !parsePositiveAmount(onlinePrice)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
                   />
                 ) : null}
               </>
@@ -385,17 +437,15 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               onChange={setListedUntil}
             />
 
-            {isOnsite ? (
-              <LocationField
-                label={t('serviceListing.location')}
-                value={location}
-                required
-                loading={locationLoading}
-                onChangeText={setLocation}
-                onUseCurrentLocation={() => void handleUseCurrentLocation()}
-                onSelectOnMap={handleSelectOnMap}
-              />
-            ) : null}
+            <LocationField
+              label={t('serviceListing.location')}
+              value={location}
+              required
+              loading={locationLoading}
+              onChangeText={setLocation}
+              onUseCurrentLocation={() => void handleUseCurrentLocation()}
+              onSelectOnMap={handleSelectOnMap}
+            />
           </View>
         ) : null}
 
@@ -409,7 +459,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
             <AttachmentsSection documents={documents} downloadable={false} />
             <Button
-              label={t('serviceListing.publish')}
+              label={editingId ? t('serviceListing.update') : t('serviceListing.publish')}
               onPress={handlePublish}
               loading={publishing}
               style={styles.publishButton}

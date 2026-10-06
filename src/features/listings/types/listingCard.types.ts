@@ -17,18 +17,27 @@ export type ListingCardProps = {
   subtitle?: string;
   /** Icon shown before the type / units line. */
   subtitleIcon?: keyof typeof Ionicons.glyphMap;
-  /** RFQ / listing status — top right (where Delivery used to sit). */
+  /** Units count shown on its own row under the category. */
+  unitsLabel?: string;
+  /** Icon for the units row — defaults to layers-outline when unitsLabel is set. */
+  unitsIcon?: keyof typeof Ionicons.glyphMap;
+  /** RFQ / listing status — top right, inline with the title. */
   typeBadge?: ListingCardBadge;
   /** City line under the type. */
   city?: string;
   /** Unused — kept for callers; duration chips are not shown on cards. */
   durationBadges?: ListingCardBadge[];
-  /** Delivery — top left. */
+  /** Delivery — bottom left with rent / sell. */
   deliveryBadge?: ListingCardBadge;
-  /** Buyer equipment: RFQ or Auction — top left of the card. */
+  /** Buyer equipment: RFQ or Auction. */
   requestBadge?: ListingCardBadge;
   /** Rent, sell, online, onsite — bottom left. */
   statusBadges?: ListingCardBadge[];
+  /**
+   * When true, keep the title under the status row (e.g. long
+   * "Awaiting your confirmation" badges). Otherwise title sits inline with status.
+   */
+  titleBelowStatus?: boolean;
   priceText?: string;
   /** Grey period/type label after the amount, same as details. */
   priceUnit?: string;

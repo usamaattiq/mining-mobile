@@ -262,7 +262,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         : [
             {
               label: t('equipmentListing.listedUntil'),
-              value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
+              value: formatListingDate(
+                currentLanguage,
+                equipmentListing.requestMode === 'auction'
+                  ? equipmentListing.auctionEndDate ?? equipmentListing.rfq?.expiresAt
+                  : equipmentListing.rfq?.expiresAt,
+              ),
             },
           ]),
     ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -507,6 +512,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
   ) || rfq?.status === 'offer-submitted';
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
+  const canEditListing = isOwner && !listingIsEngaged(rfq);
   const canOffer =
     !isAdmin &&
     Boolean(rfq) &&
@@ -694,12 +700,20 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        bottomOffset={180}
-        extraKeyboardSpace={72}
+        bottomOffset={96}
+        extraKeyboardSpace={0}
+        disableScrollOnKeyboardHide
       >
         <EquipmentImageCarousel
           media={visualMedia}
           onPressImage={setViewerIndex}
+          placeholderIcon={
+            category === 'services'
+              ? 'briefcase-outline'
+              : category === 'gold'
+                ? 'diamond-outline'
+                : 'construct-outline'
+          }
           style={styles.carousel}
         />
 
@@ -822,8 +836,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               canDecideOffers={!isAdmin && rfq?.canDecideOffers !== false}
               rfqStatus={rfq?.status}
               showUnits={category === 'equipment'}
-              showLeader={category === 'gold'}
-              messageEveryOffer={category === 'gold'}
+              placeholderIcon={
+                category === 'gold'
+                  ? 'diamond-outline'
+                  : equipmentListing?.requestMode === 'auction'
+                    ? 'construct-outline'
+                    : undefined
+              }
+              showLeader={category === 'gold' || equipmentListing?.requestMode === 'auction'}
+              messageEveryOffer={category === 'gold' || equipmentListing?.requestMode === 'auction'}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
               onPressResponder={
@@ -851,23 +872,31 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               {mySupplierOffers.map((offer) => (
                 <View key={offer.id} style={styles.myOfferCard}>
                   <View style={styles.myOfferRow}>
-                    <AppText weight="semibold" style={styles.myOfferTitle}>
-                      {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
+                    <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
                       {offer.quantity
-                        ? ` · ${t('equipmentListing.unitsCount', { count: offer.quantity })}`
-                        : ''}
+                        ? t('equipmentListing.unitsCount', { count: offer.quantity })
+                        : t('rfq.yourOffer')}
                     </AppText>
-                    <AppText style={styles.myOfferStatus}>
-                      {t(
-                        `rfq.offerStatus.${
-                          offer.status === 'selected'
-                            ? 'selected'
-                            : offer.status === 'confirmed'
-                              ? 'confirmed'
-                              : 'active'
-                        }`,
-                      )}
-                    </AppText>
+                    <View style={styles.myOfferBadges}>
+                      <View style={styles.myOfferStatusBadge}>
+                        <AppText weight="semibold" style={styles.myOfferStatusText}>
+                          {t(
+                            `rfq.offerStatus.${
+                              offer.status === 'selected'
+                                ? 'selected'
+                                : offer.status === 'confirmed'
+                                  ? 'confirmed'
+                                  : 'active'
+                            }`,
+                          )}
+                        </AppText>
+                      </View>
+                      <View style={styles.myOfferKindBadge}>
+                        <AppText weight="semibold" style={styles.myOfferKindText}>
+                          {offer.kind === 'sale' ? t('equipmentListing.sell') : t('equipmentListing.rent')}
+                        </AppText>
+                      </View>
+                    </View>
                   </View>
                   {offer.price ? (
                     <View style={styles.myOfferPriceRow}>
@@ -975,6 +1004,32 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       </KeyboardAwareScrollView>
 
       {backButton}
+
+      {canEditListing ? (
+        <Pressable
+          onPress={() => {
+            if (category === 'equipment') {
+              navigation.navigate('EquipmentListingForm', { editId: id });
+            } else if (category === 'services') {
+              navigation.navigate('ServiceListingForm', { editId: id });
+            } else {
+              navigation.navigate('GoldListingForm', { editId: id });
+            }
+          }}
+          disabled={deletingListing}
+          hitSlop={12}
+          style={[
+            styles.overlayButton,
+            styles.editButton,
+            { top: insets.top + spacing.sm },
+            deletingListing && styles.withdrawDisabled,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.edit')}
+        >
+          <Ionicons name="create-outline" size={18} color={palette.pureWhite} />
+        </Pressable>
+      ) : null}
 
       {isOwner ? (
         <Pressable
@@ -1258,6 +1313,23 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   );
 }
 
+const ENGAGED_LISTING_STATUSES = new Set([
+  'awaiting-confirmation',
+  'awaiting-your-confirmation',
+  'awaiting-action',
+  'confirmed',
+  'completed',
+]);
+
+/** True once a counterparty is awaiting confirmation, accepted, or confirmed. */
+function listingIsEngaged(rfq: { status?: string; offers?: { status: string }[] } | undefined): boolean {
+  if (!rfq) return false;
+  if (ENGAGED_LISTING_STATUSES.has(rfq.status ?? '')) return true;
+  return (rfq.offers ?? []).some(
+    (offer) => offer.status === 'selected' || offer.status === 'confirmed',
+  );
+}
+
 function supplierUnitsLeft(
   id: string,
   sources: Array<ListingDto | null | undefined>,
@@ -1349,6 +1421,9 @@ const styles = StyleSheet.create({
   backButton: {
     left: spacing.md,
   },
+  editButton: {
+    right: spacing.md + 40 + spacing.sm,
+  },
   deleteButton: {
     right: spacing.md,
   },
@@ -1410,11 +1485,28 @@ const styles = StyleSheet.create({
   myOfferRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: spacing.sm,
   },
-  myOfferTitle: { flex: 1, fontSize: 14, color: palette.charcoal },
-  myOfferStatus: { fontSize: 12, color: palette.goldDark },
+  myOfferBadges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  myOfferKindBadge: {
+    backgroundColor: palette.softGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  myOfferKindText: { fontSize: 11, color: palette.goldDark },
+  myOfferStatusBadge: {
+    backgroundColor: palette.lightGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  myOfferStatusText: { fontSize: 11, color: palette.charcoal },
+  myOfferUnits: { flex: 1, fontSize: 13, color: palette.muted },
   myOfferPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
   myOfferPrice: { fontSize: 16, color: palette.charcoal },
   myOfferPerUnit: { fontSize: 12, color: palette.muted },

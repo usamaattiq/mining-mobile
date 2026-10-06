@@ -28,9 +28,9 @@ export type RootStackParamList = {
   PersonalInformation: undefined;
   AdminUserProfile: { userId: string };
   SecuritySettings: undefined;
-  EquipmentListingForm: { repostId?: string } | undefined;
-  ServiceListingForm: { repostId?: string } | undefined;
-  GoldListingForm: { repostId?: string } | undefined;
+  EquipmentListingForm: { repostId?: string; editId?: string } | undefined;
+  ServiceListingForm: { repostId?: string; editId?: string } | undefined;
+  GoldListingForm: { repostId?: string; editId?: string } | undefined;
   CompleteListingDetail: { id: string; category: ListingCategory };
   EquipmentStock: { id: string };
   Conversation: { conversationId: string };

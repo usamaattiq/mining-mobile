@@ -95,8 +95,16 @@ export function usePushNotifications(): void {
       // Cold start: app launched by tapping a notification.
       void Notifications.getLastNotificationResponseAsync().then((response) => {
         if (cancelled || !response) return;
-        // Wait a tick so NavigationContainer can mount/link.
-        requestAnimationFrame(() => handleNotificationResponse(response));
+        // Wait until NavigationContainer is ready before navigating.
+        const tryOpen = () => {
+          if (cancelled) return;
+          if (navigationRef.isReady()) {
+            handleNotificationResponse(response);
+            return;
+          }
+          requestAnimationFrame(tryOpen);
+        };
+        requestAnimationFrame(tryOpen);
       });
     });
 

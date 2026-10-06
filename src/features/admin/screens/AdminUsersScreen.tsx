@@ -9,7 +9,9 @@ import type { RootStackParamList } from '@/navigation/types';
 import { AdminChipRow } from '@/features/admin/components/AdminChipRow';
 import { adminApi, type AdminUserItem } from '@/features/admin/api/adminApi';
 import { AppText } from '@/shared/components/AppText';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { SearchField } from '@/shared/components/SearchField';
+import { FilterBadges } from '@/features/admin/components/FilterBadges';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
@@ -18,15 +20,17 @@ export function AdminUsersScreen(): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [accountType, setAccountType] = React.useState('all');
+  const [statusFilter, setStatusFilter] = React.useState<'all' | 'blocked'>('all');
   const [query, setQuery] = React.useState('');
   const [items, setItems] = React.useState<AdminUserItem[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const load = React.useCallback(async (search: string, type: string) => {
+  const load = React.useCallback(async (search: string, type: string, status: 'all' | 'blocked') => {
     const result = await adminApi.listUsers({
       search,
       accountType: type === 'all' ? undefined : type,
+      status: status === 'blocked' ? 'suspended' : undefined,
     });
     setItems(result.items);
   }, []);
@@ -34,12 +38,12 @@ export function AdminUsersScreen(): React.ReactElement {
   React.useEffect(() => {
     const handle = setTimeout(() => {
       setLoading(true);
-      void load(query, accountType)
+      void load(query, accountType, statusFilter)
         .catch(() => showAppAlert(t('admin.loadFailed')))
         .finally(() => setLoading(false));
     }, query ? 300 : 0);
     return () => clearTimeout(handle);
-  }, [query, accountType, load, t]);
+  }, [query, accountType, statusFilter, load, t]);
 
   return (
     <GoldSheetScreen
@@ -63,16 +67,24 @@ export function AdminUsersScreen(): React.ReactElement {
           refreshing={refreshing}
           onRefresh={() => {
             setRefreshing(true);
-            void load(query, accountType).finally(() => setRefreshing(false));
+            void load(query, accountType, statusFilter).finally(() => setRefreshing(false));
           }}
         />
       }
     >
       <SearchField value={query} onChangeText={setQuery} placeholder={t('admin.searchUsers')} />
+      <FilterBadges
+        value={statusFilter}
+        onChange={setStatusFilter}
+        options={[
+          { id: 'all', label: t('admin.all') },
+          { id: 'blocked', label: t('admin.blocked') },
+        ]}
+      />
       {loading ? (
         <ActivityIndicator color={palette.gold} style={styles.loader} />
       ) : items.length === 0 ? (
-        <AppText style={styles.empty}>{t('admin.emptyUsers')}</AppText>
+        <EmptyState title={t('admin.emptyUsers')} />
       ) : (
         items.map((item) => (
           <Pressable
@@ -89,9 +101,21 @@ export function AdminUsersScreen(): React.ReactElement {
                 </AppText>
               </View>
             )}
-            <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-              {item.fullName}
-            </AppText>
+            <View style={styles.copy}>
+              <AppText weight="semibold" style={styles.name} numberOfLines={1}>
+                {item.fullName}
+              </AppText>
+              <AppText style={styles.phone} numberOfLines={1}>
+                {item.phoneE164}
+              </AppText>
+            </View>
+            {item.status === 'suspended' ? (
+              <View style={styles.badge}>
+                <AppText weight="semibold" style={styles.badgeText}>
+                  {t('admin.blocked')}
+                </AppText>
+              </View>
+            ) : null}
           </Pressable>
         ))
       )}
@@ -107,8 +131,8 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
   },
   loader: { marginTop: spacing.xl },
-  empty: { color: palette.muted, textAlign: 'center', marginTop: spacing.xl },
   card: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
@@ -116,31 +140,51 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: palette.softGold,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
+    padding: spacing.sm,
     marginBottom: spacing.xs,
     ...cardBackShadow,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 108,
+    height: 108,
+    borderRadius: 54,
   },
   avatarFallback: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 108,
+    height: 108,
+    borderRadius: 54,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.softGold,
   },
   initial: {
     color: palette.goldDark,
-    fontSize: 18,
+    fontSize: 36,
+  },
+  copy: {
+    flex: 1,
+    gap: 4,
+    minWidth: 0,
   },
   name: {
-    flex: 1,
     fontSize: 16,
     color: palette.charcoal,
+  },
+  phone: {
+    fontSize: 14,
+    color: palette.muted,
+  },
+  badge: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    backgroundColor: palette.danger,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
+  badgeText: {
+    fontSize: 11,
+    color: palette.pureWhite,
   },
 });

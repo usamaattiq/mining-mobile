@@ -21,6 +21,7 @@ const CAROUSEL_HEIGHT = 280;
 export function EquipmentImageCarousel({
   media,
   onPressImage,
+  placeholderIcon = 'image-outline',
   style,
 }: EquipmentImageCarouselProps): React.ReactElement {
   const windowWidth = useWindowDimensions().width;
@@ -80,7 +81,7 @@ export function EquipmentImageCarousel({
         </ScrollView>
       ) : (
         <View style={styles.placeholder}>
-          <Ionicons name="image-outline" size={36} color={palette.muted} />
+          <Ionicons name={placeholderIcon} size={72} color={palette.goldDark} />
         </View>
       )}
 

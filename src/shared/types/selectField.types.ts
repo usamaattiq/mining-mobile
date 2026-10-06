@@ -4,6 +4,8 @@ export type SelectFieldOption = {
   value: string;
   label: string;
   icon?: keyof typeof Ionicons.glyphMap;
+  /** Parent option value. When set, the sheet nests this row under that parent. */
+  parentValue?: string | null;
 };
 
 export type SelectFieldProps = {

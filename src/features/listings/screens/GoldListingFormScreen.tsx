@@ -24,13 +24,19 @@ import { palette, radius, spacing } from '@/theme';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isGoldListing } from '@/features/listings/api/listingsApi';
+import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
+import { clampAuctionHours } from '@/features/listings/utils/listingExpiry';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
 import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { useCurrency } from '@/shared/hooks/useCurrency';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, parsePositiveAmount, sanitizeStepPrice } from '@/shared/utils/formatAmount';
+import {
+  LISTING_DESCRIPTION_MAX_LENGTH,
+  LISTING_TITLE_MAX_LENGTH,
+} from '@/features/listings/constants/listingFieldLimits';
 import type { ServiceMediaAsset } from '@/features/listings/types/serviceMedia.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
 
@@ -41,13 +47,15 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
   const role = useMarketplaceRoleStore((s) => s.role);
+  const editingId = route.params?.editId;
+  const sourceId = editingId ?? route.params?.repostId;
 
   // Gold auctions are supplier-only; bounce buyers who land here somehow.
   React.useEffect(() => {
-    if (role === 'buyer') {
+    if (role === 'buyer' && !editingId) {
       navigation.goBack();
     }
-  }, [role, navigation]);
+  }, [editingId, role, navigation]);
 
   const weightAdornment = (
     <AppText weight="semibold" style={styles.weightAdornment}>
@@ -67,9 +75,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useGoldListingsStore((state) => state.addListing);
   const storedRepost = useGoldListingsStore((state) =>
-    route.params?.repostId
-      ? state.listings.find((item) => item.id === route.params?.repostId)
-      : undefined,
+    sourceId ? state.listings.find((item) => item.id === sourceId) : undefined,
   );
   const filledRepost = React.useRef(false);
   const [fetchedRepost, setFetchedRepost] = React.useState<GoldListing | undefined>(undefined);
@@ -80,7 +86,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   const [weight, setWeight] = React.useState('');
   const [purity, setPurity] = React.useState<string | null>(null);
   const [price, setPrice] = React.useState('');
-  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(null);
+  const [auctionStartDate, setAuctionStartDate] = React.useState<Date | null>(() => new Date());
   const [durationHours, setDurationHours] = React.useState(24);
   const [location, setLocation] = React.useState('');
   const [locationCoords, setLocationCoords] = React.useState<{
@@ -92,7 +98,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     useLocationMapPicker();
 
   React.useEffect(() => {
-    const id = route.params?.repostId;
+    const id = sourceId;
     if (!id || storedRepost) return;
     let cancelled = false;
     void listingsApi.get(id).then((listing) => {
@@ -101,18 +107,32 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     return () => {
       cancelled = true;
     };
-  }, [route.params?.repostId, storedRepost]);
+  }, [sourceId, storedRepost]);
 
   React.useEffect(() => {
     if (!sourceListing || filledRepost.current) return;
     filledRepost.current = true;
-    setTitle(sourceListing.title);
-    setDescription(sourceListing.description ?? '');
+    setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
+    setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setWeight(sourceListing.weight ?? '');
-    setPurity(matchSelectOption(purityOptions, sourceListing.purityLabel));
+    setPurity(
+      matchSelectOption(purityOptions, sourceListing.purityLabel) ??
+        (sourceListing.purityLabel.trim() || null),
+    );
     setPrice(sourceListing.price ?? '');
-    setAuctionStartDate(new Date());
-    setDurationHours(24);
+    if (editingId) {
+      const end = sourceListing.auctionEndDate ?? sourceListing.rfq?.expiresAt ?? null;
+      if (end && end > Date.now()) {
+        setAuctionStartDate(new Date());
+        setDurationHours(clampAuctionHours((end - Date.now()) / 3_600_000));
+      } else {
+        setAuctionStartDate(new Date());
+        setDurationHours(24);
+      }
+    } else {
+      setAuctionStartDate(new Date());
+      setDurationHours(24);
+    }
     setLocation(sourceListing.location ?? '');
     setMedia(
       cloneRepostMedia(
@@ -121,6 +141,12 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         ),
       ),
     );
+  }, [editingId, purityOptions, sourceListing]);
+
+  React.useEffect(() => {
+    if (!sourceListing || purityOptions.length === 0) return;
+    const matched = matchSelectOption(purityOptions, sourceListing.purityLabel);
+    if (matched) setPurity(matched);
   }, [purityOptions, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
@@ -130,6 +156,13 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   };
 
+  const autoLocated = React.useRef(false);
+  React.useEffect(() => {
+    if (step !== 1 || autoLocated.current || location.trim()) return;
+    autoLocated.current = true;
+    void handleUseCurrentLocation();
+  }, [step, location]);
+
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
       setLocation(selection.label);
@@ -138,7 +171,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   };
 
   const detailsValid = Boolean(
-    title.trim() && description.trim() && weight.trim() && purity && price.trim(),
+    title.trim() && description.trim() && weight.trim() && purity && parsePositiveAmount(price),
   );
   const mediaValid = media.length > 0 && Boolean(auctionStartDate) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
@@ -159,29 +192,36 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
 
   const handlePublish = async () => {
     if (publishing) return;
-    if (!auctionStartDate || auctionStartDate.getTime() <= Date.now()) {
-      showAppAlert(t('common.error'), t('goldListing.auctionStartPast'));
-      return;
-    }
+    if (editingId && !sourceListing) return;
+    const start = !auctionStartDate || auctionStartDate.getTime() <= Date.now()
+      ? new Date()
+      : auctionStartDate;
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
-      const listing = await listingsApi.create({
-        category: 'gold',
+      const body = {
+        category: 'gold' as const,
         title,
         description,
         weight,
         purityLabel: purityLabel ?? '',
         price,
-        auctionStartDate: auctionStartDate?.getTime() ?? null,
-        auctionEndDate:
-          auctionStartDate != null
-            ? auctionStartDate.getTime() + durationHours * 60 * 60 * 1000
-            : null,
+        auctionStartDate: start.getTime(),
+        auctionEndDate: start.getTime() + durationHours * 60 * 60 * 1000,
         location,
         media: persistedMedia,
-        postedAs: useMarketplaceRoleStore.getState().role,
-      });
+        postedAs: editingId
+          ? (sourceListing?.postedAs ?? 'supplier')
+          : useMarketplaceRoleStore.getState().role,
+      };
+      const listing = editingId
+        ? await listingsApi.update(editingId, body)
+        : await listingsApi.create(body);
+      if (editingId) {
+        cacheListing(listing);
+        navigation.goBack();
+        return;
+      }
       if (isGoldListing(listing)) addListing(listing);
       navigation.reset({
         index: 1,
@@ -233,7 +273,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     .map((item) => ({ id: item.id, uri: item.uri, kind: 'photo' as const }));
   const documents = media.filter((item) => item.kind === 'document');
 
-  if (role === 'buyer') {
+  if (role === 'buyer' && !editingId) {
     return <View style={styles.root} />;
   }
 
@@ -244,7 +284,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
       <AppTopBar
         left="back"
         variant="gold"
-        title={t('goldListing.formTitle')}
+        title={editingId ? t('goldListing.editFormTitle') : t('goldListing.formTitle')}
         onBackPress={handleBack}
         style={styles.header}
       />
@@ -260,8 +300,9 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-        bottomOffset={72}
+        bottomOffset={96}
         extraKeyboardSpace={0}
+        disableScrollOnKeyboardHide
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>
@@ -271,6 +312,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
               onChangeText={setTitle}
               placeholder={t('goldListing.titlePlaceholder')}
               required
+              maxLength={LISTING_TITLE_MAX_LENGTH}
+              showCounter
             />
 
             <FormInput
@@ -282,6 +325,8 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
               numberOfLines={4}
               style={styles.descriptionInput}
               required
+              maxLength={LISTING_DESCRIPTION_MAX_LENGTH}
+              showCounter
             />
 
             <View style={styles.rowFields}>
@@ -312,10 +357,13 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             <FormInput
               label={t('goldListing.price', { currency: currency.code })}
               value={price}
-              onChangeText={setPrice}
+              onChangeText={(value) => setPrice(sanitizeStepPrice(value))}
               keyboardType="numeric"
               placeholder={currency.code}
               required
+              error={
+                price && !parsePositiveAmount(price) ? t('common.priceGreaterThanZero') : undefined
+              }
             />
           </View>
         ) : null}
@@ -361,7 +409,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             />
             <AttachmentsSection documents={documents} downloadable={false} />
             <Button
-              label={t('goldListing.publish')}
+              label={editingId ? t('goldListing.update') : t('goldListing.publish')}
               onPress={handlePublish}
               loading={publishing}
               style={styles.publishButton}

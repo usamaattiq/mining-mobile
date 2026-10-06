@@ -6,7 +6,7 @@ export type AdminUserItem = {
   fullName: string;
   phoneE164: string;
   avatarUrl: string | null;
-  accountType: 'individual' | 'company';
+  accountType: 'individual' | 'company' | 'admin';
   companyName: string | null;
   status: 'active' | 'suspended';
   createdAt: string;
@@ -17,7 +17,7 @@ export type AdminListingItem = ListingDto;
 export type AdminCategoryItem = {
   key: 'equipment' | 'services' | 'gold';
   count: number;
-  labels: { id: string; name: string; count: number }[];
+  labels: { id: string; name: string; parentId: string | null; count: number }[];
 };
 
 export type AdminUserDetail = {
@@ -29,7 +29,7 @@ export type AdminUserDetail = {
   latitude: number | null;
   longitude: number | null;
   avatarUrl: string | null;
-  accountType: 'individual' | 'company';
+  accountType: 'individual' | 'company' | 'admin';
   companyName: string | null;
   status: 'active' | 'suspended';
   listings: { id: string; title: string; reference: string; category: 'equipment' | 'services' | 'gold'; status: string }[];
@@ -38,10 +38,11 @@ export type AdminUserDetail = {
 type Page<T> = { total: number; page: number; items: T[] };
 
 export const adminApi = {
-  listUsers(params: { search?: string; accountType?: string; page?: number }): Promise<Page<AdminUserItem>> {
+  listUsers(params: { search?: string; accountType?: string; status?: string; page?: number }): Promise<Page<AdminUserItem>> {
     const query = new URLSearchParams();
     if (params.search) query.set('search', params.search);
     if (params.accountType) query.set('accountType', params.accountType);
+    if (params.status) query.set('status', params.status);
     if (params.page) query.set('page', String(params.page));
     const suffix = query.toString() ? `?${query.toString()}` : '';
     return apiFetch(`/admin/users${suffix}`);
@@ -65,10 +66,11 @@ export const adminApi = {
   setUserStatus(id: string, status: 'active' | 'suspended'): Promise<{ id: string; status: string }> {
     return apiFetch(`/admin/users/${id}/status`, { method: 'PATCH', body: { status } });
   },
-  listListings(params: { search?: string; category?: string; page?: number }): Promise<Page<AdminListingItem>> {
+  listListings(params: { search?: string; category?: string; status?: string; page?: number }): Promise<Page<AdminListingItem>> {
     const query = new URLSearchParams();
     if (params.search) query.set('search', params.search);
     if (params.category) query.set('category', params.category);
+    if (params.status) query.set('status', params.status);
     if (params.page) query.set('page', String(params.page));
     const suffix = query.toString() ? `?${query.toString()}` : '';
     return apiFetch(`/admin/listings${suffix}`);
@@ -79,8 +81,12 @@ export const adminApi = {
   categories(): Promise<{ items: AdminCategoryItem[] }> {
     return apiFetch('/admin/categories');
   },
-  createCategory(category: string, name: string): Promise<{ id: string; name: string }> {
-    return apiFetch('/admin/categories', { method: 'POST', body: { category, name } });
+  createCategory(
+    category: string,
+    name: string,
+    parentId?: string | null,
+  ): Promise<{ id: string; name: string }> {
+    return apiFetch('/admin/categories', { method: 'POST', body: { category, name, parentId } });
   },
   renameCategory(id: string, name: string): Promise<{ id: string; name: string }> {
     return apiFetch(`/admin/categories/${id}`, { method: 'PATCH', body: { name } });

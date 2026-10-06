@@ -16,7 +16,7 @@ import {
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { adminApi, type AdminListingItem } from '@/features/admin/api/adminApi';
-import { AppText } from '@/shared/components/AppText';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { SearchField } from '@/shared/components/SearchField';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { palette, spacing } from '@/theme';
@@ -35,6 +35,7 @@ export function AdminListingsScreen(): React.ReactElement {
     const result = await adminApi.listListings({
       search,
       category: nextCategory === 'all' ? undefined : nextCategory,
+      status: 'live',
     });
     setItems(result.items);
   }, []);
@@ -93,7 +94,7 @@ export function AdminListingsScreen(): React.ReactElement {
       {loading ? (
         <ActivityIndicator color={palette.gold} style={styles.loader} />
       ) : items.length === 0 ? (
-        <AppText style={styles.empty}>{t('admin.emptyListings')}</AppText>
+        <EmptyState title={t('admin.emptyListings')} />
       ) : (
         cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
       )}
@@ -111,5 +112,4 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
   },
   loader: { marginTop: spacing.xl },
-  empty: { color: palette.muted, textAlign: 'center', marginTop: spacing.xl },
 });

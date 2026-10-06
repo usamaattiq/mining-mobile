@@ -18,4 +18,5 @@ export type EquipmentListingReviewProps = {
   onChangeMedia: () => void;
   onPublish: () => void;
   publishing: boolean;
+  publishLabel?: string;
 };

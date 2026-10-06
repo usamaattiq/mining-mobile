@@ -27,13 +27,27 @@ export function useBiometricLogin(options: {
   const prompt = React.useCallback(async () => {
     if (!cachedMpin) return;
 
-    // Avoid Face ID failing when the MPIN keyboard is still presenting.
+    // iOS cancels Face ID if the number pad is on screen. Wait until it is gone.
     Keyboard.dismiss();
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await new Promise<void>((resolve) => {
+      if (!Keyboard.isVisible()) {
+        resolve();
+        return;
+      }
+      const subscription = Keyboard.addListener('keyboardDidHide', () => {
+        subscription.remove();
+        resolve();
+      });
+      setTimeout(() => {
+        subscription.remove();
+        resolve();
+      }, 700);
+    });
 
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: t('loginMpin.biometricPrompt'),
       cancelLabel: t('common.cancel'),
+      disableDeviceFallback: false,
     });
 
     if (result.success) {

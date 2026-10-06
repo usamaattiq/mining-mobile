@@ -31,7 +31,7 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type LifeFilter = 'all' | 'live' | 'past';
+type LifeFilter = 'live' | 'past';
 
 export function RequestsScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -49,7 +49,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
       setCategory(route.params.category);
     }
   }, [route.params?.category]);
-  const [lifeFilter, setLifeFilter] = React.useState<LifeFilter>('all');
+  const [lifeFilter, setLifeFilter] = React.useState<LifeFilter>('live');
   const [lifeRowWidth, setLifeRowWidth] = React.useState(0);
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -102,25 +102,15 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
 
   const visibleCards = cards.filter((card) => {
     if (lifeFilter === 'past') return Boolean(card.ended);
-    if (lifeFilter === 'live') return !card.ended;
-    return true;
+    return !card.ended;
   });
 
   const emptyTitle =
-    lifeFilter === 'live'
-      ? t('requests.emptyLiveTitle')
-      : lifeFilter === 'past'
-        ? t('requests.emptyPastTitle')
-        : t('requests.emptyTitle');
+    lifeFilter === 'live' ? t('requests.emptyLiveTitle') : t('requests.emptyPastTitle');
   const emptySubtitle =
-    lifeFilter === 'live'
-      ? t('requests.emptyLiveSubtitle')
-      : lifeFilter === 'past'
-        ? t('requests.emptyPastSubtitle')
-        : t('requests.emptySubtitle');
+    lifeFilter === 'live' ? t('requests.emptyLiveSubtitle') : t('requests.emptyPastSubtitle');
 
   const lifeOptions: { key: LifeFilter; label: string }[] = [
-    { key: 'all', label: t('requests.filterAll') },
     { key: 'live', label: t('requests.filterLive') },
     { key: 'past', label: t('requests.filterPast') },
   ];

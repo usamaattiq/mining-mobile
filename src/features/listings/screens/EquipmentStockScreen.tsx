@@ -1,6 +1,5 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -8,6 +7,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { EquipmentDealCard } from '@/features/listings/components/EquipmentDealCard';
 import { AppText } from '@/shared/components/AppText';
+import { EmptyState } from '@/shared/components/EmptyState';
 import { Button } from '@/shared/components/Button';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
@@ -69,7 +69,6 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
     );
   };
 
-  const awaiting = stock?.holds.filter((hold) => hold.status === 'selected') ?? [];
   const active = stock?.holds.filter((hold) => hold.status === 'active') ?? [];
   const returned = stock?.holds.filter((hold) => hold.status === 'returned') ?? [];
 
@@ -108,25 +107,9 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
             {t('equipmentListing.stockRecords')}
           </AppText>
 
-          {awaiting.length === 0 && active.length === 0 && returned.length === 0 ? (
-            <View style={styles.emptyCard}>
-              <Ionicons name="file-tray-outline" size={28} color={palette.gold} />
-              <AppText style={styles.empty}>{t('equipmentListing.stockEmpty')}</AppText>
-            </View>
+          {active.length === 0 && returned.length === 0 ? (
+            <EmptyState title={t('equipmentListing.stockEmpty')} />
           ) : null}
-
-          {awaiting.map((hold) => (
-            <EquipmentDealCard
-              key={hold.id}
-              hold={hold}
-              dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
-              kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
-              unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
-              currencyCode={currency.code}
-              perUnitLabel={t('rfq.pricePerUnit')}
-              statusLabel={t('rfq.offerStatus.selected')}
-            />
-          ))}
 
           {active.map((hold) => (
             <EquipmentDealCard
@@ -219,14 +202,4 @@ const styles = StyleSheet.create({
   tileValue: { fontSize: 22, color: palette.charcoal },
   tileLabel: { fontSize: 11, color: palette.muted, textAlign: 'center' },
   sectionTitle: { fontSize: 16, color: palette.charcoal, marginTop: spacing.sm },
-  emptyCard: {
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: palette.warmWhite,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: palette.softGold,
-    padding: spacing.xl,
-  },
-  empty: { color: palette.muted, fontSize: 14, textAlign: 'center' },
 });

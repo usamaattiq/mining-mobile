@@ -14,11 +14,17 @@ type NotificationRowProps = {
   t: TranslateFn;
 };
 
+function notificationCopy(value: string, t: TranslateFn): string {
+  return value.startsWith('notifications.') ? t(value) : value;
+}
+
 export function NotificationRow({ item, onPress, t }: NotificationRowProps): React.ReactElement {
+  const title = notificationCopy(item.titleKey, t);
+  const body = notificationCopy(item.bodyKey, t);
   return (
     <PressableCard
       onPress={onPress}
-      accessibilityLabel={t(item.titleKey)}
+      accessibilityLabel={title}
       highlighted={!item.read}
       style={styles.alignStart}
     >
@@ -28,12 +34,12 @@ export function NotificationRow({ item, onPress, t }: NotificationRowProps): Rea
       <View style={styles.copy}>
         <View style={styles.topRow}>
           <AppText weight="bold" style={styles.title} numberOfLines={1}>
-            {t(item.titleKey)}
+            {title}
           </AppText>
           <AppText style={styles.time}>{formatRelativeTime(item.sentAt, t)}</AppText>
         </View>
         <AppText style={styles.body} numberOfLines={2}>
-          {t(item.bodyKey)}
+          {body}
         </AppText>
       </View>
       {!item.read ? <View style={styles.dot} /> : null}
