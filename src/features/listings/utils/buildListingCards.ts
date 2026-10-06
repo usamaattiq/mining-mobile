@@ -38,6 +38,15 @@ function cityFromLocation(location: string | undefined): string | undefined {
   return city || undefined;
 }
 
+/** Long owner statuses that need the title on its own row under the badge. */
+function titleBelowStatus(status: string | undefined): boolean {
+  return (
+    status === 'awaiting-your-confirmation' ||
+    status === 'awaiting-confirmation' ||
+    status === 'awaiting-action'
+  );
+}
+
 function priceText(currencyCode: string, amount: string): string | undefined {
   return amount ? `${currencyCode} ${formatAmountWithCommas(amount)}` : undefined;
 }
@@ -133,6 +142,7 @@ export function buildListingCards({
         subtitle: `${listing.equipmentTypeLabel} · ${t('equipmentListing.unitsCount', { count: listing.postedAs === 'supplier' ? (listing.availableUnits ?? listing.units) : listing.units })}`,
         subtitleIcon: 'construct-outline',
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+        titleBelowStatus: titleBelowStatus(listing.rfq?.status),
         requestBadge:
           listing.postedAs === 'buyer'
             ? {
@@ -207,6 +217,7 @@ export function buildListingCards({
       subtitle: listing.serviceCategoryLabel,
       subtitleIcon: 'briefcase-outline',
       typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+      titleBelowStatus: titleBelowStatus(listing.rfq?.status),
       city: cityFromLocation(listing.location),
       statusBadges: [
         ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
@@ -244,6 +255,7 @@ export function buildListingCards({
         .join(' · ') || undefined,
     city: cityFromLocation(listing.location),
     typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+    titleBelowStatus: titleBelowStatus(listing.rfq?.status),
     priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
     expiresAt: listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,

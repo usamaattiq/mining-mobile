@@ -53,7 +53,6 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [onsite, setOnsite] = React.useState(false);
   const [online, setOnline] = React.useState(false);
   const serviceType = serviceTypeFromFlags(onsite, online);
-  const isOnsite = onsite;
 
   const serviceCategoryOptions = useCatalogOptions('services');
 
@@ -148,10 +147,10 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
   const autoLocated = React.useRef(false);
   React.useEffect(() => {
-    if (step !== 1 || !isOnsite || autoLocated.current || location.trim()) return;
+    if (step !== 1 || autoLocated.current || location.trim()) return;
     autoLocated.current = true;
     void handleUseCurrentLocation();
-  }, [step, isOnsite, location]);
+  }, [step, location]);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -170,8 +169,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
           (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
   );
   const mediaValid =
-    (isBuyer || media.length > 0) &&
-    (!isOnsite || location.trim().length > 0);
+    (isBuyer || media.length > 0) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
 
   const handleBack = () => {
@@ -215,7 +213,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         price: isBuyer ? '' : onsite ? onsitePrice : onlinePrice,
         serviceDate: null,
         expiryHours: expiryHoursUntil(listedUntil),
-        location: isOnsite ? location : '',
+        location,
         media: persistedMedia,
         postedAs: editingId
           ? (sourceListing?.postedAs ?? 'supplier')
@@ -279,7 +277,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                 : '',
           },
         ]),
-    ...(isOnsite ? [{ label: t('serviceListing.location'), value: location }] : []),
+    { label: t('serviceListing.location'), value: location },
     {
       label: t('serviceListing.listedUntil'),
       value: new Intl.DateTimeFormat(currentLanguage, {
@@ -439,17 +437,15 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               onChange={setListedUntil}
             />
 
-            {isOnsite ? (
-              <LocationField
-                label={t('serviceListing.location')}
-                value={location}
-                required
-                loading={locationLoading}
-                onChangeText={setLocation}
-                onUseCurrentLocation={() => void handleUseCurrentLocation()}
-                onSelectOnMap={handleSelectOnMap}
-              />
-            ) : null}
+            <LocationField
+              label={t('serviceListing.location')}
+              value={location}
+              required
+              loading={locationLoading}
+              onChangeText={setLocation}
+              onUseCurrentLocation={() => void handleUseCurrentLocation()}
+              onSelectOnMap={handleSelectOnMap}
+            />
           </View>
         ) : null}
 
