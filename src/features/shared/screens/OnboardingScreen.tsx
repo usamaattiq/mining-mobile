@@ -1,7 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +21,7 @@ const BRAND_FONT_BOLD = getFontFamily('en', 'bold');
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 
 const mainHomeImage = require('@/assets/images/main-home.png');
+const splashLogoImage = require('@/assets/images/splash-logo.png');
 const mainHomeImageSize = Image.resolveAssetSource(mainHomeImage);
 const mainHomeAspectRatio =
   mainHomeImageSize.width && mainHomeImageSize.height
@@ -71,7 +71,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
         <View style={styles.topBar}>
           <View style={styles.logoRow}>
             <View style={styles.logoMark}>
-              <MaterialCommunityIcons name="triangle-outline" size={22} color={colors.gold} />
+              <Image source={splashLogoImage} style={styles.logoImage} resizeMode="contain" />
             </View>
             <Text style={styles.brand}>
               <Text style={styles.brandMine}>Da</Text>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: spacing.sm,
   },
   logoMark: {
     width: 30,
@@ -179,9 +179,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  logoImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 35,
+    // marginTop: 4,
+    marginLeft: 14,
+  },
   brand: {
-    fontSize: 20,
+    fontSize: 24,
     lineHeight: 30,
+    display: 'none'
   },
   brandMine: {
     fontFamily: BRAND_FONT_BOLD,
