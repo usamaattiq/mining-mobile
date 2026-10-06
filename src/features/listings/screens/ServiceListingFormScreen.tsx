@@ -25,6 +25,7 @@ import { palette, radius, spacing } from '@/theme';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isServiceListing } from '@/features/listings/api/listingsApi';
+import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
 import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
@@ -46,7 +47,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
-  const isBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
+  const editingId = route.params?.editId;
+  const sourceId = editingId ?? route.params?.repostId;
+  const roleIsBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const [onsite, setOnsite] = React.useState(false);
   const [online, setOnline] = React.useState(false);
   const serviceType = serviceTypeFromFlags(onsite, online);
@@ -64,13 +67,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useServiceListingsStore((state) => state.addListing);
   const storedRepost = useServiceListingsStore((state) =>
-    route.params?.repostId
-      ? state.listings.find((item) => item.id === route.params?.repostId)
-      : undefined,
+    sourceId ? state.listings.find((item) => item.id === sourceId) : undefined,
   );
   const filledRepost = React.useRef(false);
+  const originalListedUntil = React.useRef<number | null>(null);
   const [fetchedRepost, setFetchedRepost] = React.useState<ServiceListing | undefined>(undefined);
   const sourceListing = storedRepost ?? fetchedRepost;
+  const isBuyer = editingId ? sourceListing?.postedAs === 'buyer' : roleIsBuyer;
 
   const [serviceCategory, setServiceCategory] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState('');
@@ -89,7 +92,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     useLocationMapPicker();
 
   React.useEffect(() => {
-    const id = route.params?.repostId;
+    const id = sourceId;
     if (!id || storedRepost) return;
     let cancelled = false;
     void listingsApi.get(id).then((listing) => {
@@ -98,7 +101,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     return () => {
       cancelled = true;
     };
-  }, [route.params?.repostId, storedRepost]);
+  }, [sourceId, storedRepost]);
 
   React.useEffect(() => {
     if (!sourceListing || filledRepost.current) return;
@@ -107,7 +110,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setOnsite(flags.onsite);
     setOnline(flags.online);
     setServiceCategory(
-      matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel),
+      matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel) ??
+        (sourceListing.serviceCategoryLabel.trim() || null),
     );
     setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
     setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
@@ -116,6 +120,10 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setOnsitePrice(isBuyer ? '' : prices.onsitePrice);
     setOnlinePrice(isBuyer ? '' : prices.onlinePrice);
     setLocation(sourceListing.location ?? '');
+    if (editingId && sourceListing.rfq?.expiresAt) {
+      originalListedUntil.current = sourceListing.rfq.expiresAt;
+      setListedUntil(new Date(sourceListing.rfq.expiresAt));
+    }
     setMedia(
       cloneRepostMedia(
         (sourceListing.media ?? []).filter(
@@ -123,7 +131,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         ),
       ),
     );
-  }, [isBuyer, serviceCategoryOptions, sourceListing]);
+  }, [editingId, isBuyer, serviceCategoryOptions, sourceListing]);
+
+  React.useEffect(() => {
+    if (!sourceListing || serviceCategoryOptions.length === 0) return;
+    const matched = matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel);
+    if (matched) setServiceCategory(matched);
+  }, [serviceCategoryOptions, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();
@@ -178,15 +192,19 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
   const handlePublish = async () => {
     if (publishing || !serviceType) return;
+    if (editingId && !sourceListing) return;
     if (listedUntil.getTime() <= Date.now()) {
-      showAppAlert(t('common.error'), t('serviceListing.listedUntilPast'));
-      return;
+      const keptOriginal = originalListedUntil.current === listedUntil.getTime();
+      if (!keptOriginal) {
+        showAppAlert(t('common.error'), t('serviceListing.listedUntilPast'));
+        return;
+      }
     }
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
-      const listing = await listingsApi.create({
-        category: 'services',
+      const body = {
+        category: 'services' as const,
         serviceType,
         serviceCategoryLabel: serviceCategoryLabel ?? '',
         title,
@@ -199,8 +217,18 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         expiryHours: expiryHoursUntil(listedUntil),
         location: isOnsite ? location : '',
         media: persistedMedia,
-        postedAs: useMarketplaceRoleStore.getState().role,
-      });
+        postedAs: editingId
+          ? (sourceListing?.postedAs ?? 'supplier')
+          : useMarketplaceRoleStore.getState().role,
+      };
+      const listing = editingId
+        ? await listingsApi.update(editingId, body)
+        : await listingsApi.create(body);
+      if (editingId) {
+        cacheListing(listing);
+        navigation.goBack();
+        return;
+      }
       if (isServiceListing(listing)) addListing(listing);
       navigation.reset({
         index: 1,
@@ -273,7 +301,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       <AppTopBar
         left="back"
         variant="gold"
-        title={t('serviceListing.formTitle')}
+        title={editingId ? t('serviceListing.editFormTitle') : t('serviceListing.formTitle')}
         onBackPress={handleBack}
         style={styles.header}
       />
@@ -435,7 +463,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
             <AttachmentsSection documents={documents} downloadable={false} />
             <Button
-              label={t('serviceListing.publish')}
+              label={editingId ? t('serviceListing.update') : t('serviceListing.publish')}
               onPress={handlePublish}
               loading={publishing}
               style={styles.publishButton}

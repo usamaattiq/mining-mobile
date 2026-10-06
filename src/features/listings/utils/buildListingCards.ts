@@ -42,6 +42,19 @@ function priceText(currencyCode: string, amount: string): string | undefined {
   return amount ? `${currencyCode} ${formatAmountWithCommas(amount)}` : undefined;
 }
 
+/** When multiple units: `/ unit / hr` (etc.). Single unit keeps `/ hr`. */
+function priceUnitLabel(
+  periodUnit: string | undefined,
+  units: number,
+  t: TFunction,
+): string | undefined {
+  if (units <= 1) return periodUnit;
+  const perUnit = t('rfq.pricePerUnit');
+  if (!periodUnit) return perUnit;
+  const period = periodUnit.replace(/^\/\s*/, '').trim();
+  return period ? `${perUnit} / ${period}` : perUnit;
+}
+
 function rentalPrice(
   listing: EquipmentListing,
   t: TFunction,
@@ -93,6 +106,7 @@ export function buildListingCards({
       const price = rental.priceText
         ? rental
         : { priceText: priceText(currencyCode, listing.salePrice), priceUnit: undefined };
+      const displayUnit = priceUnitLabel(price.priceUnit, listing.units, t);
       const durationBadges = offersRent
         ? [
             listing.hourlyRental
@@ -150,7 +164,7 @@ export function buildListingCards({
                 offersSell ? { key: 'sell', label: t('equipmentListing.sell') } : null,
               ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
         priceText: listing.postedAs === 'buyer' ? undefined : price.priceText,
-        priceUnit: price.priceUnit,
+        priceUnit: listing.postedAs === 'buyer' ? undefined : displayUnit,
         createdAt: listing.postedAs === 'supplier' ? undefined : listing.createdAt,
         expiresAt:
           listing.postedAs === 'supplier'

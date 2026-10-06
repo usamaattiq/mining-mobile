@@ -82,6 +82,10 @@ export const listingsApi = {
     return apiFetch('/listings', { method: 'POST', body });
   },
 
+  update(id: string, body: CreateListingBody): Promise<ListingDto> {
+    return apiFetch(`/listings/${id}`, { method: 'PATCH', body });
+  },
+
   submitOffer(
     id: string,
     price: string,

@@ -18,6 +18,7 @@ export function EquipmentListingReview({
   onChangeMedia,
   onPublish,
   publishing,
+  publishLabel,
 }: EquipmentListingReviewProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
 
@@ -33,7 +34,7 @@ export function EquipmentListingReview({
       {deliveryAvailable ? <DeliveryAvailableBanner subtitle={deliverySubtitle} /> : null}
 
       <Button
-        label={t('equipmentListing.publish')}
+        label={publishLabel ?? t('equipmentListing.publish')}
         onPress={onPublish}
         loading={publishing}
         style={styles.publishButton}

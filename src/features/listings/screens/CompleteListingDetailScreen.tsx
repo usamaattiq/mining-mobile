@@ -512,6 +512,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
   ) || rfq?.status === 'offer-submitted';
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
+  const canEditListing = isOwner && !listingIsEngaged(rfq);
   const canOffer =
     !isAdmin &&
     Boolean(rfq) &&
@@ -1004,6 +1005,32 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
       {backButton}
 
+      {canEditListing ? (
+        <Pressable
+          onPress={() => {
+            if (category === 'equipment') {
+              navigation.navigate('EquipmentListingForm', { editId: id });
+            } else if (category === 'services') {
+              navigation.navigate('ServiceListingForm', { editId: id });
+            } else {
+              navigation.navigate('GoldListingForm', { editId: id });
+            }
+          }}
+          disabled={deletingListing}
+          hitSlop={12}
+          style={[
+            styles.overlayButton,
+            styles.editButton,
+            { top: insets.top + spacing.sm },
+            deletingListing && styles.withdrawDisabled,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.edit')}
+        >
+          <Ionicons name="create-outline" size={18} color={palette.pureWhite} />
+        </Pressable>
+      ) : null}
+
       {isOwner ? (
         <Pressable
           onPress={() => {
@@ -1286,6 +1313,23 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   );
 }
 
+const ENGAGED_LISTING_STATUSES = new Set([
+  'awaiting-confirmation',
+  'awaiting-your-confirmation',
+  'awaiting-action',
+  'confirmed',
+  'completed',
+]);
+
+/** True once a counterparty is awaiting confirmation, accepted, or confirmed. */
+function listingIsEngaged(rfq: { status?: string; offers?: { status: string }[] } | undefined): boolean {
+  if (!rfq) return false;
+  if (ENGAGED_LISTING_STATUSES.has(rfq.status ?? '')) return true;
+  return (rfq.offers ?? []).some(
+    (offer) => offer.status === 'selected' || offer.status === 'confirmed',
+  );
+}
+
 function supplierUnitsLeft(
   id: string,
   sources: Array<ListingDto | null | undefined>,
@@ -1376,6 +1420,9 @@ const styles = StyleSheet.create({
   },
   backButton: {
     left: spacing.md,
+  },
+  editButton: {
+    right: spacing.md + 40 + spacing.sm,
   },
   deleteButton: {
     right: spacing.md,

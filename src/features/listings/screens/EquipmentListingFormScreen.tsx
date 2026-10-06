@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import type { RootStackParamList } from '@/navigation/types';
+import type { EquipmentListingMode, RootStackParamList } from '@/navigation/types';
 import { AppText } from '@/shared/components/AppText';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
@@ -13,7 +13,7 @@ import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
 import { DurationSlider, formatAuctionDurationLabel } from '@/features/listings/components/DurationSlider';
 import { useCatalogOptions } from '@/features/listings/utils/useCatalogOptions';
-import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
+import { clampAuctionHours, defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
@@ -28,6 +28,7 @@ import { palette, radius, spacing } from '@/theme';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
 import { listingsApi, isEquipmentListing } from '@/features/listings/api/listingsApi';
+import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
 import { matchSelectOption, cloneRepostMedia } from '@/features/listings/utils/matchSelectOption';
 import { useListingsStore } from '@/store/listingsStore';
@@ -63,11 +64,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
-  const role = useMarketplaceRoleStore((state) => state.role);
-  const isBuyer = role === 'buyer';
+  const editingId = route.params?.editId;
+  const sourceId = editingId ?? route.params?.repostId;
+  const roleIsBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const [requestMode, setRequestMode] = React.useState<'rfq' | 'auction'>('rfq');
   const [offerRent, setOfferRent] = React.useState(false);
-  const [offerSell, setOfferSell] = React.useState(isBuyer);
+  const [offerSell, setOfferSell] = React.useState(roleIsBuyer);
   const mode = offerRent && offerSell ? 'both' : offerRent ? 'rent' : offerSell ? 'sell' : null;
 
   const steps = [
@@ -80,13 +82,13 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useListingsStore((state) => state.addListing);
   const repostListing = useListingsStore((state) =>
-    route.params?.repostId
-      ? state.listings.find((item) => item.id === route.params?.repostId)
-      : undefined,
+    sourceId ? state.listings.find((item) => item.id === sourceId) : undefined,
   );
   const filledRepost = React.useRef(false);
+  const originalListedUntil = React.useRef<number | null>(null);
   const [fetchedRepost, setFetchedRepost] = React.useState<EquipmentListing | undefined>(undefined);
   const sourceListing = repostListing ?? fetchedRepost;
+  const isBuyer = editingId ? sourceListing?.postedAs === 'buyer' : roleIsBuyer;
 
   const equipmentTypeOptions = useCatalogOptions('equipment');
 
@@ -114,7 +116,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     useLocationMapPicker();
 
   React.useEffect(() => {
-    const id = route.params?.repostId;
+    const id = sourceId;
     if (!id || repostListing) return;
     let cancelled = false;
     void listingsApi.get(id).then((listing) => {
@@ -123,7 +125,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     return () => {
       cancelled = true;
     };
-  }, [repostListing, route.params?.repostId]);
+  }, [repostListing, sourceId]);
 
   React.useEffect(() => {
     if (!sourceListing || filledRepost.current) return;
@@ -133,7 +135,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setOfferSell(
       isBuyer || sourceListing.mode === 'sell' || sourceListing.mode === 'both',
     );
-    setEquipmentType(matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel));
+    setEquipmentType(
+      matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel) ??
+        (sourceListing.equipmentTypeLabel.trim() || null),
+    );
     setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
     setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setRentPeriod(period);
@@ -166,7 +171,29 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setDeliveryAvailable(Boolean(sourceListing.deliveryAvailable));
     setDeliveryType(sourceListing.deliveryType ?? 'free');
     setDeliveryPricePerKm(sourceListing.deliveryPricePerKm ?? '');
-  }, [equipmentTypeOptions, isBuyer, sourceListing]);
+    if (editingId) {
+      const until = sourceListing.rfq?.expiresAt ?? null;
+      if (until) {
+        originalListedUntil.current = until;
+        setListedUntil(new Date(until));
+      }
+      const end = sourceListing.auctionEndDate ?? sourceListing.rfq?.expiresAt ?? null;
+      const start = sourceListing.auctionStartDate ?? null;
+      if (start && end && end > start) {
+        setAuctionStartDate(new Date(start));
+        setDurationHours(clampAuctionHours((end - start) / 3_600_000));
+      } else if (end && end > Date.now()) {
+        setAuctionStartDate(new Date());
+        setDurationHours(clampAuctionHours((end - Date.now()) / 3_600_000));
+      }
+    }
+  }, [editingId, equipmentTypeOptions, isBuyer, sourceListing]);
+
+  React.useEffect(() => {
+    if (!sourceListing || equipmentTypeOptions.length === 0) return;
+    const matched = matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel);
+    if (matched) setEquipmentType(matched);
+  }, [equipmentTypeOptions, sourceListing]);
 
   const handleUseCurrentLocation = async () => {
     const selection = await getCurrentLocation();
@@ -243,9 +270,13 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
   const handlePublish = async () => {
     if (publishing || !mode) return;
+    if (editingId && !sourceListing) return;
     if (isBuyer && requestMode === 'rfq' && listedUntil.getTime() <= Date.now()) {
-      showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
-      return;
+      const keptOriginal = originalListedUntil.current === listedUntil.getTime();
+      if (!keptOriginal) {
+        showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
+        return;
+      }
     }
     const auctionStart =
       isBuyer && requestMode === 'auction'
@@ -256,9 +287,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setPublishing(true);
     try {
       const persistedMedia = await persistListingMedia(media);
-      const listing = await listingsApi.create({
-        category: 'equipment',
-        mode: isBuyer ? 'sell' : mode,
+      const body = {
+        category: 'equipment' as const,
+        mode: (isBuyer ? 'sell' : mode) as EquipmentListingMode,
         equipmentTypeLabel: equipmentTypeLabel ?? '',
         title,
         description,
@@ -280,15 +311,25 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             : isBuyer
               ? expiryHoursUntil(listedUntil)
               : 24 * 365,
-        postedAs: useMarketplaceRoleStore.getState().role,
-        requestMode: isBuyer ? requestMode : 'rfq',
+        postedAs: editingId
+          ? (sourceListing?.postedAs ?? 'supplier')
+          : useMarketplaceRoleStore.getState().role,
+        requestMode: isBuyer ? requestMode : ('rfq' as const),
         ...(isBuyer && requestMode === 'auction' && auctionStart
           ? {
               auctionStartDate: auctionStart.getTime(),
               auctionEndDate: auctionStart.getTime() + durationHours * 60 * 60 * 1000,
             }
           : {}),
-      });
+      };
+      const listing = editingId
+        ? await listingsApi.update(editingId, body)
+        : await listingsApi.create(body);
+      if (editingId) {
+        cacheListing(listing);
+        navigation.goBack();
+        return;
+      }
       if (isEquipmentListing(listing)) addListing(listing);
       navigation.reset({
         index: 1,
@@ -298,10 +339,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         ],
       });
     } catch (error) {
-      showAppAlert(
-        t('common.error'),
-        error instanceof ApiError ? error.message : t('common.error'),
-      );
+      const message = error instanceof ApiError ? error.message : '';
+      if (message.includes('already rented or sold')) {
+        showAppAlert(t('equipmentListing.unitsBelowCommitted'));
+        return;
+      }
+      showAppAlert(t('common.error'), message || t('common.error'));
     } finally {
       setPublishing(false);
     }
@@ -384,13 +427,15 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         left="back"
         variant="gold"
         title={
-          isBuyer
-            ? t('equipmentListing.modeTitle')
-            : mode === 'sell'
-              ? t('equipmentListing.sellFormTitle')
-              : mode === 'both'
-                ? t('equipmentListing.bothFormTitle')
-                : t('equipmentListing.rentFormTitle')
+          editingId
+            ? t('equipmentListing.editFormTitle')
+            : isBuyer
+              ? t('equipmentListing.modeTitle')
+              : mode === 'sell'
+                ? t('equipmentListing.sellFormTitle')
+                : mode === 'both'
+                  ? t('equipmentListing.bothFormTitle')
+                  : t('equipmentListing.rentFormTitle')
         }
         onBackPress={handleBack}
         style={styles.header}
@@ -645,6 +690,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             onChangeMedia={() => setStep(1)}
             onPublish={handlePublish}
             publishing={publishing}
+            publishLabel={editingId ? t('equipmentListing.update') : undefined}
           />
         ) : null}
 

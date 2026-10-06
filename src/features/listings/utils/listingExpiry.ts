@@ -1,3 +1,11 @@
+const MIN_AUCTION_HOURS = 0.5;
+const MAX_AUCTION_HOURS = 24;
+
+export function clampAuctionHours(hours: number): number {
+  const snapped = Math.round(hours / MIN_AUCTION_HOURS) * MIN_AUCTION_HOURS;
+  return Math.min(MAX_AUCTION_HOURS, Math.max(MIN_AUCTION_HOURS, Number(snapped.toFixed(1))));
+}
+
 export function defaultListingEnd(from = new Date()): Date {
   const end = new Date(from);
   end.setHours(end.getHours() + 24);
