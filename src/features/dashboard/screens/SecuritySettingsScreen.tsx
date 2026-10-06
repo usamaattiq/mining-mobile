@@ -137,7 +137,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
     try {
       const deviceId = await getDeviceId();
       const result = await authApi.loginWithMpin(phoneIdentity, enableMpin, deviceId);
-      await setAuthenticated(result.accessToken);
+      await setAuthenticated(result.accessToken, result.refreshToken);
       setProfile(result.profile);
       await persistBiometric(true, enableMpin);
       setStep('idle');
@@ -203,7 +203,7 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
     try {
       const deviceId = await getDeviceId();
       const result = await authApi.resetMpin(phoneIdentity, newMpin, deviceId);
-      await setAuthenticated(result.accessToken);
+      await setAuthenticated(result.accessToken, result.refreshToken);
       setProfile(result.profile);
       const keepBiometric =
         result.profile.biometricEnabled || useDevicePrefsStore.getState().biometricEnabled;

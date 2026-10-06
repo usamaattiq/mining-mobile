@@ -27,13 +27,20 @@ export interface UserProfileDto {
 
 export interface AuthLoginResultDto {
   accessToken: string;
+  refreshToken: string;
   profile: UserProfileDto;
 }
 
 export interface AuthSignupResultDto {
   userId: string;
   accessToken: string;
+  refreshToken: string;
   profile: UserProfileDto;
+}
+
+export interface AuthRefreshResultDto {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface UpdateProfilePayload {

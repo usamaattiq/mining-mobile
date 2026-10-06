@@ -250,7 +250,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         biometricEnabled,
         deviceId,
       });
-      await setAuthenticated(result.accessToken);
+      await setAuthenticated(result.accessToken, result.refreshToken);
       setProfile(result.profile);
       await useMarketplaceRoleStore.getState().setRole('supplier');
 

@@ -1,6 +1,7 @@
 import { apiFetch } from '@/shared/services/api';
 import type {
   AuthLoginResultDto,
+  AuthRefreshResultDto,
   AuthSignupResultDto,
   LoginOtpPurpose,
   PhoneIdentity,
@@ -65,5 +66,15 @@ export const authApi = {
 
   logout(deviceId?: string): Promise<{ loggedOut: boolean }> {
     return apiFetch('/auth/logout', { method: 'POST', body: deviceId ? { deviceId } : {} });
+  },
+
+  refresh(refreshToken: string): Promise<AuthRefreshResultDto> {
+    // skipRefresh: this call IS the refresh attempt — a 401 here means the
+    // refresh token itself is dead, not something to retry by refreshing again.
+    return apiFetch('/auth/refresh', {
+      method: 'POST',
+      body: { refreshToken },
+      skipRefresh: true,
+    });
   },
 };
