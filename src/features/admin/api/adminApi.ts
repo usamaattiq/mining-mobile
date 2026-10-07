@@ -32,13 +32,7 @@ export type AdminUserDetail = {
   accountType: 'individual' | 'company' | 'admin';
   companyName: string | null;
   status: 'active' | 'suspended';
-  listings: {
-    id: string;
-    title: string;
-    reference: string;
-    category: 'equipment' | 'services' | 'gold';
-    status: string;
-  }[];
+  listings: ListingDto[];
 };
 
 type Page<T> = { total: number; page: number; items: T[] };
