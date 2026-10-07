@@ -204,8 +204,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   inputWrap: {
-    minHeight: 48,
-    borderRadius: radius.md,
+    minHeight: 44,
+    borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: palette.softGold,
     backgroundColor: palette.pureWhite,

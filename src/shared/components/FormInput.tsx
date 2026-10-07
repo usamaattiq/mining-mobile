@@ -11,6 +11,7 @@ export function FormInput({
   error,
   leftAdornment,
   rightAdornment,
+  rowStyle,
   style,
   editable,
   keyboardType,
@@ -47,6 +48,7 @@ export function FormInput({
       <View
         style={[
           styles.inputRow,
+          rowStyle,
           disabled && styles.inputRowDisabled,
           error ? styles.inputRowError : null,
         ]}

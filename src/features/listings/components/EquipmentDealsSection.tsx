@@ -29,9 +29,14 @@ export function EquipmentDealsSection({
 
   React.useEffect(() => {
     let cancelled = false;
-    void listingsApi.equipmentStock(listingId).then((stock) => {
-      if (!cancelled) setHolds(stock.holds);
-    });
+    void listingsApi
+      .equipmentStock(listingId)
+      .then((stock) => {
+        if (!cancelled) setHolds(stock.holds);
+      })
+      .catch(() => {
+        if (!cancelled) setHolds([]);
+      });
     return () => {
       cancelled = true;
     };
