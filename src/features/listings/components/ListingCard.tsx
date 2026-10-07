@@ -217,18 +217,26 @@ export function ListingCard({
             {title}
           </AppText>
 
-          {subtitle ? (
-            <AppText style={styles.gridMeta} numberOfLines={1}>
-              {subtitle}
-            </AppText>
-          ) : null}
-
-          {unitsLabel ? (
+          {subtitle || unitsLabel ? (
             <View style={styles.gridMetaRow}>
-              <Ionicons name={unitsIcon} size={12} color={palette.gold} />
-              <AppText style={styles.gridMeta} numberOfLines={1}>
-                {unitsLabel}
-              </AppText>
+              {subtitleIcon ? (
+                <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
+              ) : null}
+              {subtitle ? (
+                <AppText style={styles.gridMeta} numberOfLines={1}>
+                  {subtitle}
+                </AppText>
+              ) : (
+                <View style={styles.gridMetaSpacer} />
+              )}
+              {unitsLabel ? (
+                <View style={styles.gridUnits}>
+                  <Ionicons name={unitsIcon} size={12} color={palette.gold} />
+                  <AppText style={styles.gridMeta} numberOfLines={1}>
+                    {unitsLabel}
+                  </AppText>
+                </View>
+              ) : null}
             </View>
           ) : null}
 
@@ -430,6 +438,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+  },
+  gridUnits: {
+    marginLeft: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    flexShrink: 0,
+  },
+  gridMetaSpacer: {
+    flex: 1,
   },
   gridMeta: {
     flexShrink: 1,
