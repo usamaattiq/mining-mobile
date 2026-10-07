@@ -5,11 +5,11 @@
     "version": "1.0.5",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/images/splash-logo.png",
+    "icon": "./assets/images/app-icon.png",
     "splash": {
       "image": "./assets/images/splash-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#222222"
+      "backgroundColor": "#000000"
     },
     "scheme": "miningmobile",
     "assetBundlePatterns": ["**/*"],
@@ -24,8 +24,8 @@
       "package": "com.silveraxis.mining",
       "versionCode": 6,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/splash-logo.png",
-        "backgroundColor": "#222222"
+        "foregroundImage": "./assets/images/app-icon.png",
+        "backgroundColor": "#000000"
       }
     },
     "androidStatusBar": {
@@ -64,10 +64,10 @@
           "image": "./assets/images/splash-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#222222",
+          "backgroundColor": "#000000",
           "dark": {
             "image": "./assets/images/splash-logo.png",
-            "backgroundColor": "#222222"
+            "backgroundColor": "#000000"
           }
         }
       ],
