@@ -110,12 +110,16 @@ export function AdminUserProfileScreen({ navigation, route }: Props): React.Reac
   return (
     <GoldSheetScreen
       left="back"
-      title={t('profile.personalInformation')}
+      title={detail?.fullName}
+      titleSize="md"
       onBackPress={navigation.goBack}
       headerStyle={styles.header}
       headerExtra={
         detail ? (
           <View style={styles.switcherWrap}>
+            <AppText style={styles.phone} numberOfLines={1}>
+              {detail.phoneE164}
+            </AppText>
             <SegmentedSwitcher
               value={tab}
               onChange={setTab}
@@ -197,11 +201,18 @@ export function AdminUserProfileScreen({ navigation, route }: Props): React.Reac
 }
 
 const styles = StyleSheet.create({
-  header: { paddingBottom: spacing.sm },
+  header: { paddingBottom: 0 },
   switcherWrap: {
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl + spacing.sm,
     backgroundColor: palette.gold,
+    gap: spacing.md,
+  },
+  phone: {
+    textAlign: 'center',
+    color: palette.pureWhite,
+    fontSize: 12,
+    marginTop: -4,
   },
   avatarRing: {
     width: 108,
