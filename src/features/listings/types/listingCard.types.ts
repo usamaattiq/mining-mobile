@@ -4,7 +4,7 @@ export type ListingCardBadge = {
   key: string;
   label: string;
   icon?: keyof typeof Ionicons.glyphMap;
-  variant?: 'muted' | 'accent' | 'warning' | 'success';
+  variant?: 'muted' | 'accent' | 'warning' | 'success' | 'rfq' | 'auction';
 };
 
 export type ListingCardProps = {

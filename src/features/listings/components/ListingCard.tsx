@@ -17,7 +17,7 @@ const COUNTDOWN_TICK_MS = 1000;
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 const MINUTE_MS = 60 * 1000;
-const IMAGE_SIZE = 128;
+const IMAGE_SIZE = 96;
 const BADGE_ROW_HEIGHT = 20;
 const LINE_HEIGHT = 18;
 
@@ -58,6 +58,8 @@ function statusBadgeStyle(variant: ListingCardBadge['variant']) {
   if (variant === 'muted') return styles.statusBadge_muted;
   if (variant === 'warning') return styles.statusBadge_warning;
   if (variant === 'success') return styles.statusBadge_success;
+  if (variant === 'rfq') return styles.statusBadge_rfq;
+  if (variant === 'auction') return styles.statusBadge_auction;
   return undefined;
 }
 
@@ -108,13 +110,11 @@ export function ListingCard({
   onRepost,
   onPress,
   layout = 'row',
-  titleBelowStatus = false,
 }: ListingCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
   const windowWidth = useWindowDimensions().width;
   const thumbnailUri = thumbnail;
-  const titleInlineWithStatus = !titleBelowStatus;
 
   React.useEffect(() => {
     if (thumbnailUri) void ExpoImage.prefetch(thumbnailUri);
@@ -152,10 +152,9 @@ export function ListingCard({
     </Pressable>
   ) : null;
 
-  const bottomBadges = (
+  const modeBadges = (
     <>
-      {requestBadge && titleInlineWithStatus ? <SmallBadge badge={requestBadge} /> : null}
-      {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
+      {deliveryBadge ? <StatusBadge badge={deliveryBadge} /> : null}
       {(statusBadges ?? []).map((badge) => (
         <StatusBadge key={badge.key} badge={badge} />
       ))}
@@ -190,7 +189,7 @@ export function ListingCard({
           )}
           {requestBadge ? (
             <View style={styles.gridRequestOverlay}>
-              <SmallBadge badge={requestBadge} />
+              <StatusBadge badge={requestBadge} />
             </View>
           ) : null}
           {typeBadge ? (
@@ -281,39 +280,26 @@ export function ListingCard({
         </View>
 
         <View style={styles.copy}>
-          {titleInlineWithStatus ? (
-            <View style={styles.topRow}>
-              <AppText weight="bold" style={[styles.title, styles.titleInline]} numberOfLines={1}>
-                {title}
-              </AppText>
-              {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
+          <View style={styles.topRow}>
+            <AppText weight="bold" style={[styles.title, styles.titleInline]} numberOfLines={1}>
+              {title}
+            </AppText>
+            <View style={styles.topRight}>
+              {requestBadge ? <StatusBadge badge={requestBadge} /> : null}
+              {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
             </View>
-          ) : (
-            <View style={styles.topRow}>
-              <View style={styles.topLeft}>
-                {requestBadge ? <SmallBadge badge={requestBadge} /> : null}
-              </View>
-              {typeBadge ? <StatusBadge badge={typeBadge} /> : <View style={styles.badgeSlot} />}
-            </View>
-          )}
+          </View>
 
           <View style={styles.body}>
-            {titleInlineWithStatus ? null : (
-              <AppText weight="bold" style={styles.title} numberOfLines={1}>
-                {title}
+            <View style={styles.subtitleRow}>
+              {subtitleIcon ? (
+                <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
+              ) : null}
+              <AppText style={[styles.subtitle, styles.typeLabel]} numberOfLines={1}>
+                {subtitle ?? ' '}
               </AppText>
-            )}
-
-            {subtitle || subtitleIcon ? (
-              <View style={styles.subtitleRow}>
-                {subtitleIcon ? (
-                  <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
-                ) : null}
-                <AppText style={styles.subtitle} numberOfLines={1}>
-                  {subtitle ?? ' '}
-                </AppText>
-              </View>
-            ) : null}
+              <View style={styles.modeBadges}>{modeBadges}</View>
+            </View>
 
             {unitsLabel ? (
               <View style={styles.subtitleRow}>
@@ -322,42 +308,54 @@ export function ListingCard({
                   {unitsLabel}
                 </AppText>
               </View>
-            ) : null}
-
-            <View style={styles.subtitleRow}>
-              <Ionicons name="location-outline" size={12} color={palette.gold} />
-              <AppText style={styles.subtitle} numberOfLines={1}>
-                {city ?? ' '}
-              </AppText>
-            </View>
-
-            {resolvedPriceLines.length > 0 ? (
-              <View style={styles.prices}>
-                {resolvedPriceLines.map((line, index) => (
-                  <View key={`${line.text}-${line.unit ?? index}`} style={styles.priceRow}>
-                    <AppText weight="bold" style={styles.price} numberOfLines={1}>
-                      {line.text}
-                    </AppText>
-                    {line.unit ? <AppText style={styles.priceUnit}>{line.unit}</AppText> : null}
-                  </View>
-                ))}
-              </View>
             ) : (
-              <View style={styles.priceRow}>
-                <AppText weight="bold" style={styles.price} numberOfLines={1}>
-                  {' '}
+              <View style={styles.subtitleRow}>
+                <Ionicons name="location-outline" size={12} color={palette.gold} />
+                <AppText style={styles.subtitle} numberOfLines={1}>
+                  {city ?? ' '}
                 </AppText>
               </View>
             )}
-          </View>
 
-          <View style={styles.bottomRow}>
-            <View style={styles.topLeft}>{bottomBadges}</View>
-            <View style={styles.bottomRight}>
-              {timer}
-              {repostButton}
+            {unitsLabel ? (
+              <View style={styles.subtitleRow}>
+                <Ionicons name="location-outline" size={12} color={palette.gold} />
+                <AppText style={styles.subtitle} numberOfLines={1}>
+                  {city ?? ' '}
+                </AppText>
+              </View>
+            ) : null}
+
+            <View style={styles.priceLine}>
+              <View style={styles.timerSlot}>{showTimer ? timer : null}</View>
+              {resolvedPriceLines.length > 0 ? (
+                <View style={styles.prices}>
+                  {resolvedPriceLines.map((line, index) => (
+                    <View key={`${line.text}-${line.unit ?? index}`} style={styles.priceRow}>
+                      <AppText weight="bold" style={styles.price} numberOfLines={1}>
+                        {line.text}
+                      </AppText>
+                      {line.unit ? <AppText style={styles.priceUnit}>{line.unit}</AppText> : null}
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View style={styles.prices}>
+                  <View style={styles.priceRow}>
+                    <AppText weight="bold" style={styles.price} numberOfLines={1}>
+                      {' '}
+                    </AppText>
+                  </View>
+                </View>
+              )}
             </View>
           </View>
+
+          {showRepost ? (
+            <View style={styles.bottomRow}>
+              <View style={styles.bottomRight}>{repostButton}</View>
+            </View>
+          ) : null}
         </View>
       </View>
     </Pressable>
@@ -481,7 +479,6 @@ const styles = StyleSheet.create({
   copy: {
     flex: 1,
     height: IMAGE_SIZE,
-    justifyContent: 'space-between',
     minWidth: 0,
   },
   topRow: {
@@ -490,6 +487,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.xs,
     minHeight: BADGE_ROW_HEIGHT,
+    marginBottom: spacing.xs,
+  },
+  topRight: {
+    flexShrink: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: spacing.xs,
   },
   topLeft: {
     flex: 1,
@@ -504,10 +509,23 @@ const styles = StyleSheet.create({
     width: 1,
   },
   body: {
+    flex: 1,
     gap: 2,
     minWidth: 0,
-    // marginTop: spacing.,
-    // marginBottom: spacing.xs,
+  },
+  prices: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  priceLine: {
+    marginTop: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.xs,
+  },
+  timerSlot: {
+    flexShrink: 0,
   },
   smallBadge: {
     flexDirection: 'row',
@@ -526,6 +544,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: LINE_HEIGHT,
     color: palette.charcoal,
+    
   },
   titleInline: {
     flex: 1,
@@ -535,7 +554,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    minHeight: 12,
+    minHeight: 14,
+  },
+  modeBadges: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 4,
   },
   subtitle: {
     flex: 1,
@@ -543,9 +571,8 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     color: palette.muted,
   },
-  prices: {
-    alignItems: 'flex-end',
-    gap: 2,
+  typeLabel: {
+    paddingRight: 88,
   },
   priceRow: {
     flexDirection: 'row',
@@ -570,7 +597,7 @@ const styles = StyleSheet.create({
   bottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     gap: spacing.xs,
     minHeight: BADGE_ROW_HEIGHT,
   },
@@ -596,6 +623,12 @@ const styles = StyleSheet.create({
   },
   statusBadge_success: {
     backgroundColor: palette.goldDark,
+  },
+  statusBadge_rfq: {
+    backgroundColor: '#2F6F8F',
+  },
+  statusBadge_auction: {
+    backgroundColor: '#6B4C9A',
   },
   statusBadgeText: {
     fontSize: 10,

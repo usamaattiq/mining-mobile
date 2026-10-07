@@ -3,7 +3,7 @@ import type { ListingCategory } from '@/navigation/types';
 import type { EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
-import type { ListingCardProps } from '@/features/listings/types/listingCard.types';
+import type { ListingCardProps, ListingCardBadge } from '@/features/listings/types/listingCard.types';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { rfqStatusBadge, isEndedRfqStatus } from '@/features/listings/utils/rfqStatus';
@@ -32,6 +32,20 @@ function listingHasEnded(input: {
   if (isEndedRfqStatus(input.rfqStatus)) return true;
   const end = input.expiresAt ?? input.auctionEndDate ?? input.createdAt + 24 * 60 * 60 * 1000;
   return Date.now() >= end;
+}
+
+function activityBadge(
+  t: TFunction,
+  rfq: Parameters<typeof rfqStatusBadge>[1],
+  ended: boolean,
+): ListingCardBadge {
+  return (
+    rfqStatusBadge(t, rfq) ?? {
+      key: 'activity',
+      label: ended ? t('rfq.status.expired') : t('rfq.status.live'),
+      variant: ended ? 'muted' : 'accent',
+    }
+  );
 }
 
 function cityFromLocation(location: string | undefined): string | undefined {
@@ -151,7 +165,18 @@ export function buildListingCards({
               : listing.units,
         }),
         unitsIcon: 'layers-outline',
-        typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+        typeBadge: activityBadge(
+          t,
+          listing.rfq,
+          listing.postedAs === 'supplier'
+            ? Date.now() >= listing.createdAt + 365 * 24 * 60 * 60 * 1000
+            : listingHasEnded({
+                rfqStatus: listing.rfq?.status,
+                expiresAt: listing.rfq?.expiresAt,
+                auctionEndDate: listing.auctionEndDate,
+                createdAt: listing.createdAt,
+              }),
+        ),
         titleBelowStatus: titleBelowStatus(listing.rfq?.status),
         requestBadge:
           listing.postedAs === 'buyer'
@@ -161,6 +186,7 @@ export function buildListingCards({
                   listing.requestMode === 'auction'
                     ? t('equipmentListing.requestAuction')
                     : t('equipmentListing.requestRfq'),
+                variant: listing.requestMode === 'auction' ? 'auction' : 'rfq',
               }
             : undefined,
         city: cityFromLocation(listing.location),
@@ -225,7 +251,15 @@ export function buildListingCards({
         placeholderIcon: 'briefcase-outline',
         subtitle: labelOf('services', listing.serviceCategoryLabel),
         subtitleIcon: 'briefcase-outline',
-        typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+        typeBadge: activityBadge(
+          t,
+          listing.rfq,
+          listingHasEnded({
+            rfqStatus: listing.rfq?.status,
+            expiresAt: listing.rfq?.expiresAt,
+            createdAt: listing.createdAt,
+          }),
+        ),
         titleBelowStatus: titleBelowStatus(listing.rfq?.status),
         city: cityFromLocation(listing.location),
         statusBadges: [
@@ -263,7 +297,16 @@ export function buildListingCards({
         .filter((part): part is string => Boolean(part))
         .join(' · ') || undefined,
     city: cityFromLocation(listing.location),
-    typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
+    typeBadge: activityBadge(
+      t,
+      listing.rfq,
+      listingHasEnded({
+        rfqStatus: listing.rfq?.status,
+        expiresAt: listing.rfq?.expiresAt,
+        auctionEndDate: listing.auctionEndDate,
+        createdAt: listing.createdAt,
+      }),
+    ),
     titleBelowStatus: titleBelowStatus(listing.rfq?.status),
     priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
     createdAt: listing.createdAt,
