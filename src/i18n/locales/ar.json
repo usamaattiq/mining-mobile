@@ -243,6 +243,7 @@
     "archiveListing": "أرشفة هذا الإعلان؟",
     "restoreListing": "استعادة هذا الإعلان؟",
     "addLabel": "إضافة",
+    "addCategory": "إضافة تصنيف",
     "addSubcategory": "إضافة تصنيف فرعي",
     "deleteChildrenFirst": "احذف التصنيفات الفرعية أولاً",
     "labelName": "الاسم",

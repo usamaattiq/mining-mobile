@@ -191,7 +191,7 @@ export function AdminCategoriesScreen(): React.ReactElement {
             ? t('admin.labelName')
             : draft?.parentId
               ? t('admin.addSubcategory')
-              : t('admin.addLabel')}
+              : t('admin.addCategory')}
         </AppText>
         <View style={styles.sheetForm}>
           <FormInput

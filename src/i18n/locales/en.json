@@ -243,6 +243,7 @@
     "archiveListing": "Archive this listing?",
     "restoreListing": "Restore this listing?",
     "addLabel": "Add",
+    "addCategory": "Add Category",
     "addSubcategory": "Add subcategory",
     "deleteChildrenFirst": "Delete subcategories first",
     "labelName": "Name",
