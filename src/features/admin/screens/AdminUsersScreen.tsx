@@ -13,8 +13,8 @@ import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
-import { AdminChipRow } from '@/features/admin/components/AdminChipRow';
 import { adminApi, type AdminUserItem } from '@/features/admin/api/adminApi';
+import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { AppText } from '@/shared/components/AppText';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { SearchField } from '@/shared/components/SearchField';
@@ -26,7 +26,7 @@ import { cardBackShadow } from '@/theme/cardShadow';
 export function AdminUsersScreen(): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [accountType, setAccountType] = React.useState('all');
+  const [accountType, setAccountType] = React.useState<'individual' | 'company'>('individual');
   const [statusFilter, setStatusFilter] = React.useState<'all' | 'blocked'>('all');
   const [query, setQuery] = React.useState('');
   const [items, setItems] = React.useState<AdminUserItem[]>([]);
@@ -34,10 +34,10 @@ export function AdminUsersScreen(): React.ReactElement {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const load = React.useCallback(
-    async (search: string, type: string, status: 'all' | 'blocked') => {
+    async (search: string, type: 'individual' | 'company', status: 'all' | 'blocked') => {
       const result = await adminApi.listUsers({
         search,
-        accountType: type === 'all' ? undefined : type,
+        accountType: type,
         status: status === 'blocked' ? 'suspended' : undefined,
       });
       setItems(result.items);
@@ -61,16 +61,17 @@ export function AdminUsersScreen(): React.ReactElement {
   return (
     <GoldSheetScreen
       title={t('tabs.users')}
+      titleAlign="left"
+      titleSize="lg"
       headerStyle={styles.header}
       headerExtra={
         <View style={styles.headerExtra}>
-          <AdminChipRow
+          <SegmentedSwitcher
             value={accountType}
             onChange={setAccountType}
             options={[
-              { id: 'all', label: t('admin.all'), icon: 'people-outline' },
-              { id: 'individual', label: t('admin.individual'), icon: 'person-outline' },
-              { id: 'company', label: t('admin.company'), icon: 'business-outline' },
+              { key: 'individual', label: t('admin.individual') },
+              { key: 'company', label: t('admin.company') },
             ]}
           />
         </View>
@@ -137,10 +138,10 @@ export function AdminUsersScreen(): React.ReactElement {
 }
 
 const styles = StyleSheet.create({
-  header: { paddingBottom: spacing.sm },
+  header: { paddingBottom: spacing.lg },
   headerExtra: {
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xl + spacing.sm,
+    paddingBottom: spacing.xl,
     backgroundColor: palette.gold,
   },
   loader: { marginTop: spacing.xl },
@@ -148,31 +149,32 @@ const styles = StyleSheet.create({
     position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.sm + 2,
     backgroundColor: palette.warmWhite,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: palette.softGold,
-    padding: spacing.sm,
-    marginBottom: spacing.xs,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    // marginBottom: spacing.xs,
     ...cardBackShadow,
   },
   avatar: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   avatarFallback: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: palette.softGold,
   },
   initial: {
     color: palette.goldDark,
-    fontSize: 36,
+    fontSize: 16,
   },
   copy: {
     flex: 1,
@@ -184,13 +186,13 @@ const styles = StyleSheet.create({
     color: palette.charcoal,
   },
   phone: {
-    fontSize: 14,
+    fontSize: 13,
     color: palette.muted,
   },
   badge: {
     position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
+    top: spacing.xs,
+    right: spacing.xs,
     backgroundColor: palette.danger,
     borderRadius: radius.pill,
     paddingHorizontal: spacing.sm,
