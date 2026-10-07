@@ -26,6 +26,8 @@ import { authApi } from '@/features/auth/api/authApi';
 
 void SplashScreen.preventAutoHideAsync();
 
+const SPLASH_DURATION_MS = 2000;
+
 const NUMBER_KEYBOARDS = new Set(['numeric', 'number-pad', 'decimal-pad', 'phone-pad']);
 
 /** Number pads have no return key, so Done is shown only for those keyboards. */
@@ -82,29 +84,35 @@ const navigationTheme = {
 export default function App() {
   const [isI18nReady, setIsI18nReady] = React.useState(false);
   const [isStoresReady, setIsStoresReady] = React.useState(false);
+  const [splashElapsed, setSplashElapsed] = React.useState(false);
   const [fontsLoaded, fontError] = useFonts(appFontAssets);
-  const isReady = isI18nReady && isStoresReady && (fontsLoaded || Boolean(fontError));
+  const startupReady = isI18nReady && isStoresReady && (fontsLoaded || Boolean(fontError));
+  // Always leave the splash after 2s, even if the session check is still running.
+  const isReady = splashElapsed || startupReady;
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setSplashElapsed(true), SPLASH_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   React.useEffect(() => {
     void Promise.all([
       useAuthStore.getState().hydrate(),
       useDevicePrefsStore.getState().hydrate(),
       useMarketplaceRoleStore.getState().hydrate(),
-    ])
-      .then(async () => {
-        // A persisted token alone isn't enough to trust the session — confirm it
-        // against the server and load the profile, or drop it if it's stale/revoked.
-        if (useAuthStore.getState().status === 'authenticated') {
-          try {
-            const profile = await authApi.getMe();
-            useProfileStore.getState().setProfile(profile);
-            void registerForPushNotifications();
-          } catch {
-            await useAuthStore.getState().clear();
-          }
-        }
-      })
-      .then(() => setIsStoresReady(true));
+    ]).then(() => {
+      setIsStoresReady(true);
+      // Confirm the saved session after the splash is allowed to finish.
+      // A hung getMe() must not keep the native splash on screen.
+      if (useAuthStore.getState().status !== 'authenticated') return;
+      void authApi
+        .getMe()
+        .then((profile) => {
+          useProfileStore.getState().setProfile(profile);
+          void registerForPushNotifications();
+        })
+        .catch(() => useAuthStore.getState().clear());
+    });
   }, []);
 
   // Listens for foreground/tapped notifications for the whole app lifetime.
@@ -124,10 +132,9 @@ export default function App() {
   }, []);
 
   React.useEffect(() => {
-    if (isReady) {
-      void SplashScreen.hideAsync();
-    }
-  }, [isReady]);
+    if (!splashElapsed) return;
+    void SplashScreen.hideAsync();
+  }, [splashElapsed]);
 
   if (!isReady) {
     return null;
