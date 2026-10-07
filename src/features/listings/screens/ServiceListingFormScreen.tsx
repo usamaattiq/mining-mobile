@@ -212,7 +212,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       const body = {
         category: 'services' as const,
         serviceType,
-        serviceCategoryLabel: serviceCategoryLabel ?? '',
+        serviceCategoryLabel: serviceCategory ?? '',
         title,
         description,
         yearsOfExperience: String(yearsOfExperience),

@@ -55,6 +55,7 @@ import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
+import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabels';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteListingDetail'>;
@@ -78,6 +79,7 @@ function formatListingDate(locale: string, epoch: number | null | undefined): st
 export function CompleteListingDetailScreen({ navigation, route }: Props): React.ReactElement {
   const { id, category } = route.params;
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const catalogLabel = useLocalizedCatalogLabel();
   const { currentLanguage } = useLanguage();
   const insets = useSafeAreaInsets();
   const currency = useCurrency();
@@ -241,7 +243,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       Boolean(profileId && (equipmentListing.ownerId ?? equipmentListing.owner?.id) === profileId);
     detailRows = [
       { label: t('common.reference'), value: equipmentListing.reference ?? '' },
-      { label: t('equipmentListing.equipmentType'), value: equipmentListing.equipmentTypeLabel },
+      {
+        label: t('equipmentListing.equipmentType'),
+        value: catalogLabel('equipment', equipmentListing.equipmentTypeLabel),
+      },
       {
         label: t(
           equipmentListing.postedAs === 'supplier'
@@ -385,7 +390,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     location = serviceListing.location ?? '';
     detailRows = [
       { label: t('common.reference'), value: serviceListing.reference ?? '' },
-      { label: t('serviceListing.serviceCategory'), value: serviceListing.serviceCategoryLabel },
+      {
+        label: t('serviceListing.serviceCategory'),
+        value: catalogLabel('services', serviceListing.serviceCategoryLabel),
+      },
       {
         label: t(
           serviceListing.postedAs === 'buyer'
@@ -471,7 +479,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     location = goldListing.location ?? '';
     detailRows = [
       { label: t('common.reference'), value: goldListing.reference ?? '' },
-      { label: t('goldListing.purity'), value: goldListing.purityLabel },
+      { label: t('goldListing.purity'), value: catalogLabel('gold', goldListing.purityLabel) },
       {
         label: t('goldListing.weight'),
         value: goldListing.weight

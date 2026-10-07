@@ -12,6 +12,7 @@ import type {
   RootStackParamList,
 } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
+import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabels';
 import { NotificationBellButton } from '@/features/dashboard/components/NotificationBellButton';
 import { SearchField } from '@/shared/components/SearchField';
 import { HomeCategoryCards } from '@/features/dashboard/components/HomeCategoryCards';
@@ -87,6 +88,7 @@ const EMPTY_FILTERS: HomeFilters = {
 
 export function HomeScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const catalogLabel = useLocalizedCatalogLabel();
   const { currentLanguage } = useLanguage();
   const currency = useCurrency();
   const profile = useProfileStore((state) => state.profile);
@@ -278,6 +280,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     goldListings: visibleGold,
     t,
     currencyCode: currency.code,
+    catalogLabel,
     onOpen: (id, listingCategory) =>
       navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
   }).filter((card) => {

@@ -17,7 +17,7 @@ export type AdminListingItem = ListingDto;
 export type AdminCategoryItem = {
   key: 'equipment' | 'services' | 'gold';
   count: number;
-  labels: { id: string; name: string; parentId: string | null; count: number }[];
+  labels: { id: string; name: string; nameAr: string | null; parentId: string | null; count: number }[];
 };
 
 export type AdminUserDetail = {
@@ -106,12 +106,20 @@ export const adminApi = {
   createCategory(
     category: string,
     name: string,
+    nameAr: string,
     parentId?: string | null,
-  ): Promise<{ id: string; name: string }> {
-    return apiFetch('/admin/categories', { method: 'POST', body: { category, name, parentId } });
+  ): Promise<{ id: string; name: string; nameAr: string | null }> {
+    return apiFetch('/admin/categories', {
+      method: 'POST',
+      body: { category, name, nameAr, ...(parentId ? { parentId } : {}) },
+    });
   },
-  renameCategory(id: string, name: string): Promise<{ id: string; name: string }> {
-    return apiFetch(`/admin/categories/${id}`, { method: 'PATCH', body: { name } });
+  renameCategory(
+    id: string,
+    name: string,
+    nameAr: string,
+  ): Promise<{ id: string; name: string; nameAr: string | null }> {
+    return apiFetch(`/admin/categories/${id}`, { method: 'PATCH', body: { name, nameAr } });
   },
   deleteCategory(id: string): Promise<{ id: string }> {
     return apiFetch(`/admin/categories/${id}`, { method: 'DELETE' });

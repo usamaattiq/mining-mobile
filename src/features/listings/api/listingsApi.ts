@@ -154,7 +154,7 @@ export const listingsApi = {
 
   catalog(category: 'equipment' | 'services' | 'gold'): Promise<{
     names: string[];
-    items?: { id: string; name: string; parentId: string | null }[];
+    items?: { id: string; name: string; nameAr?: string | null; parentId: string | null }[];
   }> {
     return apiFetch(`/listings/catalog?category=${category}`);
   },

@@ -246,6 +246,8 @@
     "addSubcategory": "Add subcategory",
     "deleteChildrenFirst": "Delete subcategories first",
     "labelName": "Name",
+    "nameEnglish": "Name in English",
+    "nameArabic": "Name in Arabic",
     "searchTypes": "Search types",
     "delete": "Delete",
     "deleteLabel": "Delete this category?",

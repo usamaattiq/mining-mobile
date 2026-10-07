@@ -12,6 +12,7 @@ import type {
   RootStackParamList,
 } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
+import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabels';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
@@ -36,6 +37,7 @@ type LifeFilter = 'live' | 'past';
 
 export function RequestsScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const catalogLabel = useLocalizedCatalogLabel();
   const currency = useCurrency();
   const equipmentListings = useListingsStore((state) => state.listings);
   const serviceListings = useServiceListingsStore((state) => state.listings);
@@ -78,6 +80,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     goldListings,
     t,
     currencyCode: currency.code,
+    catalogLabel,
     onOpen: (id, listingCategory) =>
       navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
     onRepost: (id, listingCategory) => {

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { adminApi, type AdminCategoryItem } from '@/features/admin/api/adminApi';
+import { invalidateCatalogCache } from '@/features/listings/utils/catalogLabels';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { SearchField } from '@/shared/components/SearchField';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
@@ -36,7 +37,8 @@ function filterTree(nodes: LabelNode[], query: string): LabelNode[] {
   if (!q) return nodes;
   return nodes.flatMap((node) => {
     const children = filterTree(node.children, query);
-    if (node.name.toLowerCase().includes(q)) return [{ ...node, children: node.children }];
+    const haystack = `${node.name} ${node.nameAr ?? ''}`.toLowerCase();
+    if (haystack.includes(q)) return [{ ...node, children: node.children }];
     if (children.length > 0) return [{ ...node, children }];
     return [];
   });
@@ -51,6 +53,7 @@ export function AdminCategoriesScreen(): React.ReactElement {
   const [draft, setDraft] = React.useState<{
     id: string | null;
     name: string;
+    nameAr: string;
     parentId: string | null;
   } | null>(null);
   const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
@@ -71,11 +74,12 @@ export function AdminCategoriesScreen(): React.ReactElement {
   const visible = filterTree(buildTree(labels), query);
 
   const saveDraft = async () => {
-    if (!draft?.name.trim()) return;
+    if (!draft?.name.trim() || !draft.nameAr.trim()) return;
     setSaving(true);
     try {
-      if (draft.id) await adminApi.renameCategory(draft.id, draft.name.trim());
-      else await adminApi.createCategory(domain, draft.name.trim(), draft.parentId);
+      if (draft.id) await adminApi.renameCategory(draft.id, draft.name.trim(), draft.nameAr.trim());
+      else await adminApi.createCategory(domain, draft.name.trim(), draft.nameAr.trim(), draft.parentId);
+      invalidateCatalogCache();
       setDraft(null);
       await load();
     } catch {
@@ -110,7 +114,7 @@ export function AdminCategoriesScreen(): React.ReactElement {
         headerStyle={styles.header}
         rightSlot={
           <Pressable
-            onPress={() => setDraft({ id: null, name: '', parentId: null })}
+            onPress={() => setDraft({ id: null, name: '', nameAr: '', parentId: null })}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={t('admin.addLabel')}
@@ -161,10 +165,15 @@ export function AdminCategoriesScreen(): React.ReactElement {
                   onAdd={
                     domain === 'gold'
                       ? undefined
-                      : (parentId) => setDraft({ id: null, name: '', parentId })
+                      : (parentId) => setDraft({ id: null, name: '', nameAr: '', parentId })
                   }
                   onEdit={(label) =>
-                    setDraft({ id: label.id, name: label.name, parentId: label.parentId })
+                    setDraft({
+                      id: label.id,
+                      name: label.name,
+                      nameAr: label.nameAr ?? '',
+                      parentId: label.parentId,
+                    })
                   }
                   onDelete={removeLabel}
                   forceExpand={query.trim().length > 0}
@@ -186,9 +195,19 @@ export function AdminCategoriesScreen(): React.ReactElement {
         </AppText>
         <View style={styles.sheetForm}>
           <FormInput
+            label={t('admin.nameEnglish')}
+            placeholder={t('admin.nameEnglish')}
             value={draft?.name ?? ''}
             onChangeText={(name) =>
               setDraft((current) => (current ? { ...current, name } : current))
+            }
+          />
+          <FormInput
+            label={t('admin.nameArabic')}
+            placeholder="الاسم بالعربية"
+            value={draft?.nameAr ?? ''}
+            onChangeText={(nameAr) =>
+              setDraft((current) => (current ? { ...current, nameAr } : current))
             }
           />
           <Button label={t('common.save')} onPress={() => void saveDraft()} loading={saving} />
@@ -251,7 +270,7 @@ function CategoryBranch({
             <Ionicons name="pricetag-outline" size={16} color={palette.gold} />
           </View>
           <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-            {node.name}
+            {node.nameAr ? `${node.name} · ${node.nameAr}` : node.name}
           </AppText>
         </Pressable>
         {onAdd ? (

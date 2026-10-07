@@ -11,6 +11,7 @@ import type {
   RootStackParamList,
 } from '@/navigation/types';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
+import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabels';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { ErrorState } from '@/shared/components/ErrorState';
@@ -35,6 +36,7 @@ type Props = CompositeScreenProps<
 
 export function MyOffersScreen({ navigation }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const catalogLabel = useLocalizedCatalogLabel();
   const currency = useCurrency();
   const listings = useOfferedListingsStore((state) => state.listings);
   const role = useMarketplaceRoleStore((state) => state.role);
@@ -63,6 +65,7 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
     goldListings: sentInThisMode.filter(isGoldListing),
     t,
     currencyCode: currency.code,
+    catalogLabel,
     onOpen: (id, listingCategory) =>
       navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
   });

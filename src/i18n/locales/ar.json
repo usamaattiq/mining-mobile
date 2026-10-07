@@ -246,6 +246,8 @@
     "addSubcategory": "إضافة تصنيف فرعي",
     "deleteChildrenFirst": "احذف التصنيفات الفرعية أولاً",
     "labelName": "الاسم",
+    "nameEnglish": "الاسم بالإنجليزية",
+    "nameArabic": "الاسم بالعربية",
     "searchTypes": "ابحث في الأنواع",
     "delete": "حذف",
     "deleteLabel": "حذف هذا التصنيف؟",

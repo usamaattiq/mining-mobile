@@ -20,6 +20,7 @@ export type BuildListingCardsInput = {
   currencyCode: string;
   onOpen: (id: string, category: ListingCategory) => void;
   onRepost?: (id: string, category: ListingCategory) => void;
+  catalogLabel?: (category: ListingCategory, storedName: string) => string;
 };
 
 function listingHasEnded(input: {
@@ -106,7 +107,9 @@ export function buildListingCards({
   currencyCode,
   onOpen,
   onRepost,
+  catalogLabel,
 }: BuildListingCardsInput): ListingCardItem[] {
+  const labelOf = (kind: ListingCategory, stored: string) => catalogLabel?.(kind, stored) ?? stored;
   if (category === 'equipment') {
     return equipmentListings.map((listing) => {
       const offersRent = listing.mode === 'rent' || listing.mode === 'both';
@@ -139,7 +142,7 @@ export function buildListingCards({
         reference: listing.reference,
         thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
         placeholderIcon: 'construct-outline',
-        subtitle: listing.equipmentTypeLabel,
+        subtitle: labelOf('equipment', listing.equipmentTypeLabel),
         subtitleIcon: 'construct-outline',
         unitsLabel: t('equipmentListing.unitsCount', {
           count:
@@ -220,7 +223,7 @@ export function buildListingCards({
         reference: listing.reference,
         thumbnail: listing.media.find((item) => item.kind === 'photo')?.uri,
         placeholderIcon: 'briefcase-outline',
-        subtitle: listing.serviceCategoryLabel,
+        subtitle: labelOf('services', listing.serviceCategoryLabel),
         subtitleIcon: 'briefcase-outline',
         typeBadge: rfqStatusBadge(t, listing.rfq) ?? undefined,
         titleBelowStatus: titleBelowStatus(listing.rfq?.status),
@@ -255,7 +258,7 @@ export function buildListingCards({
     subtitle:
       [
         listing.weight ? t('goldListing.weightValue', { weight: listing.weight }) : null,
-        listing.purityLabel,
+        labelOf('gold', listing.purityLabel),
       ]
         .filter((part): part is string => Boolean(part))
         .join(' · ') || undefined,

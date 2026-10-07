@@ -302,7 +302,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       const body = {
         category: 'equipment' as const,
         mode: (isBuyer ? 'sell' : mode) as EquipmentListingMode,
-        equipmentTypeLabel: equipmentTypeLabel ?? '',
+        equipmentTypeLabel: equipmentType ?? '',
         title,
         description,
         hourlyRental: isBuyer ? '' : rentalByPeriod.hourly,

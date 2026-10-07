@@ -14,6 +14,7 @@ import {
   isServiceListing,
 } from '@/features/listings/api/listingsApi';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
+import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabels';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { adminApi, type AdminListingItem } from '@/features/admin/api/adminApi';
 import { EmptyState } from '@/shared/components/EmptyState';
@@ -23,6 +24,7 @@ import { palette, spacing } from '@/theme';
 
 export function AdminListingsScreen(): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const catalogLabel = useLocalizedCatalogLabel();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const currency = useCurrency();
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
@@ -60,6 +62,7 @@ export function AdminListingsScreen(): React.ReactElement {
     goldListings: items.filter(isGoldListing),
     t,
     currencyCode: currency.code,
+    catalogLabel,
     onOpen: (id, listingCategory) =>
       navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
   });
