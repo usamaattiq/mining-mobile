@@ -996,10 +996,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   .filter((offer) => offer.responderPhone)
                   .map((offer) => [offer.responderId, offer.responderPhone as string]),
               )}
-              onMessageBuyer={(buyer) => {
-                setMessagePeer({ id: buyer.id, fullName: buyer.fullName, avatarUrl: null });
-                setMessageOpen(true);
-              }}
+              onMessageBuyer={
+                isAdmin
+                  ? undefined
+                  : (buyer) => {
+                      setMessagePeer({ id: buyer.id, fullName: buyer.fullName, avatarUrl: null });
+                      setMessageOpen(true);
+                    }
+              }
               onPressBuyer={
                 isAdmin
                   ? (buyerId) => navigation.navigate('AdminUserProfile', { userId: buyerId })

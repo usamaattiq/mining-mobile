@@ -13,6 +13,7 @@ export type EquipmentStockHold = {
   status: 'active' | 'selected' | 'returned';
   buyerId?: string;
   buyerName: string;
+  buyerPhone?: string;
   price: string;
   createdAt: number;
 };

@@ -43,16 +43,19 @@ export function EquipmentDealsSection({
   }, [listingId, revision]);
 
   const contactAction = (hold: EquipmentStockHold) => {
-    if (!onMessageBuyer || !hold.buyerId) return null;
-    const phone = hold.status === 'active' ? buyerPhones?.[hold.buyerId] : undefined;
+    if (!hold.buyerId) return null;
+    const phone = buyerPhones?.[hold.buyerId] ?? hold.buyerPhone;
+    if (!onMessageBuyer && !phone) return null;
     return (
       <View style={styles.contactRow}>
-        <Button
-          label={t('messages.message')}
-          icon="chatbubble-ellipses-outline"
-          onPress={() => onMessageBuyer({ id: hold.buyerId!, fullName: hold.buyerName })}
-          style={styles.contactButton}
-        />
+        {onMessageBuyer ? (
+          <Button
+            label={t('messages.message')}
+            icon="chatbubble-ellipses-outline"
+            onPress={() => onMessageBuyer({ id: hold.buyerId!, fullName: hold.buyerName })}
+            style={styles.contactButton}
+          />
+        ) : null}
         {phone ? (
           <Button
             label={t('common.whatsapp')}
