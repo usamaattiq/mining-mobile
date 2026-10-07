@@ -71,7 +71,7 @@ export function ConversationScreen({ navigation, route }: Props): React.ReactEle
         onBackPress={navigation.goBack}
         scroll={false}
       >
-        <EmptyState title={t('messages.notFound')} />
+        <EmptyState title={t('messages.notFound')} image={null} />
       </GoldSheetScreen>
     );
   }

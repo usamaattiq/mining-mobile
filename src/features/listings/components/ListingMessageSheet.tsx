@@ -203,7 +203,7 @@ export function ListingMessageSheet({
             <AppText style={styles.errorText}>{error}</AppText>
           </View>
         ) : messages.length === 0 ? (
-          <EmptyState title={t('messages.chatEmpty')} />
+          <EmptyState title={t('messages.chatEmpty')} image={null} />
         ) : (
           <FlatList
             style={styles.list}

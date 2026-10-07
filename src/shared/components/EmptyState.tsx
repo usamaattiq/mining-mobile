@@ -13,7 +13,7 @@ export function EmptyState({
 }: EmptyStateProps): React.ReactElement {
   return (
     <View style={styles.empty}>
-      <Image source={image} style={styles.image} resizeMode="contain" />
+      {image ? <Image source={image} style={styles.image} resizeMode="contain" /> : null}
       <View style={styles.textBlock}>
         <AppText weight="semibold" style={styles.title}>
           {title}
