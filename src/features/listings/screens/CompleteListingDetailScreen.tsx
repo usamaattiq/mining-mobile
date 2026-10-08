@@ -1345,14 +1345,15 @@ const ENGAGED_LISTING_STATUSES = new Set([
   'completed',
 ]);
 
-/** True once a counterparty is awaiting confirmation, accepted, or confirmed. */
+/** True once any offer is active, or a counterparty is awaiting confirmation, accepted, or confirmed. */
 function listingIsEngaged(
   rfq: { status?: string; offers?: { status: string }[] } | undefined,
 ): boolean {
   if (!rfq) return false;
   if (ENGAGED_LISTING_STATUSES.has(rfq.status ?? '')) return true;
   return (rfq.offers ?? []).some(
-    (offer) => offer.status === 'selected' || offer.status === 'confirmed',
+    (offer) =>
+      offer.status === 'active' || offer.status === 'selected' || offer.status === 'confirmed',
   );
 }
 
