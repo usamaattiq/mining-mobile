@@ -560,6 +560,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       rfq?.myOfferStatus === 'active' ||
       rfq?.status === 'offer-submitted');
   const showOwnerOffers = (isOwner || isAdmin) && Boolean(rfq);
+  const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
+  const showBidderLeaderboard =
+    isAuction && !isOwner && !isAdmin && hasSentOffer && (rfq?.offers?.length ?? 0) > 0;
   const showCountdown =
     equipmentListing?.postedAs !== 'supplier' &&
     countdownEnd != null &&
@@ -874,6 +877,25 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 });
                 setMessageOpen(true);
               }}
+            />
+          ) : null}
+
+          {showBidderLeaderboard ? (
+            <ListingOffersPanel
+              offers={rfq?.offers ?? []}
+              currencyCode={currency.code}
+              actingOfferId={null}
+              canDecideOffers={false}
+              rfqStatus={rfq?.status}
+              showUnits={category === 'equipment'}
+              placeholderIcon={
+                category === 'gold' ? 'diamond-outline' : 'construct-outline'
+              }
+              showLeader
+              compact
+              title={t('rfq.leaderboardTitle')}
+              onAccept={() => undefined}
+              onReject={() => undefined}
             />
           ) : null}
 
@@ -1341,19 +1363,17 @@ const ENGAGED_LISTING_STATUSES = new Set([
   'awaiting-confirmation',
   'awaiting-your-confirmation',
   'awaiting-action',
-  'confirmed',
-  'completed',
 ]);
 
-/** True once any offer is active, or a counterparty is awaiting confirmation, accepted, or confirmed. */
+/** True while an offer is still open or waiting to be confirmed. Confirmed and completed listings can be edited again. */
 function listingIsEngaged(
   rfq: { status?: string; offers?: { status: string }[] } | undefined,
 ): boolean {
   if (!rfq) return false;
+  if (rfq.status === 'confirmed' || rfq.status === 'completed') return false;
   if (ENGAGED_LISTING_STATUSES.has(rfq.status ?? '')) return true;
   return (rfq.offers ?? []).some(
-    (offer) =>
-      offer.status === 'active' || offer.status === 'selected' || offer.status === 'confirmed',
+    (offer) => offer.status === 'active' || offer.status === 'selected',
   );
 }
 

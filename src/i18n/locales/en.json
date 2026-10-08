@@ -47,6 +47,7 @@
     "offerSubmitted": "Offer submitted",
     "offerFailed": "Could not send your offer. Try again.",
     "offersTitle": "Offers",
+    "leaderboardTitle": "Leaderboard",
     "noOffers": "Offers will appear here.",
     "accept": "Accept",
     "reject": "Reject",

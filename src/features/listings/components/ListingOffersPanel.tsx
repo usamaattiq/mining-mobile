@@ -24,6 +24,10 @@ export type ListingOffersPanelProps = {
   placeholderIcon?: keyof typeof Ionicons.glyphMap;
   /** Gold auctions: trophy on the rank-1 bid. */
   showLeader?: boolean;
+  /** Shorter auction tiles: price on the name line, trophy in the corner. Bidder leaderboard only. */
+  compact?: boolean;
+  /** Replaces the default "Offers" heading. */
+  title?: string;
   /** Gold auctions: message every bidder, not only the selected one. */
   messageEveryOffer?: boolean;
   onAccept: (offerId: string) => void;
@@ -51,6 +55,8 @@ export function ListingOffersPanel({
   showUnits = false,
   placeholderIcon,
   showLeader = false,
+  compact = false,
+  title,
   messageEveryOffer = false,
   onAccept,
   onReject,
@@ -68,7 +74,7 @@ export function ListingOffersPanel({
   return (
     <View style={styles.root}>
       <AppText weight="bold" style={styles.title}>
-        {t('rfq.offersTitle')}
+        {title ?? t('rfq.offersTitle')}
       </AppText>
       {offers.length === 0 ? (
         <EmptyState title={t('rfq.noOffers')} />
@@ -82,12 +88,25 @@ export function ListingOffersPanel({
           const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : null;
           const unitAmount =
             totalAmount != null && units ? Math.round((totalAmount / units) * 100) / 100 : null;
+          const priceLabel = offer.price
+            ? `${currencyCode} ${formatAmountWithCommas(offer.price)}`
+            : null;
           return (
-            <View key={offer.id} style={styles.card}>
+            <View
+              key={offer.id}
+              style={[styles.card, compact && styles.cardCompact, compact && isLeader && styles.cardLeader]}
+            >
+              {compact && isLeader ? (
+                <Ionicons name="trophy" size={16} color={palette.gold} style={styles.trophy} />
+              ) : null}
               <View style={styles.row}>
                 {placeholderIcon ? (
-                  <View style={styles.logo}>
-                    <Ionicons name={placeholderIcon} size={22} color={palette.goldDark} />
+                  <View style={[styles.logo, compact && styles.logoCompact]}>
+                    <Ionicons
+                      name={placeholderIcon}
+                      size={compact ? 16 : 22}
+                      color={palette.goldDark}
+                    />
                   </View>
                 ) : null}
                 <Pressable
@@ -101,7 +120,19 @@ export function ListingOffersPanel({
                       : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
                   </AppText>
                 </Pressable>
-                {isLeader ? <Ionicons name="trophy" size={16} color={palette.gold} /> : null}
+                {!compact && isLeader ? (
+                  <Ionicons name="trophy" size={16} color={palette.gold} />
+                ) : null}
+                {compact && priceLabel ? (
+                  <AppText
+                    weight="bold"
+                    style={[styles.priceInline, isLeader && styles.priceInlineLeader]}
+                    numberOfLines={1}
+                  >
+                    {priceLabel}
+                  </AppText>
+                ) : null}
+                {compact ? null : (
                 <View style={styles.badges}>
                   {statusKey !== 'active' ? (
                     <View style={styles.statusBadge}>
@@ -129,17 +160,18 @@ export function ListingOffersPanel({
                     </View>
                   ) : null}
                 </View>
+                )}
               </View>
-              {showUnits && unitAmount != null && units ? (
+              {compact ? null : showUnits && unitAmount != null && units ? (
                 <PriceTimesUnitsSummary
                   currencyCode={currencyCode}
                   unitAmount={unitAmount}
                   units={units}
                   compact
                 />
-              ) : offer.price ? (
+              ) : priceLabel ? (
                 <AppText weight="bold" style={styles.price}>
-                  {currencyCode} {formatAmountWithCommas(offer.price)}
+                  {priceLabel}
                 </AppText>
               ) : null}
               {canDecide ? (
@@ -204,6 +236,20 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.sm,
   },
+  cardCompact: {
+    position: 'relative',
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    gap: 0,
+  },
+  cardLeader: {
+    paddingTop: spacing.sm,
+  },
+  trophy: {
+    position: 'absolute',
+    top: 4,
+    right: 8,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -216,6 +262,10 @@ const styles = StyleSheet.create({
     backgroundColor: palette.softGold,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  logoCompact: {
+    width: 28,
+    height: 28,
   },
   badges: {
     flexDirection: 'row',
@@ -245,6 +295,13 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     color: palette.charcoal,
+  },
+  priceInline: {
+    fontSize: 13,
+    color: palette.charcoal,
+  },
+  priceInlineLeader: {
+    marginRight: 22,
   },
   actions: {
     flexDirection: 'row',
