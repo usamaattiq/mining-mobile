@@ -525,6 +525,7 @@ const styles = StyleSheet.create({
   choiceRow: {
     flexDirection: 'row',
     gap: spacing.sm,
+    alignItems: 'stretch',
   },
   descriptionInput: {
     minHeight: 96,

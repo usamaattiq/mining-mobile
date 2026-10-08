@@ -30,45 +30,47 @@ export function OptionRowCard({
         pressed && styles.pressed,
       ]}
     >
-      <LinearGradient
-        colors={[palette.lightGold, palette.gold, palette.goldDark]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.iconWrap, compact && styles.iconWrapCompact]}
-      >
-        <Ionicons name={icon} size={compact ? 22 : 30} color={palette.pureWhite} />
-      </LinearGradient>
+      <View style={[styles.heading, compact && styles.headingCompact]}>
+        <LinearGradient
+          colors={[palette.lightGold, palette.gold, palette.goldDark]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.iconWrap, compact && styles.iconWrapCompact]}
+        >
+          <Ionicons name={icon} size={compact ? 22 : 30} color={palette.pureWhite} />
+        </LinearGradient>
 
-      <View style={styles.copy}>
-        <AppText weight="bold" style={[styles.title, compact && styles.titleCompact]}>
-          {title}
-        </AppText>
-        {compact ? null : <AppText style={styles.subtitle}>{subtitle}</AppText>}
+        <View style={styles.copy}>
+          <AppText weight="bold" style={[styles.title, compact && styles.titleCompact]}>
+            {title}
+          </AppText>
+          {compact || !subtitle ? null : <AppText style={styles.subtitle}>{subtitle}</AppText>}
+        </View>
+
+        {compact ? (
+          selected ? (
+            <Ionicons name="checkmark-circle" size={20} color={palette.gold} />
+          ) : (
+            <View style={styles.radio} />
+          )
+        ) : (
+          <View style={styles.chevronWrap}>
+            <Ionicons
+              name={selected ? 'checkmark' : 'chevron-forward'}
+              size={20}
+              color={palette.gold}
+            />
+          </View>
+        )}
       </View>
 
-      {compact ? (
-        selected ? (
-          <Ionicons name="checkmark-circle" size={20} color={palette.gold} />
-        ) : (
-          <View style={styles.radio} />
-        )
-      ) : (
-        <View style={styles.chevronWrap}>
-          <Ionicons
-            name={selected ? 'checkmark' : 'chevron-forward'}
-            size={20}
-            color={palette.gold}
-          />
-        </View>
-      )}
+      {compact && subtitle ? <AppText style={styles.subtitleCompact}>{subtitle}</AppText> : null}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: spacing.md,
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg + 4,
@@ -84,6 +86,15 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: radius.lg,
     gap: spacing.sm,
+  },
+  heading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  headingCompact: {
+    gap: spacing.sm,
+    alignItems: 'center',
   },
   cardSelected: {
     borderColor: palette.gold,
@@ -119,6 +130,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     lineHeight: 18,
+    color: palette.muted,
+  },
+  subtitleCompact: {
+    fontSize: 11,
+    lineHeight: 15,
     color: palette.muted,
   },
   chevronWrap: {
