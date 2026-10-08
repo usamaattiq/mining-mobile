@@ -250,29 +250,32 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         biometricEnabled,
         deviceId,
       });
-      await setAuthenticated(result.accessToken, result.refreshToken);
       setProfile(result.profile);
-      await useMarketplaceRoleStore.getState().setRole('supplier');
+      await Promise.all([
+        setAuthenticated(result.accessToken, result.refreshToken),
+        useMarketplaceRoleStore.getState().setRole('supplier'),
+        setLastPhone({
+          countryCode: country.iso2,
+          countryCallingCode: country.dialCode.replace(/^\+/, ''),
+          phoneDigits: phoneDigits.trim(),
+        }),
+        biometricEnabled ? setCachedMpin(mpin) : Promise.resolve(),
+        setDeviceBiometricEnabled(biometricEnabled),
+      ]);
 
       if (avatarAsset) {
-        try {
-          const { url } = await uploadMedia(avatarAsset);
-          const updatedProfile = await authApi.updateMe({ avatarUrl: url });
-          setProfile(updatedProfile);
-        } catch {
-          // Avatar upload failing shouldn't block account creation; user can retry from profile.
-        }
+        const pendingAvatar = avatarAsset;
+        void (async () => {
+          try {
+            const { url } = await uploadMedia(pendingAvatar);
+            const updatedProfile = await authApi.updateMe({ avatarUrl: url });
+            setProfile(updatedProfile);
+          } catch {
+            // Avatar upload failing shouldn't block account creation; user can retry from profile.
+          }
+        })();
       }
 
-      await setLastPhone({
-        countryCode: country.iso2,
-        countryCallingCode: country.dialCode.replace(/^\+/, ''),
-        phoneDigits: phoneDigits.trim(),
-      });
-      if (biometricEnabled) {
-        await setCachedMpin(mpin);
-      }
-      await setDeviceBiometricEnabled(biometricEnabled);
       navigation.replace('Welcome');
     } catch (error) {
       if (error instanceof ApiError && error.status === 409 && /email/i.test(error.message)) {
