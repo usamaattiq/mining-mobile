@@ -9,6 +9,7 @@ import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { AppText } from '@/shared/components/AppText';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
+import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { ListingVideoThumb } from '@/features/listings/components/ListingVideoThumb';
 import { palette, radius, spacing } from '@/theme';
 import type {
@@ -42,12 +43,14 @@ export function EquipmentMediaUploader({
 }: EquipmentMediaUploaderProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [sheetKind, setSheetKind] = React.useState<'photo' | 'video' | null>(null);
+  const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [uploadingVideo, setUploadingVideo] = React.useState(false);
   const mediaRef = React.useRef(media);
   mediaRef.current = media;
 
   const photos = media.filter((item) => item.kind === 'photo');
   const video = media.find((item) => item.kind === 'video') ?? null;
+  const previewMedia = [...photos, ...(video ? [video] : [])];
   const remainingPhotoSlots = Math.max(MAX_PHOTOS - photos.length, 0);
   const remainingVideoSlots = Math.max(MAX_VIDEOS - (video ? 1 : 0), 0);
 
@@ -175,7 +178,14 @@ export function EquipmentMediaUploader({
           <View key={item?.id ?? `photo_slot_${index}`} style={styles.slot}>
             {item ? (
               <>
-                <Image source={{ uri: item.uri }} style={styles.slotImage} />
+                <Pressable
+                  style={styles.slotImage}
+                  onPress={() => setViewerIndex(previewMedia.findIndex((entry) => entry.id === item.id))}
+                  accessibilityRole="imagebutton"
+                  accessibilityLabel={t('equipmentListing.addPhoto')}
+                >
+                  <Image source={{ uri: item.uri }} style={styles.slotImage} />
+                </Pressable>
                 <Pressable
                   style={styles.remove}
                   onPress={() => remove(item.id)}
@@ -202,7 +212,17 @@ export function EquipmentMediaUploader({
         <View key={video?.id ?? 'video_slot'} style={styles.slot}>
           {video ? (
             <>
-              <ListingVideoThumb uri={video.uri} style={styles.slotImage} />
+              <Pressable
+                style={styles.slotImage}
+                onPress={() =>
+                  setViewerIndex(previewMedia.findIndex((entry) => entry.id === video.id))
+                }
+                disabled={uploadingVideo}
+                accessibilityRole="imagebutton"
+                accessibilityLabel={t('equipmentListing.addVideo')}
+              >
+                <ListingVideoThumb uri={video.uri} style={styles.slotImage} />
+              </Pressable>
               {uploadingVideo ? (
                 <View style={styles.loaderOverlay}>
                   <ActivityIndicator color={palette.pureWhite} />
@@ -291,6 +311,13 @@ export function EquipmentMediaUploader({
           </>
         )}
       </AppBottomSheet>
+
+      <EquipmentImageViewerModal
+        visible={viewerIndex !== null}
+        media={previewMedia}
+        initialIndex={viewerIndex ?? 0}
+        onClose={() => setViewerIndex(null)}
+      />
     </View>
   );
 }

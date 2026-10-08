@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
 import { AppText } from '@/shared/components/AppText';
+import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { palette, radius, spacing } from '@/theme';
 import { uploadDocument } from '@/shared/services/media';
 import type {
@@ -29,6 +30,7 @@ export function ServiceMediaUploader({
 }: ServiceMediaUploaderProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [sheetOpen, setSheetOpen] = React.useState(false);
+  const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [uploadingDocument, setUploadingDocument] = React.useState(false);
   const [uploadError, setUploadError] = React.useState<string | null>(null);
 
@@ -118,7 +120,14 @@ export function ServiceMediaUploader({
           <View key={item?.id ?? `photo_slot_${index}`} style={styles.slot}>
             {item ? (
               <>
-                <Image source={{ uri: item.uri }} style={styles.slotImage} />
+                <Pressable
+                  style={styles.slotImage}
+                  onPress={() => setViewerIndex(photos.findIndex((entry) => entry.id === item.id))}
+                  accessibilityRole="imagebutton"
+                  accessibilityLabel={t('serviceListing.addPhoto')}
+                >
+                  <Image source={{ uri: item.uri }} style={styles.slotImage} />
+                </Pressable>
                 <Pressable
                   style={styles.remove}
                   onPress={() => remove(item.id)}
@@ -211,6 +220,13 @@ export function ServiceMediaUploader({
           </AppText>
         </Pressable>
       </AppBottomSheet>
+
+      <EquipmentImageViewerModal
+        visible={viewerIndex !== null}
+        media={photos.map((item) => ({ id: item.id, uri: item.uri, kind: 'photo' as const }))}
+        initialIndex={viewerIndex ?? 0}
+        onClose={() => setViewerIndex(null)}
+      />
     </View>
   );
 }

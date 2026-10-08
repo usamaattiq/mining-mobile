@@ -6,6 +6,7 @@ import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
+import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
 import { ListingVideoThumb } from '@/features/listings/components/ListingVideoThumb';
 import type { EquipmentListingSummaryCardProps } from '@/features/listings/types/equipmentListingSummaryCard.types';
 
@@ -20,7 +21,9 @@ export function EquipmentListingSummaryCard({
 }: EquipmentListingSummaryCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [descriptionOpen, setDescriptionOpen] = React.useState(false);
+  const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const descriptionText = description?.trim() ?? '';
+  const previewMedia = media.filter((item) => item.kind === 'photo' || item.kind === 'video');
 
   return (
     <View style={styles.root}>
@@ -113,16 +116,28 @@ export function EquipmentListingSummaryCard({
             ) : null}
           </View>
           <View style={styles.mediaGrid}>
-            {media.map((item) => (
-              <View key={item.id} style={styles.mediaSlotWrap}>
+            {previewMedia.map((item, index) => (
+              <Pressable
+                key={item.id}
+                style={styles.mediaSlotWrap}
+                onPress={() => setViewerIndex(index)}
+                accessibilityRole="imagebutton"
+                accessibilityLabel={t('equipmentListing.mediaStep')}
+              >
                 {item.kind === 'video' ? (
                   <ListingVideoThumb uri={item.uri} style={styles.mediaSlot} iconSize={12} />
                 ) : (
                   <Image source={{ uri: item.uri }} style={styles.mediaSlot} />
                 )}
-              </View>
+              </Pressable>
             ))}
           </View>
+          <EquipmentImageViewerModal
+            visible={viewerIndex !== null}
+            media={previewMedia}
+            initialIndex={viewerIndex ?? 0}
+            onClose={() => setViewerIndex(null)}
+          />
         </View>
       ) : null}
     </View>
