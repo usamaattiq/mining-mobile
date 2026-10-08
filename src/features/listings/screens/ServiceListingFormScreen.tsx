@@ -274,14 +274,14 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       ? []
       : [
           {
-            label: t('serviceListing.onsitePrice'),
+            label: t('serviceListing.onsitePrice', { currency: currency.code }),
             value:
               onsite && onsitePrice
                 ? `${currency.code} ${formatAmountWithCommas(onsitePrice)}`
                 : '',
           },
           {
-            label: t('serviceListing.onlinePrice'),
+            label: t('serviceListing.onlinePrice', { currency: currency.code }),
             value:
               online && onlinePrice
                 ? `${currency.code} ${formatAmountWithCommas(onlinePrice)}`
@@ -402,7 +402,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               <>
                 {onsite ? (
                   <FormInput
-                    label={t('serviceListing.onsitePrice')}
+                    label={t('serviceListing.onsitePrice', { currency: currency.code })}
                     value={onsitePrice}
                     onChangeText={(value) => setOnsitePrice(sanitizeStepPrice(value))}
                     keyboardType="numeric"
@@ -417,7 +417,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                 ) : null}
                 {online ? (
                   <FormInput
-                    label={t('serviceListing.onlinePrice')}
+                    label={t('serviceListing.onlinePrice', { currency: currency.code })}
                     value={onlinePrice}
                     onChangeText={(value) => setOnlinePrice(sanitizeStepPrice(value))}
                     keyboardType="numeric"

@@ -229,7 +229,7 @@ export function HomeFilterSheet({
           ) : null}
 
           <AppText weight="semibold" style={styles.sectionTitle}>
-            {t('dashboardHome.filterPriceRange')}
+            {t('dashboardHome.filterPriceRange', { currency: currencyCode })}
           </AppText>
           <View style={styles.rangeRow}>
             <View style={styles.rangeField}>

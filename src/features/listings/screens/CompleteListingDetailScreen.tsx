@@ -932,7 +932,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         value={editOfferPrice}
                         onChangeText={setEditOfferPrice}
                         keyboardType="decimal-pad"
-                        placeholder={t('rfq.unitPricePlaceholder')}
+                        placeholder={t('rfq.unitPricePlaceholder', { currency: currency.code })}
                         placeholderTextColor={palette.muted}
                         style={styles.myOfferPriceInput}
                       />
@@ -1162,8 +1162,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           currencyCode={currency.code}
           placeholder={
             category === 'gold' && hasSentOffer
-              ? t('rfq.updateOfferPlaceholder')
-              : t('rfq.offerPlaceholder')
+              ? t('rfq.updateOfferPlaceholder', { currency: currency.code })
+              : t('rfq.offerPlaceholder', { currency: currency.code })
           }
           sendLabel={t('rfq.sendOffer')}
           submittedLabel={
@@ -1190,7 +1190,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               : undefined
           }
           unitPricePlaceholder={
-            category === 'equipment' ? t('rfq.unitPricePlaceholder') : undefined
+            category === 'equipment'
+              ? t('rfq.unitPricePlaceholder', { currency: currency.code })
+              : undefined
           }
           maxUnits={category === 'equipment' ? Math.max(unitsLeft, 0) : undefined}
           fulfillmentModes={
