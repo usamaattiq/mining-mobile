@@ -297,6 +297,12 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     !checkingEmail;
   const isMpinComplete = mpin.length === MPIN_LENGTH && confirmMpin.length === MPIN_LENGTH;
 
+  const isFingerprint = biometricKind === 'fingerprint';
+  const faceTitle = t(isFingerprint ? 'signUpFace.titleBiometric' : 'signUpFace.title');
+  const faceBody = !biometricAvailable
+    ? t(isFingerprint ? 'signUpFace.unavailableBiometric' : 'signUpFace.unavailable')
+    : t(isFingerprint ? 'signUpFace.subtitleBiometric' : 'signUpFace.subtitle');
+
   const header =
     step === 'phone'
       ? { title: t('signUpPhone.title'), subtitle: t('signUpPhone.subtitle') }
@@ -313,7 +319,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
                 subtitle: t('signUpSecurity.subtitleTemplate', { length: MPIN_LENGTH }),
               }
             : {
-                title: t('signUpFace.title'),
+                title: faceTitle,
                 subtitle: t('signUpFace.headerSubtitle'),
               };
 
@@ -517,10 +523,10 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
           <View style={styles.faceCard}>
             <View style={styles.faceCopy}>
               <AppText weight="semibold" style={styles.faceCardTitle}>
-                {t('signUpFace.title')}
+                {faceTitle}
               </AppText>
               <AppText style={styles.faceCardBody}>
-                {biometricAvailable ? t('signUpFace.subtitle') : t('signUpFace.unavailable')}
+                {faceBody}
               </AppText>
             </View>
             <Switch

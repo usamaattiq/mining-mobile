@@ -203,9 +203,12 @@
   },
   "signUpFace": {
     "title": "Face ID",
+    "titleBiometric": "Biometric",
     "headerSubtitle": "A faster way back in, next to your MPIN.",
     "subtitle": "Use Face ID for a faster sign in. You can always use your MPIN.",
-    "unavailable": "Face ID is not available on this device. You can finish and sign in with your MPIN."
+    "subtitleBiometric": "Use biometrics for a faster sign in. You can always use your MPIN.",
+    "unavailable": "Face ID is not available on this device. You can finish and sign in with your MPIN.",
+    "unavailableBiometric": "Biometrics are not available on this device. You can finish and sign in with your MPIN."
   },
   "legal": {
     "updatedTemplate": "Effective {effective} · Last updated {updated}"
@@ -604,8 +607,10 @@
   },
   "securitySettings": {
     "title": "Security settings",
-    "biometricTitle": "Face ID / Biometric",
-    "biometricSubtitle": "Use your face or fingerprint for faster sign in.",
+    "biometricTitle": "Face ID",
+    "biometricTitleFingerprint": "Biometric",
+    "biometricSubtitle": "Use Face ID for a faster sign in.",
+    "biometricSubtitleFingerprint": "Use biometrics for a faster sign in.",
     "biometricToggleFailed": "Couldn't update biometric unlock. Please try again.",
     "mpinTitle": "MPIN",
     "mpinSubtitle": "Change the PIN you use to log in.",

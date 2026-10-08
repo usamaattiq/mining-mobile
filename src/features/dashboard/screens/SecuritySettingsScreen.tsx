@@ -233,8 +233,16 @@ export function SecuritySettingsScreen({ navigation }: Props): React.ReactElemen
           onToggle={(enabled) => void handleToggleBiometric(enabled)}
           available={biometricAvailable}
           kind={biometricKind}
-          title={t('securitySettings.biometricTitle')}
-          subtitle={t('securitySettings.biometricSubtitle')}
+          title={t(
+            biometricKind === 'fingerprint'
+              ? 'securitySettings.biometricTitleFingerprint'
+              : 'securitySettings.biometricTitle',
+          )}
+          subtitle={t(
+            biometricKind === 'fingerprint'
+              ? 'securitySettings.biometricSubtitleFingerprint'
+              : 'securitySettings.biometricSubtitle',
+          )}
         />
         {step === 'enableMpin' ? (
           <View style={styles.enableMpin}>
