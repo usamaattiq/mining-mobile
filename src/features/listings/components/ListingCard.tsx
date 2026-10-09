@@ -210,7 +210,11 @@ function ListingCardComponent({
                   <AppText weight="bold" style={styles.gridPrice} numberOfLines={1}>
                     {line.text}
                   </AppText>
-                  {line.unit ? <AppText style={styles.gridPriceUnit}>{line.unit}</AppText> : null}
+                  {line.unit ? (
+                    <AppText style={styles.gridPriceUnit} numberOfLines={1}>
+                      {line.unit}
+                    </AppText>
+                  ) : null}
                 </View>
               ))}
             </View>
@@ -346,7 +350,11 @@ function ListingCardComponent({
                       <AppText weight="bold" style={styles.price} numberOfLines={1}>
                         {line.text}
                       </AppText>
-                      {line.unit ? <AppText style={styles.priceUnit}>{line.unit}</AppText> : null}
+                      {line.unit ? (
+                        <AppText style={styles.priceUnit} numberOfLines={1}>
+                          {line.unit}
+                        </AppText>
+                      ) : null}
                     </View>
                   ))}
                 </View>
@@ -417,19 +425,23 @@ const styles = StyleSheet.create({
   },
   gridPrices: {
     gap: 2,
+    minWidth: 0,
   },
   gridPriceRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     gap: 2,
+    minWidth: 0,
   },
   gridPrice: {
+    flexShrink: 1,
     fontSize: 16,
     lineHeight: 16,
     color: palette.charcoal,
   },
   gridPriceUnit: {
+    flexShrink: 0,
     fontSize: 12,
     lineHeight: 16,
     color: palette.muted,
@@ -537,6 +549,8 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   prices: {
+    flex: 1,
+    minWidth: 0,
     alignItems: 'flex-end',
     gap: 2,
   },
@@ -546,6 +560,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.xs,
+    minWidth: 0,
+    overflow: 'hidden',
   },
   timerSlot: {
     flexShrink: 0,
@@ -601,17 +617,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'baseline',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     gap: spacing.xs,
+    maxWidth: '100%',
+    minWidth: 0,
     minHeight: 20,
   },
   price: {
+    flexShrink: 1,
     fontSize: 18,
     lineHeight: 22,
     color: palette.charcoal,
     includeFontPadding: false,
   },
   priceUnit: {
+    flexShrink: 0,
     fontSize: 12,
     lineHeight: 16,
     color: palette.muted,
