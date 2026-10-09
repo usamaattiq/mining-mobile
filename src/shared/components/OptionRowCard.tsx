@@ -128,13 +128,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   cardWithImage: {
-    height: 172,
+    height: 148,
     paddingVertical: 0,
     paddingRight: 0,
     justifyContent: 'center',
   },
   imageRow: {
-    height: 172,
+    height: 148,
     justifyContent: 'center',
     overflow: 'hidden',
   },
