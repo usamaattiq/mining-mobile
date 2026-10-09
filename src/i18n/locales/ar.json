@@ -535,6 +535,7 @@
       "other": "أخرى"
     },
     "price": "سعر البدء ({currency})",
+    "startingPrice": "سعر البدء",
     "auctionStartDate": "تاريخ ووقت بدء المزاد",
     "auctionStartDatePlaceholder": "اختر التاريخ والوقت",
     "auctionStartPast": "اختر وقت بدء المزاد في المستقبل.",

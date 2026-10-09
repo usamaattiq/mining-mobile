@@ -318,7 +318,15 @@ export function buildListingCards({
       }),
     ),
     titleBelowStatus: titleBelowStatus(listing.rfq?.status),
-    priceText: listing.postedAs === 'buyer' ? undefined : priceText(currencyCode, listing.price),
+    priceLines:
+      listing.postedAs === 'buyer' || !listing.price
+        ? undefined
+        : [
+            {
+              text: priceText(currencyCode, listing.price) ?? '',
+              unit: t('goldListing.startingPrice'),
+            },
+          ],
     createdAt: listing.createdAt,
     expiresAt: listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,
     ended: listingHasEnded({

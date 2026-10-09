@@ -555,6 +555,7 @@
       "other": "Other"
     },
     "price": "Starting Price ({currency})",
+    "startingPrice": "Starting price",
     "auctionStartDate": "Auction start date & time",
     "auctionStartDatePlaceholder": "Select date & time",
     "auctionStartPast": "Choose an auction start time in the future.",
