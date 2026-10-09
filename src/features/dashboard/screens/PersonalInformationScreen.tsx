@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { showAppAlert } from '@/shared/services/appAlert';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +15,8 @@ import { FormInput } from '@/shared/components/FormInput';
 import { AvatarPicker } from '@/shared/components/AvatarPicker';
 import { LocationField } from '@/shared/components/LocationField';
 import { Button } from '@/shared/components/Button';
-import { spacing } from '@/theme';
+import { AppText } from '@/shared/components/AppText';
+import { cardBackShadow, palette, radius, spacing } from '@/theme';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -121,34 +123,58 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
         onBackPress={navigation.goBack}
         keyboardShouldPersistTaps="handled"
       >
-        <AvatarPicker uri={avatarUrl} onChangeUrl={setAvatarUrl} />
+        <View style={styles.hero}>
+          <AvatarPicker uri={avatarUrl} onChangeUrl={setAvatarUrl} />
+          <AppText weight="bold" style={styles.heroName} numberOfLines={1}>
+            {(isCompany ? companyName : fullName).trim() || '—'}
+          </AppText>
+          <View style={styles.typePill}>
+            <AppText weight="semibold" style={styles.typePillText}>
+              {isCompany ? t('signUpPersonalInfo.company') : t('signUpPersonalInfo.individual')}
+            </AppText>
+          </View>
+        </View>
 
-        <FormInput label={t('profile.fullName')} value={fullName} onChangeText={setFullName} />
-        {isCompany ? (
+        <View style={[styles.card, cardBackShadow]}>
+          <AppText weight="semibold" style={styles.sectionLabel}>
+            {t('profile.details')}
+          </AppText>
+          <FormInput label={t('profile.fullName')} value={fullName} onChangeText={setFullName} />
+          {isCompany ? (
+            <FormInput
+              label={t('profile.companyName')}
+              value={companyName}
+              onChangeText={setCompanyName}
+            />
+          ) : null}
           <FormInput
-            label={t('profile.companyName')}
-            value={companyName}
-            onChangeText={setCompanyName}
+            label={t('profile.email')}
+            placeholder={t('profile.emailPlaceholder')}
+            value={email}
+            onChangeText={handleEmailChange}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            error={emailError ?? undefined}
           />
-        ) : null}
-        <FormInput
-          label={t('profile.email')}
-          placeholder={t('profile.emailPlaceholder')}
-          value={email}
-          onChangeText={handleEmailChange}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          error={emailError ?? undefined}
-        />
-        <FormInput label={t('profile.phone')} value={profile?.phoneE164 ?? ''} editable={false} />
-        <LocationField
-          label={t('profile.address')}
-          value={address}
-          loading={locationLoading}
-          onChangeText={setAddress}
-          onUseCurrentLocation={() => void handleUseCurrentLocation()}
-          onSelectOnMap={handleSelectOnMap}
-        />
+          <View style={styles.phoneBlock}>
+            <AppText weight="semibold" style={styles.phoneLabel}>
+              {t('profile.phone')}
+            </AppText>
+            <View style={styles.phoneRow}>
+              <Ionicons name="call-outline" size={16} color={palette.gold} />
+              <AppText style={styles.phoneValue}>{profile?.phoneE164 || '—'}</AppText>
+              <Ionicons name="lock-closed" size={14} color={palette.muted} />
+            </View>
+          </View>
+          <LocationField
+            label={t('profile.address')}
+            value={address}
+            loading={locationLoading}
+            onChangeText={setAddress}
+            onUseCurrentLocation={() => void handleUseCurrentLocation()}
+            onSelectOnMap={handleSelectOnMap}
+          />
+        </View>
 
         <Button
           label={t('common.save')}
@@ -165,7 +191,62 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
 }
 
 const styles = StyleSheet.create({
+  hero: {
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  heroName: {
+    fontSize: 20,
+    color: palette.charcoal,
+    textAlign: 'center',
+  },
+  typePill: {
+    backgroundColor: palette.softGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+  },
+  typePillText: {
+    fontSize: 12,
+    color: palette.goldDark,
+  },
+  card: {
+    backgroundColor: palette.pureWhite,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  sectionLabel: {
+    fontSize: 13,
+    color: palette.muted,
+  },
+  phoneBlock: {
+    gap: spacing.xs,
+  },
+  phoneLabel: {
+    fontSize: 13,
+    color: palette.charcoal,
+  },
+  phoneRow: {
+    minHeight: 50,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    backgroundColor: palette.warmWhite,
+    paddingHorizontal: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  phoneValue: {
+    flex: 1,
+    fontSize: 14,
+    color: palette.charcoal,
+  },
   saveButton: {
-    marginTop: spacing.sm,
+    marginTop: spacing.lg,
   },
 });
