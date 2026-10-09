@@ -36,6 +36,9 @@ export function ListingOfferComposer({
   fulfillmentSaleLabel,
   blockedFulfillmentModes,
   offerChoiceLabel,
+  handoverModes,
+  handoverLabels,
+  handoverTitle,
   onSubmit,
   onConfirm,
   onDecline,
@@ -49,6 +52,10 @@ export function ListingOfferComposer({
   const [fulfillment, setFulfillment] = React.useState<'rent' | 'sale' | 'onsite' | 'online'>(
     fulfillmentModes?.[0] ?? 'sale',
   );
+  const [handover, setHandover] = React.useState<'pickup' | 'delivery'>('pickup');
+  React.useEffect(() => {
+    if (handoverModes && !handoverModes.includes(handover)) setHandover('pickup');
+  }, [handover, handoverModes]);
   const unitCap = Math.max(maxUnits ?? 1, 1);
   const blockedModes = React.useMemo(
     () => new Set(blockedFulfillmentModes ?? []),
@@ -82,6 +89,7 @@ export function ListingOfferComposer({
       value,
       maxUnits != null ? units : undefined,
       fulfillmentModes && fulfillmentModes.length > 0 ? fulfillment : undefined,
+      handoverModes && handoverModes.length > 0 ? handover : undefined,
     );
   };
 
@@ -203,6 +211,42 @@ export function ListingOfferComposer({
                     );
                   })}
                 </View>
+              </View>
+            ) : null}
+            {handoverModes && handoverModes.length > 1 ? (
+              <View style={styles.handoverBlock}>
+                {handoverTitle ? (
+                  <AppText weight="bold" style={styles.handoverTitle}>
+                    {handoverTitle}
+                  </AppText>
+                ) : null}
+                {handoverModes.map((mode) => {
+                  const selected = handover === mode;
+                  return (
+                    <Pressable
+                      key={mode}
+                      onPress={() => setHandover(mode)}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected }}
+                      style={styles.handoverRow}
+                    >
+                      <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
+                        {selected ? <View style={styles.radioInner} /> : null}
+                      </View>
+                      <Ionicons
+                        name={mode === 'delivery' ? 'car-outline' : 'storefront-outline'}
+                        size={18}
+                        color={selected ? palette.gold : palette.muted}
+                      />
+                      <AppText
+                        weight={selected ? 'semibold' : 'regular'}
+                        style={[styles.handoverLabel, selected && styles.handoverLabelSelected]}
+                      >
+                        {handoverLabels?.[mode] ?? mode}
+                      </AppText>
+                    </Pressable>
+                  );
+                })}
               </View>
             ) : null}
             <View style={styles.row}>
@@ -460,5 +504,42 @@ const styles = StyleSheet.create({
   },
   fulfillmentLabelDisabled: {
     color: palette.muted,
+  },
+  handoverBlock: {
+    gap: spacing.sm,
+  },
+  handoverTitle: {
+    fontSize: 14,
+    color: palette.charcoal,
+  },
+  handoverRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  radioOuter: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: palette.muted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioOuterSelected: {
+    borderColor: palette.gold,
+  },
+  radioInner: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: palette.gold,
+  },
+  handoverLabel: {
+    fontSize: 14,
+    color: palette.charcoal,
+  },
+  handoverLabelSelected: {
+    color: palette.charcoal,
   },
 });

@@ -28,10 +28,15 @@ export type ListingOfferComposerProps = {
   /** Rent/buy (or similar) chips that cannot be sent until an open offer of that kind is settled. */
   blockedFulfillmentModes?: Array<'rent' | 'sale' | 'onsite' | 'online'>;
   offerChoiceLabel?: string;
+  /** Pickup is always available. Delivery is included only when the listing offers it. */
+  handoverModes?: Array<'pickup' | 'delivery'>;
+  handoverLabels?: Partial<Record<'pickup' | 'delivery', string>>;
+  handoverTitle?: string;
   onSubmit: (
     price: string,
     units?: number,
     fulfillment?: 'rent' | 'sale' | 'onsite' | 'online',
+    handover?: 'pickup' | 'delivery',
   ) => void;
   onConfirm: () => void;
   onDecline: () => void;

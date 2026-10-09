@@ -144,6 +144,13 @@ export function ListingOffersPanel({
                       </AppText>
                     </View>
                   ) : null}
+                  {showUnits && offer.handover === 'delivery' ? (
+                    <View style={styles.kindBadge}>
+                      <AppText weight="semibold" style={styles.kindBadgeText}>
+                        {t('equipmentListing.deliveryBadge')}
+                      </AppText>
+                    </View>
+                  ) : null}
                   {showUnits && offer.kind ? (
                     <View style={styles.kindBadge}>
                       <AppText weight="semibold" style={styles.kindBadgeText}>

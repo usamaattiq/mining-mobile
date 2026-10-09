@@ -9,6 +9,7 @@ export type ListingRfqOffer = {
   quantity?: number;
   rank?: number;
   kind?: 'rent' | 'sale';
+  handover?: 'pickup' | 'delivery';
   delivery?: 'onsite' | 'online';
   responderPhone?: string;
 };
@@ -31,6 +32,7 @@ export type ListingRfq = {
   myOfferPrice?: string;
   myOfferQuantity?: number;
   myOfferKind?: 'rent' | 'sale';
+  myOfferHandover?: 'pickup' | 'delivery';
   myOfferDelivery?: 'onsite' | 'online';
   ownerPhone?: string;
   isLeading?: boolean;

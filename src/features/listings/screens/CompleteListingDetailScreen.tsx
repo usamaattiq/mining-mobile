@@ -625,13 +625,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     price: string,
     units?: number,
     choice?: 'rent' | 'sale' | 'onsite' | 'online',
+    handover?: 'pickup' | 'delivery',
   ) => {
     if (hasOpenSupplierOffer) return;
     const fulfillment = choice === 'rent' || choice === 'sale' ? choice : undefined;
     const delivery = choice === 'onsite' || choice === 'online' ? choice : undefined;
     setOfferSubmitting(true);
     void listingsApi
-      .submitOffer(id, price, category === 'equipment' ? units : undefined, fulfillment, delivery)
+      .submitOffer(
+        id,
+        price,
+        category === 'equipment' ? units : undefined,
+        fulfillment,
+        delivery,
+        category === 'equipment' && equipmentListing?.postedAs === 'supplier' ? handover : undefined,
+      )
       .then((listing) => {
         applyListing(listing);
       })
@@ -1002,6 +1010,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           </AppText>
                         </View>
                       ) : null}
+                      {offer.handover === 'delivery' ? (
+                        <View style={styles.myOfferKindBadge}>
+                          <AppText weight="semibold" style={styles.myOfferKindText}>
+                            {t('equipmentListing.deliveryBadge')}
+                          </AppText>
+                        </View>
+                      ) : null}
                       <View style={styles.myOfferKindBadge}>
                         <AppText weight="semibold" style={styles.myOfferKindText}>
                           {offer.kind === 'sale'
@@ -1339,6 +1354,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }}
           fulfillmentRentLabel={t('equipmentListing.rent')}
           fulfillmentSaleLabel={t('equipmentListing.buy')}
+          handoverModes={
+            category === 'equipment' && equipmentListing?.postedAs === 'supplier'
+              ? equipmentListing.deliveryAvailable
+                ? ['delivery', 'pickup']
+                : ['pickup']
+              : undefined
+          }
+          handoverLabels={{
+            pickup: t('equipmentListing.pickupFromSupplier'),
+            delivery: t('equipmentListing.deliveryRequested'),
+          }}
+          handoverTitle={t('equipmentListing.deliveryPreference')}
           blockedFulfillmentModes={
             supplierBuyer
               ? hasOpenSupplierOffer
