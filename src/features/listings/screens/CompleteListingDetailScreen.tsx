@@ -1519,6 +1519,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
+    paddingTop: spacing.md,
     gap: spacing.md - 2,
     paddingBottom: spacing.xxl,
   },
@@ -1681,7 +1682,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     color: palette.charcoal,
   },
   unitPriceCard: {
@@ -1707,7 +1708,7 @@ const styles = StyleSheet.create({
     color: palette.charcoal,
   },
   unitPriceAmount: {
-    fontSize: 18,
+    fontSize: 20,
     color: palette.charcoal,
     marginLeft: 18 + spacing.xs,
   },
