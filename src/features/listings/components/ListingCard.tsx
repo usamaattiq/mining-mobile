@@ -135,7 +135,7 @@ function ListingCardComponent({
 
   const timer = showTimer ? (
     <View style={styles.timerBadge}>
-      <Ionicons name="time-outline" size={10} color={palette.gold} />
+      <Ionicons name="time-outline" size={9} color={palette.pureWhite} />
       <AppText weight="semibold" style={styles.timerText}>
         {timeLeft}
       </AppText>
@@ -288,9 +288,10 @@ function ListingCardComponent({
             if (next > 0 && next !== imageSide) setImageSide(next);
           }}
         >
-          {typeBadge ? (
+          {typeBadge || showTimer ? (
             <View style={styles.badgeRow}>
-              <StatusBadge badge={typeBadge} />
+              {showTimer ? timer : <View />}
+              {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
             </View>
           ) : null}
           <View style={styles.titleRow}>
@@ -487,7 +488,7 @@ const styles = StyleSheet.create({
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     marginBottom: 4,
   },
   titleRow: {
@@ -724,15 +725,15 @@ const styles = StyleSheet.create({
   timerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: palette.softGold,
+    gap: 2,
+    backgroundColor: palette.gold,
     borderRadius: radius.sm,
-    paddingHorizontal: spacing.xs,
+    paddingHorizontal: 5,
     paddingVertical: 2,
   },
   timerText: {
-    fontSize: 12,
-    color: palette.gold,
+    fontSize: 10,
+    color: palette.pureWhite,
   },
   repostButton: {
     flexDirection: 'row',
