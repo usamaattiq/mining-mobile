@@ -318,20 +318,16 @@ function ListingCardComponent({
                     <View style={styles.priceColumn}>
                       {line.unit ? (
                         <View style={styles.priceLabelRow}>
-                          <Feather
-                            name={
-                              line.unit === t('serviceListing.onsite')
-                                ? 'map-pin'
-                                : line.unit === t('serviceListing.online')
-                                  ? 'wifi'
-                                  : line.unit.toLowerCase().includes('rent') ||
-                                      line.unit.includes('إيجار')
-                                    ? 'key'
-                                    : 'tag'
-                            }
-                            size={11}
-                            color={palette.gold}
-                          />
+                          {line.unit === t('serviceListing.onsite') ? (
+                            <Feather name="map-pin" size={11} color={palette.gold} />
+                          ) : line.unit === t('serviceListing.online') ? (
+                            <Feather name="wifi" size={11} color={palette.gold} />
+                          ) : line.unit.toLowerCase().includes('rent') ||
+                            line.unit.includes('إيجار') ? (
+                            <Feather name="key" size={11} color={palette.gold} />
+                          ) : (
+                            <Ionicons name="pricetag-outline" size={11} color={palette.gold} />
+                          )}
                           <AppText style={styles.priceLabel} numberOfLines={1}>
                             {line.unit}
                           </AppText>
