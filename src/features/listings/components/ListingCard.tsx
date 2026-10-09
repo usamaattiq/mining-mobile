@@ -319,10 +319,14 @@ function ListingCardComponent({
                         <View style={styles.priceLabelRow}>
                           <Feather
                             name={
-                              line.unit.toLowerCase().includes('rent') ||
-                              line.unit.includes('إيجار')
-                                ? 'home'
-                                : 'tag'
+                              line.unit === t('serviceListing.onsite')
+                                ? 'map-pin'
+                                : line.unit === t('serviceListing.online')
+                                  ? 'wifi'
+                                  : line.unit.toLowerCase().includes('rent') ||
+                                      line.unit.includes('إيجار')
+                                    ? 'home'
+                                    : 'tag'
                             }
                             size={11}
                             color={palette.gold}
@@ -494,7 +498,7 @@ const styles = StyleSheet.create({
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
     minWidth: 0,
     marginTop: 6,
   },

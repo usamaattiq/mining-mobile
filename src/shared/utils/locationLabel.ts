@@ -73,7 +73,7 @@ function isRegionOrState(part: string): boolean {
 }
 
 /**
- * City for display on listing cards. Geocoded labels often end with
+ * City for filters and matching. Geocoded labels often end with
  * `city, region/state, postal, country` — the second-to-last segment is the
  * state, not the city.
  */

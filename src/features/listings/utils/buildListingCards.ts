@@ -236,15 +236,23 @@ export function buildListingCards({
   if (category === 'services') {
     return serviceListings.map((listing) => {
       const prices = resolveServicePrices(listing);
-      const shownPrice = prices.onlinePrice || prices.onsitePrice;
       const priceLines =
-        listing.postedAs === 'buyer' || !shownPrice
+        listing.postedAs === 'buyer'
           ? undefined
           : [
-              {
-                text: `${currencyCode} ${formatAmountWithCommas(shownPrice)}`,
-              },
-            ];
+              prices.onsitePrice
+                ? {
+                    text: `${currencyCode} ${formatAmountWithCommas(prices.onsitePrice)}`,
+                    unit: t('serviceListing.onsite'),
+                  }
+                : null,
+              prices.onlinePrice
+                ? {
+                    text: `${currencyCode} ${formatAmountWithCommas(prices.onlinePrice)}`,
+                    unit: t('serviceListing.online'),
+                  }
+                : null,
+            ].filter((line): line is { text: string; unit: string } => Boolean(line));
       return {
         id: listing.id,
         title: listing.title,
