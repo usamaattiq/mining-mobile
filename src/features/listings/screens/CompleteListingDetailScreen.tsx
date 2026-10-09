@@ -733,36 +733,34 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 : 'construct-outline'
           }
           style={styles.carousel}
+          statusBadge={
+            headerBadge ? (
+              <View
+                style={[
+                  styles.rfqStatusChip,
+                  headerBadge.variant === 'muted' && styles.rfqStatusChipMuted,
+                  headerBadge.variant === 'warning' && styles.rfqStatusChipWarning,
+                  headerBadge.variant === 'success' && styles.rfqStatusChipSuccess,
+                ]}
+              >
+                <AppText weight="semibold" style={styles.rfqStatusChipText}>
+                  {headerBadge.label}
+                </AppText>
+              </View>
+            ) : null
+          }
         />
 
         <View style={styles.content}>
           <View style={styles.headerBlock}>
-            {headerBadge || showCountdown ? (
+            {showCountdown ? (
               <View style={styles.statusRow}>
-                {headerBadge ? (
-                  <View
-                    style={[
-                      styles.rfqStatusChip,
-                      headerBadge.variant === 'muted' && styles.rfqStatusChipMuted,
-                      headerBadge.variant === 'warning' && styles.rfqStatusChipWarning,
-                      headerBadge.variant === 'success' && styles.rfqStatusChipSuccess,
-                    ]}
-                  >
-                    <AppText weight="semibold" style={styles.rfqStatusChipText}>
-                      {headerBadge.label}
-                    </AppText>
-                  </View>
-                ) : (
-                  <View />
-                )}
-                {showCountdown ? (
-                  <View style={styles.timerBadge}>
-                    <Ionicons name="time-outline" size={12} color={palette.gold} />
-                    <AppText weight="semibold" style={styles.timerText}>
-                      {timeLeft}
-                    </AppText>
-                  </View>
-                ) : null}
+                <View style={styles.timerBadge}>
+                  <Ionicons name="time-outline" size={12} color={palette.gold} />
+                  <AppText weight="semibold" style={styles.timerText}>
+                    {timeLeft}
+                  </AppText>
+                </View>
               </View>
             ) : null}
 

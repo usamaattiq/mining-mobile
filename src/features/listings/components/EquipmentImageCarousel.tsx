@@ -23,6 +23,7 @@ export function EquipmentImageCarousel({
   media,
   onPressImage,
   placeholderIcon = 'image-outline',
+  statusBadge,
   style,
 }: EquipmentImageCarouselProps): React.ReactElement {
   const windowWidth = useWindowDimensions().width;
@@ -102,6 +103,11 @@ export function EquipmentImageCarousel({
             <Ionicons name={placeholderIcon} size={72} color={palette.goldDark} />
           </View>
         )}
+        {statusBadge ? (
+          <View style={styles.statusBadge} pointerEvents="none">
+            {statusBadge}
+          </View>
+        ) : null}
       </View>
 
       {media.length > 1 ? (
@@ -156,6 +162,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  statusBadge: {
+    position: 'absolute',
+    right: spacing.md,
+    bottom: spacing.md,
   },
   thumbs: {
     flexDirection: 'row',
