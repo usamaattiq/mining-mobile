@@ -1,5 +1,6 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image as RNImage, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,6 +12,7 @@ import { Button } from '@/shared/components/Button';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { LegalDocumentSheet } from '@/shared/components/LegalDocumentSheet';
 import type { LegalDocumentKind } from '@/shared/constants/legalContent';
+import { FadeIn } from '@/shared/motion/FadeIn';
 import { palette, spacing } from '@/theme';
 import { getFontFamily } from '@/theme';
 
@@ -22,7 +24,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 
 const mainHomeImage = require('@/assets/images/main-home.png');
 const splashLogoImage = require('@/assets/images/splash-logo.png');
-const mainHomeImageSize = Image.resolveAssetSource(mainHomeImage);
+const mainHomeImageSize = RNImage.resolveAssetSource(mainHomeImage);
 const mainHomeAspectRatio =
   mainHomeImageSize.width && mainHomeImageSize.height
     ? mainHomeImageSize.width / mainHomeImageSize.height
@@ -53,7 +55,8 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
         <Image
           source={mainHomeImage}
           style={[styles.image, { height: mainHomeImageHeight }]}
-          resizeMode="contain"
+          contentFit="contain"
+          cachePolicy="memory-disk"
         />
         <LinearGradient
           colors={['rgba(0, 0, 0, 0.65)', 'rgba(0, 0, 0, 0.25)', 'transparent']}
@@ -71,7 +74,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
         <View style={styles.topBar}>
           <View style={styles.logoRow}>
             <View style={styles.logoMark}>
-              <Image source={splashLogoImage} style={styles.logoImage} resizeMode="contain" />
+              <Image source={splashLogoImage} style={styles.logoImage} contentFit="contain" cachePolicy="memory-disk" />
             </View>
             <Text style={styles.brand}>
               <Text style={styles.brandMine}>Da</Text>
@@ -83,7 +86,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
       </View>
 
       <View style={[styles.actions, { bottom: Math.max(insets.bottom, spacing.sm) + 40 }]}>
-        <View style={styles.headline}>
+        <FadeIn delay={40} style={styles.headline}>
           <AppText weight="bold" style={styles.headlineText}>
             {t('onboarding.headlineLine1')}
             {'\n'}
@@ -94,7 +97,7 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
             </AppText>
           </AppText>
           <AppText style={styles.subtext}>{t('onboarding.subtitle')}</AppText>
-        </View>
+        </FadeIn>
 
         <Button
           label={t('onboarding.signUp')}

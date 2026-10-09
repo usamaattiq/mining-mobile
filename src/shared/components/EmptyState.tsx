@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { AppText } from '@/shared/components/AppText';
+import { FadeIn } from '@/shared/motion/FadeIn';
 import { palette, spacing } from '@/theme';
 import type { EmptyStateProps } from '@/shared/types/emptyState.types';
 
@@ -12,7 +13,7 @@ export function EmptyState({
   image = defaultEmptyImage,
 }: EmptyStateProps): React.ReactElement {
   return (
-    <View style={styles.empty}>
+    <FadeIn style={styles.empty}>
       {image ? <Image source={image} style={styles.image} resizeMode="contain" /> : null}
       <View style={styles.textBlock}>
         <AppText weight="semibold" style={styles.title}>
@@ -20,7 +21,7 @@ export function EmptyState({
         </AppText>
         {subtitle ? <AppText style={styles.subtitle}>{subtitle}</AppText> : null}
       </View>
-    </View>
+    </FadeIn>
   );
 }
 

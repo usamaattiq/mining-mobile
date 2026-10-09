@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
 import type { Ionicons } from '@expo/vector-icons';
-import type { TouchableOpacityProps } from 'react-native';
+import type { PressableProps } from 'react-native';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'link' | 'whatsapp';
 export type ButtonSize = 'md' | 'lg';
 
-export type ButtonProps = TouchableOpacityProps & {
+export type ButtonProps = PressableProps & {
   label: string;
   variant?: ButtonVariant;
   /** 'lg' is a 56px pill button (used for full-width primary CTAs like onboarding "Continue"). */

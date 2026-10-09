@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import type { HomeCategoryCardsProps } from '@/features/dashboard/types/homeCategoryCards.types';
@@ -16,37 +17,61 @@ export function HomeCategoryCards({
       {options.map((option) => {
         const selected = option.key === value;
         return (
-          <View key={option.key} style={[styles.shadowWrap, selected && styles.shadowWrapSelected]}>
-            <Pressable
-              onPress={() => onChange(option.key)}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              accessibilityLabel={option.title}
-              style={({ pressed }) => [
-                styles.card,
-                selected && styles.cardSelected,
-                pressed && styles.pressed,
-              ]}
-            >
-              <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
-                <Ionicons
-                  name={option.icon}
-                  size={24}
-                  color={selected ? palette.gold : palette.pureWhite}
-                />
-              </View>
-              <AppText
-                weight="bold"
-                style={[styles.title, selected && styles.titleSelected]}
-                numberOfLines={1}
-              >
-                {option.title}
-              </AppText>
-            </Pressable>
-          </View>
+          <CategoryCard
+            key={option.key}
+            selected={selected}
+            title={option.title}
+            icon={option.icon}
+            onPress={() => onChange(option.key)}
+          />
         );
       })}
     </View>
+  );
+}
+
+function CategoryCard({
+  selected,
+  title,
+  icon,
+  onPress,
+}: {
+  selected: boolean;
+  title: string;
+  icon: HomeCategoryCardsProps['options'][number]['icon'];
+  onPress: () => void;
+}): React.ReactElement {
+  const scale = useSharedValue(selected ? 1 : 0.98);
+
+  useEffect(() => {
+    scale.value = withSpring(selected ? 1 : 0.98, { damping: 16, stiffness: 220 });
+  }, [scale, selected]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View style={[styles.shadowWrap, selected && styles.shadowWrapSelected, animatedStyle]}>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityState={{ selected }}
+        accessibilityLabel={title}
+        style={({ pressed }) => [
+          styles.card,
+          selected && styles.cardSelected,
+          pressed && styles.pressed,
+        ]}
+      >
+        <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
+          <Ionicons name={icon} size={24} color={selected ? palette.gold : palette.pureWhite} />
+        </View>
+        <AppText weight="bold" style={[styles.title, selected && styles.titleSelected]} numberOfLines={1}>
+          {title}
+        </AppText>
+      </Pressable>
+    </Animated.View>
   );
 }
 

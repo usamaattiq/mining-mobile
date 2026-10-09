@@ -1,9 +1,12 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import type { ButtonProps } from '@/shared/types/button.types';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function Button({
   label,
@@ -20,11 +23,23 @@ export function Button({
   const isDisabled = disabled || loading;
   const iconColor = variant === 'outline' || variant === 'link' ? palette.gold : palette.pureWhite;
   const iconElement = icon ? <Ionicons name={icon} size={16} color={iconColor} /> : null;
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
+    <AnimatedPressable
+      {...rest}
       disabled={isDisabled}
+      onPressIn={(event) => {
+        scale.value = withTiming(0.97, { duration: 90 });
+        rest.onPressIn?.(event);
+      }}
+      onPressOut={(event) => {
+        scale.value = withTiming(1, { duration: 140 });
+        rest.onPressOut?.(event);
+      }}
       style={[
         styles.base,
         size === 'lg' && styles.lg,
@@ -35,9 +50,9 @@ export function Button({
         variant === 'whatsapp' && styles.whatsapp,
         overlay ? styles.clip : null,
         isDisabled && styles.disabled,
+        animatedStyle,
         style,
       ]}
-      {...rest}
     >
       {overlay}
       {loading ? (
@@ -64,7 +79,7 @@ export function Button({
           {iconPosition === 'right' ? iconElement : null}
         </>
       )}
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 }
 

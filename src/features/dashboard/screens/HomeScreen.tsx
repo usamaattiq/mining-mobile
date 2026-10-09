@@ -97,12 +97,14 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   const hasUnreadMessages = useMessagesStore((state) =>
     state.conversations.some((item) => item.unreadCount > 0),
   );
-  const marketListings = useMarketListingsStore((state) => state.listings).filter(
-    (listing) => listing.rfq?.status === 'live' && !listingHasMyOffer(listing),
+  const storedListings = useMarketListingsStore((state) => state.listings);
+  const marketListings = React.useMemo(
+    () => storedListings.filter((listing) => listing.rfq?.status === 'live' && !listingHasMyOffer(listing)),
+    [storedListings],
   );
-  const equipmentListings = marketListings.filter(isEquipmentListing);
-  const serviceListings = marketListings.filter(isServiceListing);
-  const goldListings = marketListings.filter(isGoldListing);
+  const equipmentListings = React.useMemo(() => marketListings.filter(isEquipmentListing), [marketListings]);
+  const serviceListings = React.useMemo(() => marketListings.filter(isServiceListing), [marketListings]);
+  const goldListings = React.useMemo(() => marketListings.filter(isGoldListing), [marketListings]);
   const name = profile?.fullName?.trim() || '—';
   const firstName = name === '—' ? name : (name.split(/\s+/)[0] ?? name);
   const initial = firstName.charAt(0).toUpperCase();
@@ -180,7 +182,8 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     }
   }, [role, category]);
 
-  const filterOptions =
+  const filterOptions = React.useMemo(
+    () =>
     category === 'equipment'
       ? [
           { key: 'rent' as const, label: t('equipmentListing.rent') },
@@ -196,9 +199,12 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
             { key: '21k' as const, label: t('goldListing.karatValue', { karat: 21 }) },
             { key: '22k' as const, label: t('goldListing.karatValue', { karat: 22 }) },
             { key: '24k' as const, label: t('goldListing.karatValue', { karat: 24 }) },
-          ];
+          ],
+    [category, t],
+  );
 
-  const kindOptions =
+  const kindOptions = React.useMemo(
+    () =>
     category === 'equipment'
       ? [
           { key: 'excavator', label: t('equipmentListing.type.excavator') },
@@ -221,78 +227,89 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
             },
             { key: 'other', label: t('serviceListing.category.other') },
           ]
-        : undefined;
-
-  const selectedKindLabels = new Set(
-    (kindOptions ?? [])
-      .filter((option) => filters.listingKind.includes(option.key))
-      .map((option) => option.label.trim().toLowerCase()),
+        : undefined,
+    [category, t],
   );
 
-  const matchesListingKind = (label: string): boolean => {
-    if (selectedKindLabels.size === 0) return true;
-    return selectedKindLabels.has(label.trim().toLowerCase());
-  };
-
-  const priceMin = parseFilterNumber(filters.priceMin);
-  const priceMax = parseFilterNumber(filters.priceMax);
-  const weightMin = parseFilterNumber(filters.weightMin);
-  const weightMax = parseFilterNumber(filters.weightMax);
-
-  const matchesCityAndDate = (location: string, epoch: number): boolean => {
-    if (filters.city) {
-      const selectedCity = cityFromLocationLabel(filters.city).toLowerCase();
-      const listingCity = cityFromLocationLabel(location).toLowerCase();
-      if (!selectedCity || listingCity !== selectedCity) return false;
-    }
-    if (filters.dateKey && dayKeyFromEpoch(epoch) !== filters.dateKey) return false;
-    return true;
-  };
-
-  const visibleEquipment = equipmentListings.filter((listing) => {
-    if (filters.type === 'rent' || filters.type === 'sell') {
-      if (listing.mode !== filters.type && listing.mode !== 'both') return false;
-    }
-    if (!matchesListingKind(listing.equipmentTypeLabel)) return false;
-    if (!inNumericRange(equipmentListingAmount(listing), priceMin, priceMax)) return false;
-    return matchesCityAndDate(listing.location, listing.createdAt);
-  });
-  const visibleServices = serviceListings.filter((listing) => {
-    if (filters.type === 'onsite' || filters.type === 'online') {
-      const flags = serviceTypeFlags(listing.serviceType);
-      if (!flags[filters.type]) return false;
-    }
-    if (!matchesListingKind(listing.serviceCategoryLabel)) return false;
-    if (!inNumericRange(serviceListingAmount(listing), priceMin, priceMax)) return false;
-    return matchesCityAndDate(listing.location, listing.serviceDate ?? listing.createdAt);
-  });
-  const visibleGold = goldListings.filter((listing) => {
-    if (!matchesGoldKarat(listing.purityLabel, filters.type)) return false;
-    if (!inNumericRange(goldListingWeight(listing), weightMin, weightMax)) return false;
-    if (!inNumericRange(goldListingAmount(listing), priceMin, priceMax)) return false;
-    return matchesCityAndDate(listing.location, listing.auctionEndDate ?? listing.createdAt);
-  });
-
-  const cards = buildListingCards({
-    category,
-    equipmentListings: visibleEquipment,
-    serviceListings: visibleServices,
-    goldListings: visibleGold,
-    t,
-    currencyCode: currency.code,
-    catalogLabel,
-    onOpen: (id, listingCategory) =>
-      navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
-  }).filter((card) => {
-    const needle = query.trim().toLowerCase();
-    if (!needle) return true;
-    return (
-      card.title.toLowerCase().includes(needle) ||
-      (card.reference ?? '').toLowerCase().includes(needle) ||
-      (card.subtitle ?? '').toLowerCase().includes(needle) ||
-      (card.city ?? '').toLowerCase().includes(needle)
+  const cards = React.useMemo(() => {
+    const selectedKindLabels = new Set(
+      (kindOptions ?? [])
+        .filter((option) => filters.listingKind.includes(option.key))
+        .map((option) => option.label.trim().toLowerCase()),
     );
-  });
+    const matchesListingKind = (label: string): boolean => {
+      if (selectedKindLabels.size === 0) return true;
+      return selectedKindLabels.has(label.trim().toLowerCase());
+    };
+    const priceMin = parseFilterNumber(filters.priceMin);
+    const priceMax = parseFilterNumber(filters.priceMax);
+    const weightMin = parseFilterNumber(filters.weightMin);
+    const weightMax = parseFilterNumber(filters.weightMax);
+    const matchesCityAndDate = (location: string, epoch: number): boolean => {
+      if (filters.city) {
+        const selectedCity = cityFromLocationLabel(filters.city).toLowerCase();
+        const listingCity = cityFromLocationLabel(location).toLowerCase();
+        if (!selectedCity || listingCity !== selectedCity) return false;
+      }
+      if (filters.dateKey && dayKeyFromEpoch(epoch) !== filters.dateKey) return false;
+      return true;
+    };
+    const visibleEquipment = equipmentListings.filter((listing) => {
+      if (filters.type === 'rent' || filters.type === 'sell') {
+        if (listing.mode !== filters.type && listing.mode !== 'both') return false;
+      }
+      if (!matchesListingKind(listing.equipmentTypeLabel)) return false;
+      if (!inNumericRange(equipmentListingAmount(listing), priceMin, priceMax)) return false;
+      return matchesCityAndDate(listing.location, listing.createdAt);
+    });
+    const visibleServices = serviceListings.filter((listing) => {
+      if (filters.type === 'onsite' || filters.type === 'online') {
+        const flags = serviceTypeFlags(listing.serviceType);
+        if (!flags[filters.type]) return false;
+      }
+      if (!matchesListingKind(listing.serviceCategoryLabel)) return false;
+      if (!inNumericRange(serviceListingAmount(listing), priceMin, priceMax)) return false;
+      return matchesCityAndDate(listing.location, listing.serviceDate ?? listing.createdAt);
+    });
+    const visibleGold = goldListings.filter((listing) => {
+      if (!matchesGoldKarat(listing.purityLabel, filters.type)) return false;
+      if (!inNumericRange(goldListingWeight(listing), weightMin, weightMax)) return false;
+      if (!inNumericRange(goldListingAmount(listing), priceMin, priceMax)) return false;
+      return matchesCityAndDate(listing.location, listing.auctionEndDate ?? listing.createdAt);
+    });
+    const needle = query.trim().toLowerCase();
+    return buildListingCards({
+      category,
+      equipmentListings: visibleEquipment,
+      serviceListings: visibleServices,
+      goldListings: visibleGold,
+      t,
+      currencyCode: currency.code,
+      catalogLabel,
+      onOpen: (id, listingCategory) =>
+        navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
+    }).filter((card) => {
+      if (!needle) return true;
+      return (
+        card.title.toLowerCase().includes(needle) ||
+        (card.reference ?? '').toLowerCase().includes(needle) ||
+        (card.subtitle ?? '').toLowerCase().includes(needle) ||
+        (card.city ?? '').toLowerCase().includes(needle)
+      );
+    });
+  }, [
+    catalogLabel,
+    category,
+    currency.code,
+    equipmentListings,
+    filters,
+    goldListings,
+    kindOptions,
+    navigation,
+    query,
+    serviceListings,
+    t,
+  ]);
 
   return (
     <GoldSheetScreen

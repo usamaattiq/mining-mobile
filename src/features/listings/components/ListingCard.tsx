@@ -23,14 +23,17 @@ const LINE_HEIGHT = 18;
 
 function useRemainingTime(createdAt: number, expiresAt?: number): string {
   const [now, setNow] = React.useState(() => Date.now());
-
-  React.useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), COUNTDOWN_TICK_MS);
-    return () => clearInterval(timer);
-  }, []);
-
   const end = expiresAt ?? createdAt + LISTING_LIFETIME_MS;
   const remainingMs = Math.max(0, end - now);
+  const tickMs =
+    remainingMs >= HOUR_MS ? 60_000 : remainingMs >= MINUTE_MS ? 15_000 : COUNTDOWN_TICK_MS;
+
+  React.useEffect(() => {
+    if (end <= Date.now()) return undefined;
+    const timer = setInterval(() => setNow(Date.now()), tickMs);
+    return () => clearInterval(timer);
+  }, [end, tickMs]);
+
   if (remainingMs > DAY_MS) {
     return `${Math.floor(remainingMs / DAY_MS)}d`;
   }
@@ -88,7 +91,7 @@ function StatusBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement
  * Shared Requests-tab card for equipment, services, and gold.
  * Every category uses the same rows and spacing.
  */
-export function ListingCard({
+function ListingCardComponent({
   title,
   thumbnail,
   placeholderIcon,
@@ -369,6 +372,8 @@ export function ListingCard({
     </Pressable>
   );
 }
+
+export const ListingCard = React.memo(ListingCardComponent);
 
 const styles = StyleSheet.create({
   card: {
