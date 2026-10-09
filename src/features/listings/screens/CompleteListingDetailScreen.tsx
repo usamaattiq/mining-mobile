@@ -231,6 +231,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   let location = '';
   let detailRows: DetailRow[] = [];
   let priceNode: React.ReactNode = null;
+  let unitPriceCard: React.ReactNode = null;
   let extraSection: React.ReactNode = null;
 
   if (category === 'equipment' && equipmentListing) {
@@ -344,11 +345,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     const activeDuration =
       durationOptions.find((option) => option.key === selectedDuration) ?? durationOptions[0];
 
-    const price = activeDuration
-      ? { amount: activeDuration.amount, unit: activeDuration.unit }
-      : offersSell && equipmentListing.salePrice
-        ? { amount: equipmentListing.salePrice, unit: '' }
-        : null;
     if (offersSell && equipmentListing.salePrice && activeDuration) {
       detailRows.push({
         label: t('equipmentListing.salePrice'),
@@ -356,30 +352,61 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       });
     }
 
-    priceNode =
-      equipmentListing.postedAs === 'buyer' || !price ? null : (
-        <View style={styles.priceRow}>
-          <View style={styles.priceValueRow}>
-            <AppText weight="bold" style={styles.priceAmount}>
-              {currency.code} {formatAmountWithCommas(price.amount)}
-            </AppText>
-            {price.unit ? <AppText style={styles.priceUnit}>{price.unit}</AppText> : null}
-          </View>
-
-          {durationOptions.length > 1 ? (
-            <View style={styles.durationDropdown}>
-              <SelectField
-                placeholder={t('equipmentListing.durationPlaceholder')}
-                sheetTitle={t('equipmentListing.durationPlaceholder')}
-                options={durationOptions.map((option) => ({
-                  value: option.key,
-                  label: option.label,
-                }))}
-                value={activeDuration?.key ?? null}
-                onChange={(next) => setSelectedDuration(next as RentalDuration)}
-                compact
-                dropdown
-              />
+    const rentPeriodLabel =
+      activeDuration?.key === 'hourly'
+        ? t('equipmentListing.perHour')
+        : activeDuration?.key === 'weekly'
+          ? t('equipmentListing.perWeek')
+          : activeDuration?.key === 'monthly'
+            ? t('equipmentListing.perMonth')
+            : activeDuration?.key === 'yearly'
+              ? t('equipmentListing.perYear')
+              : '';
+    const showSalePrice = offersSell && Boolean(equipmentListing.salePrice);
+    const showRentPrice = Boolean(activeDuration);
+    unitPriceCard =
+      equipmentListing.postedAs === 'buyer' || (!showSalePrice && !showRentPrice) ? null : (
+        <View style={styles.unitPriceCard}>
+          {showSalePrice ? (
+            <View style={styles.unitPriceCell}>
+              <View style={styles.unitPriceHeading}>
+                <Ionicons name="pricetag-outline" size={18} color={palette.charcoal} />
+                <AppText style={styles.unitPriceCaption}>{t('equipmentListing.salePrice')}</AppText>
+              </View>
+              <AppText weight="bold" style={styles.unitPriceAmount}>
+                {currency.code} {formatAmountWithCommas(equipmentListing.salePrice)}
+              </AppText>
+            </View>
+          ) : null}
+          {showSalePrice && showRentPrice ? <View style={styles.unitPriceDivider} /> : null}
+          {showRentPrice && activeDuration ? (
+            <View style={styles.unitPriceCell}>
+              <View style={styles.unitPriceHeading}>
+                <Ionicons name="home-outline" size={18} color={palette.charcoal} />
+                <AppText style={styles.unitPriceCaption}>{t('equipmentListing.rentPrice')}</AppText>
+              </View>
+              <AppText weight="bold" style={styles.unitPriceAmount}>
+                {currency.code} {formatAmountWithCommas(activeDuration.amount)}
+              </AppText>
+              {rentPeriodLabel ? (
+                <AppText style={styles.unitPricePeriod}>{rentPeriodLabel}</AppText>
+              ) : null}
+              {durationOptions.length > 1 ? (
+                <View style={styles.durationDropdown}>
+                  <SelectField
+                    placeholder={t('equipmentListing.durationPlaceholder')}
+                    sheetTitle={t('equipmentListing.durationPlaceholder')}
+                    options={durationOptions.map((option) => ({
+                      value: option.key,
+                      label: option.label,
+                    }))}
+                    value={activeDuration.key}
+                    onChange={(next) => setSelectedDuration(next as RentalDuration)}
+                    compact
+                    dropdown
+                  />
+                </View>
+              ) : null}
             </View>
           ) : null}
         </View>
@@ -792,48 +819,64 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             </View>
           </View>
 
-          {detailRows.length > 0 || descriptionText ? (
-            <Pressable
-              onPress={() => setDetailsOpen(true)}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.viewDetails')}
-              style={({ pressed }) => [styles.viewDetailsButton, pressed && styles.viewDetailsPressed]}
-            >
-              <View style={styles.viewDetailsIcon}>
-                <Ionicons name="document-text-outline" size={20} color={palette.gold} />
-              </View>
-              <View style={styles.viewDetailsCopy}>
-                <AppText weight="semibold" style={styles.viewDetailsLabel}>
-                  {t('common.viewDetails')}
-                </AppText>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={palette.muted} />
-            </Pressable>
+          {unitPriceCard}
+
+          {detailRows.length > 0 ||
+          descriptionText ||
+          (isOwner && equipmentListing?.postedAs === 'supplier') ? (
+            <View style={styles.viewDetailsRow}>
+              {detailRows.length > 0 || descriptionText ? (
+                <Pressable
+                  onPress={() => setDetailsOpen(true)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.viewDetails')}
+                  style={({ pressed }) => [
+                    styles.viewDetailsButton,
+                    styles.viewDetailsButtonInRow,
+                    pressed && styles.viewDetailsPressed,
+                  ]}
+                >
+                  <View style={styles.viewDetailsIcon}>
+                    <Ionicons name="document-text-outline" size={18} color={palette.gold} />
+                  </View>
+                  <View style={styles.viewDetailsCopy}>
+                    <AppText weight="semibold" style={styles.viewDetailsLabel} numberOfLines={1}>
+                      {t('common.viewDetails')}
+                    </AppText>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color={palette.muted} />
+                </Pressable>
+              ) : null}
+
+              {isOwner && equipmentListing?.postedAs === 'supplier' ? (
+                <Pressable
+                  onPress={() => navigation.navigate('EquipmentStock', { id })}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('equipmentListing.viewUnitDetails')}
+                  style={({ pressed }) => [
+                    styles.viewDetailsButton,
+                    styles.viewDetailsButtonInRow,
+                    pressed && styles.viewDetailsPressed,
+                  ]}
+                >
+                  <View style={styles.viewDetailsIcon}>
+                    <Ionicons name="cube-outline" size={18} color={palette.gold} />
+                  </View>
+                  <View style={styles.viewDetailsCopy}>
+                    <AppText weight="semibold" style={styles.viewDetailsLabel} numberOfLines={1}>
+                      {t('equipmentListing.viewUnitDetails')}
+                    </AppText>
+                    <AppText style={styles.viewDetailsHint} numberOfLines={1}>
+                      {t('equipmentListing.viewUnitDetailsHint')}
+                    </AppText>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color={palette.muted} />
+                </Pressable>
+              ) : null}
+            </View>
           ) : null}
 
           {extraSection}
-
-          {isOwner && equipmentListing?.postedAs === 'supplier' ? (
-            <Pressable
-              onPress={() => navigation.navigate('EquipmentStock', { id })}
-              accessibilityRole="button"
-              accessibilityLabel={t('equipmentListing.viewUnitDetails')}
-              style={({ pressed }) => [styles.viewDetailsButton, pressed && styles.viewDetailsPressed]}
-            >
-              <View style={styles.viewDetailsIcon}>
-                <Ionicons name="cube-outline" size={20} color={palette.gold} />
-              </View>
-              <View style={styles.viewDetailsCopy}>
-                <AppText weight="semibold" style={styles.viewDetailsLabel}>
-                  {t('equipmentListing.viewUnitDetails')}
-                </AppText>
-                <AppText style={styles.viewDetailsHint}>
-                  {t('equipmentListing.viewUnitDetailsHint')}
-                </AppText>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={palette.muted} />
-            </Pressable>
-          ) : null}
 
           {isAdmin && owner ? (
             <View style={styles.creatorBlock}>
@@ -1638,8 +1681,45 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   title: {
+    fontSize: 24,
+    color: palette.charcoal,
+  },
+  unitPriceCard: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    backgroundColor: palette.warmWhite,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+  },
+  unitPriceCell: {
+    flex: 1,
+    gap: 2,
+    paddingHorizontal: spacing.sm,
+  },
+  unitPriceHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  unitPriceCaption: {
+    fontSize: 13,
+    color: palette.charcoal,
+  },
+  unitPriceAmount: {
     fontSize: 18,
     color: palette.charcoal,
+    marginLeft: 18 + spacing.xs,
+  },
+  unitPricePeriod: {
+    fontSize: 13,
+    color: palette.muted,
+    marginLeft: 18 + spacing.xs,
+  },
+  unitPriceDivider: {
+    width: StyleSheet.hairlineWidth,
+    backgroundColor: palette.softGold,
+    marginVertical: spacing.xs,
   },
   statusRow: {
     flexDirection: 'row',
@@ -1691,39 +1771,50 @@ const styles = StyleSheet.create({
     color: palette.gold,
     textDecorationLine: 'underline',
   },
+  viewDetailsRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: spacing.sm,
+  },
   viewDetailsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: palette.softGold,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
-    minHeight: 56,
+    minHeight: 52,
+    minWidth: 0,
+  },
+  viewDetailsButtonInRow: {
+    flex: 1,
+    flexBasis: 0,
   },
   viewDetailsPressed: {
     opacity: 0.75,
   },
   viewDetailsIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
+    width: 28,
+    height: 28,
+    borderRadius: radius.sm,
     backgroundColor: palette.softGold,
     alignItems: 'center',
     justifyContent: 'center',
   },
   viewDetailsCopy: {
     flex: 1,
-    gap: 2,
+    minWidth: 0,
+    gap: 1,
   },
   viewDetailsLabel: {
-    fontSize: 16,
+    fontSize: 13,
     color: palette.charcoal,
   },
   viewDetailsHint: {
-    fontSize: 13,
+    fontSize: 12,
     color: palette.muted,
   },
   contactRow: {
