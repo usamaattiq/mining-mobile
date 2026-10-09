@@ -166,7 +166,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
   const [detailsOpen, setDetailsOpen] = React.useState(false);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
-  const [servicePriceMode, setServicePriceMode] = React.useState<'online' | 'onsite'>('online');
   const [messageOpen, setMessageOpen] = React.useState(false);
   const [messagePeer, setMessagePeer] = React.useState<{
     id: string;
@@ -230,7 +229,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   let description = '';
   let location = '';
   let detailRows: DetailRow[] = [];
-  let priceNode: React.ReactNode = null;
   let unitPriceCard: React.ReactNode = null;
   let extraSection: React.ReactNode = null;
 
@@ -462,40 +460,27 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           : null,
       ] as const
     ).filter((option): option is NonNullable<typeof option> => option !== null);
-    const activeServicePrice =
-      servicePriceOptions.find((option) => option.key === servicePriceMode) ??
-      servicePriceOptions[0];
-    priceNode =
-      serviceListing.postedAs === 'buyer' || !activeServicePrice ? null : (
-        <View style={styles.priceRow}>
-          <View style={styles.priceValueRow}>
-            <AppText weight="bold" style={styles.priceAmount}>
-              {currency.code} {formatAmountWithCommas(activeServicePrice.amount)}
-            </AppText>
-          </View>
-          {servicePriceOptions.length > 1 ? (
-            <View style={styles.serviceModeRow}>
-              {servicePriceOptions.map((option) => {
-                const selected = option.key === activeServicePrice.key;
-                return (
-                  <Pressable
-                    key={option.key}
-                    onPress={() => setServicePriceMode(option.key)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}
-                    style={[styles.serviceModeButton, selected && styles.serviceModeButtonSelected]}
-                  >
-                    <AppText
-                      weight="semibold"
-                      style={[styles.serviceModeLabel, selected && styles.serviceModeLabelSelected]}
-                    >
-                      {option.label}
-                    </AppText>
-                  </Pressable>
-                );
-              })}
-            </View>
-          ) : null}
+    unitPriceCard =
+      serviceListing.postedAs === 'buyer' || servicePriceOptions.length === 0 ? null : (
+        <View style={styles.unitPriceCard}>
+          {servicePriceOptions.map((option, index) => (
+            <React.Fragment key={option.key}>
+              {index > 0 ? <View style={styles.unitPriceDivider} /> : null}
+              <View style={styles.unitPriceCell}>
+                <View style={styles.unitPriceHeading}>
+                  <Ionicons
+                    name={option.key === 'online' ? 'laptop-outline' : 'location-outline'}
+                    size={18}
+                    color={palette.charcoal}
+                  />
+                  <AppText style={styles.unitPriceCaption}>{option.label}</AppText>
+                </View>
+                <AppText weight="bold" style={styles.unitPriceAmount}>
+                  {currency.code} {formatAmountWithCommas(option.amount)}
+                </AppText>
+              </View>
+            </React.Fragment>
+          ))}
         </View>
       );
 
@@ -524,11 +509,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
-    priceNode =
+    unitPriceCard =
       goldListing.postedAs === 'buyer' || !goldListing.price ? null : (
-        <AppText weight="bold" style={styles.priceAmount}>
-          {currency.code} {formatAmountWithCommas(goldListing.price)}
-        </AppText>
+        <View style={styles.unitPriceCard}>
+          <View style={styles.unitPriceCell}>
+            <View style={styles.unitPriceHeading}>
+              <Ionicons name="diamond-outline" size={18} color={palette.charcoal} />
+              <AppText style={styles.unitPriceCaption}>{t('goldListing.startingPrice')}</AppText>
+            </View>
+            <AppText weight="bold" style={styles.unitPriceAmount}>
+              {currency.code} {formatAmountWithCommas(goldListing.price)}
+            </AppText>
+          </View>
+        </View>
       );
 
     extraSection = <AttachmentsSection documents={documents} />;
@@ -791,8 +784,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 </View>
               </View>
             ) : null}
-
-            {priceNode}
 
             <View style={styles.titleBlock}>
               <AppText weight="bold" style={styles.title}>
