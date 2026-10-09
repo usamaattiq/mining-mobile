@@ -18,6 +18,7 @@ export function EquipmentListingSummaryCard({
   onChangeMedia,
   hideMedia,
   description,
+  plain,
 }: EquipmentListingSummaryCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [descriptionOpen, setDescriptionOpen] = React.useState(false);
@@ -28,36 +29,39 @@ export function EquipmentListingSummaryCard({
   return (
     <View style={styles.root}>
       <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <AppText weight="bold" style={styles.sectionTitle}>
-            {t('equipmentListing.detailsStep')}
-          </AppText>
-          {onChangeDetails ? (
-            <Pressable onPress={onChangeDetails} hitSlop={8}>
-              <AppText weight="semibold" style={styles.changeLink}>
-                {t('common.change')}
-              </AppText>
-            </Pressable>
-          ) : null}
-        </View>
-        <View style={[styles.card, cardBackShadow]}>
+        {plain ? null : (
+          <View style={styles.sectionHeader}>
+            <AppText weight="bold" style={styles.sectionTitle}>
+              {t('equipmentListing.detailsStep')}
+            </AppText>
+            {onChangeDetails ? (
+              <Pressable onPress={onChangeDetails} hitSlop={8}>
+                <AppText weight="semibold" style={styles.changeLink}>
+                  {t('common.change')}
+                </AppText>
+              </Pressable>
+            ) : null}
+          </View>
+        )}
+        <View style={plain ? styles.plain : [styles.card, cardBackShadow]}>
           {detailRows.map((row, index) => (
             <View
               key={row.label}
               style={[
                 styles.row,
+                plain && styles.rowPlain,
                 index === detailRows.length - 1 && !descriptionText && styles.rowLast,
               ]}
             >
-              <AppText weight="bold" style={styles.rowLabel}>
+              <AppText weight="bold" style={[styles.rowLabel, plain && styles.rowLabelPlain]}>
                 {row.label}
               </AppText>
               <View style={styles.rowValueWrap}>
-                <AppText style={styles.rowValue} numberOfLines={1}>
+                <AppText style={[styles.rowValue, plain && styles.rowValuePlain]} numberOfLines={1}>
                   {row.value}
                 </AppText>
                 {row.hint ? (
-                  <AppText style={styles.rowHint} numberOfLines={1}>
+                  <AppText style={[styles.rowHint, plain && styles.rowHintPlain]} numberOfLines={1}>
                     {row.hint}
                   </AppText>
                 ) : null}
@@ -84,7 +88,7 @@ export function EquipmentListingSummaryCard({
                 accessibilityState={{ expanded: descriptionOpen }}
                 accessibilityLabel={t('equipmentListing.description')}
               >
-                <AppText weight="bold" style={styles.rowLabel}>
+                <AppText weight="bold" style={[styles.rowLabel, plain && styles.rowLabelPlain]}>
                   {t('equipmentListing.description')}
                 </AppText>
                 <Ionicons
@@ -94,7 +98,9 @@ export function EquipmentListingSummaryCard({
                 />
               </Pressable>
               {descriptionOpen ? (
-                <AppText style={styles.description}>{descriptionText}</AppText>
+                <AppText style={[styles.description, plain && styles.descriptionPlain]}>
+                  {descriptionText}
+                </AppText>
               ) : null}
             </View>
           ) : null}
@@ -172,6 +178,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
   },
+  plain: {
+    paddingVertical: spacing.xs,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -181,12 +190,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: palette.softGold,
   },
+  rowPlain: {
+    paddingVertical: spacing.md,
+  },
   rowLast: {
     borderBottomWidth: 0,
   },
   rowLabel: {
     fontSize: 13,
     color: palette.charcoal,
+  },
+  rowLabelPlain: {
+    fontSize: 15,
   },
   rowValueWrap: {
     flex: 1,
@@ -199,11 +214,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: palette.muted,
   },
+  rowHintPlain: {
+    fontSize: 13,
+  },
   rowValue: {
     flexShrink: 1,
     fontSize: 14,
     color: palette.muted,
     textAlign: 'right',
+  },
+  rowValuePlain: {
+    fontSize: 16,
   },
   editButton: {
     width: 28,
@@ -219,6 +240,10 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: palette.muted,
     paddingBottom: spacing.sm,
+  },
+  descriptionPlain: {
+    fontSize: 16,
+    lineHeight: 22,
   },
   mediaGrid: {
     flexDirection: 'row',

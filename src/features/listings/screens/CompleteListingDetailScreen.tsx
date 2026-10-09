@@ -1366,6 +1366,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           media={[]}
           hideMedia
           description={descriptionText}
+          plain
         />
       </AppBottomSheet>
 

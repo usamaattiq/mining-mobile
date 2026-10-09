@@ -12,4 +12,6 @@ export type EquipmentListingSummaryCardProps = {
   hideMedia?: boolean;
   /** Collapsible description row inside the details card. */
   description?: string;
+  /** Flat rows with no card chrome, used inside a bottom sheet. */
+  plain?: boolean;
 };
