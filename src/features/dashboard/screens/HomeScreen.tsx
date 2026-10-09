@@ -431,11 +431,11 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       ) : viewMode === 'grid' ? (
         <View style={styles.listingGrid}>
           {cards.map(({ id, ...card }) => (
-            <ListingCard key={id} layout="grid" {...card} />
+            <ListingCard key={`${category}-${id}`} layout="grid" {...card} />
           ))}
         </View>
       ) : (
-        cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
+        cards.map(({ id, ...card }) => <ListingCard key={`${category}-${id}`} {...card} />)
       )}
 
       <HomeFilterSheet

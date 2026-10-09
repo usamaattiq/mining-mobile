@@ -81,7 +81,11 @@ export function AdminListingsScreen(): React.ReactElement {
         <View style={styles.switcherWrap}>
           <SegmentedSwitcher
             value={category}
-            onChange={setCategory}
+            onChange={(next) => {
+              setItems([]);
+              setLoading(true);
+              setCategory(next);
+            }}
             options={[
               { key: 'equipment', label: t('requests.categoryEquipment') },
               { key: 'services', label: t('requests.categoryServices') },

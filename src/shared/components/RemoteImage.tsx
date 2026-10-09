@@ -47,11 +47,12 @@ export function RemoteImage({
   return (
     <View style={[styles.frame, style]}>
       <Image
+        key={sourceKey || recyclingKey}
         source={source}
         style={StyleSheet.absoluteFill}
         contentFit={contentFit}
         cachePolicy="memory-disk"
-        recyclingKey={recyclingKey}
+        transition={0}
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
       />

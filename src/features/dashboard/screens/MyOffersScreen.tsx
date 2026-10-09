@@ -106,7 +106,7 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
       ) : cards.length === 0 ? (
         <EmptyState title={t('offers.emptyTitle')} subtitle={t('offers.emptySubtitle')} />
       ) : (
-        cards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
+        cards.map(({ id, ...card }) => <ListingCard key={`${category}-${id}`} {...card} />)
       )}
     </GoldSheetScreen>
   );

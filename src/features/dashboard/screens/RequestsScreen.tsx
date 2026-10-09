@@ -193,7 +193,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
       ) : visibleCards.length === 0 ? (
         <EmptyState title={emptyTitle} subtitle={emptySubtitle} />
       ) : (
-        visibleCards.map(({ id, ...card }) => <ListingCard key={id} {...card} />)
+        visibleCards.map(({ id, ...card }) => <ListingCard key={`${category}-${id}`} {...card} />)
       )}
     </GoldSheetScreen>
   );
