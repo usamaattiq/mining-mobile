@@ -9,7 +9,7 @@ import {
   type NativeSyntheticEvent,
   type NativeScrollEvent,
 } from 'react-native';
-import { Image } from 'expo-image';
+import { RemoteImage } from '@/shared/components/RemoteImage';
 import { Ionicons } from '@expo/vector-icons';
 import { palette, radius, spacing } from '@/theme';
 import { ListingVideoThumb } from '@/features/listings/components/ListingVideoThumb';
@@ -68,11 +68,9 @@ export function EquipmentImageCarousel({
                   iconSize={22}
                 />
               ) : (
-                <Image
+                <RemoteImage
                   source={item.uri}
                   style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
-                  contentFit="cover"
-                  cachePolicy="memory-disk"
                   recyclingKey={item.id}
                 />
               )}

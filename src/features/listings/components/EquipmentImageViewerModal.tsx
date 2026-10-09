@@ -9,7 +9,7 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
-import { Image } from 'expo-image';
+import { RemoteImage } from '@/shared/components/RemoteImage';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -69,11 +69,10 @@ export function EquipmentImageViewerModal({
                 </View>
               ) : (
                 <Pressable key={item.id} onPress={onClose} style={{ width, height }}>
-                  <Image
+                  <RemoteImage
                     source={item.uri}
                     style={styles.image}
                     contentFit="contain"
-                    cachePolicy="memory-disk"
                     recyclingKey={item.id}
                   />
                 </Pressable>

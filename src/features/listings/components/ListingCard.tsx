@@ -1,5 +1,6 @@
 import React from 'react';
-import { Image as ExpoImage } from 'expo-image';
+import { Image } from 'expo-image';
+import { RemoteImage } from '@/shared/components/RemoteImage';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
@@ -115,7 +116,7 @@ function ListingCardComponent({
   const thumbnailUri = thumbnail;
 
   React.useEffect(() => {
-    if (thumbnailUri) void ExpoImage.prefetch(thumbnailUri);
+    if (thumbnailUri) void Image.prefetch(thumbnailUri);
   }, [thumbnailUri]);
   const showRepost = Boolean(ended && onRepost);
   const showTimer = Boolean(createdAt) && !ended;
@@ -174,11 +175,10 @@ function ListingCardComponent({
           ]}
         >
           {thumbnail ? (
-            <ExpoImage
+            <RemoteImage
               source={thumbnail}
               style={styles.gridImage}
-              contentFit="cover"
-              cachePolicy="memory-disk"
+              recyclingKey={thumbnail}
             />
           ) : (
             <View style={[styles.gridImage, styles.imagePlaceholder]}>
@@ -276,12 +276,7 @@ function ListingCardComponent({
       <View style={styles.row}>
         <View style={styles.imageWrap}>
           {thumbnail ? (
-            <ExpoImage
-              source={thumbnail}
-              style={styles.image}
-              contentFit="cover"
-              cachePolicy="memory-disk"
-            />
+            <RemoteImage source={thumbnail} style={styles.image} recyclingKey={thumbnail} />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
               <Ionicons name={placeholderIcon} size={48} color={palette.goldDark} />
