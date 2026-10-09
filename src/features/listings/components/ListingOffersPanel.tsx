@@ -28,11 +28,13 @@ export type ListingOffersPanelProps = {
   compact?: boolean;
   /** Replaces the default "Offers" heading. */
   title?: string;
-  /** Gold auctions: message every bidder, not only the selected one. */
-  messageEveryOffer?: boolean;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
   onMessage?: (offer: ListingRfqOffer) => void;
+  /** When set, contact buttons only appear on this person's accepted offer. */
+  contactResponderId?: string;
+  /** Phone for that person's accepted offer. Falls back to the responder phone. */
+  contactPhone?: string;
   onPressResponder?: (offer: ListingRfqOffer) => void;
 };
 
@@ -57,10 +59,11 @@ export function ListingOffersPanel({
   showLeader = false,
   compact = false,
   title,
-  messageEveryOffer = false,
   onAccept,
   onReject,
   onMessage,
+  contactResponderId,
+  contactPhone,
   onPressResponder,
 }: ListingOffersPanelProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -193,7 +196,8 @@ export function ListingOffersPanel({
                 </View>
               ) : null}
               {onMessage &&
-              (messageEveryOffer || offer.status === 'selected' || offer.status === 'confirmed') ? (
+              offer.status === 'confirmed' &&
+              (!contactResponderId || offer.responderId === contactResponderId) ? (
                 <View style={styles.actions}>
                   <Button
                     label={t('messages.message')}
@@ -201,12 +205,20 @@ export function ListingOffersPanel({
                     onPress={() => onMessage(offer)}
                     style={styles.actionButton}
                   />
-                  {offer.status === 'confirmed' && offer.responderPhone ? (
+                  {(contactResponderId && offer.responderId === contactResponderId
+                    ? contactPhone
+                    : offer.responderPhone) ? (
                     <Button
                       label={t('common.whatsapp')}
                       icon="logo-whatsapp"
                       variant="whatsapp"
-                      onPress={() => openWhatsApp(offer.responderPhone!)}
+                      onPress={() =>
+                        openWhatsApp(
+                          (contactResponderId && offer.responderId === contactResponderId
+                            ? contactPhone
+                            : offer.responderPhone)!,
+                        )
+                      }
                       style={styles.actionButton}
                     />
                   ) : null}

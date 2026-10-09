@@ -583,7 +583,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       ? unitsLeft > 0 && rfq?.canSubmitOffer !== false && !hasOpenSupplierOffer
       : !awaitingConfirm &&
         (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live')));
-  const canMessage = !isAdmin && Boolean(owner) && !isOwner && hasSentOffer;
+  const offerAcceptedBothSides =
+    rfq?.myOfferStatus === 'confirmed' ||
+    mySupplierOffers.some((offer) => offer.status === 'confirmed');
+  const canMessage = !isAdmin && Boolean(owner) && !isOwner && offerAcceptedBothSides;
   const canWithdraw =
     !isAdmin &&
     !awaitingConfirm &&
@@ -929,7 +932,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     : undefined
               }
               showLeader={category === 'gold' || equipmentListing?.requestMode === 'auction'}
-              messageEveryOffer={category === 'gold' || equipmentListing?.requestMode === 'auction'}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
               onPressResponder={
@@ -938,14 +940,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       navigation.navigate('AdminUserProfile', { userId: offer.responderId })
                   : undefined
               }
-              onMessage={(offer) => {
-                setMessagePeer({
-                  id: offer.responderId,
-                  fullName: offer.responderName,
-                  avatarUrl: null,
-                });
-                setMessageOpen(true);
-              }}
+              onMessage={
+                isAdmin
+                  ? undefined
+                  : (offer) => {
+                      setMessagePeer({
+                        id: offer.responderId,
+                        fullName: offer.responderName,
+                        avatarUrl: null,
+                      });
+                      setMessageOpen(true);
+                    }
+              }
             />
           ) : null}
 
@@ -965,6 +971,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               title={t('rfq.leaderboardTitle')}
               onAccept={() => undefined}
               onReject={() => undefined}
+              contactResponderId={profileId}
+              contactPhone={rfq?.ownerPhone}
+              onMessage={profileId ? () => setMessageOpen(true) : undefined}
             />
           ) : null}
 
@@ -1062,6 +1071,25 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         onPress={() => handleResponderOffer('withdraw', offer.id)}
                         style={styles.myOfferAction}
                       />
+                    </View>
+                  ) : null}
+                  {offer.status === 'confirmed' ? (
+                    <View style={styles.myOfferActions}>
+                      <Button
+                        label={t('messages.message')}
+                        icon="chatbubble-ellipses-outline"
+                        onPress={() => setMessageOpen(true)}
+                        style={styles.myOfferAction}
+                      />
+                      {rfq?.ownerPhone ? (
+                        <Button
+                          label={t('common.whatsapp')}
+                          icon="logo-whatsapp"
+                          variant="whatsapp"
+                          onPress={() => openWhatsApp(rfq.ownerPhone!)}
+                          style={styles.myOfferAction}
+                        />
+                      ) : null}
                     </View>
                   ) : null}
                   {offer.status === 'selected' ? (
@@ -1246,7 +1274,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </View>
       ) : null}
 
-      {(supplierBuyer ? showOfferInput : showOfferInput || hasSentOffer) ? (
+      {(supplierBuyer
+        ? showOfferInput || offerAcceptedBothSides
+        : showOfferInput || hasSentOffer) ? (
         <ListingOfferComposer
           currencyCode={currency.code}
           placeholder={
@@ -1347,20 +1377,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   onPress={() => setMessageOpen(true)}
                   style={styles.messageButton}
                 />
-                {(() => {
-                  const whatsappReady = supplierBuyer
-                    ? mySupplierOffers.some((offer) => offer.status === 'confirmed')
-                    : rfq?.myOfferStatus === 'confirmed';
-                  return whatsappReady && rfq?.ownerPhone ? (
-                    <Button
-                      label={t('common.whatsapp')}
-                      icon="logo-whatsapp"
-                      variant="whatsapp"
-                      onPress={() => openWhatsApp(rfq.ownerPhone!)}
-                      style={styles.messageButton}
-                    />
-                  ) : null;
-                })()}
+                {rfq?.ownerPhone ? (
+                  <Button
+                    label={t('common.whatsapp')}
+                    icon="logo-whatsapp"
+                    variant="whatsapp"
+                    onPress={() => openWhatsApp(rfq.ownerPhone!)}
+                    style={styles.messageButton}
+                  />
+                ) : null}
               </View>
             ) : null
           }
