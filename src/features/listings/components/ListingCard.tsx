@@ -2,7 +2,7 @@ import React from 'react';
 import { Image } from 'expo-image';
 import { RemoteImage } from '@/shared/components/RemoteImage';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
@@ -19,9 +19,7 @@ const COUNTDOWN_TICK_MS = 1000;
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 const MINUTE_MS = 60 * 1000;
-const IMAGE_SIZE = 96;
 const BADGE_ROW_HEIGHT = 20;
-const LINE_HEIGHT = 18;
 
 function useRemainingTime(createdAt: number, expiresAt?: number): string {
   const end = expiresAt ?? createdAt + LISTING_LIFETIME_MS;
@@ -64,18 +62,25 @@ function statusBadgeStyle(variant: ListingCardBadge['variant']) {
 
 function StatusBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement {
   const variant = badge.variant ?? 'accent';
+  const onGold = variant === 'accent' || variant === 'muted';
   return (
     <View style={[styles.statusBadge, statusBadgeStyle(variant)]}>
       {badge.icon ? (
         <Ionicons
           name={badge.icon}
           size={10}
-          color={variant === 'muted' ? palette.muted : palette.pureWhite}
+          color={variant === 'muted' ? palette.muted : onGold ? palette.goldDark : palette.pureWhite}
         />
+      ) : variant === 'accent' ? (
+        <View style={styles.liveDot} />
       ) : null}
       <AppText
         weight="semibold"
-        style={[styles.statusBadgeText, variant === 'muted' && styles.statusBadgeTextMuted]}
+        style={[
+          styles.statusBadgeText,
+          variant === 'muted' && styles.statusBadgeTextMuted,
+          !onGold && styles.statusBadgeTextOnFill,
+        ]}
       >
         {badge.label}
       </AppText>
@@ -150,15 +155,6 @@ function ListingCardComponent({
       </AppText>
     </Pressable>
   ) : null;
-
-  const modeBadges = (
-    <>
-      {deliveryBadge ? <StatusBadge badge={deliveryBadge} /> : null}
-      {(statusBadges ?? []).map((badge) => (
-        <StatusBadge key={badge.key} badge={badge} />
-      ))}
-    </>
-  );
 
   if (layout === 'grid') {
     return (
@@ -279,91 +275,64 @@ function ListingCardComponent({
             <RemoteImage source={thumbnail} style={styles.image} recyclingKey={thumbnail} />
           ) : (
             <View style={[styles.image, styles.imagePlaceholder]}>
-              <Ionicons name={placeholderIcon} size={48} color={palette.goldDark} />
+              <Ionicons name={placeholderIcon} size={32} color={palette.goldDark} />
             </View>
           )}
         </View>
 
         <View style={styles.copy}>
-          <View style={styles.topRow}>
-            <AppText weight="bold" style={[styles.title, styles.titleInline]} numberOfLines={1}>
+          {typeBadge ? (
+            <View style={styles.badgeRow}>
+              <StatusBadge badge={typeBadge} />
+            </View>
+          ) : null}
+          <View style={styles.titleRow}>
+            <AppText weight="bold" style={styles.title} numberOfLines={1}>
               {title}
             </AppText>
-            <View style={styles.topRight}>
-              {requestBadge ? <StatusBadge badge={requestBadge} /> : null}
-              {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
-            </View>
           </View>
 
-          <View style={styles.body}>
-            <View style={styles.subtitleRow}>
-              {subtitleIcon ? (
-                <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
-              ) : null}
-              <AppText style={[styles.subtitle, styles.typeLabel]} numberOfLines={1}>
-                {subtitle ?? ' '}
-              </AppText>
-              <View style={styles.modeBadges}>{modeBadges}</View>
-            </View>
+          <View style={styles.locationRow}>
+            <Feather name="map-pin" size={12} color={palette.gold} />
+            <AppText style={styles.location} numberOfLines={1}>
+              {city ?? ' '}
+            </AppText>
+            <Ionicons name="chevron-forward" size={18} color={palette.muted} />
+          </View>
 
-            {unitsLabel ? (
-              <View style={styles.subtitleRow}>
-                <Ionicons name={unitsIcon} size={12} color={palette.gold} />
-                <AppText style={styles.subtitle} numberOfLines={1}>
-                  {unitsLabel}
-                </AppText>
-              </View>
-            ) : (
-              <View style={styles.subtitleRow}>
-                <Ionicons name="location-outline" size={12} color={palette.gold} />
-                <AppText style={styles.subtitle} numberOfLines={1}>
-                  {city ?? ' '}
-                </AppText>
-              </View>
-            )}
-
-            {unitsLabel ? (
-              <View style={styles.subtitleRow}>
-                <Ionicons name="location-outline" size={12} color={palette.gold} />
-                <AppText style={styles.subtitle} numberOfLines={1}>
-                  {city ?? ' '}
-                </AppText>
-              </View>
-            ) : null}
-
-            <View style={styles.priceLine}>
-              <View style={styles.timerSlot}>{showTimer ? timer : null}</View>
-              {resolvedPriceLines.length > 0 ? (
-                <View style={styles.prices}>
-                  {resolvedPriceLines.map((line, index) => (
-                    <View key={`${line.text}-${line.unit ?? index}`} style={styles.priceRow}>
+          {resolvedPriceLines.length > 0 ? (
+            <>
+              <View style={styles.divider} />
+              <View style={styles.priceColumns}>
+                {resolvedPriceLines.map((line, index) => (
+                  <React.Fragment key={`${line.text}-${line.unit ?? index}`}>
+                    {index > 0 ? <View style={styles.priceDivider} /> : null}
+                    <View style={styles.priceColumn}>
+                      {line.unit ? (
+                        <View style={styles.priceLabelRow}>
+                          <Feather
+                            name={
+                              line.unit.toLowerCase().includes('rent') ||
+                              line.unit.includes('إيجار')
+                                ? 'home'
+                                : 'tag'
+                            }
+                            size={11}
+                            color={palette.gold}
+                          />
+                          <AppText style={styles.priceLabel} numberOfLines={1}>
+                            {line.unit}
+                          </AppText>
+                        </View>
+                      ) : null}
                       <AppText weight="bold" style={styles.price} numberOfLines={1}>
                         {line.text}
                       </AppText>
-                      {line.unit ? (
-                        <AppText style={styles.priceUnit} numberOfLines={1}>
-                          {line.unit}
-                        </AppText>
-                      ) : null}
                     </View>
-                  ))}
-                </View>
-              ) : (
-                <View style={styles.prices}>
-                  <View style={styles.priceRow}>
-                    <AppText weight="bold" style={styles.price} numberOfLines={1}>
-                      {' '}
-                    </AppText>
-                  </View>
-                </View>
-              )}
-            </View>
-          </View>
-
-          {showRepost ? (
-            <View style={styles.bottomRow}>
-              <View style={styles.bottomRight}>{repostButton}</View>
-            </View>
+                  </React.Fragment>
+                ))}
+              </View>
+            </>
           ) : null}
         </View>
       </View>
@@ -376,8 +345,9 @@ export const ListingCard = React.memo(ListingCardComponent);
 const styles = StyleSheet.create({
   card: {
     backgroundColor: palette.warmWhite,
-    borderRadius: radius.lg,
-    padding: spacing.sm,
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
   },
   gridCard: {
     width: '48%',
@@ -482,14 +452,13 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'stretch',
-    gap: spacing.sm,
-    height: IMAGE_SIZE,
+    alignItems: 'center',
+    gap: 14,
   },
   imageWrap: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-    borderRadius: radius.md,
+    width: 112,
+    height: 112,
+    borderRadius: 16,
     overflow: 'hidden',
   },
   image: {
@@ -503,8 +472,79 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
-    height: IMAGE_SIZE,
     minWidth: 0,
+    justifyContent: 'center',
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginBottom: 4,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    minWidth: 0,
+    marginTop: 6,
+  },
+  location: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 16,
+    color: palette.muted,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: palette.softGold,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  priceColumns: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minWidth: 0,
+  },
+  priceColumn: {
+    flex: 1,
+    alignItems: 'flex-start',
+    gap: 2,
+    minWidth: 0,
+  },
+  priceLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    maxWidth: '100%',
+  },
+  priceLabel: {
+    flexShrink: 1,
+    fontSize: 10,
+    lineHeight: 14,
+    color: palette.muted,
+  },
+  priceDivider: {
+    width: StyleSheet.hairlineWidth,
+    alignSelf: 'stretch',
+    backgroundColor: palette.softGold,
+    marginHorizontal: spacing.sm,
+  },
+  modeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 4,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.xs,
   },
   topRow: {
     flexDirection: 'row',
@@ -570,14 +610,11 @@ const styles = StyleSheet.create({
     color: palette.gold,
   },
   title: {
-    fontSize: 15,
-    lineHeight: LINE_HEIGHT,
-    color: palette.charcoal,
-    
-  },
-  titleInline: {
     flex: 1,
     minWidth: 0,
+    fontSize: 18,
+    lineHeight: 22,
+    color: palette.charcoal,
   },
   subtitleRow: {
     flexDirection: 'row',
@@ -600,9 +637,6 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     color: palette.muted,
   },
-  typeLabel: {
-    paddingRight: 88,
-  },
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -614,9 +648,8 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
   price: {
-    flexShrink: 1,
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: 15,
+    lineHeight: 18,
     color: palette.charcoal,
     includeFontPadding: false,
   },
@@ -642,11 +675,11 @@ const styles = StyleSheet.create({
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: palette.gold,
-    borderRadius: radius.sm,
+    gap: 4,
+    backgroundColor: palette.softGold,
+    borderRadius: radius.pill,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 3,
   },
   statusBadge_muted: {
     backgroundColor: palette.softGold,
@@ -664,11 +697,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#6B4C9A',
   },
   statusBadgeText: {
-    fontSize: 10,
-    color: palette.pureWhite,
+    fontSize: 11,
+    color: palette.goldDark,
   },
   statusBadgeTextMuted: {
     color: palette.muted,
+  },
+  statusBadgeTextOnFill: {
+    color: palette.pureWhite,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: palette.gold,
   },
   timerBadge: {
     flexDirection: 'row',

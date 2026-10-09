@@ -66,19 +66,6 @@ function priceText(currencyCode: string, amount: string): string | undefined {
   return amount ? `${currencyCode} ${formatAmountWithCommas(amount)}` : undefined;
 }
 
-/** When multiple units: `/ unit / hr` (etc.). Single unit keeps `/ hr`. */
-function priceUnitLabel(
-  periodUnit: string | undefined,
-  units: number,
-  t: TFunction,
-): string | undefined {
-  if (units <= 1) return periodUnit;
-  const perUnit = t('rfq.pricePerUnit');
-  if (!periodUnit) return perUnit;
-  const period = periodUnit.replace(/^\/\s*/, '').trim();
-  return period ? `${perUnit} / ${period}` : perUnit;
-}
-
 function rentalPrice(
   listing: EquipmentListing,
   t: TFunction,
@@ -129,10 +116,26 @@ export function buildListingCards({
       const offersRent = listing.mode === 'rent' || listing.mode === 'both';
       const offersSell = listing.mode === 'sell' || listing.mode === 'both';
       const rental = rentalPrice(listing, t, currencyCode);
-      const price = rental.priceText
-        ? rental
-        : { priceText: priceText(currencyCode, listing.salePrice), priceUnit: undefined };
-      const displayUnit = priceUnitLabel(price.priceUnit, listing.units, t);
+      const saleAmount = priceText(currencyCode, listing.salePrice);
+      const priceLines =
+        listing.postedAs === 'buyer'
+          ? undefined
+          : [
+              offersSell && saleAmount
+                ? {
+                    text: saleAmount,
+                    unit: t('equipmentListing.salePrice'),
+                  }
+                : null,
+              offersRent && rental.priceText
+                ? {
+                    text: rental.priceText,
+                    unit: rental.priceUnit
+                      ? `${t('equipmentListing.rent')} (per ${rental.priceUnit.replace(/^\/\s*/, '').trim()})`
+                      : t('equipmentListing.rent'),
+                  }
+                : null,
+            ].filter((line): line is { text: string; unit: string } => Boolean(line));
       const durationBadges = offersRent
         ? [
             listing.hourlyRental
@@ -209,8 +212,7 @@ export function buildListingCards({
                 offersRent ? { key: 'rent', label: t('equipmentListing.rent') } : null,
                 offersSell ? { key: 'sell', label: t('equipmentListing.sell') } : null,
               ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
-        priceText: listing.postedAs === 'buyer' ? undefined : price.priceText,
-        priceUnit: listing.postedAs === 'buyer' ? undefined : displayUnit,
+        priceLines,
         createdAt: listing.postedAs === 'supplier' ? undefined : listing.createdAt,
         expiresAt:
           listing.postedAs === 'supplier'

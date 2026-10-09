@@ -42,7 +42,11 @@ export type ListingCardProps = {
   /** Grey period/type label after the amount, same as details. */
   priceUnit?: string;
   /** When set, each line is amount + grey unit (onsite/online or rent period). */
-  priceLines?: Array<{ text: string; unit?: string }>;
+  priceLines?: Array<{
+    text: string;
+    unit?: string;
+    icon?: keyof typeof Ionicons.glyphMap;
+  }>;
   /** Epoch ms the listing was created — countdown, bottom right. */
   createdAt?: number;
   /** RFQ expiry from RMS; used for the card countdown when present. */
