@@ -169,6 +169,18 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   };
 
+  const autoLocated = React.useRef(false);
+  React.useEffect(() => {
+    if (step !== 'personal' || autoLocated.current || location.trim()) return;
+    autoLocated.current = true;
+    void (async () => {
+      const selection = await getCurrentLocation();
+      if (!selection) return;
+      setLocation(selection.label);
+      setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
+    })();
+  }, [step, location, getCurrentLocation]);
+
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
       setLocation(selection.label);
