@@ -19,6 +19,7 @@ import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppText } from '@/shared/components/AppText';
+import { useSharedNow } from '@/shared/hooks/useSharedNow';
 import { SelectField } from '@/shared/components/SelectField';
 import { EquipmentImageCarousel } from '@/features/listings/components/EquipmentImageCarousel';
 import { EquipmentImageViewerModal } from '@/features/listings/components/EquipmentImageViewerModal';
@@ -1395,13 +1396,9 @@ const HOUR_MS = 60 * 60 * 1000;
 const MINUTE_MS = 60 * 1000;
 
 function useCountdown(endsAt: number | null | undefined): string | null {
-  const [now, setNow] = React.useState(() => Date.now());
-
-  React.useEffect(() => {
-    if (endsAt == null) return undefined;
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, [endsAt]);
+  const ahead = endsAt == null ? HOUR_MS : Math.max(0, endsAt - Date.now());
+  const tickMs = ahead >= HOUR_MS ? 60_000 : ahead >= MINUTE_MS ? 15_000 : 1000;
+  const now = useSharedNow(tickMs);
 
   if (endsAt == null) return null;
   const remainingMs = Math.max(0, endsAt - now);

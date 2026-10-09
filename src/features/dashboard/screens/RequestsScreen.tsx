@@ -73,33 +73,41 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     }
   }, [role, category]);
 
-  const cards = buildListingCards({
-    category,
-    equipmentListings,
-    serviceListings,
-    goldListings,
-    t,
-    currencyCode: currency.code,
+  const visibleCards = React.useMemo(() => {
+    const cards = buildListingCards({
+      category,
+      equipmentListings,
+      serviceListings,
+      goldListings,
+      t,
+      currencyCode: currency.code,
+      catalogLabel,
+      onOpen: (id, listingCategory) =>
+        navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
+      onRepost: (id, listingCategory) => {
+        if (listingCategory === 'equipment') {
+          navigation.navigate('EquipmentListingForm', { repostId: id });
+          return;
+        }
+        if (listingCategory === 'services') {
+          navigation.navigate('ServiceListingForm', { repostId: id });
+          return;
+        }
+        navigation.navigate('GoldListingForm', { repostId: id });
+      },
+    });
+    return cards.filter((card) => (lifeFilter === 'past' ? Boolean(card.ended) : !card.ended));
+  }, [
     catalogLabel,
-    onOpen: (id, listingCategory) =>
-      navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
-    onRepost: (id, listingCategory) => {
-      if (listingCategory === 'equipment') {
-        navigation.navigate('EquipmentListingForm', { repostId: id });
-        return;
-      }
-      if (listingCategory === 'services') {
-        navigation.navigate('ServiceListingForm', { repostId: id });
-        return;
-      }
-      navigation.navigate('GoldListingForm', { repostId: id });
-    },
-  });
-
-  const visibleCards = cards.filter((card) => {
-    if (lifeFilter === 'past') return Boolean(card.ended);
-    return !card.ended;
-  });
+    category,
+    currency.code,
+    equipmentListings,
+    goldListings,
+    lifeFilter,
+    navigation,
+    serviceListings,
+    t,
+  ]);
 
   const emptyTitle =
     lifeFilter === 'live' ? t('requests.emptyLiveTitle') : t('requests.emptyPastTitle');

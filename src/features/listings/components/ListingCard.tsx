@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
+import { useSharedNow } from '@/shared/hooks/useSharedNow';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
 import type {
@@ -22,17 +23,11 @@ const BADGE_ROW_HEIGHT = 20;
 const LINE_HEIGHT = 18;
 
 function useRemainingTime(createdAt: number, expiresAt?: number): string {
-  const [now, setNow] = React.useState(() => Date.now());
   const end = expiresAt ?? createdAt + LISTING_LIFETIME_MS;
+  const ahead = Math.max(0, end - Date.now());
+  const tickMs = ahead >= HOUR_MS ? 60_000 : ahead >= MINUTE_MS ? 15_000 : COUNTDOWN_TICK_MS;
+  const now = useSharedNow(tickMs);
   const remainingMs = Math.max(0, end - now);
-  const tickMs =
-    remainingMs >= HOUR_MS ? 60_000 : remainingMs >= MINUTE_MS ? 15_000 : COUNTDOWN_TICK_MS;
-
-  React.useEffect(() => {
-    if (end <= Date.now()) return undefined;
-    const timer = setInterval(() => setNow(Date.now()), tickMs);
-    return () => clearInterval(timer);
-  }, [end, tickMs]);
 
   if (remainingMs > DAY_MS) {
     return `${Math.floor(remainingMs / DAY_MS)}d`;

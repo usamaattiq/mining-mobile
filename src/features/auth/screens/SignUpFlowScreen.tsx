@@ -9,6 +9,7 @@ import { i18n as appI18n } from '@/i18n';
 import { OnboardingLayout } from '@/features/auth/components/OnboardingLayout';
 import { SIGN_UP_STEPS } from '@/features/auth/constants/onboardingSteps';
 import { authApi } from '@/features/auth/api/authApi';
+import { useAutoCurrentLocation } from '@/shared/hooks/useAutoCurrentLocation';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { LocationField } from '@/shared/components/LocationField';
 import { AvatarPicker } from '@/shared/components/AvatarPicker';
@@ -159,27 +160,22 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
     navigation.goBack();
   };
 
-  const handleUseCurrentLocation = async () => {
+  const applyCurrentLocation = React.useCallback(async () => {
     const selection = await getCurrentLocation();
-    if (!selection) {
-      showAppAlert(t('common.error'), t('location.locationFailed'));
-      return;
-    }
+    if (!selection) return null;
     setLocation(selection.label);
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
-  };
+    return selection;
+  }, [getCurrentLocation]);
 
-  const autoLocated = React.useRef(false);
-  React.useEffect(() => {
-    if (step !== 'personal' || autoLocated.current || location.trim()) return;
-    autoLocated.current = true;
-    void (async () => {
-      const selection = await getCurrentLocation();
-      if (!selection) return;
-      setLocation(selection.label);
-      setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
-    })();
-  }, [step, location, getCurrentLocation]);
+  useAutoCurrentLocation(step === 'personal', location.trim().length > 0, applyCurrentLocation);
+
+  const handleUseCurrentLocation = async () => {
+    const selection = await applyCurrentLocation();
+    if (!selection) {
+      showAppAlert(t('common.error'), t('location.locationFailed'));
+    }
+  };
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {

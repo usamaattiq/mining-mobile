@@ -15,6 +15,7 @@ import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
 import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
 import { LocationField } from '@/shared/components/LocationField';
+import { useAutoCurrentLocation } from '@/shared/hooks/useAutoCurrentLocation';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { Button } from '@/shared/components/Button';
 import { ListingStepper } from '@/features/listings/components/ListingStepper';
@@ -154,12 +155,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   }, [getCurrentLocation]);
 
-  const autoLocated = React.useRef(false);
-  React.useEffect(() => {
-    if (step !== 1 || autoLocated.current || location.trim()) return;
-    autoLocated.current = true;
-    void handleUseCurrentLocation();
-  }, [step, location, handleUseCurrentLocation]);
+  useAutoCurrentLocation(step === 1, location.trim().length > 0, handleUseCurrentLocation);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {

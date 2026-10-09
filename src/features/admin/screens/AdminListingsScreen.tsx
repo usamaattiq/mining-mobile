@@ -55,17 +55,21 @@ export function AdminListingsScreen(): React.ReactElement {
     return () => clearTimeout(handle);
   }, [query, category, load, t]);
 
-  const cards = buildListingCards({
-    category,
-    equipmentListings: items.filter(isEquipmentListing),
-    serviceListings: items.filter(isServiceListing),
-    goldListings: items.filter(isGoldListing),
-    t,
-    currencyCode: currency.code,
-    catalogLabel,
-    onOpen: (id, listingCategory) =>
-      navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
-  });
+  const cards = React.useMemo(
+    () =>
+      buildListingCards({
+        category,
+        equipmentListings: items.filter(isEquipmentListing),
+        serviceListings: items.filter(isServiceListing),
+        goldListings: items.filter(isGoldListing),
+        t,
+        currencyCode: currency.code,
+        catalogLabel,
+        onOpen: (id, listingCategory) =>
+          navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
+      }),
+    [catalogLabel, category, currency.code, items, navigation, t],
+  );
 
   return (
     <GoldSheetScreen

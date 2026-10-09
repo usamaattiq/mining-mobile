@@ -23,6 +23,7 @@ import {
 } from '@/features/listings/utils/listingExpiry';
 import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
+import { useAutoCurrentLocation } from '@/shared/hooks/useAutoCurrentLocation';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { ToggleRow } from '@/shared/components/ToggleRow';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
@@ -214,12 +215,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   }, [getCurrentLocation]);
 
-  const autoLocated = React.useRef(false);
-  React.useEffect(() => {
-    if (step !== 1 || autoLocated.current || location.trim()) return;
-    autoLocated.current = true;
-    void handleUseCurrentLocation();
-  }, [step, location, handleUseCurrentLocation]);
+  useAutoCurrentLocation(step === 1, location.trim().length > 0, handleUseCurrentLocation);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {

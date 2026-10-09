@@ -54,21 +54,22 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
     [],
   );
 
-  const sentInThisMode = listings.filter((listing) =>
-    role === 'buyer' ? listing.postedAs === 'supplier' : listing.postedAs === 'buyer',
-  );
-
-  const cards = buildListingCards({
-    category,
-    equipmentListings: sentInThisMode.filter(isEquipmentListing),
-    serviceListings: sentInThisMode.filter(isServiceListing),
-    goldListings: sentInThisMode.filter(isGoldListing),
-    t,
-    currencyCode: currency.code,
-    catalogLabel,
-    onOpen: (id, listingCategory) =>
-      navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
-  });
+  const cards = React.useMemo(() => {
+    const sentInThisMode = listings.filter((listing) =>
+      role === 'buyer' ? listing.postedAs === 'supplier' : listing.postedAs === 'buyer',
+    );
+    return buildListingCards({
+      category,
+      equipmentListings: sentInThisMode.filter(isEquipmentListing),
+      serviceListings: sentInThisMode.filter(isServiceListing),
+      goldListings: sentInThisMode.filter(isGoldListing),
+      t,
+      currencyCode: currency.code,
+      catalogLabel,
+      onOpen: (id, listingCategory) =>
+        navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
+    });
+  }, [catalogLabel, category, currency.code, listings, navigation, role, t]);
 
   return (
     <GoldSheetScreen
