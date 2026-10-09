@@ -326,7 +326,7 @@ function ListingCardComponent({
                                   ? 'wifi'
                                   : line.unit.toLowerCase().includes('rent') ||
                                       line.unit.includes('إيجار')
-                                    ? 'home'
+                                    ? 'key'
                                     : 'tag'
                             }
                             size={11}

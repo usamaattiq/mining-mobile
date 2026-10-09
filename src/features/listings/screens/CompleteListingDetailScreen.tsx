@@ -380,7 +380,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           {showRentPrice && activeDuration ? (
             <View style={styles.unitPriceCell}>
               <View style={styles.unitPriceHeading}>
-                <Ionicons name="home-outline" size={18} color={palette.charcoal} />
+                <Ionicons name="key-outline" size={18} color={palette.charcoal} />
                 <AppText style={styles.unitPriceCaption}>{t('equipmentListing.rentPrice')}</AppText>
               </View>
               <AppText weight="bold" style={styles.unitPriceAmount}>
@@ -569,10 +569,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
     : [];
+  // Block the other rent/sale offer until this one is accepted (confirmed).
+  // Set to false to allow both kinds again while one is still open.
+  const limitToOneOpenOffer = true;
+  const hasOpenSupplierOffer =
+    limitToOneOpenOffer &&
+    (mySupplierOffers.some((offer) => offer.status === 'active' || offer.status === 'selected') ||
+      rfq?.myOfferStatus === 'active' ||
+      rfq?.myOfferStatus === 'selected');
   const showOfferInput =
     !isAdmin &&
     (supplierBuyer
-      ? unitsLeft > 0 && rfq?.canSubmitOffer !== false
+      ? unitsLeft > 0 && rfq?.canSubmitOffer !== false && !hasOpenSupplierOffer
       : !awaitingConfirm &&
         (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live')));
   const canMessage = !isAdmin && Boolean(owner) && !isOwner && hasSentOffer;
@@ -615,6 +623,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     units?: number,
     choice?: 'rent' | 'sale' | 'onsite' | 'online',
   ) => {
+    if (hasOpenSupplierOffer) return;
     const fulfillment = choice === 'rent' || choice === 'sale' ? choice : undefined;
     const delivery = choice === 'onsite' || choice === 'online' ? choice : undefined;
     setOfferSubmitting(true);
@@ -1302,13 +1311,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           fulfillmentSaleLabel={t('equipmentListing.buy')}
           blockedFulfillmentModes={
             supplierBuyer
-              ? (['rent', 'sale'] as const).filter((kind) =>
-                  mySupplierOffers.some(
-                    (offer) =>
-                      offer.kind === kind &&
-                      (offer.status === 'active' || offer.status === 'selected'),
-                  ),
-                )
+              ? hasOpenSupplierOffer
+                ? (['rent', 'sale'] as const)
+                : (['rent', 'sale'] as const).filter((kind) =>
+                    mySupplierOffers.some(
+                      (offer) =>
+                        offer.kind === kind &&
+                        (offer.status === 'active' || offer.status === 'selected'),
+                    ),
+                  )
               : undefined
           }
           offerChoiceLabel={
