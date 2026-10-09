@@ -28,7 +28,14 @@ export function EquipmentImageCarousel({
   const windowWidth = useWindowDimensions().width;
   const [containerWidth, setContainerWidth] = React.useState(windowWidth);
   const [activeIndex, setActiveIndex] = React.useState(0);
+  const scrollRef = React.useRef<ScrollView>(null);
+  const ignoreScrollEnd = React.useRef(false);
+  const [thumbRowWidth, setThumbRowWidth] = React.useState(0);
   const hasMedia = media.length > 0;
+  const thumbWidth =
+    thumbRowWidth > 0
+      ? ((thumbRowWidth - spacing.md * 2 - spacing.xs * 3 - spacing.xl) / 4) * 0.9
+      : undefined;
 
   const photoUrls = media
     .filter((item) => item.kind !== 'video')
@@ -44,61 +51,104 @@ export function EquipmentImageCarousel({
     setContainerWidth(event.nativeEvent.layout.width);
   };
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (ignoreScrollEnd.current) {
+      ignoreScrollEnd.current = false;
+      return;
+    }
     if (containerWidth <= 0) return;
     const index = Math.round(event.nativeEvent.contentOffset.x / containerWidth);
+    setActiveIndex(Math.min(Math.max(index, 0), Math.max(media.length - 1, 0)));
+  };
+
+  const showSlide = (index: number) => {
+    ignoreScrollEnd.current = true;
     setActiveIndex(index);
+    scrollRef.current?.scrollTo({ x: index * containerWidth, animated: false });
   };
 
   return (
-    <View style={[styles.root, { height: CAROUSEL_HEIGHT }, style]} onLayout={handleLayout}>
-      {hasMedia && containerWidth > 0 ? (
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-        >
-          {media.map((item, index) => (
-            <Pressable key={item.id} onPress={() => onPressImage(index)}>
-              {item.kind === 'video' ? (
-                <ListingVideoThumb
-                  uri={item.uri}
-                  style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
-                  iconSize={22}
-                />
-              ) : (
-                <RemoteImage
-                  source={item.uri}
-                  style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
-                  recyclingKey={item.id}
-                />
-              )}
-            </Pressable>
-          ))}
-        </ScrollView>
-      ) : (
-        <View style={styles.placeholder}>
-          <Ionicons name={placeholderIcon} size={72} color={palette.goldDark} />
-        </View>
-      )}
+    <View style={[styles.root, style]}>
+      <View style={[styles.stage, { height: CAROUSEL_HEIGHT }]} onLayout={handleLayout}>
+        {hasMedia && containerWidth > 0 ? (
+          <ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleScrollEnd}
+          >
+            {media.map((item, index) => (
+              <Pressable key={item.id} onPress={() => onPressImage(index)}>
+                {item.kind === 'video' ? (
+                  <ListingVideoThumb
+                    uri={item.uri}
+                    style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
+                    iconSize={22}
+                  />
+                ) : (
+                  <RemoteImage
+                    source={item.uri}
+                    style={{ width: containerWidth, height: CAROUSEL_HEIGHT }}
+                    contentFit="cover"
+                    recyclingKey={item.id}
+                  />
+                )}
+              </Pressable>
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={styles.placeholder}>
+            <Ionicons name={placeholderIcon} size={72} color={palette.goldDark} />
+          </View>
+        )}
+      </View>
 
       {media.length > 1 ? (
-        <View style={styles.dots}>
-          {media.map((item, index) => (
-            <View key={item.id} style={[styles.dot, index === activeIndex && styles.dotActive]} />
-          ))}
+        <View
+          style={styles.thumbs}
+          onLayout={(event) => setThumbRowWidth(event.nativeEvent.layout.width)}
+        >
+          {media.map((item, index) => {
+            const selected = index === activeIndex;
+            return (
+              <Pressable
+                key={item.id}
+                onPress={() => showSlide(index)}
+                style={[
+                  styles.thumb,
+                  thumbWidth != null && { width: thumbWidth, height: thumbWidth },
+                  selected && styles.thumbSelected,
+                ]}
+              >
+                {item.kind === 'video' ? (
+                  <ListingVideoThumb uri={item.uri} style={styles.thumbMedia} iconSize={14} />
+                ) : (
+                  <RemoteImage
+                    source={item.uri}
+                    style={styles.thumbMedia}
+                    contentFit="cover"
+                    recyclingKey={`${item.id}-thumb`}
+                  />
+                )}
+              </Pressable>
+            );
+          })}
         </View>
       ) : null}
     </View>
   );
 }
 
+const THUMB_SIZE = 64;
+
 const styles = StyleSheet.create({
   root: {
     alignSelf: 'stretch',
-    borderRadius: radius.lg,
+    backgroundColor: palette.pureWhite,
+  },
+  stage: {
+    alignSelf: 'stretch',
     overflow: 'hidden',
     backgroundColor: palette.softGold,
   },
@@ -107,23 +157,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dots: {
-    position: 'absolute',
-    bottom: spacing.sm,
-    left: 0,
-    right: 0,
+  thumbs: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.xs,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.6)',
+  thumb: {
+    height: THUMB_SIZE,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
-  dotActive: {
-    backgroundColor: palette.pureWhite,
-    width: 16,
+  thumbSelected: {
+    borderColor: palette.gold,
+  },
+  thumbMedia: {
+    width: '100%',
+    height: '100%',
   },
 });

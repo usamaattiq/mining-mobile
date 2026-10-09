@@ -30,7 +30,7 @@ export function ListingVideoThumb({
   return (
     <View style={[styles.root, style]}>
       {thumb ? (
-        <Image source={{ uri: thumb }} style={styles.fill} />
+        <Image source={{ uri: thumb }} style={styles.fill} resizeMode="cover" />
       ) : (
         <View style={[styles.fill, styles.fallback]} />
       )}

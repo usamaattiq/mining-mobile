@@ -506,13 +506,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     extraSection = <AttachmentsSection documents={documents} />;
   }
 
-  const visualMedia = media
-    .filter((item) => item.kind === 'photo' || item.kind === 'video')
-    .map((item) => ({
-      id: item.id,
-      uri: item.uri,
-      kind: item.kind as 'photo' | 'video',
-    }));
+  const visualMedia = [
+    ...media.filter((item) => item.kind === 'photo').slice(0, 3),
+    ...media.filter((item) => item.kind === 'video').slice(0, 1),
+  ].map((item) => ({
+    id: item.id,
+    uri: item.uri,
+    kind: item.kind as 'photo' | 'video',
+  }));
   const descriptionText = description.trim();
   const locationLabel = location;
 
