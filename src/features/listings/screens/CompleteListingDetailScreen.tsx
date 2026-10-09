@@ -164,6 +164,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     }, [applyListing, id]),
   );
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null);
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
   const [servicePriceMode, setServicePriceMode] = React.useState<'online' | 'onsite'>('online');
   const [messageOpen, setMessageOpen] = React.useState(false);
@@ -791,12 +792,22 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             </View>
           </View>
 
-          <EquipmentListingSummaryCard
-            detailRows={detailRows}
-            media={[]}
-            hideMedia
-            description={descriptionText}
-          />
+          {detailRows.length > 0 || descriptionText ? (
+            <Pressable
+              onPress={() => setDetailsOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.viewDetails')}
+              style={({ pressed }) => [styles.viewDetailsButton, pressed && styles.viewDetailsPressed]}
+            >
+              <View style={styles.viewDetailsIcon}>
+                <Ionicons name="document-text-outline" size={20} color={palette.gold} />
+              </View>
+              <AppText weight="semibold" style={styles.viewDetailsLabel}>
+                {t('common.viewDetails')}
+              </AppText>
+              <Ionicons name="chevron-forward" size={18} color={palette.muted} />
+            </Pressable>
+          ) : null}
 
           {extraSection}
 
@@ -1349,6 +1360,15 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </AppBottomSheet>
       ) : null}
 
+      <AppBottomSheet visible={detailsOpen} onClose={() => setDetailsOpen(false)} fitContent>
+        <EquipmentListingSummaryCard
+          detailRows={detailRows}
+          media={[]}
+          hideMedia
+          description={descriptionText}
+        />
+      </AppBottomSheet>
+
       <EquipmentImageViewerModal
         visible={viewerIndex !== null}
         media={visualMedia}
@@ -1654,6 +1674,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: palette.gold,
     textDecorationLine: 'underline',
+  },
+  viewDetailsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: palette.warmWhite,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    minHeight: 56,
+  },
+  viewDetailsPressed: {
+    opacity: 0.75,
+  },
+  viewDetailsIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.md,
+    backgroundColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewDetailsLabel: {
+    flex: 1,
+    fontSize: 16,
+    color: palette.charcoal,
   },
   contactRow: {
     flexDirection: 'row',
