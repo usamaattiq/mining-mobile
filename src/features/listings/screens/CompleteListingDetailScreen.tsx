@@ -177,6 +177,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [editingOfferId, setEditingOfferId] = React.useState<string | null>(null);
   const [editOfferPrice, setEditOfferPrice] = React.useState('');
   const [editOfferUnits, setEditOfferUnits] = React.useState(1);
+  const [editOfferKind, setEditOfferKind] = React.useState<'rent' | 'sale'>('rent');
+  const [editOfferHandover, setEditOfferHandover] = React.useState<'pickup' | 'delivery'>('pickup');
   const countdownEnd =
     (equipmentListing ?? serviceListing ?? goldListing)?.rfq?.expiresAt ??
     goldListing?.auctionEndDate ??
@@ -723,7 +725,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     run();
   };
 
-  const beginEditOffer = (offer: { id: string; price?: string; quantity?: number | null }) => {
+  const beginEditOffer = (offer: {
+    id: string;
+    price?: string;
+    quantity?: number | null;
+    kind?: 'rent' | 'sale';
+    handover?: 'pickup' | 'delivery';
+  }) => {
     const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : 1;
     const total = Number(offer.price);
     const unitPrice =
@@ -731,6 +739,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     setEditingOfferId(offer.id);
     setEditOfferUnits(units);
     setEditOfferPrice(unitPrice === '' ? '' : String(unitPrice));
+    setEditOfferKind(offer.kind === 'sale' ? 'sale' : 'rent');
+    setEditOfferHandover(offer.handover === 'delivery' ? 'delivery' : 'pickup');
   };
 
   const handleSaveOffer = (offerId: string) => {
@@ -738,7 +748,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) return;
     setOfferSubmitting(true);
     void listingsApi
-      .updateOffer(id, offerId, price, editOfferUnits)
+      .updateOffer(
+        id,
+        offerId,
+        price,
+        editOfferUnits,
+        equipmentListing?.mode === 'both' ? editOfferKind : undefined,
+        equipmentListing?.deliveryAvailable ? editOfferHandover : 'pickup',
+      )
       .then((listing) => {
         applyListing(listing);
         setEditingOfferId(null);
@@ -1041,6 +1058,64 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   ) : null}
                   {offer.status === 'active' && editingOfferId === offer.id ? (
                     <View style={styles.myOfferEdit}>
+                      {equipmentListing?.mode === 'both' ? (
+                        <View style={styles.editChoiceRow}>
+                          {(['rent', 'sale'] as const).map((kind) => {
+                            const selected = editOfferKind === kind;
+                            return (
+                              <Pressable
+                                key={kind}
+                                onPress={() => setEditOfferKind(kind)}
+                                style={[styles.editChoice, selected && styles.editChoiceSelected]}
+                              >
+                                <AppText
+                                  weight="semibold"
+                                  style={[
+                                    styles.editChoiceLabel,
+                                    selected && styles.editChoiceLabelSelected,
+                                  ]}
+                                >
+                                  {kind === 'rent'
+                                    ? t('equipmentListing.rent')
+                                    : t('equipmentListing.buy')}
+                                </AppText>
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      ) : null}
+                      {equipmentListing?.deliveryAvailable ? (
+                        <View style={styles.editHandover}>
+                          {(['delivery', 'pickup'] as const).map((mode) => {
+                            const selected = editOfferHandover === mode;
+                            return (
+                              <Pressable
+                                key={mode}
+                                onPress={() => setEditOfferHandover(mode)}
+                                accessibilityRole="radio"
+                                accessibilityState={{ selected }}
+                                style={styles.editHandoverRow}
+                              >
+                                <View
+                                  style={[styles.editRadio, selected && styles.editRadioSelected]}
+                                >
+                                  {selected ? <View style={styles.editRadioDot} /> : null}
+                                </View>
+                                <Ionicons
+                                  name={mode === 'delivery' ? 'car-outline' : 'storefront-outline'}
+                                  size={18}
+                                  color={selected ? palette.gold : palette.muted}
+                                />
+                                <AppText weight={selected ? 'semibold' : 'regular'} style={styles.editHandoverLabel}>
+                                  {mode === 'delivery'
+                                    ? t('equipmentListing.deliveryRequested')
+                                    : t('equipmentListing.pickupFromSupplier')}
+                                </AppText>
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      ) : null}
                       <TextInput
                         value={editOfferPrice}
                         onChangeText={setEditOfferPrice}
@@ -1691,6 +1766,33 @@ const styles = StyleSheet.create({
   myOfferActions: { flexDirection: 'row', gap: spacing.sm },
   myOfferAction: { flex: 1 },
   myOfferEdit: { gap: spacing.sm },
+  editChoiceRow: { flexDirection: 'row', gap: spacing.xs },
+  editChoice: {
+    flex: 1,
+    minHeight: 36,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  editChoiceSelected: { backgroundColor: palette.gold, borderColor: palette.gold },
+  editChoiceLabel: { fontSize: 13, color: palette.charcoal },
+  editChoiceLabelSelected: { color: palette.pureWhite },
+  editHandover: { gap: spacing.sm },
+  editHandoverRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  editHandoverLabel: { fontSize: 14, color: palette.charcoal },
+  editRadio: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: palette.muted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  editRadioSelected: { borderColor: palette.gold },
+  editRadioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: palette.gold },
   myOfferPriceInput: {
     borderWidth: 1,
     borderColor: palette.softGold,

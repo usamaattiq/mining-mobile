@@ -143,10 +143,22 @@ export const listingsApi = {
     return apiFetch(`/listings/${id}/offers/${offerId}/decline`, { method: 'POST', body: {} });
   },
 
-  updateOffer(id: string, offerId: string, price: string, units: number): Promise<ListingDto> {
+  updateOffer(
+    id: string,
+    offerId: string,
+    price: string,
+    units: number,
+    fulfillment?: 'rent' | 'sale',
+    handover?: 'pickup' | 'delivery',
+  ): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers/${offerId}`, {
       method: 'PATCH',
-      body: { price, units },
+      body: {
+        price,
+        units,
+        ...(fulfillment ? { fulfillment } : {}),
+        ...(handover ? { handover } : {}),
+      },
     });
   },
 
