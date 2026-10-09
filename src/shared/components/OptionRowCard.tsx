@@ -29,8 +29,8 @@ export function OptionRowCard({
         compact && styles.cardCompact,
         selected && styles.cardSelected,
         cardBackShadow,
-        pressed && styles.pressed,
         image && !compact && styles.cardWithImage,
+        pressed && styles.cardPressed,
       ]}
     >
       {image && !compact ? (
@@ -188,9 +188,8 @@ const styles = StyleSheet.create({
     borderColor: palette.gold,
     backgroundColor: palette.softGold,
   },
-  pressed: {
-    opacity: 0.92,
-    backgroundColor: palette.softGold,
+  cardPressed: {
+    borderColor: palette.gold,
   },
   iconWrap: {
     width: 64,
