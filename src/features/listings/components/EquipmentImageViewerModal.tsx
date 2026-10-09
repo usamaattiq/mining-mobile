@@ -98,11 +98,12 @@ export function EquipmentImageViewerModal({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.95)',
+    backgroundColor: '#000000',
   },
   image: {
     width: '100%',
     height: '100%',
+    backgroundColor: '#000000',
   },
   closeButton: {
     position: 'absolute',
