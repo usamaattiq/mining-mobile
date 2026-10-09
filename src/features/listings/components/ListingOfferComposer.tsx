@@ -29,6 +29,7 @@ export function ListingOfferComposer({
   awaitingConfirm,
   submitting,
   sendInline = false,
+  offerTypeLabel,
   fulfillmentModes,
   fulfillmentLabels,
   fulfillmentRentLabel,
@@ -80,7 +81,7 @@ export function ListingOfferComposer({
     onSubmit(
       value,
       maxUnits != null ? units : undefined,
-      fulfillmentModes && fulfillmentModes.length > 1 ? fulfillment : fulfillmentModes?.[0],
+      fulfillmentModes && fulfillmentModes.length > 0 ? fulfillment : undefined,
     );
   };
 
@@ -164,36 +165,44 @@ export function ListingOfferComposer({
         {showInput ? (
           <View style={styles.form}>
             {fulfillmentModes && fulfillmentModes.length > 1 ? (
-              <View style={styles.fulfillmentRow}>
-                {fulfillmentModes.map((mode) => {
-                  const selected = fulfillment === mode;
-                  const blocked = blockedModes.has(mode);
-                  return (
-                    <Pressable
-                      key={mode}
-                      onPress={() => setFulfillment(mode)}
-                      disabled={blocked}
-                      accessibilityState={{ disabled: blocked, selected }}
-                      style={[
-                        styles.fulfillmentChip,
-                        selected && !blocked && styles.fulfillmentChipSelected,
-                        blocked && styles.fulfillmentChipDisabled,
-                      ]}
-                    >
-                      <AppText
-                        weight="semibold"
+              <View style={styles.fulfillmentBlock}>
+                {offerTypeLabel ? (
+                  <AppText weight="semibold" style={styles.fulfillmentHeading}>
+                    {offerTypeLabel}
+                  </AppText>
+                ) : null}
+                <View style={styles.fulfillmentRow}>
+                  {fulfillmentModes.map((mode) => {
+                    const selected = fulfillment === mode;
+                    const blocked = blockedModes.has(mode);
+                    return (
+                      <Pressable
+                        key={mode}
+                        onPress={() => setFulfillment(mode)}
+                        disabled={blocked}
+                        accessibilityState={{ disabled: blocked, selected }}
                         style={[
-                          styles.fulfillmentLabel,
-                          selected && !blocked && styles.fulfillmentLabelSelected,
-                          blocked && styles.fulfillmentLabelDisabled,
+                          styles.fulfillmentChip,
+                          selected && !blocked && styles.fulfillmentChipSelected,
+                          blocked && styles.fulfillmentChipDisabled,
                         ]}
                       >
-                        {fulfillmentLabels?.[mode] ??
-                          (mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel)}
-                      </AppText>
-                    </Pressable>
-                  );
-                })}
+                        <AppText
+                          weight="semibold"
+                          numberOfLines={1}
+                          style={[
+                            styles.fulfillmentLabel,
+                            selected && !blocked && styles.fulfillmentLabelSelected,
+                            blocked && styles.fulfillmentLabelDisabled,
+                          ]}
+                        >
+                          {fulfillmentLabels?.[mode] ??
+                            (mode === 'rent' ? fulfillmentRentLabel : fulfillmentSaleLabel)}
+                        </AppText>
+                      </Pressable>
+                    );
+                  })}
+                </View>
               </View>
             ) : null}
             <View style={styles.row}>
@@ -414,9 +423,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: palette.charcoal,
   },
+  fulfillmentBlock: {
+    gap: spacing.xs,
+  },
+  fulfillmentHeading: {
+    fontSize: 13,
+    color: palette.charcoal,
+  },
   fulfillmentRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   fulfillmentChip: {
     flex: 1,

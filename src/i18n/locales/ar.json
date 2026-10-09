@@ -45,6 +45,7 @@
     "offerCalculation": "{price} × {count}",
     "offerTotal": "الإجمالي {amount}",
     "sendOffer": "إرسال العرض",
+    "offerType": "نوع العرض",
     "offerSubmitted": "تم تقديم العرض",
     "offerFailed": "تعذر إرسال العرض. حاول مرة أخرى.",
     "offersTitle": "العروض",

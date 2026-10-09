@@ -45,6 +45,7 @@
     "offerCalculation": "{price} × {count}",
     "offerTotal": "Total {amount}",
     "sendOffer": "Send offer",
+    "offerType": "Offer type",
     "offerSubmitted": "Offer submitted",
     "offerFailed": "Could not send your offer. Try again.",
     "offersTitle": "Offers",

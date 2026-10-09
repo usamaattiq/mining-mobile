@@ -982,23 +982,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         : t('rfq.yourOffer')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
-                      <View style={styles.myOfferStatusBadge}>
-                        <AppText weight="semibold" style={styles.myOfferStatusText}>
-                          {t(
-                            `rfq.offerStatus.${
-                              offer.status === 'selected'
-                                ? 'selected'
-                                : offer.status === 'confirmed'
-                                  ? 'confirmed'
-                                  : 'active'
-                            }`,
-                          )}
-                        </AppText>
-                      </View>
+                      {offer.status === 'selected' || offer.status === 'confirmed' ? (
+                        <View style={styles.myOfferStatusBadge}>
+                          <AppText weight="semibold" style={styles.myOfferStatusText}>
+                            {t(
+                              `rfq.offerStatus.${
+                                offer.status === 'selected' ? 'selected' : 'confirmed'
+                              }`,
+                            )}
+                          </AppText>
+                        </View>
+                      ) : null}
                       <View style={styles.myOfferKindBadge}>
                         <AppText weight="semibold" style={styles.myOfferKindText}>
                           {offer.kind === 'sale'
-                            ? t('equipmentListing.sell')
+                            ? t('equipmentListing.buy')
                             : t('equipmentListing.rent')}
                         </AppText>
                       </View>
@@ -1286,6 +1284,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               : undefined
           }
           maxUnits={category === 'equipment' ? Math.max(unitsLeft, 0) : undefined}
+          offerTypeLabel={
+            (category === 'equipment' && equipmentListing?.postedAs === 'supplier') ||
+            (category === 'services' && serviceListing?.serviceType === 'both')
+              ? t('rfq.offerType')
+              : undefined
+          }
           fulfillmentModes={
             category === 'equipment' && equipmentListing?.postedAs === 'supplier'
               ? equipmentListing.mode === 'both'

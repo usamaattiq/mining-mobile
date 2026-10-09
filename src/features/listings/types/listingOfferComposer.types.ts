@@ -20,6 +20,7 @@ export type ListingOfferComposerProps = {
   submitting: boolean;
   /** Units, price, and send share one row. Message actions stay on the line below. */
   sendInline?: boolean;
+  offerTypeLabel?: string;
   fulfillmentModes?: Array<'rent' | 'sale' | 'onsite' | 'online'>;
   fulfillmentLabels?: Partial<Record<'rent' | 'sale' | 'onsite' | 'online', string>>;
   fulfillmentRentLabel?: string;
