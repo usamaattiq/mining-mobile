@@ -119,6 +119,7 @@ function ListingCardComponent({
   const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
   const windowWidth = useWindowDimensions().width;
   const thumbnailUri = thumbnail;
+  const [imageSide, setImageSide] = React.useState(96);
 
   React.useEffect(() => {
     if (thumbnailUri) void Image.prefetch(thumbnailUri);
@@ -270,7 +271,7 @@ function ListingCardComponent({
       style={({ pressed }) => [styles.card, cardBackShadow, pressed && styles.pressed]}
     >
       <View style={styles.row}>
-        <View style={styles.imageWrap}>
+        <View style={[styles.imageWrap, { width: imageSide, height: imageSide }]}>
           {thumbnail ? (
             <RemoteImage source={thumbnail} style={styles.image} recyclingKey={thumbnail} />
           ) : (
@@ -280,7 +281,13 @@ function ListingCardComponent({
           )}
         </View>
 
-        <View style={styles.copy}>
+        <View
+          style={styles.copy}
+          onLayout={(event) => {
+            const next = Math.round(event.nativeEvent.layout.height);
+            if (next > 0 && next !== imageSide) setImageSide(next);
+          }}
+        >
           {typeBadge ? (
             <View style={styles.badgeRow}>
               <StatusBadge badge={typeBadge} />
@@ -346,8 +353,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: palette.warmWhite,
     borderRadius: 22,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
   },
   gridCard: {
     width: '48%',
@@ -453,11 +460,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 8,
   },
   imageWrap: {
-    width: 112,
-    height: 112,
     borderRadius: 16,
     overflow: 'hidden',
   },
