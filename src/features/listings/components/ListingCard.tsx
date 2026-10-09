@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   timerText: {
-    fontSize: 10,
+    fontSize: 11,
     color: palette.pureWhite,
   },
   repostButton: {
