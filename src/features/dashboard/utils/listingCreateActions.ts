@@ -18,6 +18,7 @@ export function listingCreateActions(
         isBuyer ? 'dashboardHome.requestEquipmentSubtitle' : 'dashboardHome.listEquipmentSubtitle',
       ),
       onPress: () => navigate('EquipmentListingForm'),
+      image: require('@/assets/images/request-equipment.jpg'),
     },
     {
       icon: 'briefcase-outline',
@@ -26,6 +27,7 @@ export function listingCreateActions(
         isBuyer ? 'dashboardHome.requestServiceSubtitle' : 'dashboardHome.listServiceSubtitle',
       ),
       onPress: () => navigate('ServiceListingForm'),
+      image: require('@/assets/images/request-service.jpg'),
     },
   ];
 
@@ -35,6 +37,7 @@ export function listingCreateActions(
       title: t('dashboardHome.auctionGold'),
       subtitle: t('dashboardHome.auctionGoldSubtitle'),
       onPress: () => navigate('GoldListingForm'),
+      image: require('@/assets/images/request-gold.jpg'),
     });
   }
 

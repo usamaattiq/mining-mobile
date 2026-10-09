@@ -1,3 +1,4 @@
+import type { ImageSourcePropType } from 'react-native';
 import type { Ionicons } from '@expo/vector-icons';
 
 export type HomeActionCardProps = {
@@ -5,4 +6,5 @@ export type HomeActionCardProps = {
   title: string;
   subtitle: string;
   onPress: () => void;
+  image?: ImageSourcePropType;
 };

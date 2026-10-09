@@ -1,3 +1,4 @@
+import type { ImageSourcePropType } from 'react-native';
 import type { Ionicons } from '@expo/vector-icons';
 
 export type OptionRowCardProps = {
@@ -7,4 +8,5 @@ export type OptionRowCardProps = {
   onPress: () => void;
   selected?: boolean;
   compact?: boolean;
+  image?: ImageSourcePropType;
 };
