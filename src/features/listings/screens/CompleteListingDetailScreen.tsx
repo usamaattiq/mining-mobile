@@ -802,9 +802,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               <View style={styles.viewDetailsIcon}>
                 <Ionicons name="document-text-outline" size={20} color={palette.gold} />
               </View>
-              <AppText weight="semibold" style={styles.viewDetailsLabel}>
-                {t('common.viewDetails')}
-              </AppText>
+              <View style={styles.viewDetailsCopy}>
+                <AppText weight="semibold" style={styles.viewDetailsLabel}>
+                  {t('common.viewDetails')}
+                </AppText>
+              </View>
               <Ionicons name="chevron-forward" size={18} color={palette.muted} />
             </Pressable>
           ) : null}
@@ -812,12 +814,25 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           {extraSection}
 
           {isOwner && equipmentListing?.postedAs === 'supplier' ? (
-            <Button
-              label={t('equipmentListing.manageUnits')}
-              icon="cube-outline"
-              variant="outline"
+            <Pressable
               onPress={() => navigation.navigate('EquipmentStock', { id })}
-            />
+              accessibilityRole="button"
+              accessibilityLabel={t('equipmentListing.viewUnitDetails')}
+              style={({ pressed }) => [styles.viewDetailsButton, pressed && styles.viewDetailsPressed]}
+            >
+              <View style={styles.viewDetailsIcon}>
+                <Ionicons name="cube-outline" size={20} color={palette.gold} />
+              </View>
+              <View style={styles.viewDetailsCopy}>
+                <AppText weight="semibold" style={styles.viewDetailsLabel}>
+                  {t('equipmentListing.viewUnitDetails')}
+                </AppText>
+                <AppText style={styles.viewDetailsHint}>
+                  {t('equipmentListing.viewUnitDetailsHint')}
+                </AppText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={palette.muted} />
+            </Pressable>
           ) : null}
 
           {isAdmin && owner ? (
@@ -1699,10 +1714,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  viewDetailsLabel: {
+  viewDetailsCopy: {
     flex: 1,
+    gap: 2,
+  },
+  viewDetailsLabel: {
     fontSize: 16,
     color: palette.charcoal,
+  },
+  viewDetailsHint: {
+    fontSize: 13,
+    color: palette.muted,
   },
   contactRow: {
     flexDirection: 'row',
