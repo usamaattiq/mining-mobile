@@ -1519,7 +1519,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
-    gap: spacing.lg,
+    gap: spacing.md - 2,
     paddingBottom: spacing.xxl,
   },
   headerBlock: {
