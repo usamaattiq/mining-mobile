@@ -38,6 +38,15 @@ export type ListingOffersPanelProps = {
   onPressResponder?: (offer: ListingRfqOffer) => void;
 };
 
+function displayOfferName(name: string, status: string, fallback: string): string {
+  const trimmed = name.trim();
+  if (status === 'selected' || status === 'confirmed') {
+    return trimmed || fallback;
+  }
+  if (!trimmed) return fallback;
+  return `${trimmed.slice(0, 3)}******`;
+}
+
 const OFFER_STATUS_KEY: Record<string, string> = {
   active: 'active',
   selected: 'selected',
@@ -118,9 +127,11 @@ export function ListingOffersPanel({
                   style={styles.namePress}
                 >
                   <AppText weight="semibold" style={styles.name} numberOfLines={1}>
-                    {offer.status === 'confirmed'
-                      ? offer.responderName || t('messages.fallbackName')
-                      : offer.responderName.trim().split(/\s+/)[0] || t('messages.fallbackName')}
+                    {displayOfferName(
+                      offer.responderName,
+                      offer.status,
+                      t('messages.fallbackName'),
+                    )}
                   </AppText>
                 </Pressable>
                 {!compact && isLeader ? (
