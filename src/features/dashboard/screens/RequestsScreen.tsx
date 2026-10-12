@@ -22,6 +22,8 @@ import { useListingsStore } from '@/store/listingsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
+import { useSeenOffersStore } from '@/store/seenOffersStore';
+import { hasUnseenOffers } from '@/features/listings/utils/unseenOffers';
 import { refreshListings } from '@/features/listings/utils/refreshListings';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -43,6 +45,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
   const serviceListings = useServiceListingsStore((state) => state.listings);
   const goldListings = useGoldListingsStore((state) => state.listings);
   const role = useMarketplaceRoleStore((state) => state.role);
+  const seenOfferIds = useSeenOffersStore((state) => state.ids);
   const [category, setCategory] = React.useState<ListingCategory>(
     route.params?.category ?? 'equipment',
   );
@@ -96,7 +99,16 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
         navigation.navigate('GoldListingForm', { repostId: id });
       },
     });
-    return cards.filter((card) => (lifeFilter === 'past' ? Boolean(card.ended) : !card.ended));
+    const seen = new Set(seenOfferIds);
+    const rfqFor = (id: string) => {
+      if (category === 'equipment') return equipmentListings.find((item) => item.id === id)?.rfq;
+      if (category === 'services') return serviceListings.find((item) => item.id === id)?.rfq;
+      return goldListings.find((item) => item.id === id)?.rfq;
+    };
+    return cards
+      .filter((card) => (lifeFilter === 'past' ? Boolean(card.ended) : !card.ended))
+      .map((card) => ({ ...card, hasNewOffer: hasUnseenOffers(rfqFor(card.id), seen) }))
+      .sort((a, b) => Number(Boolean(b.hasNewOffer)) - Number(Boolean(a.hasNewOffer)));
   }, [
     catalogLabel,
     category,
@@ -105,6 +117,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     goldListings,
     lifeFilter,
     navigation,
+    seenOfferIds,
     serviceListings,
     t,
   ]);

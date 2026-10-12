@@ -25,6 +25,8 @@ import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshOfferedListings } from '@/features/listings/utils/refreshListings';
 import { listingHasMyOffer, listingOfferIsSettled } from '@/features/listings/utils/listingOfferState';
+import { hasUnseenMyOffer } from '@/features/listings/utils/unseenOffers';
+import { useSeenOffersStore } from '@/store/seenOffersStore';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useAbortableFocusLoad } from '@/shared/hooks/useAbortableFocusLoad';
@@ -40,6 +42,7 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
   const catalogLabel = useLocalizedCatalogLabel();
   const currency = useCurrency();
   const listings = useOfferedListingsStore((state) => state.listings);
+  const seenOfferIds = useSeenOffersStore((state) => state.ids);
   const role = useMarketplaceRoleStore((state) => state.role);
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
   const hasCachedData = listings.length > 0;
@@ -65,7 +68,8 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
           Number(listingHasMyOffer(b) && !listingOfferIsSettled(b)) -
           Number(listingHasMyOffer(a) && !listingOfferIsSettled(a)),
       );
-    return buildListingCards({
+    const seen = new Set(seenOfferIds);
+    const built = buildListingCards({
       category,
       equipmentListings: sentInThisMode.filter(isEquipmentListing),
       serviceListings: sentInThisMode.filter(isServiceListing),
@@ -76,7 +80,11 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
       onOpen: (id, listingCategory) =>
         navigation.navigate('CompleteListingDetail', { id, category: listingCategory }),
     });
-  }, [catalogLabel, category, currency.code, listings, navigation, role, t]);
+    const rfqFor = (id: string) => sentInThisMode.find((item) => item.id === id)?.rfq;
+    return built
+      .map((card) => ({ ...card, hasNewOffer: hasUnseenMyOffer(card.id, rfqFor(card.id), seen) }))
+      .sort((a, b) => Number(Boolean(b.hasNewOffer)) - Number(Boolean(a.hasNewOffer)));
+  }, [catalogLabel, category, currency.code, listings, navigation, role, seenOfferIds, t]);
 
   return (
     <GoldSheetScreen

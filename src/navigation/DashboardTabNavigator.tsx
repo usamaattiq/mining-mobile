@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { AppState, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -17,6 +17,9 @@ import { AdminCategoriesScreen } from '@/features/admin/screens/AdminCategoriesS
 import { tabNavigatorScreenOptions } from '@/navigation/tabScreenOptions';
 import type { DashboardTabParamList } from '@/navigation/types';
 import { useProfileStore } from '@/store/profileStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
+import { useSeenOffersStore } from '@/store/seenOffersStore';
+import { refreshListings, refreshOfferedListings } from '@/features/listings/utils/refreshListings';
 
 const Tab = createBottomTabNavigator<DashboardTabParamList>();
 
@@ -38,6 +41,32 @@ export function DashboardTabNavigator(): React.ReactElement {
   const contentPadding = getFloatingTabBarReservedHeight(insets.bottom);
   const [tabBarProps, setTabBarProps] = React.useState<BottomTabBarProps | null>(null);
   const isAdmin = useProfileStore((state) => state.profile?.accountType === 'admin');
+  const role = useMarketplaceRoleStore((state) => state.role);
+
+  React.useEffect(() => {
+    void useSeenOffersStore.getState().hydrate();
+  }, []);
+
+  React.useEffect(() => {
+    if (isAdmin) return;
+    let cancelled = false;
+    const load = () => {
+      void refreshListings(role).catch(() => undefined);
+      void refreshOfferedListings().catch(() => undefined);
+    };
+    load();
+    const interval = setInterval(() => {
+      if (!cancelled && AppState.currentState === 'active') load();
+    }, 30_000);
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next === 'active') load();
+    });
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      sub.remove();
+    };
+  }, [isAdmin, role]);
 
   return (
     <FloatingTabBarInsetContext.Provider value={contentPadding}>

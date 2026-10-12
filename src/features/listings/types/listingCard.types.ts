@@ -56,4 +56,6 @@ export type ListingCardProps = {
   onRepost?: () => void;
   onPress: () => void;
   layout?: 'row' | 'grid';
+  /** Unseen incoming offer — blinking dot, and the row is sorted to the top. */
+  hasNewOffer?: boolean;
 };

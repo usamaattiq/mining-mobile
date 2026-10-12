@@ -56,6 +56,8 @@ import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
+import { myOfferAttentionKey, openOfferIds } from '@/features/listings/utils/unseenOffers';
+import { useSeenOffersStore } from '@/store/seenOffersStore';
 import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabels';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
@@ -139,6 +141,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     category === 'services' && source && isServiceListing(source) ? source : undefined;
   const goldListing = category === 'gold' && source && isGoldListing(source) ? source : undefined;
   hasListingRef.current = Boolean(equipmentListing || serviceListing || goldListing);
+  const seenActivityIds = React.useMemo(() => {
+    const listing = equipmentListing ?? serviceListing ?? goldListing;
+    if (!listing || !profileId) return [];
+    const ownerId = listing.ownerId ?? listing.owner?.id;
+    if (ownerId === profileId) return openOfferIds(listing.rfq);
+    const key = myOfferAttentionKey(listing.id, listing.rfq);
+    return key ? [key] : [];
+  }, [equipmentListing, goldListing, profileId, serviceListing]);
+
+  React.useEffect(() => {
+    useSeenOffersStore.getState().markSeen(seenActivityIds);
+  }, [seenActivityIds]);
 
   useFocusEffect(
     React.useCallback(() => {

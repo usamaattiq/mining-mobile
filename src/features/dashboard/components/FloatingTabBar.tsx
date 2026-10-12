@@ -8,8 +8,15 @@ import { useTranslation } from 'react-i18next';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
+import { BlinkingDot } from '@/shared/components/BlinkingDot';
+import { hasUnseenMyOffer, hasUnseenOffers } from '@/features/listings/utils/unseenOffers';
 import { palette, radius, spacing } from '@/theme';
+import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useListingsStore } from '@/store/listingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
+import { useOfferedListingsStore } from '@/store/offeredListingsStore';
+import { useSeenOffersStore } from '@/store/seenOffersStore';
+import { useServiceListingsStore } from '@/store/serviceListingsStore';
 
 const TAB_FOCUS_TIMING = { duration: 200 };
 
@@ -85,12 +92,14 @@ function TabBarItem({
   icon,
   iconFocused,
   onPress,
+  showAlert,
 }: {
   focused: boolean;
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   iconFocused: keyof typeof Ionicons.glyphMap;
   onPress: () => void;
+  showAlert?: boolean;
 }): React.ReactElement {
   const progress = useSharedValue(focused ? 1 : 0);
   const color = focused ? palette.gold : palette.muted;
@@ -112,7 +121,10 @@ function TabBarItem({
       style={({ pressed }) => [styles.tabItem, pressed && styles.pressed]}
     >
       <Animated.View style={[styles.tabItemInner, animatedStyle]}>
-        <Ionicons name={focused ? iconFocused : icon} size={22} color={color} />
+        <View>
+          <Ionicons name={focused ? iconFocused : icon} size={22} color={color} />
+          {showAlert ? <BlinkingDot style={styles.alertDot} /> : null}
+        </View>
         <AppText
           weight={focused ? 'semibold' : 'medium'}
           style={[styles.tabLabel, { color }]}
@@ -129,6 +141,29 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
   const insets = useSafeAreaInsets();
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const isBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
+  const equipmentListings = useListingsStore((store) => store.listings);
+  const serviceListings = useServiceListingsStore((store) => store.listings);
+  const goldListings = useGoldListingsStore((store) => store.listings);
+  const offeredListings = useOfferedListingsStore((store) => store.listings);
+  const seenOfferIds = useSeenOffersStore((store) => store.ids);
+  const seen = React.useMemo(() => new Set(seenOfferIds), [seenOfferIds]);
+  const requestsHaveNewOffers = React.useMemo(
+    () =>
+      [...equipmentListings, ...serviceListings, ...goldListings].some((listing) =>
+        hasUnseenOffers(listing.rfq, seen),
+      ),
+    [equipmentListings, goldListings, seen, serviceListings],
+  );
+  const myOffersHaveUpdates = React.useMemo(
+    () =>
+      offeredListings.some(
+        (listing) =>
+          listing.rfq &&
+          hasUnseenMyOffer(listing.id, listing.rfq, seen) &&
+          (isBuyer ? listing.postedAs === 'supplier' : listing.postedAs === 'buyer'),
+      ),
+    [isBuyer, offeredListings, seen],
+  );
   const bottomOffset = getFloatingTabBarBottomOffset(insets.bottom);
   const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -164,6 +199,10 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
         icon={visual.icon}
         iconFocused={visual.iconFocused}
         onPress={onPress}
+        showAlert={
+          (route.name === 'Requests' && requestsHaveNewOffers) ||
+          (route.name === 'MyOffers' && myOffersHaveUpdates)
+        }
       />
     );
   };
@@ -272,6 +311,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 4,
     width: '100%',
+  },
+  alertDot: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: palette.pureWhite,
   },
   tabLabel: {
     fontSize: 11,

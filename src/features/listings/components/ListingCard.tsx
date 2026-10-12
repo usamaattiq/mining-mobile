@@ -4,6 +4,7 @@ import { RemoteImage } from '@/shared/components/RemoteImage';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/shared/components/AppText';
+import { BlinkingDot } from '@/shared/components/BlinkingDot';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { useSharedNow } from '@/shared/hooks/useSharedNow';
@@ -114,6 +115,7 @@ function ListingCardComponent({
   onRepost,
   onPress,
   layout = 'row',
+  hasNewOffer,
 }: ListingCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
@@ -250,6 +252,7 @@ function ListingCardComponent({
 
           <View style={styles.gridFooter}>
             <View style={styles.gridFooterLeft}>
+              {hasNewOffer ? <BlinkingDot /> : null}
               {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
               {(statusBadges ?? []).map((badge) => (
                 <StatusBadge key={badge.key} badge={badge} />
@@ -293,9 +296,12 @@ function ListingCardComponent({
             if (next > 0 && next !== imageSide) setImageSide(next);
           }}
         >
-          {typeBadge || showTimer ? (
+          {typeBadge || showTimer || hasNewOffer ? (
             <View style={styles.badgeRow}>
-              {showTimer ? timer : <View />}
+              <View style={styles.badgeRowStart}>
+                {hasNewOffer ? <BlinkingDot /> : null}
+                {showTimer ? timer : null}
+              </View>
               {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
             </View>
           ) : null}
@@ -491,6 +497,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 4,
+  },
+  badgeRowStart: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   titleRow: {
     flexDirection: 'row',
