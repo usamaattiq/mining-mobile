@@ -28,7 +28,6 @@ export function ListingOfferComposer({
   showInput,
   awaitingConfirm,
   submitting,
-  sendInline = false,
   offerTypeLabel,
   fulfillmentModes,
   fulfillmentLabels,
@@ -254,7 +253,7 @@ export function ListingOfferComposer({
             ) : null}
             <View style={styles.row}>
               {maxUnits != null ? (
-                <View style={sendInline ? styles.unitsWrapInline : styles.unitsWrap}>
+                <View style={styles.unitsWrapInline}>
                   <CounterField value={units} onChange={setUnits} min={1} max={unitCap} required />
                 </View>
               ) : null}
@@ -272,26 +271,24 @@ export function ListingOfferComposer({
                   style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
                 />
               </View>
-              {sendInline ? (
-                <Pressable
-                  onPress={handleSend}
-                  disabled={!canSend}
-                  accessibilityRole="button"
-                  accessibilityLabel={sendLabel}
-                  style={({ pressed }) => [
-                    styles.send,
-                    styles.sendInline,
-                    !canSend && styles.sendDisabled,
-                    pressed && canSend && styles.sendPressed,
-                  ]}
-                >
-                  {submitting ? (
-                    <ActivityIndicator color={palette.pureWhite} size="small" />
-                  ) : (
-                    <Ionicons name="send" size={16} color={palette.pureWhite} />
-                  )}
-                </Pressable>
-              ) : null}
+              <Pressable
+                onPress={handleSend}
+                disabled={!canSend}
+                accessibilityRole="button"
+                accessibilityLabel={sendLabel}
+                style={({ pressed }) => [
+                  styles.send,
+                  styles.sendInline,
+                  !canSend && styles.sendDisabled,
+                  pressed && canSend && styles.sendPressed,
+                ]}
+              >
+                {submitting ? (
+                  <ActivityIndicator color={palette.pureWhite} size="small" />
+                ) : (
+                  <Ionicons name="send" size={16} color={palette.pureWhite} />
+                )}
+              </Pressable>
             </View>
             {draftUnitAmount != null && maxUnits != null ? (
               <PriceTimesUnitsSummary
@@ -301,38 +298,10 @@ export function ListingOfferComposer({
                 compact
               />
             ) : null}
-            {sendInline ? null : (
-              <View style={styles.actions}>
-                {footer ? <View style={styles.actionButton}>{footer}</View> : null}
-                <Pressable
-                  onPress={handleSend}
-                  disabled={!canSend}
-                  accessibilityRole="button"
-                  accessibilityLabel={sendLabel}
-                  style={({ pressed }) => [
-                    styles.send,
-                    styles.actionButton,
-                    !canSend && styles.sendDisabled,
-                    pressed && canSend && styles.sendPressed,
-                  ]}
-                >
-                  {submitting ? (
-                    <ActivityIndicator color={palette.pureWhite} size="small" />
-                  ) : (
-                    <>
-                      <Ionicons name="send" size={14} color={palette.pureWhite} />
-                      <AppText weight="bold" style={styles.sendLabel} numberOfLines={1}>
-                        {sendLabel}
-                      </AppText>
-                    </>
-                  )}
-                </Pressable>
-              </View>
-            )}
           </View>
         ) : null}
 
-        {sendInline || !showInput ? footer : null}
+        {footer}
       </View>
     </KeyboardStickyView>
   );
@@ -380,10 +349,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  unitsWrap: {
-    flex: 1,
-    maxWidth: 168,
-  },
   unitsWrapInline: {
     width: 128,
     flexShrink: 0,
@@ -391,14 +356,6 @@ const styles = StyleSheet.create({
   sendInline: {
     width: 44,
     paddingHorizontal: 0,
-  },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    gap: spacing.sm,
-  },
-  actionButton: {
-    flex: 1,
   },
   form: {
     gap: spacing.sm,
