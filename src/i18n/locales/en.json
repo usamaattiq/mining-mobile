@@ -463,7 +463,7 @@
     "stockSold": "Units Sold",
     "stockPosted": "Posted {date}",
     "stockRef": "Ref: {ref}",
-    "returnToCatalog": "Return to catalog",
+    "returnToCatalog": "Back to Catalog",
     "returnToCatalogTitle": "Return these units to the catalog?",
     "returnToCatalogMessage": "They will be available to offer again.",
     "stockEmpty": "Accepted rent or sale deals will appear here.",
