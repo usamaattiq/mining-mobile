@@ -699,7 +699,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       return;
     }
 
-    run();
+    showAppAlert(t('rfq.rejectConfirmTitle'), t('rfq.rejectConfirmMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('rfq.reject'), style: 'destructive', onPress: run },
+    ]);
   };
 
   const handleResponderOffer = (
@@ -1167,7 +1170,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         <Button
                           label={t('common.cancel')}
                           variant="outline"
-                          onPress={() => setEditingOfferId(null)}
+                          onPress={() =>
+                            showAppAlert(t('rfq.discardEditTitle'), t('rfq.discardEditMessage'), [
+                              { text: t('common.cancel'), style: 'cancel' },
+                              {
+                                text: t('rfq.discardEdit'),
+                                style: 'destructive',
+                                onPress: () => setEditingOfferId(null),
+                              },
+                            ])
+                          }
                           style={styles.myOfferAction}
                         />
                         <Button
