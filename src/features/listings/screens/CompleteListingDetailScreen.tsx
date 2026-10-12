@@ -1074,14 +1074,20 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   {offer.price ? (
                     <View style={styles.myOfferPriceRow}>
                       <AppText weight="bold" style={styles.myOfferPrice}>
-                        {currency.code}{' '}
-                        {formatAmountWithCommas(
-                          offer.quantity && Number(offer.price) > 0
-                            ? String(Math.round((Number(offer.price) / offer.quantity) * 100) / 100)
-                            : offer.price,
-                        )}
+                        {currency.code} {formatAmountWithCommas(offer.price)}
                       </AppText>
-                      <AppText style={styles.myOfferPerUnit}>{t('rfq.pricePerUnit')}</AppText>
+                      {offer.quantity && Number(offer.price) > 0 ? (
+                        <AppText style={styles.myOfferPerUnit}>
+                          {t('rfq.offerCalculation', {
+                            price: `${currency.code} ${formatAmountWithCommas(
+                              String(
+                                Math.round((Number(offer.price) / offer.quantity) * 100) / 100,
+                              ),
+                            )}`,
+                            count: offer.quantity,
+                          })}
+                        </AppText>
+                      ) : null}
                     </View>
                   ) : null}
                   {offer.status === 'active' && editingOfferId === offer.id ? (
@@ -1789,7 +1795,7 @@ const styles = StyleSheet.create({
   myOfferStatusText: { fontSize: 11, color: palette.charcoal },
   myOfferUnits: { flex: 1, fontSize: 13, color: palette.muted },
   myOfferPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
-  myOfferPrice: { fontSize: 16, color: palette.charcoal },
+  myOfferPrice: { fontSize: 22, color: palette.charcoal },
   myOfferPerUnit: { fontSize: 12, color: palette.muted },
   myOfferActions: { flexDirection: 'row', gap: spacing.sm },
   myOfferAction: { flex: 1 },

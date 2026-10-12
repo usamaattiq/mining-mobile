@@ -27,18 +27,11 @@ export function PriceTimesUnitsSummary({
   if (compact) {
     return (
       <View style={styles.compactWrap}>
-        <View style={styles.compactPriceRow}>
-          <AppText weight="bold" style={styles.compactPrice} numberOfLines={1}>
-            {unitText}
-          </AppText>
-          <AppText style={styles.compactBeside} numberOfLines={1}>
-            {t('rfq.pricePerUnit')}
-          </AppText>
-        </View>
+        <AppText weight="bold" style={styles.compactPrice} numberOfLines={1}>
+          {totalText}
+        </AppText>
         <AppText style={styles.compact} numberOfLines={2}>
           {t('rfq.offerCalculation', { price: unitText, count: units })}
-          {'  ·  '}
-          {t('rfq.offerTotal', { amount: totalText })}
         </AppText>
       </View>
     );
@@ -120,18 +113,9 @@ const styles = StyleSheet.create({
   compactWrap: {
     gap: 2,
   },
-  compactPriceRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: spacing.xs,
-  },
   compactPrice: {
     fontSize: 22,
     color: palette.charcoal,
-  },
-  compactBeside: {
-    fontSize: 13,
-    color: palette.muted,
   },
   compact: {
     fontSize: 12,
