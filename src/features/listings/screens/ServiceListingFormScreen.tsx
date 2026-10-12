@@ -386,6 +386,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               onChange={setServiceCategory}
               required
               searchable
+              tallWhenMany
               searchPlaceholder={t('serviceListing.searchServiceTypes')}
             />
 

@@ -550,6 +550,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onChange={setEquipmentType}
               required
               searchable
+              tallWhenMany
               searchPlaceholder={t('equipmentListing.searchTypes')}
             />
 

@@ -27,6 +27,7 @@ export function SelectField({
   searchPlaceholder,
   compact,
   dropdown,
+  tallWhenMany,
 }: SelectFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
@@ -215,7 +216,13 @@ export function SelectField({
         <AppBottomSheet
           visible={open}
           onClose={() => setOpen(false)}
-          heightRatio={searchable || hierarchical ? 0.34 : 0.55}
+          heightRatio={
+            searchable || hierarchical
+              ? tallWhenMany && options.length > 3
+                ? 0.46
+                : 0.3
+              : 0.55
+          }
           fitContent={!searchable && !hierarchical}
         >
           <AppText weight="bold" style={styles.sheetTitle}>

@@ -24,4 +24,6 @@ export type SelectFieldProps = {
   compact?: boolean;
   /** Opens a small popover menu anchored under the trigger instead of a bottom sheet. */
   dropdown?: boolean;
+  /** When the option list is long, open a taller sheet. Short lists keep the usual height. */
+  tallWhenMany?: boolean;
 };
