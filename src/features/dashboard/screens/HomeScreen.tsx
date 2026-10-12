@@ -412,7 +412,13 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           <SearchField
             value={query}
             onChangeText={setQuery}
-            placeholder={t('dashboardHome.searchPlaceholder')}
+            placeholder={t(
+              category === 'services'
+                ? 'dashboardHome.searchServices'
+                : category === 'gold'
+                  ? 'dashboardHome.searchGold'
+                  : 'dashboardHome.searchEquipment',
+            )}
           />
         </View>
         <Pressable
