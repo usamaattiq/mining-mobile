@@ -6,26 +6,34 @@ import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
 import type { HomeCategoryCardsProps } from '@/features/dashboard/types/homeCategoryCards.types';
 
-/** Icon category picker for the Home gold header — Equipment, Services, Gold. */
+/** Category picker in the Home gold header — illustrated cards with a title and short detail. */
 export function HomeCategoryCards({
+  heading,
+  description,
   value,
   options,
   onChange,
 }: HomeCategoryCardsProps): React.ReactElement {
   return (
-    <View style={styles.row}>
-      {options.map((option) => {
-        const selected = option.key === value;
-        return (
+    <View style={styles.wrap}>
+      <View style={styles.copy}>
+        <AppText weight="bold" style={styles.heading}>
+          {heading}
+        </AppText>
+        <AppText style={styles.description}>{description}</AppText>
+      </View>
+      <View style={styles.row}>
+        {options.map((option) => (
           <CategoryCard
             key={option.key}
-            selected={selected}
+            selected={option.key === value}
             title={option.title}
+            subtitle={option.subtitle}
             icon={option.icon}
             onPress={() => onChange(option.key)}
           />
-        );
-      })}
+        ))}
+      </View>
     </View>
   );
 }
@@ -33,11 +41,13 @@ export function HomeCategoryCards({
 function CategoryCard({
   selected,
   title,
+  subtitle,
   icon,
   onPress,
 }: {
   selected: boolean;
   title: string;
+  subtitle: string;
   icon: HomeCategoryCardsProps['options'][number]['icon'];
   onPress: () => void;
 }): React.ReactElement {
@@ -65,10 +75,17 @@ function CategoryCard({
         ]}
       >
         <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
-          <Ionicons name={icon} size={24} color={selected ? palette.gold : palette.pureWhite} />
+          <Ionicons
+            name={icon}
+            size={28}
+            color={selected ? palette.gold : palette.pureWhite}
+          />
         </View>
-        <AppText weight="bold" style={[styles.title, selected && styles.titleSelected]} numberOfLines={1}>
+        <AppText weight="bold" style={[styles.title, selected && styles.titleSelected]} numberOfLines={2}>
           {title}
+        </AppText>
+        <AppText style={[styles.subtitle, selected && styles.subtitleSelected]} numberOfLines={2}>
+          {subtitle}
         </AppText>
       </Pressable>
     </Animated.View>
@@ -76,6 +93,22 @@ function CategoryCard({
 }
 
 const styles = StyleSheet.create({
+  wrap: {
+    gap: spacing.md,
+  },
+  copy: {
+    gap: 4,
+  },
+  heading: {
+    fontSize: 28,
+    lineHeight: 34,
+    color: palette.pureWhite,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 21,
+    color: 'rgba(255, 255, 255, 0.92)',
+  },
   row: {
     flexDirection: 'row',
     gap: spacing.sm,
@@ -84,51 +117,63 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     borderRadius: radius.lg,
-    backgroundColor: palette.gold,
-    shadowColor: '#000000',
-    shadowOpacity: 0.18,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 12,
-    elevation: 6,
+    backgroundColor: 'transparent',
   },
   shadowWrapSelected: {
-    backgroundColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
+    shadowColor: '#000000',
+    shadowOpacity: 0.16,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 14,
+    elevation: 6,
   },
   card: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: radius.lg,
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.28)',
+    borderColor: 'rgba(255, 255, 255, 0.38)',
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
     gap: 6,
-    overflow: 'hidden',
+    minHeight: 168,
   },
   cardSelected: {
-    backgroundColor: palette.warmWhite,
-    borderColor: palette.warmWhite,
+    backgroundColor: palette.pureWhite,
+    borderColor: palette.pureWhite,
   },
   pressed: {
     opacity: 0.88,
   },
   iconWrap: {
-    width: 46,
-    height: 46,
-    borderRadius: 16,
+    width: 64,
+    height: 64,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    marginBottom: 4,
   },
   iconWrapSelected: {
     backgroundColor: palette.softGold,
   },
   title: {
-    fontSize: 13,
+    fontSize: 15,
+    lineHeight: 20,
     color: palette.pureWhite,
     textAlign: 'center',
   },
   titleSelected: {
-    color: palette.goldDark,
+    color: '#1C2430',
+  },
+  subtitle: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: 'rgba(255, 255, 255, 0.82)',
+    textAlign: 'center',
+  },
+  subtitleSelected: {
+    color: '#6B7280',
   },
 });

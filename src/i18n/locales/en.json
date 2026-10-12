@@ -283,7 +283,9 @@
     "profile": "Profile",
     "users": "User",
     "listings": "Listing",
-    "categories": "Categories"
+    "categories": "Categories",
+    "createListing": "Create Listing",
+    "createRequest": "Create Request"
   },
   "requests": {
     "title": "Listing",
@@ -342,6 +344,20 @@
     "apply": "Apply",
     "buyer": "Buyer",
     "supplier": "Supplier",
+    "buyerHeading": "Find Equipment & Services",
+    "buyerDescription": "Browse trusted suppliers and send a request.",
+    "buyerEquipment": "Equipment",
+    "buyerEquipmentSubtitle": "Machines, tools & more",
+    "buyerServices": "Services",
+    "buyerServicesSubtitle": "Repairs, installation, etc.",
+    "buyerGold": "Gold",
+    "buyerGoldSubtitle": "Buy or sell gold",
+    "supplierHeading": "Buyer Requests",
+    "supplierDescription": "See what buyers need and send your offer.",
+    "supplierEquipment": "Equipment Requests",
+    "supplierEquipmentSubtitle": "Machines, tools and equipment",
+    "supplierServices": "Service Requests",
+    "supplierServicesSubtitle": "Repairs, maintenance and other services",
     "emptyTitle": "List will show here",
     "emptySubtitle": "Listings from others will show up here"
   },

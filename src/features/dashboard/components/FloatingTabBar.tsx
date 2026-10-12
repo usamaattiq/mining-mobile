@@ -173,7 +173,13 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
       <View pointerEvents="box-none" style={[styles.wrapper, { marginBottom: bottomOffset }]}>
         <View style={styles.bar}>
           {firstHalf.map(renderTab)}
-          {isAdminBar ? null : <View style={styles.plusSlot} />}
+          {isAdminBar ? null : (
+            <View style={styles.plusSlot} pointerEvents="none">
+              <AppText weight="medium" style={styles.plusLabel} numberOfLines={2}>
+                {t(isBuyer ? 'tabs.createRequest' : 'tabs.createListing')}
+              </AppText>
+            </View>
+          )}
           {secondHalf.map(renderTab)}
         </View>
 
@@ -181,7 +187,7 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
           <Pressable
             onPress={() => rootNavigation?.navigate('QuickCreate')}
             accessibilityRole="button"
-            accessibilityLabel={t('dashboardHome.quickCreateTitle')}
+            accessibilityLabel={t(isBuyer ? 'tabs.createRequest' : 'tabs.createListing')}
             style={({ pressed }) => [styles.plusButton, pressed && styles.plusButtonPressed]}
           >
             <Ionicons name="add" size={28} color={palette.pureWhite} />
@@ -227,7 +233,17 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   plusSlot: {
-    width: PLUS_BUTTON_SIZE,
+    width: 78,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 2,
+  },
+  plusLabel: {
+    fontSize: 10,
+    lineHeight: 12,
+    textAlign: 'center',
+    color: palette.muted,
   },
   plusButton: {
     position: 'absolute',

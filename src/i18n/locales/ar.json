@@ -283,7 +283,9 @@
     "profile": "الملف الشخصي",
     "users": "المستخدمون",
     "listings": "الإعلانات",
-    "categories": "التصنيفات"
+    "categories": "التصنيفات",
+    "createListing": "إنشاء إعلان",
+    "createRequest": "إنشاء طلب"
   },
   "requests": {
     "title": "الإعلانات",
@@ -342,6 +344,20 @@
     "apply": "تطبيق",
     "buyer": "مشتري",
     "supplier": "مورّد",
+    "buyerHeading": "ابحث عن المعدات والخدمات",
+    "buyerDescription": "تصفح الموردين الموثوقين وأرسل طلبًا.",
+    "buyerEquipment": "المعدات",
+    "buyerEquipmentSubtitle": "آلات وأدوات والمزيد",
+    "buyerServices": "الخدمات",
+    "buyerServicesSubtitle": "إصلاحات وتركيب وغيرها",
+    "buyerGold": "الذهب",
+    "buyerGoldSubtitle": "شراء أو بيع الذهب",
+    "supplierHeading": "طلبات المشترين",
+    "supplierDescription": "اطلع على ما يحتاجه المشترون وأرسل عرضك.",
+    "supplierEquipment": "طلبات المعدات",
+    "supplierEquipmentSubtitle": "آلات وأدوات ومعدات",
+    "supplierServices": "طلبات الخدمات",
+    "supplierServicesSubtitle": "إصلاحات وصيانة وخدمات أخرى",
     "emptyTitle": "ستظهر القائمة هنا",
     "emptySubtitle": "ستظهر إعلانات الآخرين هنا"
   },

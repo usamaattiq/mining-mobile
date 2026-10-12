@@ -153,27 +153,42 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     setFilterOpen(false);
   };
 
-  const categoryOptions = [
-    {
-      key: 'equipment' as const,
-      icon: 'construct-outline' as const,
-      title: t('requests.categoryEquipment'),
-    },
-    {
-      key: 'services' as const,
-      icon: 'briefcase-outline' as const,
-      title: t('requests.categoryServices'),
-    },
-    ...(role === 'buyer'
+  const categoryOptions =
+    role === 'buyer'
       ? [
+          {
+            key: 'equipment' as const,
+            icon: 'construct-outline' as const,
+            title: t('dashboardHome.buyerEquipment'),
+            subtitle: t('dashboardHome.buyerEquipmentSubtitle'),
+          },
+          {
+            key: 'services' as const,
+            icon: 'briefcase-outline' as const,
+            title: t('dashboardHome.buyerServices'),
+            subtitle: t('dashboardHome.buyerServicesSubtitle'),
+          },
           {
             key: 'gold' as const,
             icon: 'diamond-outline' as const,
-            title: t('requests.categoryGold'),
+            title: t('dashboardHome.buyerGold'),
+            subtitle: t('dashboardHome.buyerGoldSubtitle'),
           },
         ]
-      : []),
-  ];
+      : [
+          {
+            key: 'equipment' as const,
+            icon: 'construct-outline' as const,
+            title: t('dashboardHome.supplierEquipment'),
+            subtitle: t('dashboardHome.supplierEquipmentSubtitle'),
+          },
+          {
+            key: 'services' as const,
+            icon: 'briefcase-outline' as const,
+            title: t('dashboardHome.supplierServices'),
+            subtitle: t('dashboardHome.supplierServicesSubtitle'),
+          },
+        ];
 
   React.useEffect(() => {
     if (role === 'supplier' && category === 'gold') {
@@ -334,6 +349,9 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
             <AppText weight="medium" style={styles.name} numberOfLines={1}>
               {firstName}
             </AppText>
+            <AppText style={styles.roleLabel} numberOfLines={1}>
+              {role === 'buyer' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
+            </AppText>
           </View>
         </Pressable>
       }
@@ -370,10 +388,15 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       headerStyle={styles.header}
       headerExtra={
         <View style={styles.headerExtra}>
-          <AppText weight="bold" style={styles.activeRole} numberOfLines={1}>
-            {role === 'buyer' ? t('dashboardHome.buyer') : t('dashboardHome.supplier')}
-          </AppText>
           <HomeCategoryCards
+            heading={
+              role === 'buyer' ? t('dashboardHome.buyerHeading') : t('dashboardHome.supplierHeading')
+            }
+            description={
+              role === 'buyer'
+                ? t('dashboardHome.buyerDescription')
+                : t('dashboardHome.supplierDescription')
+            }
             value={category}
             options={categoryOptions}
             onChange={handleCategoryChange}
@@ -526,6 +549,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: palette.pureWhite,
   },
+  roleLabel: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: 'rgba(255, 255, 255, 0.85)',
+  },
   identityText: {
     flexShrink: 1,
     minWidth: 0,
@@ -539,12 +567,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl + spacing.sm,
     backgroundColor: palette.gold,
     gap: spacing.sm,
-  },
-  activeRole: {
-    fontSize: 24,
-    color: palette.pureWhite,
-    alignSelf: 'flex-start',
-    // paddingVertical: spacing.xs,
   },
   headerActions: {
     flexDirection: 'row',
