@@ -1769,7 +1769,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: palette.charcoal,
   },
-  myOffers: { gap: spacing.sm },
+  myOffers: { gap: spacing.xs },
   myOffersTitle: { fontSize: 16, color: palette.charcoal },
   myOfferCard: {
     backgroundColor: palette.warmWhite,
@@ -1777,7 +1777,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.softGold,
     padding: spacing.md,
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   myOfferRow: {
     flexDirection: 'row',
@@ -1814,8 +1814,13 @@ const styles = StyleSheet.create({
   myOfferPrice: { flex: 1, fontSize: 22, color: palette.charcoal },
   myOfferPerUnit: { fontSize: 16, color: palette.muted },
   myOfferActions: { flexDirection: 'row', gap: spacing.sm },
-  myOfferAction: { flex: 1 },
-  myOfferEdit: { gap: spacing.sm },
+  myOfferAction: {
+    flex: 1,
+    minHeight: 36,
+    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
+  },
+  myOfferEdit: { gap: spacing.xs },
   editChoiceRow: { flexDirection: 'row', gap: spacing.xs },
   editChoice: {
     flex: 1,
