@@ -44,7 +44,7 @@ function displayOfferName(name: string, status: string, fallback: string): strin
     return trimmed || fallback;
   }
   if (!trimmed) return fallback;
-  return `${trimmed.slice(0, 3)}******`;
+  return `${trimmed.slice(0, 2)}******`;
 }
 
 const OFFER_STATUS_KEY: Record<string, string> = {
