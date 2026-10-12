@@ -1154,14 +1154,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           })}
                         </View>
                       ) : null}
-                      <TextInput
-                        value={editOfferPrice}
-                        onChangeText={setEditOfferPrice}
-                        keyboardType="decimal-pad"
-                        placeholder={t('rfq.unitPricePlaceholder', { currency: currency.code })}
-                        placeholderTextColor={palette.muted}
-                        style={styles.myOfferPriceInput}
-                      />
+                      <View style={styles.myOfferPriceWrap}>
+                        <AppText weight="semibold" style={styles.myOfferCurrency}>
+                          {currency.code}
+                        </AppText>
+                        <TextInput
+                          value={editOfferPrice}
+                          onChangeText={setEditOfferPrice}
+                          keyboardType="decimal-pad"
+                          placeholder={t('rfq.unitPriceAmountPlaceholder')}
+                          placeholderTextColor={palette.muted}
+                          style={styles.myOfferPriceInput}
+                        />
+                      </View>
                       <CounterField
                         label={t('rfq.unitsLabel')}
                         value={editOfferUnits}
@@ -1418,8 +1423,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           currencyCode={currency.code}
           placeholder={
             category === 'gold' && hasSentOffer
-              ? t('rfq.updateOfferPlaceholder', { currency: currency.code })
-              : t('rfq.offerPlaceholder', { currency: currency.code })
+              ? t('rfq.updateOfferAmountPlaceholder')
+              : t('rfq.offerAmountPlaceholder')
           }
           sendLabel={t('rfq.sendOffer')}
           submittedLabel={
@@ -1446,9 +1451,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               : undefined
           }
           unitPricePlaceholder={
-            category === 'equipment'
-              ? t('rfq.unitPricePlaceholder', { currency: currency.code })
-              : undefined
+            category === 'equipment' ? t('rfq.unitPriceAmountPlaceholder') : undefined
           }
           maxUnits={category === 'equipment' ? Math.max(unitsLeft, 0) : undefined}
           offerTypeLabel={
@@ -1865,14 +1868,28 @@ const styles = StyleSheet.create({
   },
   editRadioSelected: { borderColor: palette.gold },
   editRadioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: palette.gold },
-  myOfferPriceInput: {
+  myOfferPriceWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    minHeight: 44,
     borderWidth: 1,
     borderColor: palette.softGold,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    backgroundColor: palette.pureWhite,
+  },
+  myOfferCurrency: {
+    flexShrink: 0,
+    fontSize: 14,
+    color: palette.gold,
+  },
+  myOfferPriceInput: {
+    flex: 1,
+    minWidth: 0,
     fontSize: 16,
     color: palette.charcoal,
+    paddingVertical: 0,
   },
   priceAmount: {
     fontSize: 28,

@@ -416,14 +416,16 @@ const styles = StyleSheet.create({
     backgroundColor: palette.pureWhite,
   },
   currency: {
+    flexShrink: 0,
     fontSize: 14,
     color: palette.gold,
   },
   input: {
     flex: 1,
+    minWidth: 0,
     fontSize: 16,
     color: palette.charcoal,
-    paddingVertical: spacing.sm,
+    paddingVertical: 0,
   },
   send: {
     flexDirection: 'row',
