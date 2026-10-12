@@ -422,6 +422,7 @@
     "requestAuction": "Auction",
     "requestAuctionSubtitle": "Suppliers bid until the listing ends",
     "equipmentType": "Equipment Type",
+    "fieldEquipmentType": "What kind of equipment is this?",
     "equipmentTypePlaceholder": "Choose equipment type",
     "searchTypes": "Search equipment types",
     "type": {
@@ -554,6 +555,7 @@
     "reviewStep": "Review",
     "stepLabel": "Step {current} of {total}",
     "serviceCategory": "Service Type",
+    "fieldServiceCategory": "What kind of service is this?",
     "serviceCategoryPlaceholder": "Choose service type",
     "searchServiceTypes": "Search service types",
     "type": "Type",

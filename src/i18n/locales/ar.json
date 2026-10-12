@@ -402,6 +402,7 @@
     "requestAuction": "مزاد",
     "requestAuctionSubtitle": "يقدم الموردون عروضهم حتى انتهاء الإعلان",
     "equipmentType": "نوع المعدة",
+    "fieldEquipmentType": "ما نوع هذه المعدة؟",
     "equipmentTypePlaceholder": "اختر نوع المعدة",
     "searchTypes": "ابحث عن نوع المعدة",
     "type": {
@@ -534,6 +535,7 @@
     "reviewStep": "المراجعة",
     "stepLabel": "الخطوة {current} من {total}",
     "serviceCategory": "نوع الخدمة",
+    "fieldServiceCategory": "ما نوع هذه الخدمة؟",
     "serviceCategoryPlaceholder": "اختر نوع الخدمة",
     "searchServiceTypes": "ابحث عن نوع الخدمة",
     "type": "النوع",

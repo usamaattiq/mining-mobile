@@ -258,7 +258,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const detailRows = [
     { label: t('serviceListing.fieldTitle'), value: title },
     { label: t('serviceListing.fieldDescription'), value: description },
-    { label: t('serviceListing.serviceCategory'), value: serviceCategoryLabel ?? '' },
+    { label: t('serviceListing.fieldServiceCategory'), value: serviceCategoryLabel ?? '' },
     {
       label: t(
         isBuyer ? 'serviceListing.yearsOfExperienceWanted' : 'serviceListing.yearsOfExperience',
@@ -378,9 +378,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <SelectField
-              label={t('serviceListing.serviceCategory')}
+              label={t('serviceListing.fieldServiceCategory')}
               placeholder={t('serviceListing.serviceCategoryPlaceholder')}
-              sheetTitle={t('serviceListing.serviceCategory')}
+              sheetTitle={t('serviceListing.fieldServiceCategory')}
               options={serviceCategoryOptions}
               value={serviceCategory}
               onChange={setServiceCategory}

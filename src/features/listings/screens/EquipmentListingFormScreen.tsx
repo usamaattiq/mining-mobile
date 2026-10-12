@@ -365,7 +365,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const detailRows = [
     { label: t('equipmentListing.fieldTitle'), value: title },
     { label: t('equipmentListing.fieldDescription'), value: description },
-    { label: t('equipmentListing.equipmentType'), value: equipmentTypeLabel ?? '' },
+    { label: t('equipmentListing.fieldEquipmentType'), value: equipmentTypeLabel ?? '' },
     ...(isBuyer
       ? []
       : [
@@ -542,9 +542,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             />
 
             <SelectField
-              label={t('equipmentListing.equipmentType')}
+              label={t('equipmentListing.fieldEquipmentType')}
               placeholder={t('equipmentListing.equipmentTypePlaceholder')}
-              sheetTitle={t('equipmentListing.equipmentType')}
+              sheetTitle={t('equipmentListing.fieldEquipmentType')}
               options={equipmentTypeOptions}
               value={equipmentType}
               onChange={setEquipmentType}
