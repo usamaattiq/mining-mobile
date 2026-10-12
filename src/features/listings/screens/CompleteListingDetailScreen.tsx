@@ -58,6 +58,7 @@ import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/uti
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabels';
 import { palette, radius, spacing } from '@/theme';
+import { cardBackShadow } from '@/theme/cardShadow';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CompleteListingDetail'>;
 type DetailRow = {
@@ -1039,7 +1040,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 {t('rfq.yourOffer')}
               </AppText>
               {mySupplierOffers.map((offer) => (
-                <View key={offer.id} style={styles.myOfferCard}>
+                <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
                   <View style={styles.myOfferRow}>
                     <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
                       {t('rfq.yourOffer')}

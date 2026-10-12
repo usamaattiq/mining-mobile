@@ -4,6 +4,7 @@ import type { EquipmentStockHold } from '@/features/listings/api/listingsApi';
 import { AppText } from '@/shared/components/AppText';
 import { formatMoneyAmount, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { palette, radius, spacing } from '@/theme';
+import { cardBackShadow } from '@/theme/cardShadow';
 
 export function EquipmentDealCard({
   hold,
@@ -29,7 +30,7 @@ export function EquipmentDealCard({
   const total = parsePositiveAmount(hold.price);
   const meta = [statusLabel, dateLabel].filter(Boolean).join(' · ');
   return (
-    <View style={[styles.card, muted && styles.cardMuted]}>
+    <View style={[styles.card, cardBackShadow, muted && styles.cardMuted]}>
       <View style={styles.cardRow}>
         <Pressable disabled={!onPressName} onPress={onPressName} style={styles.namePress}>
           <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>

@@ -10,6 +10,7 @@ import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTime
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { palette, radius, spacing } from '@/theme';
+import { cardBackShadow } from '@/theme/cardShadow';
 import type { ListingRfqOffer } from '@/features/listings/types/listingRfq.types';
 
 export type ListingOffersPanelProps = {
@@ -106,7 +107,12 @@ export function ListingOffersPanel({
           return (
             <View
               key={offer.id}
-              style={[styles.card, compact && styles.cardCompact, compact && isLeader && styles.cardLeader]}
+              style={[
+                styles.card,
+                cardBackShadow,
+                compact && styles.cardCompact,
+                compact && isLeader && styles.cardLeader,
+              ]}
             >
               {compact && isLeader ? (
                 <Ionicons name="trophy" size={16} color={palette.gold} style={styles.trophy} />
