@@ -766,25 +766,33 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const handleSaveOffer = (offerId: string) => {
     const price = editOfferPrice.trim();
     if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) return;
-    setOfferSubmitting(true);
-    void listingsApi
-      .updateOffer(
-        id,
-        offerId,
-        price,
-        editOfferUnits,
-        equipmentListing?.mode === 'both' ? editOfferKind : undefined,
-        equipmentListing?.deliveryAvailable ? editOfferHandover : 'pickup',
-      )
-      .then((listing) => {
-        applyListing(listing);
-        setEditingOfferId(null);
-      })
-      .catch((error: unknown) => {
-        const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
-        showAppAlert(t('common.error'), message);
-      })
-      .finally(() => setOfferSubmitting(false));
+    showAppAlert(t('rfq.updateConfirmTitle'), t('rfq.updateConfirmMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('rfq.update'),
+        onPress: () => {
+          setOfferSubmitting(true);
+          void listingsApi
+            .updateOffer(
+              id,
+              offerId,
+              price,
+              editOfferUnits,
+              equipmentListing?.mode === 'both' ? editOfferKind : undefined,
+              equipmentListing?.deliveryAvailable ? editOfferHandover : 'pickup',
+            )
+            .then((listing) => {
+              applyListing(listing);
+              setEditingOfferId(null);
+            })
+            .catch((error: unknown) => {
+              const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+              showAppAlert(t('common.error'), message);
+            })
+            .finally(() => setOfferSubmitting(false));
+        },
+      },
+    ]);
   };
 
   return (

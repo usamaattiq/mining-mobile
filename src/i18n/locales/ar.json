@@ -63,6 +63,8 @@
     "acceptConfirmMessage": "سيُطلب من الطرف الآخر التأكيد قبل إتمام الصفقة.",
     "confirmOfferTitle": "تأكيد هذا العرض؟",
     "confirmOfferMessage": "هذا يعني قبول العرض ومتابعة الصفقة.",
+    "updateConfirmTitle": "تحديث هذا العرض؟",
+    "updateConfirmMessage": "سيتم استبدال عرضك بهذه التغييرات.",
     "waitingForConfirmation": "بانتظار تأكيد الطرف الآخر.",
     "actionFailed": "تعذر تحديث هذا العرض. حاول مرة أخرى.",
     "noUnitsAvailable": "لا توجد وحدات متاحة",

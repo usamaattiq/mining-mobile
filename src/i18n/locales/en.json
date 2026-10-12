@@ -63,6 +63,8 @@
     "acceptConfirmMessage": "The other party will be asked to confirm before it goes through.",
     "confirmOfferTitle": "Confirm this offer?",
     "confirmOfferMessage": "This accepts the offer and continues the deal.",
+    "updateConfirmTitle": "Update this offer?",
+    "updateConfirmMessage": "Your offer will be replaced with these changes.",
     "waitingForConfirmation": "Waiting for the other party to confirm.",
     "actionFailed": "Could not update this offer. Try again.",
     "noUnitsAvailable": "No units available",
