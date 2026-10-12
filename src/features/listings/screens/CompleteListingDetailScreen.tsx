@@ -1039,9 +1039,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 <View key={offer.id} style={styles.myOfferCard}>
                   <View style={styles.myOfferRow}>
                     <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
-                      {offer.quantity
-                        ? t('equipmentListing.unitsCount', { count: offer.quantity })
-                        : t('rfq.yourOffer')}
+                      {t('rfq.yourOffer')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
                       {offer.status === 'selected' || offer.status === 'confirmed' ? (
@@ -1071,21 +1069,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     </View>
                   </View>
+                  {offer.createdAt ? (
+                    <AppText style={styles.myOfferDate} numberOfLines={1}>
+                      {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium' }).format(
+                        new Date(offer.createdAt),
+                      )}
+                    </AppText>
+                  ) : null}
                   {offer.price ? (
                     <View style={styles.myOfferPriceRow}>
-                      <AppText weight="bold" style={styles.myOfferPrice}>
+                      <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
                         {currency.code} {formatAmountWithCommas(offer.price)}
                       </AppText>
-                      {offer.quantity && Number(offer.price) > 0 ? (
-                        <AppText style={styles.myOfferPerUnit}>
-                          {t('rfq.offerCalculation', {
-                            price: `${currency.code} ${formatAmountWithCommas(
-                              String(
-                                Math.round((Number(offer.price) / offer.quantity) * 100) / 100,
-                              ),
-                            )}`,
-                            count: offer.quantity,
-                          })}
+                      {offer.quantity ? (
+                        <AppText weight="semibold" style={styles.myOfferPerUnit} numberOfLines={1}>
+                          {t('equipmentListing.unitsCount', { count: offer.quantity })}
                         </AppText>
                       ) : null}
                     </View>
@@ -1794,9 +1792,15 @@ const styles = StyleSheet.create({
   },
   myOfferStatusText: { fontSize: 11, color: palette.charcoal },
   myOfferUnits: { flex: 1, fontSize: 13, color: palette.muted },
-  myOfferPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
-  myOfferPrice: { fontSize: 22, color: palette.charcoal },
-  myOfferPerUnit: { fontSize: 12, color: palette.muted },
+  myOfferDate: { fontSize: 12, color: palette.muted },
+  myOfferPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  myOfferPrice: { flex: 1, fontSize: 22, color: palette.charcoal },
+  myOfferPerUnit: { fontSize: 16, color: palette.muted },
   myOfferActions: { flexDirection: 'row', gap: spacing.sm },
   myOfferAction: { flex: 1 },
   myOfferEdit: { gap: spacing.sm },

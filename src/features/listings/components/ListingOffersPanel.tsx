@@ -183,6 +183,13 @@ export function ListingOffersPanel({
                 </View>
                 )}
               </View>
+              {offer.createdAt ? (
+                <AppText style={styles.sentAt} numberOfLines={1}>
+                  {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium' }).format(
+                    new Date(offer.createdAt),
+                  )}
+                </AppText>
+              ) : null}
               {compact ? null : showUnits && unitAmount != null && units ? (
                 <PriceTimesUnitsSummary
                   currencyCode={currencyCode}
@@ -307,6 +314,10 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 14,
     color: palette.charcoal,
+  },
+  sentAt: {
+    fontSize: 12,
+    color: palette.muted,
   },
   kindBadge: {
     backgroundColor: palette.softGold,

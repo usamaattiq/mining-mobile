@@ -85,11 +85,10 @@ export function EquipmentDealsSection({
         <EquipmentDealCard
           key={hold.id}
           hold={hold}
-          dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
+          dateLabel={formatDealDate(appI18n.language, hold.acceptedAt ?? hold.createdAt)}
           kindLabel={hold.kind === 'rent' ? t('equipmentListing.rent') : t('equipmentListing.sell')}
           unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
           currencyCode={currency.code}
-          perUnitLabel={t('rfq.pricePerUnit')}
           action={contactAction(hold)}
           onPressName={hold.buyerId && onPressBuyer ? () => onPressBuyer(hold.buyerId!) : undefined}
         />
@@ -99,11 +98,10 @@ export function EquipmentDealsSection({
           key={hold.id}
           hold={hold}
           muted
-          dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
+          dateLabel={formatDealDate(appI18n.language, hold.acceptedAt ?? hold.createdAt)}
           kindLabel={t('equipmentListing.rent')}
           unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
           currencyCode={currency.code}
-          perUnitLabel={t('rfq.pricePerUnit')}
           statusLabel={t('equipmentListing.stockReturned')}
           action={contactAction(hold)}
           onPressName={hold.buyerId && onPressBuyer ? () => onPressBuyer(hold.buyerId!) : undefined}

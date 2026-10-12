@@ -11,6 +11,7 @@ export type ListingRfqOffer = {
   kind?: 'rent' | 'sale';
   handover?: 'pickup' | 'delivery';
   delivery?: 'onsite' | 'online';
+  createdAt?: number;
   responderPhone?: string;
 };
 

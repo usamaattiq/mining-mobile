@@ -229,11 +229,10 @@ function HoldList({
           key={hold.id}
           hold={hold}
           muted={hold.status === 'returned'}
-          dateLabel={formatDealDate(appI18n.language, hold.createdAt)}
+          dateLabel={formatDealDate(appI18n.language, hold.acceptedAt ?? hold.createdAt)}
           kindLabel={kindLabel}
           unitsLabel={t('equipmentListing.unitsCount', { count: hold.units })}
           currencyCode={currencyCode}
-          perUnitLabel={t('rfq.pricePerUnit')}
           statusLabel={hold.status === 'returned' ? t('equipmentListing.stockReturned') : undefined}
           action={
             hold.kind === 'rent' && hold.status === 'active' ? (

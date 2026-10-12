@@ -16,6 +16,7 @@ export type EquipmentStockHold = {
   buyerPhone?: string;
   price: string;
   createdAt: number;
+  acceptedAt?: number;
 };
 
 export type EquipmentStock = {
