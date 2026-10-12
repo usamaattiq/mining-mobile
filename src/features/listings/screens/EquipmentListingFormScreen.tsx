@@ -364,9 +364,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   };
 
   const detailRows = [
-    { label: t('equipmentListing.equipmentType'), value: equipmentTypeLabel ?? '' },
     { label: t('equipmentListing.fieldTitle'), value: title },
     { label: t('equipmentListing.fieldDescription'), value: description },
+    { label: t('equipmentListing.equipmentType'), value: equipmentTypeLabel ?? '' },
     ...(isBuyer
       ? []
       : [
@@ -520,18 +520,6 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               </View>
             ) : null}
 
-            <SelectField
-              label={t('equipmentListing.equipmentType')}
-              placeholder={t('equipmentListing.equipmentTypePlaceholder')}
-              sheetTitle={t('equipmentListing.equipmentType')}
-              options={equipmentTypeOptions}
-              value={equipmentType}
-              onChange={setEquipmentType}
-              required
-              searchable
-              searchPlaceholder={t('equipmentListing.searchTypes')}
-            />
-
             <FormInput
               label={t('equipmentListing.fieldTitle')}
               value={title}
@@ -552,6 +540,18 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               style={styles.descriptionInput}
               maxLength={LISTING_DESCRIPTION_MAX_LENGTH}
               showCounter
+            />
+
+            <SelectField
+              label={t('equipmentListing.equipmentType')}
+              placeholder={t('equipmentListing.equipmentTypePlaceholder')}
+              sheetTitle={t('equipmentListing.equipmentType')}
+              options={equipmentTypeOptions}
+              value={equipmentType}
+              onChange={setEquipmentType}
+              required
+              searchable
+              searchPlaceholder={t('equipmentListing.searchTypes')}
             />
 
             {!isBuyer && offerRent ? (

@@ -256,9 +256,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   };
 
   const detailRows = [
-    { label: t('serviceListing.serviceCategory'), value: serviceCategoryLabel ?? '' },
     { label: t('serviceListing.fieldTitle'), value: title },
     { label: t('serviceListing.fieldDescription'), value: description },
+    { label: t('serviceListing.serviceCategory'), value: serviceCategoryLabel ?? '' },
     {
       label: t(
         isBuyer ? 'serviceListing.yearsOfExperienceWanted' : 'serviceListing.yearsOfExperience',
@@ -354,18 +354,6 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
         {step === 1 ? (
           <View style={styles.stepBlock}>
-            <SelectField
-              label={t('serviceListing.serviceCategory')}
-              placeholder={t('serviceListing.serviceCategoryPlaceholder')}
-              sheetTitle={t('serviceListing.serviceCategory')}
-              options={serviceCategoryOptions}
-              value={serviceCategory}
-              onChange={setServiceCategory}
-              required
-              searchable
-              searchPlaceholder={t('serviceListing.searchServiceTypes')}
-            />
-
             <FormInput
               label={t('serviceListing.fieldTitle')}
               value={title}
@@ -387,6 +375,18 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               required
               maxLength={LISTING_DESCRIPTION_MAX_LENGTH}
               showCounter
+            />
+
+            <SelectField
+              label={t('serviceListing.serviceCategory')}
+              placeholder={t('serviceListing.serviceCategoryPlaceholder')}
+              sheetTitle={t('serviceListing.serviceCategory')}
+              options={serviceCategoryOptions}
+              value={serviceCategory}
+              onChange={setServiceCategory}
+              required
+              searchable
+              searchPlaceholder={t('serviceListing.searchServiceTypes')}
             />
 
             <CounterField
