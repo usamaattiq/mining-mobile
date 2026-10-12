@@ -246,13 +246,13 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   };
 
   const detailRows = [
-    { label: t('goldListing.title'), value: title },
-    { label: t('goldListing.description'), value: description },
+    { label: t('goldListing.fieldTitle'), value: title },
+    { label: t('goldListing.fieldDescription'), value: description },
     {
-      label: t('goldListing.weight'),
+      label: t('goldListing.fieldWeight'),
       value: weight ? t('goldListing.weightValue', { weight }) : '',
     },
-    { label: t('goldListing.purity'), value: purityLabel ?? '' },
+    { label: t('goldListing.fieldPurity'), value: purityLabel ?? '' },
     {
       label: t('goldListing.price', { currency: currency.code }),
       value: price ? `${currency.code} ${formatAmountWithCommas(price)}` : '',
@@ -270,7 +270,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
       label: t('goldListing.auctionDuration'),
       value: formatAuctionDurationLabel(durationHours, t),
     },
-    { label: t('goldListing.location'), value: location },
+    { label: t('goldListing.fieldLocation'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
   const photoMedia = media
@@ -312,7 +312,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         {step === 0 ? (
           <View style={styles.stepBlock}>
             <FormInput
-              label={t('goldListing.title')}
+              label={t('goldListing.fieldTitle')}
               value={title}
               onChangeText={setTitle}
               placeholder={t('goldListing.titlePlaceholder')}
@@ -322,7 +322,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             />
 
             <FormInput
-              label={t('goldListing.description')}
+              label={t('goldListing.fieldDescription')}
               value={description}
               onChangeText={setDescription}
               placeholder={t('goldListing.descriptionPlaceholder')}
@@ -337,7 +337,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             <View style={styles.rowFields}>
               <View style={styles.rowField}>
                 <FormInput
-                  label={t('goldListing.weight')}
+                  label={t('goldListing.fieldWeight')}
                   value={weight}
                   onChangeText={setWeight}
                   placeholder={t('goldListing.weightPlaceholder')}
@@ -348,9 +348,9 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
               </View>
               <View style={styles.rowField}>
                 <SelectField
-                  label={t('goldListing.purity')}
+                  label={t('goldListing.fieldPurity')}
                   placeholder={t('goldListing.purityPlaceholder')}
-                  sheetTitle={t('goldListing.purity')}
+                  sheetTitle={t('goldListing.fieldPurity')}
                   options={purityOptions}
                   value={purity}
                   onChange={setPurity}
@@ -393,7 +393,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             />
 
             <LocationField
-              label={t('goldListing.location')}
+              label={t('goldListing.fieldLocation')}
               value={location}
               required
               loading={locationLoading}

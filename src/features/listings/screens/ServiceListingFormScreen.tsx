@@ -257,8 +257,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
   const detailRows = [
     { label: t('serviceListing.serviceCategory'), value: serviceCategoryLabel ?? '' },
-    { label: t('serviceListing.title'), value: title },
-    { label: t('serviceListing.description'), value: description },
+    { label: t('serviceListing.fieldTitle'), value: title },
+    { label: t('serviceListing.fieldDescription'), value: description },
     {
       label: t(
         isBuyer ? 'serviceListing.yearsOfExperienceWanted' : 'serviceListing.yearsOfExperience',
@@ -287,7 +287,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                 : '',
           },
         ]),
-    { label: t('serviceListing.location'), value: location },
+    { label: t('serviceListing.fieldLocation'), value: location },
     {
       label: t('serviceListing.listedUntil'),
       value: new Intl.DateTimeFormat(currentLanguage, {
@@ -367,7 +367,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <FormInput
-              label={t('serviceListing.title')}
+              label={t('serviceListing.fieldTitle')}
               value={title}
               onChangeText={setTitle}
               placeholder={t('serviceListing.titlePlaceholder')}
@@ -377,7 +377,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <FormInput
-              label={t('serviceListing.description')}
+              label={t('serviceListing.fieldDescription')}
               value={description}
               onChangeText={setDescription}
               placeholder={t('serviceListing.descriptionPlaceholder')}
@@ -452,7 +452,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <LocationField
-              label={t('serviceListing.location')}
+              label={t('serviceListing.fieldLocation')}
               value={location}
               required
               loading={locationLoading}

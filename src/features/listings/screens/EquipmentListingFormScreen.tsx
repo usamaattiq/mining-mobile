@@ -365,8 +365,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
 
   const detailRows = [
     { label: t('equipmentListing.equipmentType'), value: equipmentTypeLabel ?? '' },
-    { label: t('equipmentListing.title'), value: title },
-    { label: t('equipmentListing.description'), value: description },
+    { label: t('equipmentListing.fieldTitle'), value: title },
+    { label: t('equipmentListing.fieldDescription'), value: description },
     ...(isBuyer
       ? []
       : [
@@ -423,7 +423,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           },
         ]
       : []),
-    { label: t('equipmentListing.location'), value: location },
+    { label: t('equipmentListing.fieldLocation'), value: location },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
   const deliverySubtitle =
@@ -533,7 +533,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             />
 
             <FormInput
-              label={t('equipmentListing.title')}
+              label={t('equipmentListing.fieldTitle')}
               value={title}
               onChangeText={setTitle}
               placeholder={t('equipmentListing.titlePlaceholder')}
@@ -543,7 +543,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             />
 
             <FormInput
-              label={t('equipmentListing.description')}
+              label={t('equipmentListing.fieldDescription')}
               value={description}
               onChangeText={setDescription}
               placeholder={t('equipmentListing.descriptionPlaceholder')}
@@ -653,7 +653,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               </>
             ) : null}
             <LocationField
-              label={t('equipmentListing.location')}
+              label={t('equipmentListing.fieldLocation')}
               value={location}
               required
               loading={locationLoading}
