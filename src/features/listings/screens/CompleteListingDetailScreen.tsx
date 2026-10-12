@@ -586,9 +586,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       ? unitsLeft > 0 && rfq?.canSubmitOffer !== false && !hasOpenSupplierOffer
       : !awaitingConfirm &&
         (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live')));
-  const offerAcceptedBothSides =
-    rfq?.myOfferStatus === 'confirmed' ||
-    mySupplierOffers.some((offer) => offer.status === 'confirmed');
   const canWithdraw =
     !isAdmin &&
     !awaitingConfirm &&
@@ -1415,9 +1412,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </View>
       ) : null}
 
-      {(supplierBuyer
-        ? showOfferInput || offerAcceptedBothSides
-        : showOfferInput || hasSentOffer) ? (
+      {(showOfferInput || (!supplierBuyer && hasSentOffer)) ? (
         <ListingOfferComposer
           currencyCode={currency.code}
           placeholder={

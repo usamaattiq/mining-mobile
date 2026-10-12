@@ -92,11 +92,13 @@ export function ListingOfferComposer({
     );
   };
 
+  if (!hasOffer && !showInput && !footer) return <></>;
+
   return (
     <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
       <View
         style={[
-          styles.bar,
+          showInput ? styles.bar : styles.barPlain,
           { paddingBottom: keyboardVisible ? spacing.sm : Math.max(insets.bottom, spacing.md) },
         ]}
       >
@@ -314,6 +316,12 @@ const styles = StyleSheet.create({
     backgroundColor: palette.warmWhite,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: palette.softGold,
+    gap: spacing.sm,
+  },
+  barPlain: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    backgroundColor: palette.pureWhite,
     gap: spacing.sm,
   },
   card: {
