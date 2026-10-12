@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    paddingBottom: 2,
+    paddingBottom: 8,
   },
   plusLabel: {
     fontSize: 10,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   plusButton: {
     position: 'absolute',
-    top: -PLUS_BUTTON_SIZE / 2 + 14,
+    top: -PLUS_BUTTON_SIZE / 2 + 8,
     left: '50%',
     marginLeft: -PLUS_BUTTON_SIZE / 2,
     width: PLUS_BUTTON_SIZE,
