@@ -9,8 +9,38 @@ import { cardBackShadow } from '@/theme/cardShadow';
 import type { OptionRowCardProps } from '@/shared/types/optionRowCard.types';
 
 /** Bold, gradient-icon full-width row card used for a small set of tappable choices (e.g. Rent/Sell, Onsite/Online, quick-create). */
+function LeadingIcon({
+  icon,
+  iconImage,
+  compact,
+}: {
+  icon: OptionRowCardProps['icon'];
+  iconImage?: OptionRowCardProps['iconImage'];
+  compact: boolean;
+}): React.ReactElement {
+  if (iconImage) {
+    return (
+      <View style={[styles.iconWrap, styles.iconImageWrap, compact && styles.iconWrapCompact]}>
+        <Image source={iconImage} style={compact ? styles.iconImageCompact : styles.iconImage} contentFit="contain" />
+      </View>
+    );
+  }
+
+  return (
+    <LinearGradient
+      colors={[palette.lightGold, palette.gold, palette.goldDark]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[styles.iconWrap, compact && styles.iconWrapCompact]}
+    >
+      <Ionicons name={icon} size={compact ? 22 : 30} color={palette.pureWhite} />
+    </LinearGradient>
+  );
+}
+
 export function OptionRowCard({
   icon,
+  iconImage,
   title,
   subtitle,
   onPress,
@@ -54,14 +84,7 @@ export function OptionRowCard({
             />
           </View>
           <View style={[styles.heading, styles.headingBesideImage]}>
-            <LinearGradient
-              colors={[palette.lightGold, palette.gold, palette.goldDark]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.iconWrap}
-            >
-              <Ionicons name={icon} size={30} color={palette.pureWhite} />
-            </LinearGradient>
+            <LeadingIcon icon={icon} iconImage={iconImage} compact={false} />
             <View style={styles.copy}>
               <AppText weight="bold" style={styles.title}>
                 {title}
@@ -77,14 +100,7 @@ export function OptionRowCard({
           compact && styles.headingCompact,
         ]}
       >
-        <LinearGradient
-          colors={[palette.lightGold, palette.gold, palette.goldDark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.iconWrap, compact && styles.iconWrapCompact]}
-        >
-          <Ionicons name={icon} size={compact ? 22 : 30} color={palette.pureWhite} />
-        </LinearGradient>
+        <LeadingIcon icon={icon} iconImage={iconImage} compact={compact} />
 
         <View style={styles.copy}>
           <AppText weight="bold" style={[styles.title, compact && styles.titleCompact]}>
@@ -206,6 +222,17 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.md,
+  },
+  iconImageWrap: {
+    // backgroundColor: palette.softGold,
+  },
+  iconImage: {
+    width: 76,
+    height: 76,
+  },
+  iconImageCompact: {
+    width: 24,
+    height: 24,
   },
   copy: {
     flex: 1,

@@ -13,6 +13,7 @@ export function listingCreateActions(
   const actions: HomeActionCardProps[] = [
     {
       icon: 'construct-outline',
+      iconImage: require('@/assets/images/equipment.png'),
       title: t(isBuyer ? 'dashboardHome.requestEquipment' : 'dashboardHome.listEquipment'),
       subtitle: t(
         isBuyer ? 'dashboardHome.requestEquipmentSubtitle' : 'dashboardHome.listEquipmentSubtitle',
@@ -22,6 +23,7 @@ export function listingCreateActions(
     },
     {
       icon: 'briefcase-outline',
+      iconImage: require('@/assets/images/service.png'),
       title: t(isBuyer ? 'dashboardHome.requestService' : 'dashboardHome.listService'),
       subtitle: t(
         isBuyer ? 'dashboardHome.requestServiceSubtitle' : 'dashboardHome.listServiceSubtitle',
@@ -34,6 +36,7 @@ export function listingCreateActions(
   if (role === 'supplier') {
     actions.push({
       icon: 'hammer-outline',
+      iconImage: require('@/assets/images/gold.png'),
       title: t('dashboardHome.auctionGold'),
       subtitle: t('dashboardHome.auctionGoldSubtitle'),
       onPress: () => navigate('GoldListingForm'),
