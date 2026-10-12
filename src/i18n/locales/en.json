@@ -273,6 +273,7 @@
   "tabs": {
     "home": "Home",
     "requests": "Listing",
+    "myRequests": "My Request",
     "offers": "My offers",
     "profile": "Profile",
     "users": "User",

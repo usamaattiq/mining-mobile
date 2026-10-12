@@ -9,7 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
-import type { RootStackParamList } from '@/navigation/types';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 
 const TAB_FOCUS_TIMING = { duration: 200 };
 
@@ -128,6 +128,7 @@ function TabBarItem({
 export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const isBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const bottomOffset = getFloatingTabBarBottomOffset(insets.bottom);
   const rootNavigation = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -157,7 +158,9 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
       <TabBarItem
         key={route.key}
         focused={focused}
-        label={t(visual.labelKey)}
+        label={t(
+          route.name === 'Requests' && isBuyer ? 'tabs.myRequests' : visual.labelKey,
+        )}
         icon={visual.icon}
         iconFocused={visual.iconFocused}
         onPress={onPress}

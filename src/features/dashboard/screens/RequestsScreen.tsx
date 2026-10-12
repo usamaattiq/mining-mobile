@@ -139,7 +139,7 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
 
   return (
     <GoldSheetScreen
-      title={t('requests.title')}
+      title={t(role === 'buyer' ? 'tabs.myRequests' : 'requests.title')}
       titleAlign="left"
       titleSize="lg"
       headerStyle={styles.header}
