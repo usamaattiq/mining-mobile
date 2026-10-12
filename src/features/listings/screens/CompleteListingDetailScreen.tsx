@@ -589,7 +589,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const offerAcceptedBothSides =
     rfq?.myOfferStatus === 'confirmed' ||
     mySupplierOffers.some((offer) => offer.status === 'confirmed');
-  const canMessage = !isAdmin && Boolean(owner) && !isOwner && offerAcceptedBothSides;
   const canWithdraw =
     !isAdmin &&
     !awaitingConfirm &&
@@ -1520,27 +1519,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           onSubmit={handleSubmitOffer}
           onConfirm={() => handleResponderOffer('confirm')}
           onDecline={() => handleResponderOffer('decline')}
-          footer={
-            canMessage ? (
-              <View style={styles.contactRow}>
-                <Button
-                  label={t('messages.message')}
-                  icon="chatbubble-ellipses-outline"
-                  onPress={() => setMessageOpen(true)}
-                  style={styles.messageButton}
-                />
-                {rfq?.ownerPhone ? (
-                  <Button
-                    label={t('common.whatsapp')}
-                    icon="logo-whatsapp"
-                    variant="whatsapp"
-                    onPress={() => openWhatsApp(rfq.ownerPhone!)}
-                    style={styles.messageButton}
-                  />
-                ) : null}
-              </View>
-            ) : null
-          }
         />
       ) : null}
 
@@ -2066,16 +2044,6 @@ const styles = StyleSheet.create({
   viewDetailsHint: {
     fontSize: 12,
     color: palette.muted,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  messageButton: {
-    flex: 1,
-    minHeight: 44,
-    borderRadius: radius.md,
-    paddingVertical: 0,
   },
   notFoundWrap: {
     flex: 1,
