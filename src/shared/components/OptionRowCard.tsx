@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg + 4,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.lg,
     borderWidth: 2,
     borderColor: 'transparent',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     bottom: 0,
-    width: '40%',
+    width: '50%',
     overflow: 'hidden',
   },
   sideImage: {
