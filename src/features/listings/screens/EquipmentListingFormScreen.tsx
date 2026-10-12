@@ -29,6 +29,7 @@ import { ToggleRow } from '@/shared/components/ToggleRow';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { Button } from '@/shared/components/Button';
 import { OptionRowCard } from '@/shared/components/OptionRowCard';
+import { OfferChoiceCard } from '@/features/listings/components/OfferChoiceCard';
 import { ListingStepper } from '@/features/listings/components/ListingStepper';
 import { EquipmentMediaUploader } from '@/features/listings/components/EquipmentMediaUploader';
 import { EquipmentListingReview } from '@/features/listings/components/EquipmentListingReview';
@@ -84,10 +85,11 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const roleIsBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const [requestMode, setRequestMode] = React.useState<'rfq' | 'auction'>('rfq');
   const [offerRent, setOfferRent] = React.useState(false);
-  const [offerSell, setOfferSell] = React.useState(roleIsBuyer);
+  const [offerSell, setOfferSell] = React.useState(false);
   const mode = offerRent && offerSell ? 'both' : offerRent ? 'rent' : offerSell ? 'sell' : null;
 
   const steps = [
+    { key: 'offer', label: t('equipmentListing.offerStep') },
     { key: 'details', label: t('equipmentListing.detailsStep') },
     { key: 'media', label: t('equipmentListing.mediaStep') },
     { key: 'review', label: t('equipmentListing.reviewStep') },
@@ -215,7 +217,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   }, [getCurrentLocation]);
 
-  useAutoCurrentLocation(step === 1, location.trim().length > 0, handleUseCurrentLocation);
+  useAutoCurrentLocation(step === 2, location.trim().length > 0, handleUseCurrentLocation);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -244,7 +246,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     location.trim().length > 0 &&
     deliveryValid &&
     (!isBuyer || requestMode !== 'auction' || auctionStartDate != null);
-  const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
+  const canGoNext = step === 0 ? Boolean(mode) : step === 1 ? detailsValid : step === 2 ? mediaValid : true;
 
   const rentalByPeriod = {
     hourly: offerRent && rentPeriod === 'hourly' ? rentalAmount : '',
@@ -297,7 +299,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       const persistedMedia = await persistListingMedia(media);
       const body = {
         category: 'equipment' as const,
-        mode: (isBuyer ? 'sell' : mode) as EquipmentListingMode,
+        mode: mode as EquipmentListingMode,
         equipmentTypeLabel: equipmentType ?? '',
         title,
         description,
@@ -470,6 +472,33 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>
+            <AppText weight="bold" style={styles.offerHeading}>
+              {t('equipmentListing.offerHeading')}
+            </AppText>
+            <AppText style={styles.offerHint}>{t('equipmentListing.offerHint')}</AppText>
+            <OfferChoiceCard
+              selected={offerRent}
+              icon="key-outline"
+              title={t('equipmentListing.rent')}
+              subtitle={
+                isBuyer ? t('equipmentListing.rentRequestSubtitle') : t('equipmentListing.rentSubtitle')
+              }
+              onPress={() => setOfferRent((current) => !current)}
+            />
+            <OfferChoiceCard
+              selected={offerSell}
+              icon="pricetag-outline"
+              title={isBuyer ? t('equipmentListing.buy') : t('equipmentListing.sell')}
+              subtitle={
+                isBuyer ? t('equipmentListing.buyRequestSubtitle') : t('equipmentListing.sellSubtitle')
+              }
+              onPress={() => setOfferSell((current) => !current)}
+            />
+          </View>
+        ) : null}
+
+        {step === 1 ? (
+          <View style={styles.stepBlock}>
             {isBuyer ? (
               <View style={styles.choiceRow}>
                 <OptionRowCard
@@ -487,26 +516,6 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   title={t('equipmentListing.requestAuction')}
                   subtitle={t('equipmentListing.requestAuctionSubtitle')}
                   onPress={() => setRequestMode('auction')}
-                />
-              </View>
-            ) : null}
-            {!isBuyer ? (
-              <View style={styles.choiceRow}>
-                <OptionRowCard
-                  compact
-                  selected={offerRent}
-                  icon="key-outline"
-                  title={t('equipmentListing.rent')}
-                  subtitle={t('equipmentListing.rentSubtitle')}
-                  onPress={() => setOfferRent((current) => !current)}
-                />
-                <OptionRowCard
-                  compact
-                  selected={offerSell}
-                  icon="pricetag-outline"
-                  title={t('equipmentListing.sell')}
-                  subtitle={t('equipmentListing.sellSubtitle')}
-                  onPress={() => setOfferSell((current) => !current)}
                 />
               </View>
             ) : null}
@@ -608,7 +617,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           </View>
         ) : null}
 
-        {step === 1 ? (
+        {step === 2 ? (
           <View style={styles.stepBlock}>
             <EquipmentMediaUploader
               media={media}
@@ -692,14 +701,14 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           </View>
         ) : null}
 
-        {step === 2 ? (
+        {step === 3 ? (
           <EquipmentListingReview
             detailRows={detailRows}
             media={media}
             deliveryAvailable={!isBuyer && deliveryAvailable}
             deliverySubtitle={deliverySubtitle}
-            onChangeDetails={() => setStep(0)}
-            onChangeMedia={() => setStep(1)}
+            onChangeDetails={() => setStep(1)}
+            onChangeMedia={() => setStep(2)}
             onPublish={handlePublish}
             publishing={publishing}
             publishLabel={editingId ? t('equipmentListing.update') : undefined}
@@ -749,6 +758,17 @@ const styles = StyleSheet.create({
   },
   stepBlock: {
     gap: spacing.md,
+  },
+  offerHeading: {
+    fontSize: 24,
+    lineHeight: 30,
+    color: palette.charcoal,
+  },
+  offerHint: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: palette.charcoal,
+    marginTop: -spacing.xs,
   },
   choiceRow: {
     flexDirection: 'row',

@@ -6,7 +6,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
-import { OptionRowCard } from '@/shared/components/OptionRowCard';
+import { AppText } from '@/shared/components/AppText';
+import { OfferChoiceCard } from '@/features/listings/components/OfferChoiceCard';
 import type { RootStackParamList } from '@/navigation/types';
 import { AppTopBar } from '@/shared/components/AppTopBar';
 import { FormInput } from '@/shared/components/FormInput';
@@ -67,6 +68,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const serviceCategoryOptions = useCatalogOptions('services');
 
   const steps = [
+    { key: 'type', label: t('serviceListing.typeStep') },
     { key: 'details', label: t('serviceListing.detailsStep') },
     { key: 'media', label: t('serviceListing.mediaStep') },
     { key: 'review', label: t('serviceListing.reviewStep') },
@@ -155,7 +157,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   }, [getCurrentLocation]);
 
-  useAutoCurrentLocation(step === 1, location.trim().length > 0, handleUseCurrentLocation);
+  useAutoCurrentLocation(step === 2, location.trim().length > 0, handleUseCurrentLocation);
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -174,7 +176,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
   );
   const mediaValid = (isBuyer || media.length > 0) && location.trim().length > 0;
-  const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
+  const canGoNext =
+    step === 0 ? Boolean(serviceType) : step === 1 ? detailsValid : step === 2 ? mediaValid : true;
 
   const handleBack = () => {
     if (step > 0) {
@@ -328,25 +331,29 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       >
         {step === 0 ? (
           <View style={styles.stepBlock}>
-            <View style={styles.choiceRow}>
-              <OptionRowCard
-                compact
-                selected={onsite}
-                icon="location-outline"
-                title={t('serviceListing.onsite')}
-                subtitle={t('serviceListing.onsiteSubtitle')}
-                onPress={() => setOnsite((value) => !value)}
-              />
-              <OptionRowCard
-                compact
-                selected={online}
-                icon="globe-outline"
-                title={t('serviceListing.online')}
-                subtitle={t('serviceListing.onlineSubtitle')}
-                onPress={() => setOnline((value) => !value)}
-              />
-            </View>
+            <AppText weight="bold" style={styles.offerHeading}>
+              {t('serviceListing.offerHeading')}
+            </AppText>
+            <AppText style={styles.offerHint}>{t('serviceListing.offerHint')}</AppText>
+            <OfferChoiceCard
+              selected={onsite}
+              icon="location-outline"
+              title={t('serviceListing.onsite')}
+              subtitle={t('serviceListing.onsiteSubtitle')}
+              onPress={() => setOnsite((value) => !value)}
+            />
+            <OfferChoiceCard
+              selected={online}
+              icon="globe-outline"
+              title={t('serviceListing.online')}
+              subtitle={t('serviceListing.onlineSubtitle')}
+              onPress={() => setOnline((value) => !value)}
+            />
+          </View>
+        ) : null}
 
+        {step === 1 ? (
+          <View style={styles.stepBlock}>
             <SelectField
               label={t('serviceListing.serviceCategory')}
               placeholder={t('serviceListing.serviceCategoryPlaceholder')}
@@ -431,7 +438,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
           </View>
         ) : null}
 
-        {step === 1 ? (
+        {step === 2 ? (
           <View style={styles.stepBlock}>
             <ServiceMediaUploader media={media} onChange={setMedia} required={!isBuyer} />
 
@@ -456,13 +463,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
           </View>
         ) : null}
 
-        {step === 2 ? (
+        {step === 3 ? (
           <View style={styles.stepBlock}>
             <EquipmentListingSummaryCard
               detailRows={detailRows}
               media={photoMedia}
-              onChangeDetails={() => setStep(0)}
-              onChangeMedia={() => setStep(1)}
+              onChangeDetails={() => setStep(1)}
+              onChangeMedia={() => setStep(2)}
             />
             <AttachmentsSection documents={documents} downloadable={false} />
             <Button
@@ -517,6 +524,17 @@ const styles = StyleSheet.create({
   },
   stepBlock: {
     gap: spacing.sm,
+  },
+  offerHeading: {
+    fontSize: 24,
+    lineHeight: 30,
+    color: palette.charcoal,
+  },
+  offerHint: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: palette.charcoal,
+    marginTop: -spacing.xs,
   },
   choiceRow: {
     flexDirection: 'row',
