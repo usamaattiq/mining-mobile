@@ -185,7 +185,7 @@ export function ListingOffersPanel({
               </View>
               {offer.createdAt ? (
                 <AppText style={styles.sentAt} numberOfLines={1}>
-                  {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium' }).format(
+                  {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
                     new Date(offer.createdAt),
                   )}
                 </AppText>
@@ -259,7 +259,7 @@ export function ListingOffersPanel({
 
 const styles = StyleSheet.create({
   root: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   title: {
     fontSize: 15,
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.softGold,
     padding: spacing.md,
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   cardCompact: {
     position: 'relative',
@@ -350,5 +350,8 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+    minHeight: 36,
+    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
   },
 });

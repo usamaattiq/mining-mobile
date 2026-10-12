@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     borderColor: palette.softGold,
     borderRadius: radius.md,
     padding: spacing.md,
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   cardMuted: { backgroundColor: palette.softGold },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },

@@ -1071,7 +1071,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   </View>
                   {offer.createdAt ? (
                     <AppText style={styles.myOfferDate} numberOfLines={1}>
-                      {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium' }).format(
+                      {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
                         new Date(offer.createdAt),
                       )}
                     </AppText>

@@ -112,7 +112,7 @@ export function EquipmentDealsSection({
 }
 
 function formatDealDate(locale: string, epoch: number): string {
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(epoch));
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(epoch));
 }
 
 const styles = StyleSheet.create({
@@ -121,8 +121,9 @@ const styles = StyleSheet.create({
   contactRow: { flexDirection: 'row', gap: spacing.sm },
   contactButton: {
     flex: 1,
-    minHeight: 44,
+    minHeight: 36,
     borderRadius: radius.md,
-    paddingVertical: 0,
+    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
   },
 });
