@@ -26,15 +26,16 @@ export function formatMoneyAmount(currencyCode: string, amount: number | string)
   return `${currencyCode} ${formatAmountWithCommas(typeof amount === 'number' ? String(amount) : amount)}`;
 }
 
+const THOUSAND = 1_000;
 const TEN_LAC = 1_000_000;
 const BILLION = 1_000_000_000;
 
-/** 10 lac and above as "1.5M" or "2B". Smaller amounts keep comma grouping. */
+/** 1,000+ as "1.5k", 10 lac+ as "1.5M", and 1 billion+ as "2B". */
 function formatLargeAmount(amount: number): string | null {
   const absolute = Math.abs(amount);
-  if (absolute < TEN_LAC) return null;
-  const scale = absolute >= BILLION ? BILLION : TEN_LAC;
-  const label = absolute >= BILLION ? 'B' : 'M';
+  if (absolute < THOUSAND) return null;
+  const scale = absolute >= BILLION ? BILLION : absolute >= TEN_LAC ? TEN_LAC : THOUSAND;
+  const label = absolute >= BILLION ? 'B' : absolute >= TEN_LAC ? 'M' : 'k';
   const scaled = Number((absolute / scale).toFixed(2)).toString();
   return `${amount < 0 ? '-' : ''}${scaled}${label}`;
 }
