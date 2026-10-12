@@ -24,6 +24,7 @@ import {
 import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshOfferedListings } from '@/features/listings/utils/refreshListings';
+import { listingHasMyOffer, listingOfferIsSettled } from '@/features/listings/utils/listingOfferState';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useAbortableFocusLoad } from '@/shared/hooks/useAbortableFocusLoad';
@@ -55,9 +56,15 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
   );
 
   const cards = React.useMemo(() => {
-    const sentInThisMode = listings.filter((listing) =>
-      role === 'buyer' ? listing.postedAs === 'supplier' : listing.postedAs === 'buyer',
-    );
+    const sentInThisMode = listings
+      .filter((listing) =>
+        role === 'buyer' ? listing.postedAs === 'supplier' : listing.postedAs === 'buyer',
+      )
+      .sort(
+        (a, b) =>
+          Number(listingHasMyOffer(b) && !listingOfferIsSettled(b)) -
+          Number(listingHasMyOffer(a) && !listingOfferIsSettled(a)),
+      );
     return buildListingCards({
       category,
       equipmentListings: sentInThisMode.filter(isEquipmentListing),

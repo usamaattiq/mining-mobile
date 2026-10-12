@@ -8,3 +8,14 @@ export function listingHasMyOffer(listing: ListingDto): boolean {
   if (rfq.myOfferStatus && ATTACHED_OFFER_STATUSES.has(rfq.myOfferStatus)) return true;
   return rfq.status === 'offer-submitted' || rfq.status === 'awaiting-your-confirmation';
 }
+
+/** True only after both sides have accepted the offer. */
+export function listingOfferIsSettled(listing: ListingDto): boolean {
+  const rfq = 'rfq' in listing ? listing.rfq : undefined;
+  if (!rfq) return false;
+  return (
+    rfq.myOfferStatus === 'confirmed' ||
+    rfq.status === 'confirmed' ||
+    rfq.status === 'completed'
+  );
+}

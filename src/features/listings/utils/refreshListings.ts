@@ -14,7 +14,10 @@ import { useMarketListingsStore } from '@/store/marketListingsStore';
 import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import type { MarketplaceRole } from '@/navigation/types';
-import { listingHasMyOffer } from '@/features/listings/utils/listingOfferState';
+import {
+  listingHasMyOffer,
+  listingOfferIsSettled,
+} from '@/features/listings/utils/listingOfferState';
 
 type RefreshOptions = { signal?: AbortSignal };
 
@@ -59,12 +62,16 @@ export function cacheListing(listing: ListingDto): void {
     useGoldListingsStore.getState().listings.some((item) => item.id === listing.id);
 
   if (listingHasMyOffer(listing) && !owned) {
-    useMarketListingsStore
-      .getState()
-      .setListings(
-        useMarketListingsStore.getState().listings.filter((item) => item.id !== listing.id),
-      );
     useOfferedListingsStore.getState().upsertListing(listing);
+    if (listingOfferIsSettled(listing)) {
+      useMarketListingsStore
+        .getState()
+        .setListings(
+          useMarketListingsStore.getState().listings.filter((item) => item.id !== listing.id),
+        );
+    } else {
+      useMarketListingsStore.getState().upsertListing(listing);
+    }
     return;
   }
 

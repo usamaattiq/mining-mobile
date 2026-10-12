@@ -51,7 +51,10 @@ import {
 } from '@/store/marketplaceRoleStore';
 import { notificationsApi } from '@/features/dashboard/api/notificationsApi';
 import { refreshMarketListings } from '@/features/listings/utils/refreshListings';
-import { listingHasMyOffer } from '@/features/listings/utils/listingOfferState';
+import {
+  listingHasMyOffer,
+  listingOfferIsSettled,
+} from '@/features/listings/utils/listingOfferState';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { AppText } from '@/shared/components/AppText';
 import { useCurrency } from '@/shared/hooks/useCurrency';
@@ -99,7 +102,14 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
   );
   const storedListings = useMarketListingsStore((state) => state.listings);
   const marketListings = React.useMemo(
-    () => storedListings.filter((listing) => listing.rfq?.status === 'live' && !listingHasMyOffer(listing)),
+    () =>
+      storedListings
+        .filter((listing) => {
+          if (listingOfferIsSettled(listing)) return false;
+          if (listingHasMyOffer(listing)) return true;
+          return listing.rfq?.status === 'live';
+        })
+        .sort((a, b) => Number(listingHasMyOffer(b)) - Number(listingHasMyOffer(a))),
     [storedListings],
   );
   const equipmentListings = React.useMemo(() => marketListings.filter(isEquipmentListing), [marketListings]);
