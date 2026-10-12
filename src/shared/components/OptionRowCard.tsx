@@ -26,11 +26,11 @@ export function OptionRowCard({
       accessibilityLabel={title}
       style={({ pressed }) => [
         styles.card,
-        compact && styles.cardCompact,
-        selected && styles.cardSelected,
+        compact ? styles.cardCompact : null,
+        selected ? styles.cardSelected : null,
         cardBackShadow,
-        image && !compact && styles.cardWithImage,
-        pressed && styles.cardPressed,
+        image && !compact ? styles.cardWithImage : null,
+        pressed ? styles.cardPressed : null,
       ]}
     >
       {image && !compact ? (
@@ -151,7 +151,11 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   sideTint: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: 'rgba(252, 249, 240, 0.28)',
   },
   sideFade: {
