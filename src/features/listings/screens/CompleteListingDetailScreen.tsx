@@ -1121,7 +1121,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         </View>
                       ) : null}
                       {equipmentListing?.deliveryAvailable ? (
-                        <View style={styles.editHandover}>
+                        <View style={styles.editChoiceRow}>
                           {(['delivery', 'pickup'] as const).map((mode) => {
                             const selected = editOfferHandover === mode;
                             return (
@@ -1130,11 +1130,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                 onPress={() => setEditOfferHandover(mode)}
                                 accessibilityRole="radio"
                                 accessibilityState={{ selected }}
-                                style={styles.editHandoverRow}
+                                style={[styles.editHandoverOption, selected && styles.editHandoverOptionSelected]}
                               >
-                                <View
-                                  style={[styles.editRadio, selected && styles.editRadioSelected]}
-                                >
+                                <View style={[styles.editRadio, selected && styles.editRadioSelected]}>
                                   {selected ? <View style={styles.editRadioDot} /> : null}
                                 </View>
                                 <Ionicons
@@ -1142,10 +1140,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                   size={18}
                                   color={selected ? palette.gold : palette.muted}
                                 />
-                                <AppText weight={selected ? 'semibold' : 'regular'} style={styles.editHandoverLabel}>
+                                <AppText
+                                  weight={selected ? 'semibold' : 'regular'}
+                                  numberOfLines={1}
+                                  style={styles.editHandoverLabel}
+                                >
                                   {mode === 'delivery'
-                                    ? t('equipmentListing.deliveryRequested')
-                                    : t('equipmentListing.pickupFromSupplier')}
+                                    ? t('equipmentListing.deliveryBadge')
+                                    : t('equipmentListing.pickup')}
                                 </AppText>
                               </Pressable>
                             );
@@ -1482,8 +1484,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               : undefined
           }
           handoverLabels={{
-            pickup: t('equipmentListing.pickupFromSupplier'),
-            delivery: t('equipmentListing.deliveryRequested'),
+            pickup: t('equipmentListing.pickup'),
+            delivery: t('equipmentListing.deliveryBadge'),
           }}
           handoverTitle={t('equipmentListing.deliveryPreference')}
           blockedFulfillmentModes={
@@ -1835,9 +1837,23 @@ const styles = StyleSheet.create({
   editChoiceSelected: { backgroundColor: palette.gold, borderColor: palette.gold },
   editChoiceLabel: { fontSize: 13, color: palette.charcoal },
   editChoiceLabelSelected: { color: palette.pureWhite },
-  editHandover: { gap: spacing.sm },
-  editHandoverRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  editHandoverLabel: { fontSize: 14, color: palette.charcoal },
+  editHandoverOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    minHeight: 44,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: '#E7E1D6',
+    backgroundColor: palette.warmWhite,
+  },
+  editHandoverOptionSelected: {
+    borderColor: palette.gold,
+    backgroundColor: '#FFF9EE',
+  },
+  editHandoverLabel: { flex: 1, fontSize: 14, color: palette.charcoal },
   editRadio: {
     width: 18,
     height: 18,

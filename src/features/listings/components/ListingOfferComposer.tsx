@@ -220,33 +220,36 @@ export function ListingOfferComposer({
                     {handoverTitle}
                   </AppText>
                 ) : null}
-                {handoverModes.map((mode) => {
-                  const selected = handover === mode;
-                  return (
-                    <Pressable
-                      key={mode}
-                      onPress={() => setHandover(mode)}
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected }}
-                      style={styles.handoverRow}
-                    >
-                      <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
-                        {selected ? <View style={styles.radioInner} /> : null}
-                      </View>
-                      <Ionicons
-                        name={mode === 'delivery' ? 'car-outline' : 'storefront-outline'}
-                        size={18}
-                        color={selected ? palette.gold : palette.muted}
-                      />
-                      <AppText
-                        weight={selected ? 'semibold' : 'regular'}
-                        style={[styles.handoverLabel, selected && styles.handoverLabelSelected]}
+                <View style={styles.handoverRow}>
+                  {handoverModes.map((mode) => {
+                    const selected = handover === mode;
+                    return (
+                      <Pressable
+                        key={mode}
+                        onPress={() => setHandover(mode)}
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected }}
+                        style={[styles.handoverOption, selected && styles.handoverOptionSelected]}
                       >
-                        {handoverLabels?.[mode] ?? mode}
-                      </AppText>
-                    </Pressable>
-                  );
-                })}
+                        <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
+                          {selected ? <View style={styles.radioInner} /> : null}
+                        </View>
+                        <Ionicons
+                          name={mode === 'delivery' ? 'car-outline' : 'storefront-outline'}
+                          size={18}
+                          color={selected ? palette.gold : palette.muted}
+                        />
+                        <AppText
+                          weight={selected ? 'semibold' : 'regular'}
+                          numberOfLines={1}
+                          style={[styles.handoverLabel, selected && styles.handoverLabelSelected]}
+                        >
+                          {handoverLabels?.[mode] ?? mode}
+                        </AppText>
+                      </Pressable>
+                    );
+                  })}
+                </View>
               </View>
             ) : null}
             <View style={styles.row}>
@@ -514,8 +517,23 @@ const styles = StyleSheet.create({
   },
   handoverRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: spacing.sm,
+  },
+  handoverOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    minHeight: 44,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: '#E7E1D6',
+    backgroundColor: palette.warmWhite,
+  },
+  handoverOptionSelected: {
+    borderColor: palette.gold,
+    backgroundColor: '#FFF9EE',
   },
   radioOuter: {
     width: 18,
@@ -536,6 +554,7 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
   },
   handoverLabel: {
+    flex: 1,
     fontSize: 14,
     color: palette.charcoal,
   },
