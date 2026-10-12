@@ -554,7 +554,7 @@
     "description": "الوصف",
     "fieldDescription": "ما الذي تتضمنه هذه الخدمة",
     "descriptionPlaceholder": "صف ما تتضمنه هذه الخدمة",
-    "yearsOfExperience": "سنوات الخبرة",
+    "yearsOfExperience": "كم سنة خبرة لديك؟",
     "yearsOfExperienceWanted": "كم سنة خبرة تريد؟",
     "yearsOfExperiencePlaceholder": "مثال: 5",
     "yearsOfExperienceValue": "{years} سنوات",
