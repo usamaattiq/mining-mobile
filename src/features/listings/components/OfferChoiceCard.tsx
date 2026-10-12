@@ -11,6 +11,8 @@ type OfferChoiceCardProps = {
   title: string;
   subtitle: string;
   onPress: () => void;
+  /** Match form field text (15) instead of the larger first-step title. */
+  compact?: boolean;
 };
 
 /** Large selectable card for the first step of a listing — rent/sell or onsite/online. */
@@ -20,6 +22,7 @@ export function OfferChoiceCard({
   title,
   subtitle,
   onPress,
+  compact = false,
 }: OfferChoiceCardProps): React.ReactElement {
   return (
     <Pressable
@@ -38,7 +41,7 @@ export function OfferChoiceCard({
         <Ionicons name={icon} size={26} color={selected ? palette.pureWhite : palette.gold} />
       </View>
       <View style={styles.copy}>
-        <AppText weight="bold" style={styles.title}>
+        <AppText weight="bold" style={[styles.title, compact && styles.titleCompact]}>
           {title}
         </AppText>
         <AppText style={styles.subtitle}>{subtitle}</AppText>
@@ -87,6 +90,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     color: palette.charcoal,
+  },
+  titleCompact: {
+    fontSize: 15,
   },
   subtitle: {
     fontSize: 13,

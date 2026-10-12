@@ -25,7 +25,6 @@ import { CounterField } from '@/shared/components/CounterField';
 import { LocationField } from '@/shared/components/LocationField';
 import { useAutoCurrentLocation } from '@/shared/hooks/useAutoCurrentLocation';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
-import { ToggleRow } from '@/shared/components/ToggleRow';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { Button } from '@/shared/components/Button';
 import { OptionRowCard } from '@/shared/components/OptionRowCard';
@@ -662,12 +661,28 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onSelectOnMap={handleSelectOnMap}
             />
             {!isBuyer ? (
-              <ToggleRow
-                title={t('equipmentListing.deliveryAvailable')}
-                subtitle={t('equipmentListing.deliveryAvailableSubtitle')}
-                enabled={deliveryAvailable}
-                onToggle={setDeliveryAvailable}
-              />
+              <View style={styles.deliveryChoice}>
+                <AppText weight="semibold" style={styles.deliveryHeading}>
+                  {t('equipmentListing.deliveryHeading')}
+                </AppText>
+                <AppText style={styles.deliveryHint}>{t('equipmentListing.deliveryHint')}</AppText>
+                <OfferChoiceCard
+                  compact
+                  selected={deliveryAvailable}
+                  icon="car-outline"
+                  title={t('equipmentListing.deliveryYes')}
+                  subtitle={t('equipmentListing.deliveryYesSubtitle')}
+                  onPress={() => setDeliveryAvailable(true)}
+                />
+                <OfferChoiceCard
+                  compact
+                  selected={!deliveryAvailable}
+                  icon="storefront-outline"
+                  title={t('equipmentListing.deliveryNo')}
+                  subtitle={t('equipmentListing.deliveryNoSubtitle')}
+                  onPress={() => setDeliveryAvailable(false)}
+                />
+              </View>
             ) : null}
 
             {!isBuyer && deliveryAvailable ? (
@@ -773,6 +788,19 @@ const styles = StyleSheet.create({
   choiceRow: {
     flexDirection: 'row',
     gap: spacing.sm,
+  },
+  deliveryChoice: {
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  deliveryHeading: {
+    fontSize: 15,
+    color: palette.charcoal,
+  },
+  deliveryHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: palette.muted,
   },
   descriptionInput: {
     minHeight: 96,
