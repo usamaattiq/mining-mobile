@@ -669,25 +669,37 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         return;
       }
     }
-    setActingOfferId(offerId);
-    const request = action === 'accept' ? listingsApi.acceptOffer : listingsApi.rejectOffer;
-    void request(id, offerId)
-      .then((listing) => {
-        applyListing(listing);
-      })
-      .catch((error: unknown) => {
-        const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
-        if (message === 'No units available') {
-          showAppAlert(t('rfq.noUnitsAvailable'));
-          return;
-        }
-        if (message === 'Less units available') {
-          showAppAlert(t('rfq.lessUnitsAvailable'));
-          return;
-        }
-        showAppAlert(t('common.error'), message);
-      })
-      .finally(() => setActingOfferId(null));
+    const run = () => {
+      setActingOfferId(offerId);
+      const request = action === 'accept' ? listingsApi.acceptOffer : listingsApi.rejectOffer;
+      void request(id, offerId)
+        .then((listing) => {
+          applyListing(listing);
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+          if (message === 'No units available') {
+            showAppAlert(t('rfq.noUnitsAvailable'));
+            return;
+          }
+          if (message === 'Less units available') {
+            showAppAlert(t('rfq.lessUnitsAvailable'));
+            return;
+          }
+          showAppAlert(t('common.error'), message);
+        })
+        .finally(() => setActingOfferId(null));
+    };
+
+    if (action === 'accept') {
+      showAppAlert(t('rfq.acceptConfirmTitle'), t('rfq.acceptConfirmMessage'), [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('rfq.accept'), onPress: run },
+      ]);
+      return;
+    }
+
+    run();
   };
 
   const handleResponderOffer = (
@@ -718,6 +730,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       showAppAlert(t('rfq.withdrawConfirmTitle'), t('rfq.withdrawConfirmMessage'), [
         { text: t('common.cancel'), style: 'cancel' },
         { text: t('rfq.withdraw'), style: 'destructive', onPress: run },
+      ]);
+      return;
+    }
+
+    if (action === 'confirm') {
+      showAppAlert(t('rfq.confirmOfferTitle'), t('rfq.confirmOfferMessage'), [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('rfq.confirm'), onPress: run },
       ]);
       return;
     }
