@@ -158,19 +158,19 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       ? [
           {
             key: 'equipment' as const,
-            icon: 'construct-outline' as const,
+            icon: require('@/assets/images/equipment.png'),
             title: t('dashboardHome.buyerEquipment'),
             subtitle: t('dashboardHome.buyerEquipmentSubtitle'),
           },
           {
             key: 'services' as const,
-            icon: 'briefcase-outline' as const,
+            icon: require('@/assets/images/service.png'),
             title: t('dashboardHome.buyerServices'),
             subtitle: t('dashboardHome.buyerServicesSubtitle'),
           },
           {
             key: 'gold' as const,
-            icon: 'diamond-outline' as const,
+            icon: require('@/assets/images/gold.png'),
             title: t('dashboardHome.buyerGold'),
             subtitle: t('dashboardHome.buyerGoldSubtitle'),
           },
@@ -178,13 +178,13 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       : [
           {
             key: 'equipment' as const,
-            icon: 'construct-outline' as const,
+            icon: require('@/assets/images/equipment.png'),
             title: t('dashboardHome.supplierEquipment'),
             subtitle: t('dashboardHome.supplierEquipmentSubtitle'),
           },
           {
             key: 'services' as const,
-            icon: 'briefcase-outline' as const,
+            icon: require('@/assets/images/service.png'),
             title: t('dashboardHome.supplierServices'),
             subtitle: t('dashboardHome.supplierServicesSubtitle'),
           },
@@ -435,7 +435,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           accessibilityLabel={t('dashboardHome.filter')}
           style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
         >
-          <Ionicons name="options-outline" size={20} color={palette.gold} />
+          <Image source={require('@/assets/images/filter.png')} style={styles.filterIcon} resizeMode="contain" />
         </Pressable>
       </View>
 
@@ -605,6 +605,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     rowGap: spacing.md,
+  },
+  filterIcon: {
+    width: 20,
+    height: 20,
   },
   filterButton: {
     width: 48,

@@ -1,9 +1,9 @@
-import type { Ionicons } from '@expo/vector-icons';
+import type { ImageSourcePropType } from 'react-native';
 import type { ListingCategory } from '@/navigation/types';
 
 export type HomeCategoryCardItem = {
   key: ListingCategory;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: ImageSourcePropType;
   title: string;
   subtitle: string;
 };

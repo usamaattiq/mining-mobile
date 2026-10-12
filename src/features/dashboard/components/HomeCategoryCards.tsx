@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { AppText } from '@/shared/components/AppText';
 import { palette, radius, spacing } from '@/theme';
@@ -75,11 +74,7 @@ function CategoryCard({
         ]}
       >
         <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
-          <Ionicons
-            name={icon}
-            size={22}
-            color={selected ? palette.gold : palette.pureWhite}
-          />
+          <Image source={icon} style={styles.icon} resizeMode="contain" />
         </View>
         <AppText weight="bold" style={[styles.title, selected && styles.titleSelected]} numberOfLines={2}>
           {title}
@@ -152,10 +147,14 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    // backgroundColor: 'rgba(255, 255, 255, 0.16)',
   },
   iconWrapSelected: {
-    backgroundColor: palette.softGold,
+    // backgroundColor: palette.softGold,
+  },
+  icon: {
+    width: 42,
+    height: 42,
   },
   title: {
     fontSize: 15,
