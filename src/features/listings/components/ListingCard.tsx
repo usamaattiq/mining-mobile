@@ -271,7 +271,12 @@ function ListingCardComponent({
       style={({ pressed }) => [styles.card, cardBackShadow, pressed && styles.pressed]}
     >
       <View style={styles.row}>
-        <View style={[styles.imageWrap, { width: imageSide, height: imageSide }]}>
+        <View
+          style={[
+            styles.imageWrap,
+            { width: Math.max(imageSide - 12, 64), height: Math.max(imageSide - 20, 64) },
+          ]}
+        >
           {thumbnail ? (
             <RemoteImage source={thumbnail} style={styles.image} recyclingKey={thumbnail} />
           ) : (
@@ -354,8 +359,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: palette.warmWhite,
     borderRadius: 22,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
   },
   gridCard: {
     width: '48%',
@@ -460,7 +465,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
   },
   imageWrap: {
