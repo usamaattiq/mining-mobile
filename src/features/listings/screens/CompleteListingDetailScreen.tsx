@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
@@ -1135,9 +1135,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                 <View style={[styles.editRadio, selected && styles.editRadioSelected]}>
                                   {selected ? <View style={styles.editRadioDot} /> : null}
                                 </View>
-                                <Ionicons
-                                  name={mode === 'delivery' ? 'car-outline' : 'storefront-outline'}
-                                  size={18}
+                                <MaterialCommunityIcons
+                                  name={mode === 'delivery' ? 'truck-fast' : 'package-variant-closed'}
+                                  size={20}
                                   color={selected ? palette.gold : palette.muted}
                                 />
                                 <AppText

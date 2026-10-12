@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { KeyboardStickyView, useKeyboardState } from 'react-native-keyboard-controller';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CounterField } from '@/shared/components/CounterField';
 import { AppText } from '@/shared/components/AppText';
@@ -234,9 +234,9 @@ export function ListingOfferComposer({
                         <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
                           {selected ? <View style={styles.radioInner} /> : null}
                         </View>
-                        <Ionicons
-                          name={mode === 'delivery' ? 'car-outline' : 'storefront-outline'}
-                          size={18}
+                        <MaterialCommunityIcons
+                          name={mode === 'delivery' ? 'truck-fast' : 'package-variant-closed'}
+                          size={20}
                           color={selected ? palette.gold : palette.muted}
                         />
                         <AppText
