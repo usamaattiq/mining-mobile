@@ -77,7 +77,7 @@ function CategoryCard({
         <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
           <Ionicons
             name={icon}
-            size={28}
+            size={22}
             color={selected ? palette.gold : palette.pureWhite}
           />
         </View>
@@ -134,10 +134,10 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.38)',
     paddingHorizontal: spacing.sm,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-    gap: 6,
-    minHeight: 168,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+    gap: 2,
+    minHeight: 118,
   },
   cardSelected: {
     backgroundColor: palette.pureWhite,
@@ -147,13 +147,12 @@ const styles = StyleSheet.create({
     opacity: 0.88,
   },
   iconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.16)',
-    marginBottom: 4,
   },
   iconWrapSelected: {
     backgroundColor: palette.softGold,
