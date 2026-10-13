@@ -58,6 +58,22 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
     [],
   );
 
+  const categoryAlerts = React.useMemo(() => {
+    const seen = new Set(seenOfferIds);
+    const sent = listings.filter((listing) =>
+      role === 'buyer' ? listing.postedAs === 'supplier' : listing.postedAs === 'buyer',
+    );
+    const unseen = (category: ListingCategory) =>
+      sent.some(
+        (listing) => listing.category === category && hasUnseenMyOffer(listing.id, listing.rfq, seen),
+      );
+    return {
+      equipment: unseen('equipment'),
+      services: unseen('services'),
+      gold: unseen('gold'),
+    };
+  }, [listings, role, seenOfferIds]);
+
   const cards = React.useMemo(() => {
     const sentInThisMode = listings
       .filter((listing) =>
@@ -101,10 +117,10 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
             value={category}
             onChange={setCategory}
             options={[
-              { key: 'equipment' as const, label: t('requests.categoryEquipment') },
-              { key: 'services' as const, label: t('requests.categoryServices') },
+              { key: 'equipment' as const, label: t('requests.categoryEquipment'), alert: categoryAlerts.equipment },
+              { key: 'services' as const, label: t('requests.categoryServices'), alert: categoryAlerts.services },
               ...(role === 'buyer'
-                ? [{ key: 'gold' as const, label: t('requests.categoryGold') }]
+                ? [{ key: 'gold' as const, label: t('requests.categoryGold'), alert: categoryAlerts.gold }]
                 : []),
             ]}
           />

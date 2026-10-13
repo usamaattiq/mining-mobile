@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { AppText } from '@/shared/components/AppText';
+import { BlinkingDot } from '@/shared/components/BlinkingDot';
 import { useSlidingPill } from '@/shared/hooks/useSlidingPill';
 import { palette, radius, spacing } from '@/theme';
 import type { SegmentedSwitcherProps } from '@/shared/types/segmentedSwitcher.types';
@@ -35,6 +36,7 @@ export function SegmentedSwitcher<T extends string>({
             >
               {option.label}
             </AppText>
+            {option.alert ? <BlinkingDot style={styles.alert} /> : null}
           </Pressable>
         );
       })}
@@ -63,6 +65,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.sm,
+  },
+  alert: {
+    position: 'absolute',
+    top: 4,
+    end: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: palette.pureWhite,
   },
   label: {
     fontSize: 13,

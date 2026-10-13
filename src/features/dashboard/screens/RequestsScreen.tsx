@@ -64,10 +64,21 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     [role],
   );
 
+  const categoryAlerts = React.useMemo(() => {
+    const seen = new Set(seenOfferIds);
+    return {
+      equipment: equipmentListings.some((listing) => hasUnseenOffers(listing.rfq, seen)),
+      services: serviceListings.some((listing) => hasUnseenOffers(listing.rfq, seen)),
+      gold: goldListings.some((listing) => hasUnseenOffers(listing.rfq, seen)),
+    };
+  }, [equipmentListings, goldListings, seenOfferIds, serviceListings]);
+
   const categoryOptions = [
-    { key: 'equipment' as const, label: t('requests.categoryEquipment') },
-    { key: 'services' as const, label: t('requests.categoryServices') },
-    ...(role === 'supplier' ? [{ key: 'gold' as const, label: t('requests.categoryGold') }] : []),
+    { key: 'equipment' as const, label: t('requests.categoryEquipment'), alert: categoryAlerts.equipment },
+    { key: 'services' as const, label: t('requests.categoryServices'), alert: categoryAlerts.services },
+    ...(role === 'supplier'
+      ? [{ key: 'gold' as const, label: t('requests.categoryGold'), alert: categoryAlerts.gold }]
+      : []),
   ];
 
   React.useEffect(() => {
