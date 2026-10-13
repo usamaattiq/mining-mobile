@@ -29,14 +29,16 @@ export function SegmentedSwitcher<T extends string>({
             accessibilityState={{ selected }}
             style={styles.segment}
           >
-            <AppText
-              weight={selected ? 'bold' : 'medium'}
-              style={[styles.label, selected && styles.labelSelected]}
-              numberOfLines={1}
-            >
-              {option.label}
-            </AppText>
-            {option.alert ? <BlinkingDot style={styles.alert} /> : null}
+            <View style={styles.labelWrap}>
+              <AppText
+                weight={selected ? 'bold' : 'medium'}
+                style={[styles.label, selected && styles.labelSelected]}
+                numberOfLines={1}
+              >
+                {option.label}
+              </AppText>
+              {option.alert ? <BlinkingDot style={styles.alert} /> : null}
+            </View>
           </Pressable>
         );
       })}
@@ -66,10 +68,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.sm,
   },
+  labelWrap: {
+    position: 'relative',
+  },
   alert: {
     position: 'absolute',
-    top: 4,
-    end: 8,
+    top: -3,
+    end: -7,
     width: 8,
     height: 8,
     borderRadius: 4,
