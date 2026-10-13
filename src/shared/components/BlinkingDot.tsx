@@ -2,11 +2,7 @@ import React from 'react';
 import { Animated, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { palette } from '@/theme';
 
-export function BlinkingDot({
-  style,
-}: {
-  style?: StyleProp<ViewStyle>;
-}): React.ReactElement {
+export function BlinkingDot({ style }: { style?: StyleProp<ViewStyle> }): React.ReactElement {
   const opacity = React.useRef(new Animated.Value(1)).current;
 
   React.useEffect(() => {
@@ -27,7 +23,7 @@ const styles = StyleSheet.create({
   dot: {
     width: 10,
     height: 10,
-    borderRadius: 6,
+    borderRadius: 5,
     backgroundColor: palette.gold,
   },
 });
