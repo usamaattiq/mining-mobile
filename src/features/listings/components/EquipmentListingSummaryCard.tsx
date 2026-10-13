@@ -57,11 +57,11 @@ export function EquipmentListingSummaryCard({
                 {row.label}
               </AppText>
               <View style={styles.rowValueWrap}>
-                <AppText style={[styles.rowValue, plain && styles.rowValuePlain]} numberOfLines={1}>
+                <AppText style={[styles.rowValue, plain && styles.rowValuePlain]}>
                   {row.value}
                 </AppText>
                 {row.hint ? (
-                  <AppText style={[styles.rowHint, plain && styles.rowHintPlain]} numberOfLines={1}>
+                  <AppText style={[styles.rowHint, plain && styles.rowHintPlain]}>
                     {row.hint}
                   </AppText>
                 ) : null}
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: spacing.md,
     paddingVertical: spacing.sm,
@@ -197,6 +197,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   rowLabel: {
+    flexShrink: 1,
+    maxWidth: '46%',
     fontSize: 13,
     color: palette.charcoal,
   },
@@ -206,8 +208,9 @@ const styles = StyleSheet.create({
   rowValueWrap: {
     flex: 1,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'flex-end',
-    alignItems: 'baseline',
+    alignItems: 'center',
     gap: 4,
   },
   rowHint: {
@@ -220,6 +223,7 @@ const styles = StyleSheet.create({
   rowValue: {
     flexShrink: 1,
     fontSize: 14,
+    lineHeight: 20,
     color: palette.muted,
     textAlign: 'right',
   },
