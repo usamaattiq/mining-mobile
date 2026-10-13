@@ -84,7 +84,8 @@
       "withdrawn": "مسحوب",
       "declined": "مرفوض",
       "timedOut": "انتهت المهلة",
-      "lapsed": "منتهٍ"
+      "lapsed": "منتهٍ",
+      "returned": "مُرجَع"
     },
     "status": {
       "comingSoon": "قريباً",

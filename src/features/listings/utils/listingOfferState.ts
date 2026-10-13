@@ -1,6 +1,6 @@
 import type { ListingDto } from '@/features/listings/api/listingsApi';
 
-const ATTACHED_OFFER_STATUSES = new Set(['active', 'selected', 'confirmed']);
+const ATTACHED_OFFER_STATUSES = new Set(['active', 'selected', 'confirmed', 'returned']);
 
 export function listingHasMyOffer(listing: ListingDto): boolean {
   const rfq = 'rfq' in listing ? listing.rfq : undefined;
@@ -15,6 +15,7 @@ export function listingOfferIsSettled(listing: ListingDto): boolean {
   if (!rfq) return false;
   return (
     rfq.myOfferStatus === 'confirmed' ||
+    rfq.myOfferStatus === 'returned' ||
     rfq.status === 'confirmed' ||
     rfq.status === 'completed'
   );

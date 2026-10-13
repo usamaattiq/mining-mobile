@@ -84,7 +84,8 @@
       "withdrawn": "Withdrawn",
       "declined": "Rejected",
       "timedOut": "Timed out",
-      "lapsed": "Lapsed"
+      "lapsed": "Lapsed",
+      "returned": "Returned"
     },
     "status": {
       "comingSoon": "Coming soon",
