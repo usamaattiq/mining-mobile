@@ -451,7 +451,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           accessibilityLabel={t('dashboardHome.filter')}
           style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
         >
-          <Image source={require('@/assets/images/filter.png')} style={styles.filterIcon} resizeMode="contain" />
+          <Ionicons name="options-outline" size={20} color={palette.gold} />
         </Pressable>
       </View>
 
@@ -621,10 +621,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     rowGap: spacing.md,
-  },
-  filterIcon: {
-    width: 20,
-    height: 20,
   },
   filterButton: {
     width: 48,
