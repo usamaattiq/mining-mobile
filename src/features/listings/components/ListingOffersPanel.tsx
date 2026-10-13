@@ -36,6 +36,11 @@ export type ListingOffersPanelProps = {
   contactResponderId?: string;
   /** Phone for that person's accepted offer. Falls back to the responder phone. */
   contactPhone?: string;
+  /** Name shown in the prefilled WhatsApp message when contacting the listing owner. */
+  contactName?: string;
+  senderName?: string;
+  listingTitle?: string;
+  listingReference?: string;
   onPressResponder?: (offer: ListingRfqOffer) => void;
 };
 
@@ -74,6 +79,10 @@ export function ListingOffersPanel({
   onMessage,
   contactResponderId,
   contactPhone,
+  contactName,
+  senderName,
+  listingTitle,
+  listingReference,
   onPressResponder,
 }: ListingOffersPanelProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -243,13 +252,25 @@ export function ListingOffersPanel({
                       label={t('common.whatsapp')}
                       icon="logo-whatsapp"
                       variant="whatsapp"
-                      onPress={() =>
+                      onPress={() => {
+                        const contactingOwner = Boolean(
+                          contactResponderId && offer.responderId === contactResponderId,
+                        );
+                        const phone = contactingOwner ? contactPhone : offer.responderPhone;
+                        if (!phone) return;
+                        const recipient = (contactingOwner ? contactName : offer.responderName)?.trim();
                         openWhatsApp(
-                          (contactResponderId && offer.responderId === contactResponderId
-                            ? contactPhone
-                            : offer.responderPhone)!,
-                        )
-                      }
+                          phone,
+                          recipient && senderName && listingTitle && listingReference
+                            ? t('common.whatsappListingMessage', {
+                                recipient,
+                                sender: senderName,
+                                listing: listingTitle,
+                                reference: listingReference,
+                              })
+                            : undefined,
+                        );
+                      }}
                       style={styles.actionButton}
                     />
                   ) : null}

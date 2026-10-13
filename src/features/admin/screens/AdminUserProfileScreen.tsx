@@ -22,6 +22,7 @@ import { useLocalizedCatalogLabel } from '@/features/listings/utils/catalogLabel
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
+import { useProfileStore } from '@/store/profileStore';
 import { cardBackShadow, palette, radius, spacing } from '@/theme';
 
 type InfoTab = 'details' | 'history';
@@ -30,6 +31,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AdminUserProfile'>;
 
 export function AdminUserProfileScreen({ navigation, route }: Props): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const senderName = useProfileStore((state) => state.profile?.fullName?.trim() ?? '');
   const catalogLabel = useLocalizedCatalogLabel();
   const currency = useCurrency();
   const [detail, setDetail] = React.useState<AdminUserDetail | null>(null);
@@ -184,7 +186,17 @@ export function AdminUserProfileScreen({ navigation, route }: Props): React.Reac
             label={t('common.whatsapp')}
             icon="logo-whatsapp"
             variant="whatsapp"
-            onPress={() => openWhatsApp(detail.phoneE164)}
+            onPress={() =>
+              openWhatsApp(
+                detail.phoneE164,
+                detail.fullName.trim() && senderName
+                  ? t('common.whatsappContactMessage', {
+                      recipient: detail.fullName.trim(),
+                      sender: senderName,
+                    })
+                  : undefined,
+              )
+            }
           />
         </View>
       )}

@@ -89,6 +89,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const currency = useCurrency();
 
   const profileId = useProfileStore((state) => state.profile?.id);
+  const senderName = useProfileStore((state) => state.profile?.fullName?.trim() ?? '');
   const isAdmin = useProfileStore((state) => state.profile?.accountType === 'admin');
   const marketListing = useMarketListingsStore((state) =>
     state.listings.find((item) => item.id === id),
@@ -1032,6 +1033,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       setMessageOpen(true);
                     }
               }
+              senderName={senderName}
+              listingTitle={title}
+              listingReference={
+                equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
+              }
             />
           ) : null}
 
@@ -1053,6 +1059,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               onReject={() => undefined}
               contactResponderId={profileId}
               contactPhone={rfq?.ownerPhone}
+              contactName={owner?.fullName}
+              senderName={senderName}
+              listingTitle={title}
+              listingReference={
+                equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
+              }
               onMessage={profileId ? () => setMessageOpen(true) : undefined}
             />
           ) : null}
@@ -1350,7 +1362,27 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         label={t('common.whatsapp')}
                         icon="logo-whatsapp"
                         variant="whatsapp"
-                        onPress={() => openWhatsApp(rfq.ownerPhone!)}
+                        onPress={() =>
+                          openWhatsApp(
+                            rfq.ownerPhone!,
+                            owner?.fullName?.trim() &&
+                              senderName &&
+                              title &&
+                              (equipmentListing?.reference ??
+                                serviceListing?.reference ??
+                                goldListing?.reference)
+                              ? t('common.whatsappListingMessage', {
+                                  recipient: owner.fullName.trim(),
+                                  sender: senderName,
+                                  listing: title,
+                                  reference:
+                                    equipmentListing?.reference ??
+                                    serviceListing?.reference ??
+                                    goldListing?.reference,
+                                })
+                              : undefined,
+                          )
+                        }
                         style={styles.myOfferAction}
                       />
                     ) : null}
@@ -1364,6 +1396,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             <EquipmentDealsSection
               listingId={id}
               revision={(rfq?.offers ?? []).map((offer) => `${offer.id}:${offer.status}`).join('|')}
+              senderName={senderName}
+              listingTitle={title}
+              listingReference={equipmentListing?.reference}
               buyerPhones={Object.fromEntries(
                 (rfq?.offers ?? [])
                   .filter((offer) => offer.responderPhone)

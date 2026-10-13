@@ -14,12 +14,18 @@ export function EquipmentDealsSection({
   listingId,
   revision,
   buyerPhones,
+  senderName,
+  listingTitle,
+  listingReference,
   onMessageBuyer,
   onPressBuyer,
 }: {
   listingId: string;
   revision?: string;
   buyerPhones?: Record<string, string>;
+  senderName?: string;
+  listingTitle?: string;
+  listingReference?: string;
   onMessageBuyer?: (buyer: { id: string; fullName: string }) => void;
   onPressBuyer?: (buyerId: string) => void;
 }): React.ReactElement | null {
@@ -61,7 +67,19 @@ export function EquipmentDealsSection({
             label={t('common.whatsapp')}
             icon="logo-whatsapp"
             variant="whatsapp"
-            onPress={() => openWhatsApp(phone)}
+            onPress={() =>
+              openWhatsApp(
+                phone,
+                hold.buyerName.trim() && senderName && listingTitle && listingReference
+                  ? t('common.whatsappListingMessage', {
+                      recipient: hold.buyerName.trim(),
+                      sender: senderName,
+                      listing: listingTitle,
+                      reference: listingReference,
+                    })
+                  : undefined,
+              )
+            }
             style={styles.contactButton}
           />
         ) : null}

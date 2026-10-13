@@ -30,7 +30,9 @@
     "stepOfTotal": "الخطوة {current} من {total}",
     "date": "التاريخ",
     "postedOn": "تاريخ النشر",
-    "reference": "المرجع"
+    "reference": "المرجع",
+    "whatsappListingMessage": "مرحباً {recipient}،\n\nاسمي {sender}. أتواصل معك عبر دهبي بخصوص \"{listing}\".\n\nرقم المرجع: {reference}\n\nيسعدني مناقشة التفاصيل في الوقت المناسب لك.\n\nشكراً لك.",
+    "whatsappContactMessage": "مرحباً {recipient}،\n\nاسمي {sender}. أتواصل معك عبر دهبي.\n\nيرجى الرد عندما يكون ذلك مناسباً لك.\n\nشكراً لك."
   },
   "rfq": {
     "statusLabel": "الحالة",
