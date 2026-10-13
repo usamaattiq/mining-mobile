@@ -390,6 +390,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
               label={t('goldListing.auctionDuration')}
               value={durationHours}
               onChange={setDurationHours}
+              allowOneMinute
             />
 
             <LocationField

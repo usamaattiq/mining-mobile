@@ -527,18 +527,33 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
+    const highestBid = goldListing.rfq?.currentPrice;
     unitPriceCard =
-      goldListing.postedAs === 'buyer' || !goldListing.price ? null : (
+      (goldListing.postedAs === 'buyer' || !goldListing.price) && !highestBid ? null : (
         <View style={styles.unitPriceCard}>
-          <View style={styles.unitPriceCell}>
-            <View style={styles.unitPriceHeading}>
-              <Ionicons name="diamond-outline" size={18} color={palette.charcoal} />
-              <AppText style={styles.unitPriceCaption}>{t('goldListing.startingPrice')}</AppText>
+          {goldListing.price ? (
+            <View style={styles.unitPriceCell}>
+              <View style={styles.unitPriceHeading}>
+                <Ionicons name="diamond-outline" size={18} color={palette.charcoal} />
+                <AppText style={styles.unitPriceCaption}>{t('goldListing.startingPrice')}</AppText>
+              </View>
+              <AppText weight="bold" style={styles.unitPriceAmount}>
+                {currency.code} {formatAmountWithCommas(goldListing.price)}
+              </AppText>
             </View>
-            <AppText weight="bold" style={styles.unitPriceAmount}>
-              {currency.code} {formatAmountWithCommas(goldListing.price)}
-            </AppText>
-          </View>
+          ) : null}
+          {goldListing.price && highestBid ? <View style={styles.unitPriceDivider} /> : null}
+          {highestBid ? (
+            <View style={styles.unitPriceCell}>
+              <View style={styles.unitPriceHeading}>
+                <Ionicons name="trophy-outline" size={18} color={palette.charcoal} />
+                <AppText style={styles.unitPriceCaption}>{t('goldListing.highestBid')}</AppText>
+              </View>
+              <AppText weight="bold" style={styles.unitPriceAmount}>
+                {currency.code} {formatAmountWithCommas(highestBid)}
+              </AppText>
+            </View>
+          ) : null}
         </View>
       );
 
@@ -874,9 +889,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         <View
           style={[
             styles.content,
-            category === 'gold' && !isOwner && (showOfferInput || rfq?.currentPrice)
-              ? styles.contentAboveBidBar
-              : null,
+            category === 'gold' && !isOwner && showOfferInput ? styles.contentAboveBidBar : null,
           ]}
         >
           <View style={styles.headerBlock}>
@@ -1051,6 +1064,20 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               listingReference={
                 equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
               }
+            />
+          ) : null}
+
+          {category === 'gold' &&
+          isOwner &&
+          rfq?.canDecideOffers &&
+          (rfq.offers ?? []).some((offer) => offer.status === 'active') ? (
+            <Button
+              label={t('goldListing.sendConfirmation')}
+              onPress={() => {
+                const nextBid = (rfq.offers ?? []).find((offer) => offer.status === 'active');
+                if (nextBid) handleDecideOffer(nextBid.id, 'accept');
+              }}
+              loading={Boolean(actingOfferId)}
             />
           ) : null}
 
@@ -1555,15 +1582,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             {t('rfq.withdraw')}
           </AppText>
         </Pressable>
-      ) : null}
-
-      {category === 'gold' && !isOwner && rfq?.currentPrice ? (
-        <View style={styles.highestBid}>
-          <AppText style={styles.highestBidLabel}>{t('goldListing.highestBid')}</AppText>
-          <AppText weight="bold" style={styles.highestBidAmount}>
-            {currency.code} {formatAmountWithCommas(rfq.currentPrice)}
-          </AppText>
-        </View>
       ) : null}
 
       {(showOfferInput || (!showMyOfferCards && hasSentOffer)) ? (

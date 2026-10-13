@@ -11,11 +11,14 @@ const MIN_HOURS = 0.5;
 const MAX_HOURS = 24;
 const SLIDER_STEP_HOURS = 0.5;
 const TICK_HOURS = [6, 12, 18, 24];
+export const ONE_MINUTE_HOURS = 1 / 60;
 
 type DurationSliderProps = {
   value: number;
   onChange: (hours: number) => void;
   label: string;
+  /** Development shortcut so a gold auction can end in one minute. */
+  allowOneMinute?: boolean;
 };
 
 function snapToHalfHour(hours: number): number {
@@ -46,9 +49,11 @@ export function DurationSlider({
   value,
   onChange,
   label,
+  allowOneMinute = false,
 }: DurationSliderProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
-  const safeValue = snapToHalfHour(value);
+  const oneMinute = allowOneMinute && Math.abs(value - ONE_MINUTE_HOURS) < 0.001;
+  const safeValue = oneMinute ? value : snapToHalfHour(value);
 
   return (
     <View style={styles.wrap}>
@@ -64,12 +69,32 @@ export function DurationSlider({
         minimumValue={MIN_HOURS}
         maximumValue={MAX_HOURS}
         step={SLIDER_STEP_HOURS}
-        value={safeValue}
+        value={oneMinute ? MIN_HOURS : safeValue}
         onValueChange={(next) => onChange(snapToHalfHour(next))}
         minimumTrackTintColor={palette.gold}
         maximumTrackTintColor={palette.softGold}
         thumbTintColor={palette.gold}
       />
+
+      {allowOneMinute ? (
+        <Pressable
+          onPress={() => onChange(ONE_MINUTE_HOURS)}
+          style={({ pressed }) => [
+            styles.minuteButton,
+            oneMinute && styles.tickSelected,
+            pressed && styles.tickPressed,
+          ]}
+          accessibilityRole="button"
+          accessibilityState={{ selected: oneMinute }}
+        >
+          <AppText
+            weight="bold"
+            style={[styles.minuteLabel, oneMinute && styles.tickHoursSelected]}
+          >
+            {t('goldListing.auctionDurationOneMinute')}
+          </AppText>
+        </Pressable>
+      ) : null}
 
       <View style={styles.ticks}>
         {TICK_HOURS.map((hour) => {
@@ -122,6 +147,19 @@ const styles = StyleSheet.create({
   slider: {
     width: '100%',
     height: 40,
+  },
+  minuteButton: {
+    minHeight: 44,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.warmWhite,
+    borderWidth: 1.5,
+    borderColor: palette.softGold,
+  },
+  minuteLabel: {
+    fontSize: 15,
+    color: palette.charcoal,
   },
   ticks: {
     flexDirection: 'row',
