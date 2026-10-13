@@ -126,9 +126,6 @@ export function ListingOffersPanel({
                 compact && isLeader && styles.cardLeader,
               ]}
             >
-              {compact && isLeader ? (
-                <Ionicons name="trophy" size={16} color={palette.gold} style={styles.trophy} />
-              ) : null}
               <View style={styles.row}>
                 {placeholderIcon ? (
                   <View style={[styles.logo, compact && styles.logoCompact]}>
@@ -157,13 +154,12 @@ export function ListingOffersPanel({
                   <Ionicons name="trophy" size={16} color={palette.gold} />
                 ) : null}
                 {compact && priceLabel ? (
-                  <AppText
-                    weight="bold"
-                    style={[styles.priceInline, isLeader && styles.priceInlineLeader]}
-                    numberOfLines={1}
-                  >
+                  <AppText weight="bold" style={styles.priceInline} numberOfLines={1}>
                     {priceLabel}
                   </AppText>
+                ) : null}
+                {compact && isLeader ? (
+                  <Ionicons name="trophy" size={16} color={palette.gold} />
                 ) : null}
                 {compact ? null : (
                 <View style={styles.badges}>
@@ -325,11 +321,6 @@ const styles = StyleSheet.create({
   cardLeader: {
     paddingTop: spacing.sm,
   },
-  trophy: {
-    position: 'absolute',
-    top: 4,
-    right: 8,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -383,9 +374,6 @@ const styles = StyleSheet.create({
   priceInline: {
     fontSize: 13,
     color: palette.charcoal,
-  },
-  priceInlineLeader: {
-    marginRight: 22,
   },
   actions: {
     flexDirection: 'row',
