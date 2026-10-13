@@ -1044,12 +1044,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
 
-          {supplierBuyer && mySupplierOffers.length > 0 ? (
+          {supplierBuyer && mySupplierOffers.some((offer) => offer.status !== 'confirmed' && offer.status !== 'returned') ? (
             <View style={styles.myOffers}>
               <AppText weight="bold" style={styles.myOffersTitle}>
                 {t('rfq.yourOffer')}
               </AppText>
-              {mySupplierOffers.map((offer) => (
+              {mySupplierOffers.filter((offer) => offer.status !== 'confirmed' && offer.status !== 'returned').map((offer) => (
                 <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
                   <View style={styles.myOfferRow}>
                     <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
@@ -1231,25 +1231,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       />
                     </View>
                   ) : null}
-                  {offer.status === 'confirmed' || offer.status === 'returned' ? (
-                    <View style={styles.myOfferActions}>
-                      <Button
-                        label={t('messages.message')}
-                        icon="chatbubble-ellipses-outline"
-                        onPress={() => setMessageOpen(true)}
-                        style={styles.myOfferAction}
-                      />
-                      {rfq?.ownerPhone ? (
-                        <Button
-                          label={t('common.whatsapp')}
-                          icon="logo-whatsapp"
-                          variant="whatsapp"
-                          onPress={() => openWhatsApp(rfq.ownerPhone!)}
-                          style={styles.myOfferAction}
-                        />
-                      ) : null}
-                    </View>
-                  ) : null}
                   {offer.status === 'selected' ? (
                     <View style={styles.myOfferActions}>
                       <Button
@@ -1265,6 +1246,75 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       />
                     </View>
                   ) : null}
+                </View>
+              ))}
+            </View>
+          ) : null}
+
+          {supplierBuyer && mySupplierOffers.some((offer) => offer.status === 'confirmed' || offer.status === 'returned') ? (
+            <View style={styles.myOffers}>
+              <AppText weight="bold" style={styles.myOffersTitle}>
+                {t('profile.history')}
+              </AppText>
+              {mySupplierOffers.filter((offer) => offer.status === 'confirmed' || offer.status === 'returned').map((offer) => (
+                <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
+                  <View style={styles.myOfferRow}>
+                    <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
+                      {offer.kind === 'sale' ? t('equipmentListing.buy') : t('equipmentListing.rent')}
+                    </AppText>
+                    <View style={styles.myOfferBadges}>
+                      <View style={styles.myOfferStatusBadge}>
+                        <AppText weight="semibold" style={styles.myOfferStatusText}>
+                          {t(
+                            `rfq.offerStatus.${offer.status === 'returned' ? 'returned' : 'confirmed'}`,
+                          )}
+                        </AppText>
+                      </View>
+                      {offer.handover === 'delivery' ? (
+                        <View style={styles.myOfferKindBadge}>
+                          <AppText weight="semibold" style={styles.myOfferKindText}>
+                            {t('equipmentListing.deliveryBadge')}
+                          </AppText>
+                        </View>
+                      ) : null}
+                    </View>
+                  </View>
+                  {offer.createdAt ? (
+                    <AppText style={styles.myOfferDate} numberOfLines={1}>
+                      {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
+                        new Date(offer.createdAt),
+                      )}
+                    </AppText>
+                  ) : null}
+                  {offer.price ? (
+                    <View style={styles.myOfferPriceRow}>
+                      <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
+                        {currency.code} {formatAmountWithCommas(offer.price)}
+                      </AppText>
+                      {offer.quantity ? (
+                        <AppText weight="semibold" style={styles.myOfferPerUnit} numberOfLines={1}>
+                          {t('equipmentListing.unitsCount', { count: offer.quantity })}
+                        </AppText>
+                      ) : null}
+                    </View>
+                  ) : null}
+                  <View style={styles.myOfferActions}>
+                    <Button
+                      label={t('messages.message')}
+                      icon="chatbubble-ellipses-outline"
+                      onPress={() => setMessageOpen(true)}
+                      style={styles.myOfferAction}
+                    />
+                    {rfq?.ownerPhone ? (
+                      <Button
+                        label={t('common.whatsapp')}
+                        icon="logo-whatsapp"
+                        variant="whatsapp"
+                        onPress={() => openWhatsApp(rfq.ownerPhone!)}
+                        style={styles.myOfferAction}
+                      />
+                    ) : null}
+                  </View>
                 </View>
               ))}
             </View>
