@@ -339,14 +339,14 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               selected={onsite}
               icon="location-outline"
               title={t('serviceListing.onsite')}
-              subtitle={t('serviceListing.onsiteSubtitle')}
+              subtitle={t(isBuyer ? 'serviceListing.onsiteRequestSubtitle' : 'serviceListing.onsiteSubtitle')}
               onPress={() => setOnsite((value) => !value)}
             />
             <OfferChoiceCard
               selected={online}
               icon="globe-outline"
               title={t('serviceListing.online')}
-              subtitle={t('serviceListing.onlineSubtitle')}
+              subtitle={t(isBuyer ? 'serviceListing.onlineRequestSubtitle' : 'serviceListing.onlineSubtitle')}
               onPress={() => setOnline((value) => !value)}
             />
           </View>
