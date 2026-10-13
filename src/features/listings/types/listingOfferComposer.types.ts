@@ -8,6 +8,8 @@ export type ListingOfferComposerProps = {
   confirmLabel: string;
   declineLabel: string;
   offerPrice?: string;
+  /** When this offer was sent, shown under the submitted label. */
+  offerSentAt?: number;
   offerUnitsLabel?: string;
   offerUnits?: number;
   unitsLabel?: string;

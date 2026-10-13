@@ -586,9 +586,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     !isAdmin && !isOwner && category === 'equipment' && equipmentListing?.postedAs === 'supplier';
   const supplierServiceSender =
     !isAdmin && !isOwner && category === 'services' && serviceListing?.postedAs === 'supplier';
+  const respondingToBuyer = !isAdmin && !isOwner && postedAs === 'buyer' && Boolean(rfq?.myOfferId);
+  const showMyOfferCards = supplierBuyer || supplierServiceSender || respondingToBuyer;
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
-    : supplierServiceSender && rfq?.myOfferId
+    : (supplierServiceSender || respondingToBuyer) && rfq?.myOfferId
       ? [
           {
             id: rfq.myOfferId,
@@ -596,7 +598,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             responderName: '',
             status: rfq.myOfferStatus ?? 'active',
             price: rfq.myOfferPrice,
+            quantity: rfq.myOfferQuantity,
+            kind: rfq.myOfferKind,
+            handover: rfq.myOfferHandover,
             delivery: rfq.myOfferDelivery,
+            createdAt: rfq.myOfferCreatedAt,
           },
         ]
       : [];
@@ -1069,7 +1075,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
 
-          {(supplierBuyer || supplierServiceSender) && mySupplierOffers.some((offer) => offer.status !== 'confirmed' && offer.status !== 'returned') ? (
+          {showMyOfferCards && mySupplierOffers.some((offer) => offer.status !== 'confirmed' && offer.status !== 'returned') ? (
             <View style={styles.myOffers}>
               <AppText weight="bold" style={styles.myOffersTitle}>
                 {t('rfq.yourOffer')}
@@ -1100,7 +1106,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                             </AppText>
                           </View>
                         ) : null
-                      ) : (
+                      ) : offer.kind ? (
                         <View style={styles.myOfferKindBadge}>
                           <AppText weight="semibold" style={styles.myOfferKindText}>
                             {offer.kind === 'sale'
@@ -1108,7 +1114,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                               : t('equipmentListing.rent')}
                           </AppText>
                         </View>
-                      )}
+                      ) : null}
                       {offer.status === 'selected' ? (
                         <View style={styles.myOfferStatusBadge}>
                           <AppText weight="semibold" style={styles.myOfferStatusText}>
@@ -1130,14 +1136,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
                         {currency.code} {formatAmountWithCommas(offer.price)}
                       </AppText>
-                      {offer.quantity ? (
+                      {category === 'equipment' && offer.quantity ? (
                         <AppText weight="semibold" style={styles.myOfferPerUnit} numberOfLines={1}>
                           {t('equipmentListing.unitsCount', { count: offer.quantity })}
                         </AppText>
                       ) : null}
                     </View>
                   ) : null}
-                  {category === 'equipment' && offer.status === 'active' && editingOfferId === offer.id ? (
+                  {supplierBuyer && offer.status === 'active' && editingOfferId === offer.id ? (
                     <View style={styles.myOfferEdit}>
                       {equipmentListing?.mode === 'both' ? (
                         <View style={styles.editChoiceRow}>
@@ -1244,7 +1250,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     </View>
                   ) : null}
-                  {category === 'equipment' && offer.status === 'active' && editingOfferId !== offer.id ? (
+                  {supplierBuyer && offer.status === 'active' && editingOfferId !== offer.id ? (
                     <View style={styles.myOfferActions}>
                       <Button
                         label={t('rfq.update')}
@@ -1260,7 +1266,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       />
                     </View>
                   ) : null}
-                  {category === 'services' && offer.status === 'active' ? (
+                  {(supplierServiceSender || respondingToBuyer) && offer.status === 'active' ? (
                     <View style={styles.myOfferActions}>
                       <Button
                         label={t('rfq.withdraw')}
@@ -1290,7 +1296,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             </View>
           ) : null}
 
-          {(supplierBuyer || supplierServiceSender) && mySupplierOffers.some((offer) => offer.status === 'confirmed' || offer.status === 'returned') ? (
+          {showMyOfferCards && mySupplierOffers.some((offer) => offer.status === 'confirmed' || offer.status === 'returned') ? (
             <View style={styles.myOffers}>
               <AppText weight="bold" style={styles.myOffersTitle}>
                 {t('profile.history')}
@@ -1343,7 +1349,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
                         {currency.code} {formatAmountWithCommas(offer.price)}
                       </AppText>
-                      {offer.quantity ? (
+                      {category === 'equipment' && offer.quantity ? (
                         <AppText weight="semibold" style={styles.myOfferPerUnit} numberOfLines={1}>
                           {t('equipmentListing.unitsCount', { count: offer.quantity })}
                         </AppText>
@@ -1557,7 +1563,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </View>
       ) : null}
 
-      {(showOfferInput || (!supplierBuyer && !supplierServiceSender && hasSentOffer)) ? (
+      {(showOfferInput || (!showMyOfferCards && hasSentOffer)) ? (
         <ListingOfferComposer
           currencyCode={currency.code}
           placeholder={
@@ -1578,6 +1584,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           confirmLabel={t('rfq.confirm')}
           declineLabel={t('rfq.decline')}
           offerPrice={rfq?.myOfferPrice}
+          offerSentAt={rfq?.myOfferCreatedAt}
           offerUnits={category === 'equipment' ? rfq?.myOfferQuantity : undefined}
           offerUnitsLabel={
             category === 'equipment' && rfq?.myOfferQuantity
@@ -1650,10 +1657,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 ? t('serviceListing.online')
                 : undefined
           }
-          hasOffer={supplierBuyer ? false : hasSentOffer}
+          hasOffer={!showMyOfferCards && hasSentOffer}
           leading={category === 'gold' && Boolean(rfq?.isLeading)}
           showInput={showOfferInput}
-          awaitingConfirm={supplierBuyer ? false : awaitingConfirm}
+          awaitingConfirm={!showMyOfferCards && awaitingConfirm}
           sendInline={supplierBuyer}
           submitting={offerSubmitting}
           onSubmit={handleSubmitOffer}

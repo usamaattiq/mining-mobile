@@ -19,6 +19,7 @@ export function ListingOfferComposer({
   confirmLabel,
   declineLabel,
   offerPrice,
+  offerSentAt,
   offerUnitsLabel,
   offerUnits,
   maxUnits,
@@ -105,9 +106,19 @@ export function ListingOfferComposer({
         {hasOffer ? (
           <View style={styles.card}>
             <View style={styles.cardPriceRow}>
-              <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
-                {submittedLabel}
-              </AppText>
+              <View style={styles.cardTitleBlock}>
+                <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+                  {submittedLabel}
+                </AppText>
+                {offerSentAt ? (
+                  <AppText style={styles.cardDate} numberOfLines={1}>
+                    {new Intl.DateTimeFormat(currentLanguage, {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    }).format(new Date(offerSentAt))}
+                  </AppText>
+                ) : null}
+              </View>
               {submittedUnitAmount != null && submittedUnits ? (
                 <PriceTimesUnitsSummary
                   currencyCode={currencyCode}
@@ -331,6 +342,14 @@ const styles = StyleSheet.create({
     borderColor: palette.softGold,
     padding: spacing.sm + 2,
     gap: spacing.sm,
+  },
+  cardTitleBlock: {
+    flex: 1,
+    gap: 2,
+  },
+  cardDate: {
+    fontSize: 12,
+    color: palette.muted,
   },
   cardTitle: {
     flex: 1,

@@ -35,6 +35,7 @@ export type ListingRfq = {
   myOfferKind?: 'rent' | 'sale';
   myOfferHandover?: 'pickup' | 'delivery';
   myOfferDelivery?: 'onsite' | 'online';
+  myOfferCreatedAt?: number;
   ownerPhone?: string;
   isLeading?: boolean;
   offers?: ListingRfqOffer[];
