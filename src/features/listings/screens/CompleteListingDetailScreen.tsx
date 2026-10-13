@@ -583,9 +583,22 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     Boolean(rfq?.canConfirmOffer);
   const supplierBuyer =
     !isAdmin && !isOwner && category === 'equipment' && equipmentListing?.postedAs === 'supplier';
+  const supplierServiceSender =
+    !isAdmin && !isOwner && category === 'services' && serviceListing?.postedAs === 'supplier';
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
-    : [];
+    : supplierServiceSender && rfq?.myOfferId
+      ? [
+          {
+            id: rfq.myOfferId,
+            responderId: profileId ?? '',
+            responderName: '',
+            status: rfq.myOfferStatus ?? 'active',
+            price: rfq.myOfferPrice,
+            delivery: rfq.myOfferDelivery,
+          },
+        ]
+      : [];
   // Block the other rent/sale offer until this one is accepted (confirmed).
   // Set to false to allow both kinds again while one is still open.
   const limitToOneOpenOffer = true;
@@ -1044,7 +1057,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
 
-          {supplierBuyer && mySupplierOffers.some((offer) => offer.status !== 'confirmed' && offer.status !== 'returned') ? (
+          {(supplierBuyer || supplierServiceSender) && mySupplierOffers.some((offer) => offer.status !== 'confirmed' && offer.status !== 'returned') ? (
             <View style={styles.myOffers}>
               <AppText weight="bold" style={styles.myOffersTitle}>
                 {t('rfq.yourOffer')}
@@ -1053,7 +1066,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
                   <View style={styles.myOfferRow}>
                     <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
-                      {t('rfq.yourOffer')}
+                      {category === 'services'
+                        ? owner?.fullName || t('messages.fallbackName')
+                        : t('rfq.yourOffer')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
                       {offer.handover === 'delivery' ? (
@@ -1063,13 +1078,25 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           </AppText>
                         </View>
                       ) : null}
-                      <View style={styles.myOfferKindBadge}>
-                        <AppText weight="semibold" style={styles.myOfferKindText}>
-                          {offer.kind === 'sale'
-                            ? t('equipmentListing.buy')
-                            : t('equipmentListing.rent')}
-                        </AppText>
-                      </View>
+                      {category === 'services' ? (
+                        offer.delivery ? (
+                          <View style={styles.myOfferKindBadge}>
+                            <AppText weight="semibold" style={styles.myOfferKindText}>
+                              {offer.delivery === 'online'
+                                ? t('serviceListing.online')
+                                : t('serviceListing.onsite')}
+                            </AppText>
+                          </View>
+                        ) : null
+                      ) : (
+                        <View style={styles.myOfferKindBadge}>
+                          <AppText weight="semibold" style={styles.myOfferKindText}>
+                            {offer.kind === 'sale'
+                              ? t('equipmentListing.buy')
+                              : t('equipmentListing.rent')}
+                          </AppText>
+                        </View>
+                      )}
                       {offer.status === 'selected' ? (
                         <View style={styles.myOfferStatusBadge}>
                           <AppText weight="semibold" style={styles.myOfferStatusText}>
@@ -1098,7 +1125,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       ) : null}
                     </View>
                   ) : null}
-                  {offer.status === 'active' && editingOfferId === offer.id ? (
+                  {category === 'equipment' && offer.status === 'active' && editingOfferId === offer.id ? (
                     <View style={styles.myOfferEdit}>
                       {equipmentListing?.mode === 'both' ? (
                         <View style={styles.editChoiceRow}>
@@ -1205,7 +1232,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     </View>
                   ) : null}
-                  {offer.status === 'active' && editingOfferId !== offer.id ? (
+                  {category === 'equipment' && offer.status === 'active' && editingOfferId !== offer.id ? (
                     <View style={styles.myOfferActions}>
                       <Button
                         label={t('rfq.update')}
@@ -1213,6 +1240,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         onPress={() => beginEditOffer(offer)}
                         style={styles.myOfferAction}
                       />
+                      <Button
+                        label={t('rfq.withdraw')}
+                        variant="outline"
+                        onPress={() => handleResponderOffer('withdraw', offer.id)}
+                        style={styles.myOfferAction}
+                      />
+                    </View>
+                  ) : null}
+                  {category === 'services' && offer.status === 'active' ? (
+                    <View style={styles.myOfferActions}>
                       <Button
                         label={t('rfq.withdraw')}
                         variant="outline"
@@ -1241,7 +1278,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             </View>
           ) : null}
 
-          {supplierBuyer && mySupplierOffers.some((offer) => offer.status === 'confirmed' || offer.status === 'returned') ? (
+          {(supplierBuyer || supplierServiceSender) && mySupplierOffers.some((offer) => offer.status === 'confirmed' || offer.status === 'returned') ? (
             <View style={styles.myOffers}>
               <AppText weight="bold" style={styles.myOffersTitle}>
                 {t('profile.history')}
@@ -1250,9 +1287,22 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
                   <View style={styles.myOfferRow}>
                     <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
-                      {offer.kind === 'sale' ? t('equipmentListing.buy') : t('equipmentListing.rent')}
+                      {category === 'services'
+                        ? owner?.fullName || t('messages.fallbackName')
+                        : offer.kind === 'sale'
+                          ? t('equipmentListing.buy')
+                          : t('equipmentListing.rent')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
+                      {category === 'services' && offer.delivery ? (
+                        <View style={styles.myOfferKindBadge}>
+                          <AppText weight="semibold" style={styles.myOfferKindText}>
+                            {offer.delivery === 'online'
+                              ? t('serviceListing.online')
+                              : t('serviceListing.onsite')}
+                          </AppText>
+                        </View>
+                      ) : null}
                       {offer.handover === 'delivery' ? (
                         <View style={styles.myOfferKindBadge}>
                           <AppText weight="semibold" style={styles.myOfferKindText}>
@@ -1472,7 +1522,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </View>
       ) : null}
 
-      {(showOfferInput || (!supplierBuyer && hasSentOffer)) ? (
+      {(showOfferInput || (!supplierBuyer && !supplierServiceSender && hasSentOffer)) ? (
         <ListingOfferComposer
           currencyCode={currency.code}
           placeholder={
