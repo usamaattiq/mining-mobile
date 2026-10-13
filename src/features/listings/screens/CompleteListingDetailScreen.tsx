@@ -1056,23 +1056,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       {t('rfq.yourOffer')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
-                      {offer.status === 'selected' ||
-                      offer.status === 'confirmed' ||
-                      offer.status === 'returned' ? (
-                        <View style={styles.myOfferStatusBadge}>
-                          <AppText weight="semibold" style={styles.myOfferStatusText}>
-                            {t(
-                              `rfq.offerStatus.${
-                                offer.status === 'selected'
-                                  ? 'selected'
-                                  : offer.status === 'returned'
-                                    ? 'returned'
-                                    : 'confirmed'
-                              }`,
-                            )}
-                          </AppText>
-                        </View>
-                      ) : null}
                       {offer.handover === 'delivery' ? (
                         <View style={styles.myOfferKindBadge}>
                           <AppText weight="semibold" style={styles.myOfferKindText}>
@@ -1087,6 +1070,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                             : t('equipmentListing.rent')}
                         </AppText>
                       </View>
+                      {offer.status === 'selected' ? (
+                        <View style={styles.myOfferStatusBadge}>
+                          <AppText weight="semibold" style={styles.myOfferStatusText}>
+                            {t('rfq.offerStatus.selected')}
+                          </AppText>
+                        </View>
+                      ) : null}
                     </View>
                   </View>
                   {offer.createdAt ? (
@@ -1263,13 +1253,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       {offer.kind === 'sale' ? t('equipmentListing.buy') : t('equipmentListing.rent')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
-                      <View style={styles.myOfferStatusBadge}>
-                        <AppText weight="semibold" style={styles.myOfferStatusText}>
-                          {t(
-                            `rfq.offerStatus.${offer.status === 'returned' ? 'returned' : 'confirmed'}`,
-                          )}
-                        </AppText>
-                      </View>
                       {offer.handover === 'delivery' ? (
                         <View style={styles.myOfferKindBadge}>
                           <AppText weight="semibold" style={styles.myOfferKindText}>
@@ -1277,6 +1260,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           </AppText>
                         </View>
                       ) : null}
+                      <View style={styles.myOfferStatusBadge}>
+                        <AppText weight="semibold" style={styles.myOfferStatusText}>
+                          {t(
+                            `rfq.offerStatus.${offer.status === 'returned' ? 'returned' : 'confirmed'}`,
+                          )}
+                        </AppText>
+                      </View>
                     </View>
                   </View>
                   {offer.createdAt ? (

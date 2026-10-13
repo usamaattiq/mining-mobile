@@ -28,7 +28,6 @@ export function EquipmentDealCard({
   onPressName?: () => void;
 }): React.ReactElement {
   const total = parsePositiveAmount(hold.price);
-  const meta = [statusLabel, dateLabel].filter(Boolean).join(' · ');
   return (
     <View style={[styles.card, cardBackShadow, muted && styles.cardMuted]}>
       <View style={styles.cardRow}>
@@ -42,10 +41,17 @@ export function EquipmentDealCard({
             {kindLabel}
           </AppText>
         </View>
+        {statusLabel ? (
+          <View style={[styles.statusBadge, muted && styles.kindBadgeMuted]}>
+            <AppText weight="semibold" style={[styles.statusLabel, muted && styles.kindLabelMuted]}>
+              {statusLabel}
+            </AppText>
+          </View>
+        ) : null}
       </View>
-      {meta ? (
+      {dateLabel ? (
         <AppText style={styles.cardMeta} numberOfLines={1}>
-          {meta}
+          {dateLabel}
         </AppText>
       ) : null}
       <View style={styles.priceRow}>
@@ -83,6 +89,13 @@ const styles = StyleSheet.create({
   kindBadgeMuted: { backgroundColor: palette.pureWhite },
   kindLabel: { fontSize: 11, color: palette.goldDark },
   kindLabelMuted: { color: palette.muted },
+  statusBadge: {
+    backgroundColor: palette.lightGold,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
+  statusLabel: { fontSize: 11, color: palette.charcoal },
   cardMeta: { fontSize: 12, color: palette.muted },
   priceRow: {
     flexDirection: 'row',

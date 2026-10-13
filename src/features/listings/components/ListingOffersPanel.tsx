@@ -154,13 +154,6 @@ export function ListingOffersPanel({
                 ) : null}
                 {compact ? null : (
                 <View style={styles.badges}>
-                  {statusKey !== 'active' ? (
-                    <View style={styles.statusBadge}>
-                      <AppText weight="semibold" style={styles.statusBadgeText}>
-                        {t(`rfq.offerStatus.${statusKey}`)}
-                      </AppText>
-                    </View>
-                  ) : null}
                   {showUnits && offer.handover === 'delivery' ? (
                     <View style={styles.kindBadge}>
                       <AppText weight="semibold" style={styles.kindBadgeText}>
@@ -183,6 +176,13 @@ export function ListingOffersPanel({
                         {offer.delivery === 'onsite'
                           ? t('serviceListing.onsite')
                           : t('serviceListing.online')}
+                      </AppText>
+                    </View>
+                  ) : null}
+                  {statusKey !== 'active' ? (
+                    <View style={styles.statusBadge}>
+                      <AppText weight="semibold" style={styles.statusBadgeText}>
+                        {t(`rfq.offerStatus.${statusKey}`)}
                       </AppText>
                     </View>
                   ) : null}
