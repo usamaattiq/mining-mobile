@@ -33,6 +33,8 @@ export type ListingOffersPanelProps = {
   title?: string;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
+  /** Gold auction: one button on this bid instead of a control under the list. */
+  confirmationOfferId?: string;
   onMessage?: (offer: ListingRfqOffer) => void;
   /** When set, contact buttons only appear on this person's accepted offer. */
   contactResponderId?: string;
@@ -79,6 +81,7 @@ export function ListingOffersPanel({
   title,
   onAccept,
   onReject,
+  confirmationOfferId,
   onMessage,
   contactResponderId,
   contactPhone,
@@ -226,7 +229,17 @@ export function ListingOffersPanel({
                   {priceLabel}
                 </AppText>
               ) : null}
-              {canDecide ? (
+              {confirmationOfferId && offer.id === confirmationOfferId ? (
+                <View style={styles.actions}>
+                  <Button
+                    label={t('goldListing.sendConfirmation')}
+                    loading={busy}
+                    disabled={Boolean(actingOfferId)}
+                    onPress={() => onAccept(offer.id)}
+                    style={styles.actionButton}
+                  />
+                </View>
+              ) : canDecide ? (
                 <View style={styles.actions}>
                   <Button
                     label={t('rfq.reject')}

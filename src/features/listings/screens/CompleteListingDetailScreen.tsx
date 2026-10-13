@@ -737,6 +737,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         .finally(() => setActingOfferId(null));
     };
 
+    if (action === 'accept' && category === 'gold') {
+      showAppAlert(t('goldListing.sendConfirmationTitle'), undefined, [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.confirm'), onPress: run },
+      ]);
+      return;
+    }
+
     if (action === 'accept') {
       showAppAlert(t('rfq.acceptConfirmTitle'), t('rfq.acceptConfirmMessage'), [
         { text: t('common.cancel'), style: 'cancel' },
@@ -1064,20 +1072,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               listingReference={
                 equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
               }
-            />
-          ) : null}
-
-          {category === 'gold' &&
-          isOwner &&
-          rfq?.canDecideOffers &&
-          (rfq.offers ?? []).some((offer) => offer.status === 'active') ? (
-            <Button
-              label={t('goldListing.sendConfirmation')}
-              onPress={() => {
-                const nextBid = (rfq.offers ?? []).find((offer) => offer.status === 'active');
-                if (nextBid) handleDecideOffer(nextBid.id, 'accept');
-              }}
-              loading={Boolean(actingOfferId)}
+              confirmationOfferId={
+                category === 'gold' && isOwner && rfq?.canDecideOffers
+                  ? (rfq.offers ?? []).find((offer) => offer.status === 'active')?.id
+                  : undefined
+              }
             />
           ) : null}
 
@@ -1097,15 +1096,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               title={t('rfq.leaderboardTitle')}
               onAccept={() => undefined}
               onReject={() => undefined}
-              contactResponderId={profileId}
-              contactPhone={rfq?.ownerPhone}
-              contactName={owner?.fullName}
-              senderName={senderName}
-              listingTitle={title}
-              listingReference={
-                equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
-              }
-              onMessage={profileId ? () => setMessageOpen(true) : undefined}
             />
           ) : null}
 
@@ -1687,6 +1677,47 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           onSubmit={handleSubmitOffer}
           onConfirm={() => handleResponderOffer('confirm')}
           onDecline={() => handleResponderOffer('decline')}
+          acceptedOwnerName={
+            rfq?.myOfferStatus === 'confirmed' ? owner?.fullName?.trim() || undefined : undefined
+          }
+          messageLabel={t('messages.message')}
+          whatsappLabel={t('common.whatsapp')}
+          onMessage={
+            rfq?.myOfferStatus === 'confirmed' && owner
+              ? () => {
+                  setMessagePeer({
+                    id: owner.id,
+                    fullName: owner.fullName,
+                    avatarUrl: owner.avatarUrl,
+                  });
+                  setMessageOpen(true);
+                }
+              : undefined
+          }
+          onWhatsApp={
+            rfq?.myOfferStatus === 'confirmed' && rfq.ownerPhone
+              ? () =>
+                  openWhatsApp(
+                    rfq.ownerPhone!,
+                    owner?.fullName?.trim() &&
+                      senderName &&
+                      title &&
+                      (equipmentListing?.reference ??
+                        serviceListing?.reference ??
+                        goldListing?.reference)
+                      ? t('common.whatsappListingMessage', {
+                          recipient: owner.fullName.trim(),
+                          sender: senderName,
+                          listing: title,
+                          reference:
+                            equipmentListing?.reference ??
+                            serviceListing?.reference ??
+                            goldListing?.reference,
+                        })
+                      : undefined,
+                  )
+              : undefined
+          }
         />
       ) : null}
 

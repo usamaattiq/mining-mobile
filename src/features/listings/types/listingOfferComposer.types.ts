@@ -42,5 +42,11 @@ export type ListingOfferComposerProps = {
   ) => void;
   onConfirm: () => void;
   onDecline: () => void;
+  /** Shown on the pinned accepted tile instead of the status label. */
+  acceptedOwnerName?: string;
+  messageLabel?: string;
+  whatsappLabel?: string;
+  onMessage?: () => void;
+  onWhatsApp?: () => void;
   footer?: ReactNode;
 };

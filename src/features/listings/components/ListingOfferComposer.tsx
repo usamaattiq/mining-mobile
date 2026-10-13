@@ -42,6 +42,11 @@ export function ListingOfferComposer({
   onSubmit,
   onConfirm,
   onDecline,
+  acceptedOwnerName,
+  messageLabel,
+  whatsappLabel,
+  onMessage,
+  onWhatsApp,
   footer,
 }: ListingOfferComposerProps): React.ReactElement {
   const insets = useSafeAreaInsets();
@@ -107,9 +112,14 @@ export function ListingOfferComposer({
           <View style={styles.card}>
             <View style={styles.cardPriceRow}>
               <View style={styles.cardTitleBlock}>
-                <AppText weight="semibold" style={styles.cardTitle}>
-                  {submittedLabel}
+                <AppText weight="semibold" style={acceptedOwnerName ? styles.cardOwner : styles.cardTitle}>
+                  {acceptedOwnerName ?? submittedLabel}
                 </AppText>
+                {acceptedOwnerName ? (
+                  <AppText weight="semibold" style={styles.cardStatus}>
+                    {submittedLabel}
+                  </AppText>
+                ) : null}
                 {offerSentAt ? (
                   <AppText style={styles.cardDate} numberOfLines={1}>
                     {new Intl.DateTimeFormat(currentLanguage, {
@@ -177,6 +187,34 @@ export function ListingOfferComposer({
                     </AppText>
                   )}
                 </Pressable>
+              </View>
+            ) : null}
+            {onMessage && !awaitingConfirm ? (
+              <View style={styles.confirmRow}>
+                <Pressable
+                  onPress={onMessage}
+                  accessibilityRole="button"
+                  accessibilityLabel={messageLabel}
+                  style={({ pressed }) => [styles.send, styles.confirm, pressed && styles.sendPressed]}
+                >
+                  <Ionicons name="chatbubble-ellipses-outline" size={16} color={palette.pureWhite} />
+                  <AppText weight="bold" style={styles.sendLabel}>
+                    {messageLabel}
+                  </AppText>
+                </Pressable>
+                {onWhatsApp ? (
+                  <Pressable
+                    onPress={onWhatsApp}
+                    accessibilityRole="button"
+                    accessibilityLabel={whatsappLabel}
+                    style={({ pressed }) => [styles.whatsapp, pressed && styles.whatsappPressed]}
+                  >
+                    <Ionicons name="logo-whatsapp" size={16} color={palette.pureWhite} />
+                    <AppText weight="bold" style={styles.sendLabel}>
+                      {whatsappLabel}
+                    </AppText>
+                  </Pressable>
+                ) : null}
               </View>
             ) : null}
           </View>
@@ -355,6 +393,30 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     color: palette.muted,
+  },
+  cardOwner: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: palette.charcoal,
+  },
+  cardStatus: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: palette.muted,
+  },
+  whatsapp: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: '#25D366',
+  },
+  whatsappPressed: {
+    opacity: 0.85,
   },
   cardPrice: {
     fontSize: 18,

@@ -653,6 +653,7 @@
     "auctionEndDate": "Auction end date & time",
     "highestBid": "Highest bid",
     "sendConfirmation": "Send confirmation",
+    "sendConfirmationTitle": "Send confirmation to this user?",
     "auctionEndDatePlaceholder": "Select date & time",
     "location": "Location",
     "fieldLocation": "Where the gold is located",

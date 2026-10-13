@@ -633,6 +633,7 @@
     "auctionEndDate": "تاريخ ووقت انتهاء المزاد",
     "highestBid": "أعلى عرض",
     "sendConfirmation": "إرسال التأكيد",
+    "sendConfirmationTitle": "إرسال التأكيد إلى هذا المستخدم؟",
     "auctionEndDatePlaceholder": "اختر التاريخ والوقت",
     "location": "الموقع",
     "fieldLocation": "أين يوجد الذهب",
