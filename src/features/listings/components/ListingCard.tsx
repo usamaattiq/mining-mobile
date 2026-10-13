@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: palette.softGold,
+    backgroundColor: palette.lightGold,
     marginTop: 10,
     marginBottom: 10,
   },
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
   priceDivider: {
     width: StyleSheet.hairlineWidth,
     alignSelf: 'stretch',
-    backgroundColor: palette.softGold,
+    backgroundColor: palette.lightGold,
     marginHorizontal: spacing.sm,
   },
   modeRow: {
