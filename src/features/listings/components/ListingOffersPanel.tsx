@@ -25,6 +25,8 @@ export type ListingOffersPanelProps = {
   placeholderIcon?: keyof typeof Ionicons.glyphMap;
   /** Gold auctions: trophy on the rank-1 bid. */
   showLeader?: boolean;
+  /** When false, bidder names stay visible. Owner name masking is handled by the caller. */
+  maskNames?: boolean;
   /** Shorter auction tiles: price on the name line, trophy in the corner. Bidder leaderboard only. */
   compact?: boolean;
   /** Replaces the default "Offers" heading. */
@@ -44,9 +46,9 @@ export type ListingOffersPanelProps = {
   onPressResponder?: (offer: ListingRfqOffer) => void;
 };
 
-function displayOfferName(name: string, status: string, fallback: string): string {
+function displayOfferName(name: string, status: string, fallback: string, mask: boolean): string {
   const trimmed = name.trim();
-  if (status === 'selected' || status === 'confirmed') {
+  if (!mask || status === 'confirmed' || status === 'returned') {
     return trimmed || fallback;
   }
   if (!trimmed) return fallback;
@@ -72,6 +74,7 @@ export function ListingOffersPanel({
   showUnits = false,
   placeholderIcon,
   showLeader = false,
+  maskNames = true,
   compact = false,
   title,
   onAccept,
@@ -94,7 +97,7 @@ export function ListingOffersPanel({
   const requestIsLive = (rfqStatus ?? 'live') === 'live';
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, compact && styles.rootCompact]}>
       <AppText weight="bold" style={styles.title}>
         {title ?? t('rfq.offersTitle')}
       </AppText>
@@ -141,11 +144,12 @@ export function ListingOffersPanel({
                   onPress={() => onPressResponder?.(offer)}
                   style={styles.namePress}
                 >
-                  <AppText weight="semibold" style={styles.name} numberOfLines={1}>
+                  <AppText weight="semibold" style={styles.name} numberOfLines={compact ? 2 : 1}>
                     {displayOfferName(
                       offer.responderName,
                       offer.status,
                       t('messages.fallbackName'),
+                      maskNames && offer.responderId !== contactResponderId,
                     )}
                   </AppText>
                 </Pressable>
@@ -198,7 +202,16 @@ export function ListingOffersPanel({
                 </View>
                 )}
               </View>
-              {offer.createdAt ? (
+              {compact && statusKey !== 'active' ? (
+                <View style={styles.badges}>
+                  <View style={styles.statusBadge}>
+                    <AppText weight="semibold" style={styles.statusBadgeText}>
+                      {t(`rfq.offerStatus.${statusKey}`)}
+                    </AppText>
+                  </View>
+                </View>
+              ) : null}
+              {!compact && offer.createdAt ? (
                 <AppText style={styles.sentAt} numberOfLines={1}>
                   {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
                     new Date(offer.createdAt),
@@ -288,6 +301,9 @@ const styles = StyleSheet.create({
   root: {
     gap: spacing.xs,
   },
+  rootCompact: {
+    gap: spacing.sm,
+  },
   title: {
     fontSize: 15,
     color: palette.charcoal,
@@ -304,7 +320,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
-    gap: 0,
+    gap: 2,
   },
   cardLeader: {
     paddingTop: spacing.sm,

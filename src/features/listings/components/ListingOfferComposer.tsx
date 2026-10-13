@@ -107,7 +107,7 @@ export function ListingOfferComposer({
           <View style={styles.card}>
             <View style={styles.cardPriceRow}>
               <View style={styles.cardTitleBlock}>
-                <AppText weight="semibold" style={styles.cardTitle} numberOfLines={1}>
+                <AppText weight="semibold" style={styles.cardTitle}>
                   {submittedLabel}
                 </AppText>
                 {offerSentAt ? (
@@ -352,10 +352,9 @@ const styles = StyleSheet.create({
     color: palette.muted,
   },
   cardTitle: {
-    flex: 1,
     fontSize: 13,
+    lineHeight: 18,
     color: palette.muted,
-    justifyContent: 'space-between',
   },
   cardPrice: {
     fontSize: 18,
@@ -363,9 +362,8 @@ const styles = StyleSheet.create({
   },
   cardPriceRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'flex-start',
     gap: spacing.xs,
-    flexShrink: 1,
   },
   cardUnits: {
     fontSize: 12,

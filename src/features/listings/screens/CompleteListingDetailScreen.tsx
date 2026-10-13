@@ -871,7 +871,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }
         />
 
-        <View style={styles.content}>
+        <View
+          style={[
+            styles.content,
+            category === 'gold' && !isOwner && (showOfferInput || rfq?.currentPrice)
+              ? styles.contentAboveBidBar
+              : null,
+          ]}
+        >
           <View style={styles.headerBlock}>
             {showCountdown ? (
               <View style={styles.statusRow}>
@@ -1084,9 +1091,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
                   <View style={styles.myOfferRow}>
                     <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
-                      {category === 'services'
-                        ? owner?.fullName || t('messages.fallbackName')
-                        : t('rfq.yourOffer')}
+                      {owner?.fullName?.trim()
+                        ? `${owner.fullName.trim().slice(0, 2)}******`
+                        : t('messages.fallbackName')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
                       {offer.handover === 'delivery' ? (
@@ -1305,11 +1312,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
                   <View style={styles.myOfferRow}>
                     <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
-                      {category === 'services'
-                        ? owner?.fullName || t('messages.fallbackName')
-                        : offer.kind === 'sale'
-                          ? t('equipmentListing.buy')
-                          : t('equipmentListing.rent')}
+                      {owner?.fullName?.trim() || t('messages.fallbackName')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
                       {category === 'services' && offer.delivery ? (
@@ -1830,6 +1833,9 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     gap: spacing.md - 2,
     paddingBottom: spacing.xxl,
+  },
+  contentAboveBidBar: {
+    paddingBottom: 168,
   },
   headerBlock: {
     gap: spacing.xs,
