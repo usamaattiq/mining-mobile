@@ -410,7 +410,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               ]
             : []),
         ]),
-    { label: t('equipmentListing.units'), value: String(units) },
+    { label: t(isBuyer ? 'equipmentListing.unitsRequest' : 'equipmentListing.units'), value: String(units) },
     ...(isBuyer && requestMode === 'rfq'
       ? [
           {
@@ -670,7 +670,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             ) : null}
 
             <CounterField
-              label={t('equipmentListing.units')}
+              label={t(isBuyer ? 'equipmentListing.unitsRequest' : 'equipmentListing.units')}
               value={units}
               onChange={setUnits}
               min={1}

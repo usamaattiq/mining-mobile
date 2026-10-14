@@ -499,6 +499,7 @@
     "cardYearlyUnit": "/yr",
     "saleBadge": "For Sale",
     "units": "How many units are available?",
+    "unitsRequest": "How many units do you need?",
     "neededDate": "When do you need this equipment?",
     "neededDatePlaceholder": "Select date & time",
     "listedUntil": "How long should this listing stay open?",

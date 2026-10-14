@@ -478,6 +478,7 @@
     "cardYearlyUnit": "/سنة",
     "saleBadge": "للبيع",
     "units": "كم وحدة متاحة؟",
+    "unitsRequest": "كم وحدة تحتاج؟",
     "neededDate": "متى تحتاج هذه المعدات؟",
     "neededDatePlaceholder": "اختر التاريخ والوقت",
     "listedUntil": "إلى متى يبقى هذا الإعلان مفتوحاً؟",
