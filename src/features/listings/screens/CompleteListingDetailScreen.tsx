@@ -1848,7 +1848,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }
           unitsLabel={
             category === 'equipment' && !isAuction
-              ? t('equipmentListing.unitsLeft', { count: unitsLeft })
+              ? equipmentListing?.postedAs === 'buyer'
+                ? `${t('equipmentListing.requiredUnits')}: ${unitsLeft}`
+                : `${t('equipmentListing.availableUnits')}: ${unitsLeft}`
               : undefined
           }
           unitPricePlaceholder={

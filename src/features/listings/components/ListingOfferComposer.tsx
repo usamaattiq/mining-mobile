@@ -22,6 +22,7 @@ export function ListingOfferComposer({
   offerSentAt,
   offerUnitsLabel,
   offerUnits,
+  unitsLabel,
   maxUnits,
   unitPricePlaceholder,
   hasOffer,
@@ -302,6 +303,11 @@ export function ListingOfferComposer({
                 </View>
               </View>
             ) : null}
+            {unitsLabel && maxUnits != null ? (
+              <AppText weight="semibold" style={styles.unitsCaption}>
+                {unitsLabel}
+              </AppText>
+            ) : null}
             <View style={styles.row}>
               {maxUnits != null ? (
                 <View style={styles.unitsWrapInline}>
@@ -435,6 +441,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  unitsCaption: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: palette.charcoal,
   },
   unitsWrapInline: {
     width: 128,
