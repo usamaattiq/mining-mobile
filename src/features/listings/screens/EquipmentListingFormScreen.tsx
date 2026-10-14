@@ -782,6 +782,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 26,
     color: palette.charcoal,
+    marginBottom: spacing.sm,
   },
   choiceRow: {
     flexDirection: 'row',
