@@ -134,7 +134,7 @@ export function ListingOffersPanel({
                   <View style={[styles.logo, compact && styles.logoCompact]}>
                     <Ionicons
                       name={placeholderIcon}
-                      size={compact ? 16 : 22}
+                      size={compact ? 18 : 22}
                       color={palette.goldDark}
                     />
                   </View>
@@ -162,7 +162,7 @@ export function ListingOffersPanel({
                   </AppText>
                 ) : null}
                 {compact && isLeader ? (
-                  <Ionicons name="trophy" size={16} color={palette.gold} />
+                  <Ionicons name="trophy" size={18} color={palette.gold} />
                 ) : null}
                 {compact ? null : (
                 <View style={styles.badges}>
@@ -327,12 +327,12 @@ const styles = StyleSheet.create({
   },
   cardCompact: {
     position: 'relative',
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    gap: 2,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    gap: 4,
   },
   cardLeader: {
-    paddingTop: spacing.sm,
+    paddingTop: 12,
   },
   row: {
     flexDirection: 'row',
@@ -348,8 +348,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoCompact: {
-    width: 28,
-    height: 28,
+    width: 34,
+    height: 34,
   },
   badges: {
     flexDirection: 'row',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     color: palette.charcoal,
   },
   priceInline: {
-    fontSize: 13,
+    fontSize: 15,
     color: palette.charcoal,
   },
   actions: {
