@@ -712,6 +712,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   label={t('goldListing.auctionDuration')}
                   value={durationHours}
                   onChange={setDurationHours}
+                  allowOneMinute
                 />
               </>
             ) : null}

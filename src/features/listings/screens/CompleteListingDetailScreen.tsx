@@ -81,6 +81,49 @@ function formatListingDate(locale: string, epoch: number | null | undefined): st
   }).format(new Date(epoch));
 }
 
+function AuctionPriceCard({
+  currencyCode,
+  startingPrice,
+  highestBid,
+  startingLabel,
+  highestLabel,
+}: {
+  currencyCode: string;
+  startingPrice?: string;
+  highestBid?: string;
+  startingLabel: string;
+  highestLabel: string;
+}): React.ReactElement | null {
+  if (!startingPrice && !highestBid) return null;
+  return (
+    <View style={styles.unitPriceCard}>
+      {startingPrice ? (
+        <View style={styles.unitPriceCell}>
+          <View style={styles.unitPriceHeading}>
+            <Ionicons name="diamond-outline" size={18} color={palette.charcoal} />
+            <AppText style={styles.unitPriceCaption}>{startingLabel}</AppText>
+          </View>
+          <AppText weight="bold" style={styles.unitPriceAmount}>
+            {currencyCode} {formatAmountWithCommas(startingPrice)}
+          </AppText>
+        </View>
+      ) : null}
+      {startingPrice && highestBid ? <View style={styles.unitPriceDivider} /> : null}
+      {highestBid ? (
+        <View style={styles.unitPriceCell}>
+          <View style={styles.unitPriceHeading}>
+            <Ionicons name="trophy-outline" size={18} color={palette.charcoal} />
+            <AppText style={styles.unitPriceCaption}>{highestLabel}</AppText>
+          </View>
+          <AppText weight="bold" style={styles.unitPriceAmount}>
+            {currencyCode} {formatAmountWithCommas(highestBid)}
+          </AppText>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 /** Published-listing detail screen shared by equipment, service and gold auction listings. */
 export function CompleteListingDetailScreen({ navigation, route }: Props): React.ReactElement {
   const { id, category } = route.params;
@@ -202,6 +245,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const countdownEnd =
     (equipmentListing ?? serviceListing ?? goldListing)?.rfq?.expiresAt ??
     goldListing?.auctionEndDate ??
+    (equipmentListing?.requestMode === 'auction' ? equipmentListing.auctionEndDate : null) ??
     null;
   const timeLeft = useCountdown(countdownEnd, t('rfq.status.endingSoon'));
 
@@ -257,6 +301,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   let extraSection: React.ReactNode = null;
 
   if (category === 'equipment' && equipmentListing) {
+    const isEquipmentAuction =
+      equipmentListing.postedAs === 'buyer' && equipmentListing.requestMode === 'auction';
     const offersRent = equipmentListing.mode === 'rent' || equipmentListing.mode === 'both';
     const offersSell = equipmentListing.mode === 'sell' || equipmentListing.mode === 'both';
     title = equipmentListing.title;
@@ -266,7 +312,28 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     const ownerCanEditUnits =
       equipmentListing.postedAs === 'supplier' &&
       Boolean(profileId && (equipmentListing.ownerId ?? equipmentListing.owner?.id) === profileId);
-    detailRows = [
+    detailRows = isEquipmentAuction
+      ? [
+          { label: t('common.reference'), value: equipmentListing.reference ?? '' },
+          {
+            label: t('equipmentListing.equipmentType'),
+            value: catalogLabel('equipment', equipmentListing.equipmentTypeLabel),
+          },
+          {
+            label: t('equipmentListing.units'),
+            value: String(equipmentListing.units),
+          },
+          {
+            label: t('goldListing.auctionEndDate'),
+            value: formatListingDate(
+              currentLanguage,
+              equipmentListing.auctionEndDate ??
+                equipmentListing.rfq?.expiresAt ??
+                equipmentListing.createdAt,
+            ),
+          },
+        ].filter((row) => (row.value ?? '').trim().length > 0)
+      : [
       { label: t('common.reference'), value: equipmentListing.reference ?? '' },
       {
         label: t('equipmentListing.equipmentType'),
@@ -303,12 +370,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         : [
             {
               label: t('equipmentListing.listedUntilRequest'),
-              value: formatListingDate(
-                currentLanguage,
-                equipmentListing.requestMode === 'auction'
-                  ? (equipmentListing.auctionEndDate ?? equipmentListing.rfq?.expiresAt)
-                  : equipmentListing.rfq?.expiresAt,
-              ),
+              value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
             },
           ]),
     ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -367,7 +429,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     const activeDuration =
       durationOptions.find((option) => option.key === selectedDuration) ?? durationOptions[0];
 
-    if (offersSell && equipmentListing.salePrice && activeDuration) {
+    if (!isEquipmentAuction && offersSell && equipmentListing.salePrice && activeDuration) {
       detailRows.push({
         label: t('equipmentListing.salePrice'),
         value: `${currency.code} ${formatAmountWithCommas(equipmentListing.salePrice)}`,
@@ -386,8 +448,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               : '';
     const showSalePrice = offersSell && Boolean(equipmentListing.salePrice);
     const showRentPrice = Boolean(activeDuration);
-    unitPriceCard =
-      equipmentListing.postedAs === 'buyer' || (!showSalePrice && !showRentPrice) ? null : (
+    if (isEquipmentAuction) {
+      unitPriceCard = (
+        <AuctionPriceCard
+          currencyCode={currency.code}
+          highestBid={equipmentListing.rfq?.currentPrice}
+          startingLabel={t('goldListing.startingPrice')}
+          highestLabel={t('goldListing.highestBid')}
+        />
+      );
+    } else {
+      unitPriceCard =
+        equipmentListing.postedAs === 'buyer' || (!showSalePrice && !showRentPrice) ? null : (
         <View style={styles.unitPriceCard}>
           {showSalePrice ? (
             <View style={styles.unitPriceCell}>
@@ -433,6 +505,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           ) : null}
         </View>
       );
+    }
   } else if (category === 'services' && serviceListing) {
     title = serviceListing.title;
     media = serviceListing.media;
@@ -537,35 +610,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
-    const highestBid = goldListing.rfq?.currentPrice;
     unitPriceCard =
-      (goldListing.postedAs === 'buyer' || !goldListing.price) && !highestBid ? null : (
-        <View style={styles.unitPriceCard}>
-          {goldListing.price ? (
-            <View style={styles.unitPriceCell}>
-              <View style={styles.unitPriceHeading}>
-                <Ionicons name="diamond-outline" size={18} color={palette.charcoal} />
-                <AppText style={styles.unitPriceCaption}>{t('goldListing.startingPrice')}</AppText>
-              </View>
-              <AppText weight="bold" style={styles.unitPriceAmount}>
-                {currency.code} {formatAmountWithCommas(goldListing.price)}
-              </AppText>
-            </View>
-          ) : null}
-          {goldListing.price && highestBid ? <View style={styles.unitPriceDivider} /> : null}
-          {highestBid ? (
-            <View style={styles.unitPriceCell}>
-              <View style={styles.unitPriceHeading}>
-                <Ionicons name="trophy-outline" size={18} color={palette.charcoal} />
-                <AppText style={styles.unitPriceCaption}>{t('goldListing.highestBid')}</AppText>
-              </View>
-              <AppText weight="bold" style={styles.unitPriceAmount}>
-                {currency.code} {formatAmountWithCommas(highestBid)}
-              </AppText>
-            </View>
-          ) : null}
-        </View>
-      );
+      (goldListing.postedAs === 'buyer' || !goldListing.price) && !goldListing.rfq?.currentPrice
+        ? null
+        : (
+            <AuctionPriceCard
+              currencyCode={currency.code}
+              startingPrice={goldListing.price || undefined}
+              highestBid={goldListing.rfq?.currentPrice}
+              startingLabel={t('goldListing.startingPrice')}
+              highestLabel={t('goldListing.highestBid')}
+            />
+          );
 
     extraSection = <AttachmentsSection documents={documents} />;
   }
@@ -615,7 +671,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     !isAdmin && !isOwner && category === 'equipment' && equipmentListing?.postedAs === 'supplier';
   const supplierServiceSender =
     !isAdmin && !isOwner && category === 'services' && serviceListing?.postedAs === 'supplier';
-  const respondingToBuyer = !isAdmin && !isOwner && postedAs === 'buyer' && Boolean(rfq?.myOfferId);
+  const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
+  const respondingToBuyer =
+    !isAdmin && !isOwner && postedAs === 'buyer' && !isAuction && Boolean(rfq?.myOfferId);
   const showMyOfferCards = supplierBuyer || supplierServiceSender || respondingToBuyer;
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
@@ -638,7 +696,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   // Block the other rent/sale offer until this one is accepted (confirmed).
   // Set to false to allow both kinds again while one is still open.
   const limitToOneOpenOffer = true;
-  const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
   const hasOpenSupplierOffer =
     limitToOneOpenOffer &&
     !isAuction &&
@@ -650,7 +707,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     (supplierBuyer
       ? unitsLeft > 0 && rfq?.canSubmitOffer !== false && !hasOpenSupplierOffer
       : !awaitingConfirm &&
-        (canOffer || (category === 'gold' && hasSentOffer && rfq?.status === 'live')));
+        (canOffer || (isAuction && hasSentOffer && rfq?.status === 'live')));
   const canWithdraw =
     !isAdmin &&
     !awaitingConfirm &&
@@ -706,7 +763,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       .submitOffer(
         id,
         price,
-        category === 'equipment' ? units : undefined,
+        category === 'equipment' && !isAuction ? units : undefined,
         fulfillment,
         delivery,
         category === 'equipment' && equipmentListing?.postedAs === 'supplier' ? handover : undefined,
@@ -764,7 +821,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         .finally(() => setActingOfferId(null));
     };
 
-    if (action === 'accept' && category === 'gold' && !alreadyConfirmed) {
+    if (action === 'accept' && isAuction && !alreadyConfirmed) {
       showAppAlert(t('goldListing.sendConfirmationTitle'), undefined, [
         { text: t('common.cancel'), style: 'cancel' },
         { text: t('common.confirm'), onPress: run },
@@ -942,7 +999,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         <View
           style={[
             styles.content,
-            category === 'gold' && !isOwner && showOfferInput ? styles.contentAboveBidBar : null,
+            isAuction && !isOwner && showOfferInput ? styles.contentAboveBidBar : null,
           ]}
         >
           <View style={styles.headerBlock}>
@@ -1083,7 +1140,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               actingOfferId={actingOfferId}
               canDecideOffers={!isAdmin && rfq?.canDecideOffers !== false}
               rfqStatus={rfq?.status}
-              showUnits={category === 'equipment'}
+              showUnits={category === 'equipment' && !isAuction}
               placeholderIcon={
                 category === 'gold'
                   ? 'diamond-outline'
@@ -1091,7 +1148,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     ? 'construct-outline'
                     : undefined
               }
-              showLeader={category === 'gold' || equipmentListing?.requestMode === 'auction'}
+              showLeader={isAuction}
               onAccept={(offerId) => handleDecideOffer(offerId, 'accept')}
               onReject={(offerId) => handleDecideOffer(offerId, 'reject')}
               onPressResponder={
@@ -1118,7 +1175,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
               }
               confirmationOfferId={
-                category === 'gold' && isOwner && rfq?.canDecideOffers
+                isAuction && isOwner && rfq?.canDecideOffers
                   ? (rfq.offers ?? []).find((offer) => offer.status === 'active')?.id
                   : undefined
               }
@@ -1132,7 +1189,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               actingOfferId={null}
               canDecideOffers={false}
               rfqStatus={rfq?.status}
-              showUnits={category === 'equipment'}
+              showUnits={category === 'equipment' && !isAuction}
               placeholderIcon={
                 category === 'gold' ? 'diamond-outline' : 'construct-outline'
               }
@@ -1639,7 +1696,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         <ListingOfferComposer
           currencyCode={currency.code}
           placeholder={
-            category === 'gold' && hasSentOffer
+            isAuction && hasSentOffer
               ? t('rfq.updateOfferAmountPlaceholder')
               : t('rfq.offerAmountPlaceholder')
           }
@@ -1653,7 +1710,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                   ? t('rfq.offerStatus.declined')
                   : rfq?.myOfferStatus === 'timed_out' || rfq?.status === 'timed-out'
                     ? t('rfq.offerStatus.timedOut')
-                    : category === 'gold'
+                    : isAuction
                       ? t('rfq.yourOffer')
                       : t('rfq.offerSubmitted')
           }
@@ -1661,21 +1718,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           declineLabel={t('rfq.decline')}
           offerPrice={rfq?.myOfferPrice}
           offerSentAt={rfq?.myOfferCreatedAt}
-          offerUnits={category === 'equipment' ? rfq?.myOfferQuantity : undefined}
+          offerUnits={category === 'equipment' && !isAuction ? rfq?.myOfferQuantity : undefined}
           offerUnitsLabel={
-            category === 'equipment' && rfq?.myOfferQuantity
+            category === 'equipment' && !isAuction && rfq?.myOfferQuantity
               ? t('equipmentListing.unitsCount', { count: rfq.myOfferQuantity })
               : undefined
           }
           unitsLabel={
-            category === 'equipment'
+            category === 'equipment' && !isAuction
               ? t('equipmentListing.unitsLeft', { count: unitsLeft })
               : undefined
           }
           unitPricePlaceholder={
-            category === 'equipment' ? t('rfq.unitPriceAmountPlaceholder') : undefined
+            category === 'equipment' && !isAuction ? t('rfq.unitPriceAmountPlaceholder') : undefined
           }
-          maxUnits={category === 'equipment' ? Math.max(unitsLeft, 0) : undefined}
+          maxUnits={category === 'equipment' && !isAuction ? Math.max(unitsLeft, 0) : undefined}
           offerTypeLabel={
             (category === 'equipment' && equipmentListing?.postedAs === 'supplier') ||
             (category === 'services' && serviceListing?.serviceType === 'both')
@@ -1734,7 +1791,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 : undefined
           }
           hasOffer={!showMyOfferCards && hasSentOffer}
-          leading={category === 'gold' && Boolean(rfq?.isLeading)}
+          leading={isAuction && Boolean(rfq?.isLeading)}
           showInput={showOfferInput}
           awaitingConfirm={!showMyOfferCards && awaitingConfirm}
           sendInline={supplierBuyer}
