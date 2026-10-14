@@ -332,21 +332,26 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         {step === 0 ? (
           <View style={styles.stepBlock}>
             <AppText weight="bold" style={styles.offerHeading}>
-              {t('serviceListing.offerHeading')}
+              {t(
+                isBuyer ? 'serviceListing.offerHeadingRequest' : 'serviceListing.offerHeading',
+              )}
             </AppText>
-            <AppText style={styles.offerHint}>{t('serviceListing.offerHint')}</AppText>
             <OfferChoiceCard
               selected={onsite}
               icon="location-outline"
               title={t('serviceListing.onsite')}
-              subtitle={t(isBuyer ? 'serviceListing.onsiteRequestSubtitle' : 'serviceListing.onsiteSubtitle')}
+              subtitle={t(
+                isBuyer ? 'serviceListing.onsiteRequestSubtitle' : 'serviceListing.onsiteSubtitle',
+              )}
               onPress={() => setOnsite((value) => !value)}
             />
             <OfferChoiceCard
               selected={online}
               icon="globe-outline"
               title={t('serviceListing.online')}
-              subtitle={t(isBuyer ? 'serviceListing.onlineRequestSubtitle' : 'serviceListing.onlineSubtitle')}
+              subtitle={t(
+                isBuyer ? 'serviceListing.onlineRequestSubtitle' : 'serviceListing.onlineSubtitle',
+              )}
               onPress={() => setOnline((value) => !value)}
             />
           </View>
@@ -527,15 +532,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   offerHeading: {
-    fontSize: 24,
-    lineHeight: 30,
+    fontSize: 20,
+    lineHeight: 26,
     color: palette.charcoal,
-  },
-  offerHint: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: palette.charcoal,
-    marginTop: -spacing.xs,
   },
   choiceRow: {
     flexDirection: 'row',

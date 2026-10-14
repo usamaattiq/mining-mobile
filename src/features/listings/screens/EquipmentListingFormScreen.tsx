@@ -472,9 +472,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         {step === 0 ? (
           <View style={styles.stepBlock}>
             <AppText weight="bold" style={styles.offerHeading}>
-              {t('equipmentListing.offerHeading')}
+              {t(
+                isBuyer
+                  ? 'equipmentListing.offerHeadingRequest'
+                  : 'equipmentListing.offerHeading',
+              )}
             </AppText>
-            <AppText style={styles.offerHint}>{t('equipmentListing.offerHint')}</AppText>
             <OfferChoiceCard
               selected={offerRent}
               icon="key-outline"
@@ -776,15 +779,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   offerHeading: {
-    fontSize: 24,
-    lineHeight: 30,
+    fontSize: 20,
+    lineHeight: 26,
     color: palette.charcoal,
-  },
-  offerHint: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: palette.charcoal,
-    marginTop: -spacing.xs,
   },
   choiceRow: {
     flexDirection: 'row',
