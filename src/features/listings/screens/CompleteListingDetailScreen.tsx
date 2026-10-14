@@ -259,6 +259,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [editOfferUnits, setEditOfferUnits] = React.useState(1);
   const [editOfferKind, setEditOfferKind] = React.useState<'rent' | 'sale'>('rent');
   const [editOfferHandover, setEditOfferHandover] = React.useState<'pickup' | 'delivery'>('pickup');
+  const [editOfferDelivery, setEditOfferDelivery] = React.useState<'onsite' | 'online'>('onsite');
   const countdownEnd =
     (equipmentListing ?? serviceListing ?? goldListing)?.rfq?.expiresAt ??
     goldListing?.auctionEndDate ??
@@ -706,23 +707,28 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     !isAdmin && !isOwner && category === 'services' && serviceListing?.postedAs === 'supplier';
   const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
   const respondingToBuyer =
-    !isAdmin && !isOwner && postedAs === 'buyer' && !isAuction && Boolean(rfq?.myOfferId);
+    !isAdmin &&
+    !isOwner &&
+    postedAs === 'buyer' &&
+    !isAuction &&
+    (Boolean(rfq?.myOfferId) || (category === 'services' && hasSentOffer));
+  const editingBuyerServiceOffer = respondingToBuyer && category === 'services';
   const showMyOfferCards = supplierBuyer || supplierServiceSender || respondingToBuyer;
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
-    : (supplierServiceSender || respondingToBuyer) && rfq?.myOfferId
+    : (supplierServiceSender || respondingToBuyer) && (rfq?.myOfferId || hasSentOffer)
       ? [
           {
-            id: rfq.myOfferId,
+            id: rfq?.myOfferId ?? 'mine',
             responderId: profileId ?? '',
             responderName: '',
-            status: rfq.myOfferStatus ?? 'active',
-            price: rfq.myOfferPrice,
-            quantity: rfq.myOfferQuantity,
-            kind: rfq.myOfferKind,
-            handover: rfq.myOfferHandover,
-            delivery: rfq.myOfferDelivery,
-            createdAt: rfq.myOfferCreatedAt,
+            status: rfq?.myOfferStatus ?? 'active',
+            price: rfq?.myOfferPrice,
+            quantity: rfq?.myOfferQuantity,
+            kind: rfq?.myOfferKind,
+            handover: rfq?.myOfferHandover,
+            delivery: rfq?.myOfferDelivery,
+            createdAt: rfq?.myOfferCreatedAt,
           },
         ]
       : [];
@@ -739,7 +745,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     !isAdmin &&
     (supplierBuyer
       ? unitsLeft > 0 && rfq?.canSubmitOffer !== false && !hasOpenSupplierOffer
-      : !awaitingConfirm &&
+      : !editingBuyerServiceOffer &&
+        !awaitingConfirm &&
         (canOffer || (isAuction && hasSentOffer && rfq?.status === 'live')));
   const canWithdraw =
     !isAdmin &&
@@ -954,6 +961,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     quantity?: number | null;
     kind?: 'rent' | 'sale';
     handover?: 'pickup' | 'delivery';
+    delivery?: 'onsite' | 'online';
   }) => {
     const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : 1;
     const total = Number(offer.price);
@@ -964,6 +972,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     setEditOfferPrice(unitPrice === '' ? '' : String(unitPrice));
     setEditOfferKind(offer.kind === 'sale' ? 'sale' : 'rent');
     setEditOfferHandover(offer.handover === 'delivery' ? 'delivery' : 'pickup');
+    setEditOfferDelivery(offer.delivery === 'online' ? 'online' : 'onsite');
   };
 
   const handleSaveOffer = (offerId: string) => {
@@ -980,9 +989,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               id,
               offerId,
               price,
-              editOfferUnits,
+              category === 'services' ? undefined : editOfferUnits,
               equipmentListing?.mode === 'both' ? editOfferKind : undefined,
-              equipmentListing?.deliveryAvailable ? editOfferHandover : 'pickup',
+              category === 'services'
+                ? undefined
+                : equipmentListing?.deliveryAvailable
+                  ? editOfferHandover
+                  : 'pickup',
+              category === 'services' && serviceListing?.serviceType === 'both'
+                ? editOfferDelivery
+                : undefined,
             )
             .then((listing) => {
               applyListing(listing);
@@ -1339,7 +1355,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       ) : null}
                     </View>
                   ) : null}
-                  {supplierBuyer && offer.status === 'active' && editingOfferId === offer.id ? (
+                  {(supplierBuyer || editingBuyerServiceOffer) &&
+                  offer.status === 'active' &&
+                  editingOfferId === offer.id ? (
                     <View style={styles.myOfferEdit}>
                       {equipmentListing?.mode === 'both' ? (
                         <View style={styles.editChoiceRow}>
@@ -1361,6 +1379,32 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                   {kind === 'rent'
                                     ? t('equipmentListing.rent')
                                     : t('equipmentListing.buy')}
+                                </AppText>
+                              </Pressable>
+                            );
+                          })}
+                        </View>
+                      ) : null}
+                      {editingBuyerServiceOffer && serviceListing?.serviceType === 'both' ? (
+                        <View style={styles.editChoiceRow}>
+                          {(['onsite', 'online'] as const).map((mode) => {
+                            const selected = editOfferDelivery === mode;
+                            return (
+                              <Pressable
+                                key={mode}
+                                onPress={() => setEditOfferDelivery(mode)}
+                                style={[styles.editChoice, selected && styles.editChoiceSelected]}
+                              >
+                                <AppText
+                                  weight="semibold"
+                                  style={[
+                                    styles.editChoiceLabel,
+                                    selected && styles.editChoiceLabelSelected,
+                                  ]}
+                                >
+                                  {mode === 'onsite'
+                                    ? t('serviceListing.onsite')
+                                    : t('serviceListing.online')}
                                 </AppText>
                               </Pressable>
                             );
@@ -1409,18 +1453,24 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           value={editOfferPrice}
                           onChangeText={setEditOfferPrice}
                           keyboardType="decimal-pad"
-                          placeholder={t('rfq.unitPriceAmountPlaceholder')}
+                          placeholder={
+                            editingBuyerServiceOffer
+                              ? t('rfq.offerAmountPlaceholder')
+                              : t('rfq.unitPriceAmountPlaceholder')
+                          }
                           placeholderTextColor={palette.muted}
                           style={styles.myOfferPriceInput}
                         />
                       </View>
-                      <CounterField
-                        label={t('rfq.unitsLabel')}
-                        value={editOfferUnits}
-                        min={1}
-                        max={Math.max(unitsLeft, offer.quantity ?? 1)}
-                        onChange={setEditOfferUnits}
-                      />
+                      {editingBuyerServiceOffer ? null : (
+                        <CounterField
+                          label={t('rfq.unitsLabel')}
+                          value={editOfferUnits}
+                          min={1}
+                          max={Math.max(unitsLeft, offer.quantity ?? 1)}
+                          onChange={setEditOfferUnits}
+                        />
+                      )}
                       <View style={styles.myOfferActions}>
                         <Button
                           label={t('common.cancel')}
@@ -1446,7 +1496,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     </View>
                   ) : null}
-                  {supplierBuyer && offer.status === 'active' && editingOfferId !== offer.id ? (
+                  {(supplierBuyer || editingBuyerServiceOffer) &&
+                  offer.status === 'active' &&
+                  editingOfferId !== offer.id ? (
                     <View style={styles.myOfferActions}>
                       <Button
                         label={t('rfq.update')}
@@ -1462,7 +1514,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       />
                     </View>
                   ) : null}
-                  {(supplierServiceSender || respondingToBuyer) && offer.status === 'active' ? (
+                  {(supplierServiceSender || (respondingToBuyer && !editingBuyerServiceOffer)) &&
+                  offer.status === 'active' ? (
                     <View style={styles.myOfferActions}>
                       <Button
                         label={t('rfq.withdraw')}
@@ -1733,7 +1786,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </Pressable>
       ) : null}
 
-      {canWithdraw && !supplierBuyer ? (
+      {canWithdraw && !supplierBuyer && !editingBuyerServiceOffer ? (
         <Pressable
           onPress={() => handleResponderOffer('withdraw')}
           disabled={offerSubmitting}

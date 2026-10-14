@@ -148,17 +148,19 @@ export const listingsApi = {
     id: string,
     offerId: string,
     price: string,
-    units: number,
+    units?: number,
     fulfillment?: 'rent' | 'sale',
     handover?: 'pickup' | 'delivery',
+    delivery?: 'onsite' | 'online',
   ): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers/${offerId}`, {
       method: 'PATCH',
       body: {
         price,
-        units,
+        ...(units != null ? { units } : {}),
         ...(fulfillment ? { fulfillment } : {}),
         ...(handover ? { handover } : {}),
+        ...(delivery ? { delivery } : {}),
       },
     });
   },
