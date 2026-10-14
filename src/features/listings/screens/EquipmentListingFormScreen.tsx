@@ -480,13 +480,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                   : 'equipmentListing.editFormTitle',
               )
             : isBuyer
-              ? mode === 'sell'
-                ? t('equipmentListing.buyRequestFormTitle')
-                : mode === 'both'
-                  ? t('equipmentListing.bothRequestFormTitle')
-                  : mode === 'rent'
-                    ? t('equipmentListing.rentRequestFormTitle')
-                    : t('equipmentListing.requestModeTitle')
+              ? t('equipmentListing.requestModeTitle')
               : mode === 'sell'
                 ? t('equipmentListing.sellFormTitle')
                 : mode === 'both'

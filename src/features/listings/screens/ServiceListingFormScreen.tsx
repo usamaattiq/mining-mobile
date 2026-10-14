@@ -331,13 +331,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
           editingId
             ? t(isBuyer ? 'serviceListing.editRequestFormTitle' : 'serviceListing.editFormTitle')
             : isBuyer
-              ? onsite && online
-                ? t('serviceListing.bothRequestFormTitle')
-                : onsite
-                  ? t('serviceListing.onsiteRequestFormTitle')
-                  : online
-                    ? t('serviceListing.onlineRequestFormTitle')
-                    : t('serviceListing.requestFormTitle')
+              ? t('serviceListing.requestFormTitle')
               : t('serviceListing.formTitle')
         }
         onBackPress={handleBack}
