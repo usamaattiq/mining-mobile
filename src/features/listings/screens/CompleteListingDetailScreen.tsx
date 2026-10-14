@@ -683,20 +683,23 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const postedAs = equipmentListing?.postedAs ?? serviceListing?.postedAs ?? goldListing?.postedAs;
   const rfq = equipmentListing?.rfq ?? serviceListing?.rfq ?? goldListing?.rfq;
   const hasSentOffer =
-    Boolean(
-      rfq?.myOfferStatus &&
-        ['active', 'selected', 'confirmed', 'declined', 'timed_out'].includes(rfq.myOfferStatus),
-    ) ||
-    rfq?.status === 'offer-submitted' ||
-    rfq?.status === 'declined' ||
-    rfq?.status === 'timed-out';
+    rfq?.myOfferStatus === 'withdrawn'
+      ? false
+      : Boolean(
+          rfq?.myOfferStatus &&
+            ['active', 'selected', 'confirmed', 'declined', 'timed_out'].includes(rfq.myOfferStatus),
+        ) ||
+        rfq?.status === 'offer-submitted' ||
+        rfq?.status === 'declined' ||
+        rfq?.status === 'timed-out';
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
   const canEditListing = isOwner && !listingIsEngaged(rfq);
   const canOffer =
     !isAdmin &&
     Boolean(rfq) &&
     !isOwner &&
-    (rfq?.canSubmitOffer ?? (!hasSentOffer && Boolean(postedAs)));
+    (rfq?.myOfferStatus === 'withdrawn' ||
+      (rfq?.canSubmitOffer ?? (!hasSentOffer && Boolean(postedAs))));
   const awaitingConfirm =
     rfq?.myOfferStatus === 'selected' ||
     rfq?.status === 'awaiting-your-confirmation' ||
@@ -711,7 +714,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     !isOwner &&
     postedAs === 'buyer' &&
     !isAuction &&
-    (Boolean(rfq?.myOfferId) || (category === 'services' && hasSentOffer));
+    hasSentOffer &&
+    (category === 'services' || Boolean(rfq?.myOfferId));
   const editingBuyerServiceOffer = respondingToBuyer && category === 'services';
   const showMyOfferCards = supplierBuyer || supplierServiceSender || respondingToBuyer;
   const mySupplierOffers = supplierBuyer
