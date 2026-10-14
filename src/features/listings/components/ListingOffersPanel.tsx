@@ -98,6 +98,16 @@ export function ListingOffersPanel({
     return rank(left.status) - rank(right.status);
   });
   const requestIsLive = (rfqStatus ?? 'live') === 'live';
+  const currentOfferId =
+    orderedOffers.find((offer) => offer.status === 'selected')?.id ??
+    orderedOffers.find((offer) => offer.status === 'confirmed')?.id ??
+    orderedOffers.find(
+      (offer) =>
+        offer.rank === 1 &&
+        offer.status !== 'declined' &&
+        offer.status !== 'timed_out' &&
+        offer.status !== 'withdrawn',
+    )?.id;
 
   return (
     <View style={[styles.root, compact && styles.rootCompact]}>
@@ -111,12 +121,7 @@ export function ListingOffersPanel({
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
           const canDecide = requestIsLive && canDecideOffers && offer.status === 'active';
           const busy = actingOfferId === offer.id;
-          const isLeader =
-            showLeader &&
-            offer.rank === 1 &&
-            offer.status !== 'declined' &&
-            offer.status !== 'timed_out' &&
-            offer.status !== 'withdrawn';
+          const isLeader = showLeader && offer.id === currentOfferId;
           const totalAmount = parsePositiveAmount(offer.price);
           const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : null;
           const unitAmount =
