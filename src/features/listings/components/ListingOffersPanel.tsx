@@ -151,7 +151,9 @@ export function ListingOffersPanel({
                 >
                   <AppText weight="semibold" style={styles.name} numberOfLines={compact ? 2 : 1}>
                     {displayOfferName(
-                      offer.responderName,
+                      offer.responderId === contactResponderId && senderName
+                        ? offer.responderName.trim() || senderName
+                        : offer.responderName,
                       offer.status,
                       t('messages.fallbackName'),
                       maskNames && offer.responderId !== contactResponderId,

@@ -1131,6 +1131,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               showLeader
               compact
               title={t('rfq.leaderboardTitle')}
+              contactResponderId={profileId}
+              senderName={senderName}
               onAccept={() => undefined}
               onReject={() => undefined}
             />
