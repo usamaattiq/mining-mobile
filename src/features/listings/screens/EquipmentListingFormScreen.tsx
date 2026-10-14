@@ -283,7 +283,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     if (isBuyer && requestMode === 'rfq' && listedUntil.getTime() <= Date.now()) {
       const keptOriginal = originalListedUntil.current === listedUntil.getTime();
       if (!keptOriginal) {
-        showAppAlert(t('common.error'), t('equipmentListing.listedUntilPast'));
+        showAppAlert(t('common.error'), t('equipmentListing.listedUntilPastRequest'));
         return;
       }
     }
@@ -414,7 +414,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     ...(isBuyer && requestMode === 'rfq'
       ? [
           {
-            label: t('equipmentListing.listedUntil'),
+            label: t('equipmentListing.listedUntilRequest'),
             value: new Intl.DateTimeFormat(currentLanguage, {
               dateStyle: 'medium',
               timeStyle: 'short',
@@ -690,7 +690,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             />
             {isBuyer && requestMode === 'rfq' ? (
               <DateTimeField
-                label={t('equipmentListing.listedUntil')}
+                label={t('equipmentListing.listedUntilRequest')}
                 value={listedUntil}
                 required
                 minimumDate={new Date()}

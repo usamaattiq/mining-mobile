@@ -135,7 +135,12 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
           onRetry={retry}
         />
       ) : cards.length === 0 ? (
-        <EmptyState title={t('offers.emptyTitle')} subtitle={t('offers.emptySubtitle')} />
+        <EmptyState
+          title={t('offers.emptyTitle')}
+          subtitle={t(
+            role === 'buyer' ? 'offers.emptySubtitle' : 'offers.emptySubtitleSupplier',
+          )}
+        />
       ) : (
         cards.map(({ id, ...card }) => <ListingCard key={`${category}-${id}`} {...card} />)
       )}

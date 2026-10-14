@@ -241,6 +241,8 @@
     "listingTitle": "Congratulations",
     "listingSubtitle": "Your listing is live.",
     "listingContinue": "View Listing",
+    "requestSubtitle": "Your request is live.",
+    "requestContinue": "View Request",
     "logout": "Log out",
     "logoutConfirmTitle": "Log out?",
     "logoutConfirmMessage": "You'll need to verify your phone number or enter your MPIN to log back in."
@@ -301,14 +303,18 @@
     "categoryGold": "Gold",
     "emptyTitle": "List will show here",
     "emptySubtitle": "Your listings will show up in this space.",
+    "emptySubtitleRequest": "Your requests will show up in this space.",
     "emptyLiveTitle": "List will show here",
     "emptyLiveSubtitle": "Active listings will show up in this space.",
+    "emptyLiveSubtitleRequest": "Active requests will show up in this space.",
     "emptyPastTitle": "List will show here",
     "emptyPastSubtitle": "Closed, completed, and expired listings will show up in this space.",
+    "emptyPastSubtitleRequest": "Closed, completed, and expired requests will show up in this space.",
     "filterAll": "All",
     "filterLive": "Live",
     "filterPast": "Past",
     "notFound": "This listing is no longer available.",
+    "notFoundRequest": "This request is no longer available.",
     "repost": "Repost"
   },
   "listingDetail": {
@@ -383,12 +389,15 @@
     "auctionTitle": "New bid",
     "auctionBody": "Someone placed a bid on your auction.",
     "listingLiveTitle": "Your listing is live",
-    "listingLiveBody": "Buyers can see your listing now."
+    "listingLiveBody": "Buyers can see your listing now.",
+    "requestLiveTitle": "Your request is live",
+    "requestLiveBody": "Suppliers can see your request now."
   },
   "offers": {
     "title": "My offers",
     "emptyTitle": "Offers will appear here",
-    "emptySubtitle": "Listings you send an offer on will show up in this space."
+    "emptySubtitle": "Listings you send an offer on will show up in this space.",
+    "emptySubtitleSupplier": "Requests you send an offer on will show up in this space."
   },
   "messages": {
     "title": "Messages",
@@ -437,7 +446,7 @@
     "requestRfq": "RFQ",
     "requestRfqSubtitle": "Collect offers from suppliers",
     "requestAuction": "Auction",
-    "requestAuctionSubtitle": "Suppliers bid until the listing ends",
+    "requestAuctionSubtitle": "Suppliers bid until the request ends",
     "equipmentType": "Equipment Type",
     "fieldEquipmentType": "What kind of equipment is this?",
     "fieldEquipmentTypeRequest": "What kind of equipment do you need?",
@@ -493,8 +502,10 @@
     "neededDate": "When do you need this equipment?",
     "neededDatePlaceholder": "Select date & time",
     "listedUntil": "How long should this listing stay open?",
+    "listedUntilRequest": "How long should this request stay open?",
     "listedUntilPlaceholder": "Select date & time",
     "listedUntilPast": "Choose a listing end time in the future.",
+    "listedUntilPastRequest": "Choose a request end time in the future.",
     "location": "Location",
     "fieldLocation": "Where the equipment is located",
     "fieldLocationRequest": "Where do you need the equipment?",
@@ -506,6 +517,8 @@
     "viewUnitDetailsHint": "See rented and sold units",
     "deleteListingTitle": "Delete this listing?",
     "deleteListingMessage": "It will be removed from the marketplace.",
+    "deleteRequestTitle": "Delete this request?",
+    "deleteRequestMessage": "It will be removed from the marketplace.",
     "stockTitle": "Unit Details",
     "stockOverview": "Unit Overview",
     "stockSoldTab": "Sold Units ({count})",
@@ -628,8 +641,10 @@
     "onsitePrice": "Onsite price per project ({currency})",
     "onlinePrice": "Online price per project ({currency})",
     "listedUntil": "How long should this listing stay open?",
+    "listedUntilRequest": "How long should this request stay open?",
     "listedUntilPlaceholder": "Select date & time",
     "listedUntilPast": "Choose a listing end time in the future.",
+    "listedUntilPastRequest": "Choose a request end time in the future.",
     "serviceDate": "When do you need this service?",
     "dateTimeLabel": "Date/Time",
     "serviceDatePlaceholder": "Select date & time",
@@ -648,7 +663,9 @@
     "documentUploadError": "Couldn't upload this document. Please try again.",
     "document": "Document",
     "publish": "Publish listing",
-    "publishRequest": "Publish request"
+    "publishRequest": "Publish request",
+    "deleteRequestTitle": "Delete this request?",
+    "deleteRequestMessage": "It will be removed from the marketplace."
   },
   "goldListing": {
     "formTitle": "Auction Gold",

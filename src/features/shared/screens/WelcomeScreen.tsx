@@ -15,6 +15,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import { Confetti } from '@/features/auth/components/Confetti';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { palette, radius, spacing } from '@/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
@@ -24,6 +25,7 @@ const CONTINUE_DELAY_MS = 5000;
 export function WelcomeScreen({ navigation, route }: Props): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const isBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const [continuing, setContinuing] = React.useState(false);
   const progress = useSharedValue(0);
   const toListings = route.params?.next === 'listings';
@@ -96,11 +98,23 @@ export function WelcomeScreen({ navigation, route }: Props): React.ReactElement 
           {t(toListings ? 'welcome.listingTitle' : 'welcome.title')}
         </AppText>
         <AppText style={styles.subtitle}>
-          {t(toListings ? 'welcome.listingSubtitle' : 'welcome.subtitle')}
+          {t(
+            toListings
+              ? isBuyer
+                ? 'welcome.requestSubtitle'
+                : 'welcome.listingSubtitle'
+              : 'welcome.subtitle',
+          )}
         </AppText>
 
         <Button
-          label={t(toListings ? 'welcome.listingContinue' : 'welcome.continue')}
+          label={t(
+            toListings
+              ? isBuyer
+                ? 'welcome.requestContinue'
+                : 'welcome.listingContinue'
+              : 'welcome.continue',
+          )}
           onPress={handleContinue}
           disabled={continuing}
           size="lg"

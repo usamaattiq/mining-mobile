@@ -201,7 +201,10 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     if (listedUntil.getTime() <= Date.now()) {
       const keptOriginal = originalListedUntil.current === listedUntil.getTime();
       if (!keptOriginal) {
-        showAppAlert(t('common.error'), t('serviceListing.listedUntilPast'));
+        showAppAlert(
+          t('common.error'),
+          t(isBuyer ? 'serviceListing.listedUntilPastRequest' : 'serviceListing.listedUntilPast'),
+        );
         return;
       }
     }
@@ -307,7 +310,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       value: location,
     },
     {
-      label: t('serviceListing.listedUntil'),
+      label: t(isBuyer ? 'serviceListing.listedUntilRequest' : 'serviceListing.listedUntil'),
       value: new Intl.DateTimeFormat(currentLanguage, {
         dateStyle: 'medium',
         timeStyle: 'short',
@@ -498,7 +501,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <DateTimeField
-              label={t('serviceListing.listedUntil')}
+              label={t(
+                isBuyer ? 'serviceListing.listedUntilRequest' : 'serviceListing.listedUntil',
+              )}
               value={listedUntil}
               required
               minimumDate={new Date()}

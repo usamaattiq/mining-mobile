@@ -51,6 +51,7 @@ import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
+import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
@@ -92,6 +93,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const profileId = useProfileStore((state) => state.profile?.id);
   const senderName = useProfileStore((state) => state.profile?.fullName?.trim() ?? '');
   const isAdmin = useProfileStore((state) => state.profile?.accountType === 'admin');
+  const isBuyerRole = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const marketListing = useMarketListingsStore((state) =>
     state.listings.find((item) => item.id === id),
   );
@@ -220,7 +222,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       <StatusBar style="dark" />
       {backButton}
       <View style={styles.notFoundWrap}>
-        <AppText style={styles.notFound}>{t('requests.notFound')}</AppText>
+        <AppText style={styles.notFound}>
+          {t(isBuyerRole ? 'requests.notFoundRequest' : 'requests.notFound')}
+        </AppText>
       </View>
     </View>
   );
@@ -298,7 +302,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         ? []
         : [
             {
-              label: t('equipmentListing.listedUntil'),
+              label: t('equipmentListing.listedUntilRequest'),
               value: formatListingDate(
                 currentLanguage,
                 equipmentListing.requestMode === 'auction'
@@ -456,7 +460,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         value: serviceTypeLabels(t, serviceListing.serviceType).join(' / '),
       },
       {
-        label: t('serviceListing.listedUntil'),
+        label: t(
+          serviceListing.postedAs === 'buyer'
+            ? 'serviceListing.listedUntilRequest'
+            : 'serviceListing.listedUntil',
+        ),
         value: formatListingDate(currentLanguage, serviceListing.rfq?.expiresAt),
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -1525,8 +1533,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         <Pressable
           onPress={() => {
             showAppAlert(
-              t('equipmentListing.deleteListingTitle'),
-              t('equipmentListing.deleteListingMessage'),
+              t(
+                postedAs === 'buyer'
+                  ? 'equipmentListing.deleteRequestTitle'
+                  : 'equipmentListing.deleteListingTitle',
+              ),
+              t(
+                postedAs === 'buyer'
+                  ? 'equipmentListing.deleteRequestMessage'
+                  : 'equipmentListing.deleteListingMessage',
+              ),
               [
                 { text: t('common.cancel'), style: 'cancel' },
                 {

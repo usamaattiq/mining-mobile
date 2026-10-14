@@ -241,6 +241,8 @@
     "listingTitle": "تهانينا",
     "listingSubtitle": "إعلانك أصبح ظاهرًا الآن.",
     "listingContinue": "عرض الإعلان",
+    "requestSubtitle": "طلبك أصبح ظاهرًا الآن.",
+    "requestContinue": "عرض الطلب",
     "logout": "تسجيل الخروج",
     "logoutConfirmTitle": "تسجيل الخروج؟",
     "logoutConfirmMessage": "ستحتاج إلى التحقق من رقم هاتفك أو إدخال الرمز السري لتسجيل الدخول مرة أخرى."
@@ -301,14 +303,18 @@
     "categoryGold": "الذهب",
     "emptyTitle": "ستظهر القائمة هنا",
     "emptySubtitle": "ستظهر إعلاناتك في هذه المساحة.",
+    "emptySubtitleRequest": "ستظهر طلباتك في هذه المساحة.",
     "emptyLiveTitle": "ستظهر القائمة هنا",
     "emptyLiveSubtitle": "ستظهر الإعلانات النشطة في هذه المساحة.",
+    "emptyLiveSubtitleRequest": "ستظهر الطلبات النشطة في هذه المساحة.",
     "emptyPastTitle": "ستظهر القائمة هنا",
     "emptyPastSubtitle": "ستظهر الإعلانات المغلقة والمكتملة والمنتهية في هذه المساحة.",
+    "emptyPastSubtitleRequest": "ستظهر الطلبات المغلقة والمكتملة والمنتهية في هذه المساحة.",
     "filterAll": "الكل",
     "filterLive": "نشط",
     "filterPast": "السابقة",
     "notFound": "هذا الإعلان لم يعد متاحًا.",
+    "notFoundRequest": "هذا الطلب لم يعد متاحًا.",
     "repost": "إعادة النشر"
   },
   "listingDetail": {
@@ -383,7 +389,9 @@
     "auctionTitle": "مزايدة جديدة",
     "auctionBody": "قدّم أحدهم مزايدة على مزادك.",
     "listingLiveTitle": "إعلانك منشور",
-    "listingLiveBody": "يمكن للمشترين رؤية إعلانك الآن."
+    "listingLiveBody": "يمكن للمشترين رؤية إعلانك الآن.",
+    "requestLiveTitle": "طلبك منشور",
+    "requestLiveBody": "يمكن للموردين رؤية طلبك الآن."
   },
   "equipmentListing": {
     "modeTitle": "عرض معدات",
@@ -417,7 +425,7 @@
     "requestRfq": "طلب عرض",
     "requestRfqSubtitle": "اجمع عروض الموردين",
     "requestAuction": "مزاد",
-    "requestAuctionSubtitle": "يقدم الموردون عروضهم حتى انتهاء الإعلان",
+    "requestAuctionSubtitle": "يقدم الموردون عروضهم حتى انتهاء الطلب",
     "equipmentType": "نوع المعدة",
     "fieldEquipmentType": "ما نوع هذه المعدة؟",
     "fieldEquipmentTypeRequest": "ما نوع المعدة التي تحتاجها؟",
@@ -473,8 +481,10 @@
     "neededDate": "متى تحتاج هذه المعدات؟",
     "neededDatePlaceholder": "اختر التاريخ والوقت",
     "listedUntil": "إلى متى يبقى هذا الإعلان مفتوحاً؟",
+    "listedUntilRequest": "إلى متى يبقى هذا الطلب مفتوحاً؟",
     "listedUntilPlaceholder": "اختر التاريخ والوقت",
     "listedUntilPast": "اختر وقت انتهاء في المستقبل.",
+    "listedUntilPastRequest": "اختر وقت انتهاء الطلب في المستقبل.",
     "location": "الموقع",
     "fieldLocation": "أين تقع المعدة",
     "fieldLocationRequest": "أين تحتاج المعدة؟",
@@ -486,6 +496,8 @@
     "viewUnitDetailsHint": "اطّلع على الوحدات المؤجرة والمباعة",
     "deleteListingTitle": "حذف هذا الإعلان؟",
     "deleteListingMessage": "سيتم إزالته من السوق.",
+    "deleteRequestTitle": "حذف هذا الطلب؟",
+    "deleteRequestMessage": "سيتم إزالته من السوق.",
     "stockTitle": "تفاصيل الوحدات",
     "stockOverview": "نظرة عامة",
     "stockSoldTab": "الوحدات المباعة ({count})",
@@ -608,8 +620,10 @@
     "onsitePrice": "سعر في الموقع لكل مشروع ({currency})",
     "onlinePrice": "سعر عن بُعد لكل مشروع ({currency})",
     "listedUntil": "إلى متى يبقى هذا الإعلان مفتوحاً؟",
+    "listedUntilRequest": "إلى متى يبقى هذا الطلب مفتوحاً؟",
     "listedUntilPlaceholder": "اختر التاريخ والوقت",
     "listedUntilPast": "اختر وقت انتهاء في المستقبل.",
+    "listedUntilPastRequest": "اختر وقت انتهاء الطلب في المستقبل.",
     "serviceDate": "متى تحتاج هذه الخدمة؟",
     "dateTimeLabel": "التاريخ/الوقت",
     "serviceDatePlaceholder": "اختر التاريخ والوقت",
@@ -628,7 +642,9 @@
     "documentUploadError": "تعذّر رفع هذا المستند. حاول مرة أخرى.",
     "document": "مستند",
     "publish": "نشر الإعلان",
-    "publishRequest": "نشر الطلب"
+    "publishRequest": "نشر الطلب",
+    "deleteRequestTitle": "حذف هذا الطلب؟",
+    "deleteRequestMessage": "سيتم إزالته من السوق."
   },
   "goldListing": {
     "formTitle": "مزاد الذهب",
@@ -684,7 +700,8 @@
   "offers": {
     "title": "عروضي",
     "emptyTitle": "ستظهر العروض هنا",
-    "emptySubtitle": "ستظهر هنا الإعلانات التي أرسلت عليها عرضاً."
+    "emptySubtitle": "ستظهر هنا الإعلانات التي أرسلت عليها عرضاً.",
+    "emptySubtitleSupplier": "ستظهر هنا الطلبات التي أرسلت عليها عرضاً."
   },
   "messages": {
     "title": "الرسائل",

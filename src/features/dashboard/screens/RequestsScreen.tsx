@@ -136,7 +136,17 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
   const emptyTitle =
     lifeFilter === 'live' ? t('requests.emptyLiveTitle') : t('requests.emptyPastTitle');
   const emptySubtitle =
-    lifeFilter === 'live' ? t('requests.emptyLiveSubtitle') : t('requests.emptyPastSubtitle');
+    lifeFilter === 'live'
+      ? t(
+          role === 'buyer'
+            ? 'requests.emptyLiveSubtitleRequest'
+            : 'requests.emptyLiveSubtitle',
+        )
+      : t(
+          role === 'buyer'
+            ? 'requests.emptyPastSubtitleRequest'
+            : 'requests.emptyPastSubtitle',
+        );
 
   const lifeOptions: { key: LifeFilter; label: string }[] = [
     { key: 'live', label: t('requests.filterLive') },
