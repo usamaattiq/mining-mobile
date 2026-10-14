@@ -217,7 +217,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         serviceCategoryLabel: serviceCategory ?? '',
         title,
         description,
-        yearsOfExperience: String(yearsOfExperience),
+        yearsOfExperience: isBuyer ? '' : String(yearsOfExperience),
         onsitePrice: isBuyer || !onsite ? '' : onsitePrice,
         onlinePrice: isBuyer || !online ? '' : onlinePrice,
         price: isBuyer ? '' : onsite ? onsitePrice : onlinePrice,
@@ -277,12 +277,14 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       ),
       value: serviceCategoryLabel ?? '',
     },
-    {
-      label: t(
-        isBuyer ? 'serviceListing.yearsOfExperienceWanted' : 'serviceListing.yearsOfExperience',
-      ),
-      value: t('serviceListing.yearsOfExperienceValue', { years: yearsOfExperience }),
-    },
+    ...(isBuyer
+      ? []
+      : [
+          {
+            label: t('serviceListing.yearsOfExperience'),
+            value: t('serviceListing.yearsOfExperienceValue', { years: yearsOfExperience }),
+          },
+        ]),
     {
       label: t('serviceListing.type'),
       value: serviceTypeLabels(t, serviceType).join(' / '),
@@ -442,17 +444,15 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               searchPlaceholder={t('serviceListing.searchServiceTypes')}
             />
 
-            <CounterField
-              label={t(
-                isBuyer
-                  ? 'serviceListing.yearsOfExperienceWanted'
-                  : 'serviceListing.yearsOfExperience',
-              )}
-              value={yearsOfExperience}
-              onChange={setYearsOfExperience}
-              min={1}
-              max={80}
-            />
+            {isBuyer ? null : (
+              <CounterField
+                label={t('serviceListing.yearsOfExperience')}
+                value={yearsOfExperience}
+                onChange={setYearsOfExperience}
+                min={1}
+                max={80}
+              />
+            )}
 
             {isBuyer ? null : (
               <>

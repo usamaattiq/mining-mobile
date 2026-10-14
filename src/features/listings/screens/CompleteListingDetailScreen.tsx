@@ -549,16 +549,18 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         label: t('serviceListing.serviceCategory'),
         value: catalogLabel('services', serviceListing.serviceCategoryLabel),
       },
-      {
-        label: t(
-          serviceListing.postedAs === 'buyer'
-            ? 'serviceListing.yearsOfExperienceWanted'
-            : 'serviceListing.yearsOfExperience',
-        ),
-        value: serviceListing.yearsOfExperience
-          ? t('serviceListing.yearsOfExperienceValue', { years: serviceListing.yearsOfExperience })
-          : '',
-      },
+      ...(serviceListing.postedAs === 'buyer'
+        ? []
+        : [
+            {
+              label: t('serviceListing.yearsOfExperience'),
+              value: serviceListing.yearsOfExperience
+                ? t('serviceListing.yearsOfExperienceValue', {
+                    years: serviceListing.yearsOfExperience,
+                  })
+                : '',
+            },
+          ]),
       {
         label: t('serviceListing.type'),
         value: serviceTypeLabels(t, serviceListing.serviceType).join(' / '),
