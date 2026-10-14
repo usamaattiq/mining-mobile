@@ -686,6 +686,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onChange={setMedia}
               onBusyChange={setMediaBusy}
               required={!isBuyer}
+              isRequest={isBuyer}
             />
             {isBuyer && requestMode === 'rfq' ? (
               <DateTimeField

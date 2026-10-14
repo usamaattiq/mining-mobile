@@ -490,7 +490,12 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
 
         {step === 2 ? (
           <View style={styles.stepBlock}>
-            <ServiceMediaUploader media={media} onChange={setMedia} required={!isBuyer} />
+            <ServiceMediaUploader
+              media={media}
+              onChange={setMedia}
+              required={!isBuyer}
+              isRequest={isBuyer}
+            />
 
             <DateTimeField
               label={t('serviceListing.listedUntil')}

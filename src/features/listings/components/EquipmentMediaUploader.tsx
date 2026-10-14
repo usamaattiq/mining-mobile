@@ -40,6 +40,7 @@ export function EquipmentMediaUploader({
   onChange,
   onBusyChange,
   required = true,
+  isRequest = false,
 }: EquipmentMediaUploaderProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [sheetKind, setSheetKind] = React.useState<'photo' | 'video' | null>(null);
@@ -161,11 +162,11 @@ export function EquipmentMediaUploader({
     <View style={styles.root}>
       <View style={styles.header}>
         <AppText weight="semibold" style={styles.title}>
-          {t('equipmentListing.mediaTitle')}
+          {t(isRequest ? 'equipmentListing.mediaTitleRequest' : 'equipmentListing.mediaTitle')}
           {required ? <AppText style={styles.required}> *</AppText> : null}
         </AppText>
         <AppText style={styles.subtitle}>
-          {t('equipmentListing.mediaSubtitle', {
+          {t(isRequest ? 'equipmentListing.mediaSubtitleRequest' : 'equipmentListing.mediaSubtitle', {
             photos: MAX_PHOTOS,
             videos: MAX_VIDEOS,
             mb: MAX_VIDEO_MB,

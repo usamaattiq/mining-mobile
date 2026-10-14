@@ -27,6 +27,7 @@ export function ServiceMediaUploader({
   media,
   onChange,
   required = true,
+  isRequest = false,
 }: ServiceMediaUploaderProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const [sheetOpen, setSheetOpen] = React.useState(false);
@@ -107,11 +108,13 @@ export function ServiceMediaUploader({
     <View style={styles.root}>
       <View style={styles.header}>
         <AppText weight="bold" style={styles.title}>
-          {t('serviceListing.mediaTitle')}
+          {t(isRequest ? 'serviceListing.mediaTitleRequest' : 'serviceListing.mediaTitle')}
           {required ? <AppText style={styles.required}> *</AppText> : null}
         </AppText>
         <AppText style={styles.subtitle}>
-          {t('serviceListing.mediaSubtitle', { photos: MAX_PHOTOS })}
+          {t(isRequest ? 'serviceListing.mediaSubtitleRequest' : 'serviceListing.mediaSubtitle', {
+            photos: MAX_PHOTOS,
+          })}
         </AppText>
       </View>
 

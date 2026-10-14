@@ -14,4 +14,6 @@ export type ServiceMediaUploaderProps = {
   media: ServiceMediaAsset[];
   onChange: (media: ServiceMediaAsset[]) => void;
   required?: boolean;
+  /** Buyer request copy — “what you need” instead of listing media. */
+  isRequest?: boolean;
 };

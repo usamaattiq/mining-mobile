@@ -11,4 +11,6 @@ export type EquipmentMediaUploaderProps = {
   onChange: (media: EquipmentMediaAsset[]) => void;
   onBusyChange?: (busy: boolean) => void;
   required?: boolean;
+  /** Buyer request copy — “what you need” instead of listing media. */
+  isRequest?: boolean;
 };
