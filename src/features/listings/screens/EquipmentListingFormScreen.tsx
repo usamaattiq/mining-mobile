@@ -310,9 +310,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         units,
         location,
         media: persistedMedia,
-        deliveryAvailable: isBuyer ? false : deliveryAvailable,
-        deliveryType,
-        deliveryPricePerKm,
+        deliveryAvailable,
+        deliveryType: isBuyer ? 'free' : deliveryType,
+        deliveryPricePerKm: isBuyer ? '' : deliveryPricePerKm,
         neededDate: null,
         expiryHours:
           isBuyer && requestMode === 'auction'
@@ -445,14 +445,25 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       ),
       value: location,
     },
+    ...(isBuyer
+      ? [
+          {
+            label: t('equipmentListing.deliveryPreference'),
+            value: deliveryAvailable
+              ? t('equipmentListing.deliveryRequested')
+              : t('equipmentListing.pickupFromSupplier'),
+          },
+        ]
+      : []),
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
-  const deliverySubtitle =
-    !isBuyer && deliveryAvailable
-      ? deliveryType === 'free'
+  const deliverySubtitle = !deliveryAvailable
+    ? undefined
+    : isBuyer
+      ? t('equipmentListing.deliveryRequested')
+      : deliveryType === 'free'
         ? t('equipmentListing.deliveryFree')
-        : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(deliveryPricePerKm)}`
-      : undefined;
+        : `${t('equipmentListing.deliveryPerKm')} · ${currency.code} ${formatAmountWithCommas(deliveryPricePerKm)}`;
 
   return (
     <View style={styles.root}>
@@ -722,30 +733,52 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               onUseCurrentLocation={() => void handleUseCurrentLocation()}
               onSelectOnMap={handleSelectOnMap}
             />
-            {!isBuyer ? (
-              <View style={styles.deliveryChoice}>
-                <AppText weight="semibold" style={styles.deliveryHeading}>
-                  {t('equipmentListing.deliveryHeading')}
-                </AppText>
-                <AppText style={styles.deliveryHint}>{t('equipmentListing.deliveryHint')}</AppText>
-                <OfferChoiceCard
-                  compact
-                  selected={deliveryAvailable}
-                  icon="car-outline"
-                  title={t('equipmentListing.deliveryYes')}
-                  subtitle={t('equipmentListing.deliveryYesSubtitle')}
-                  onPress={() => setDeliveryAvailable(true)}
-                />
-                <OfferChoiceCard
-                  compact
-                  selected={!deliveryAvailable}
-                  icon="storefront-outline"
-                  title={t('equipmentListing.deliveryNo')}
-                  subtitle={t('equipmentListing.deliveryNoSubtitle')}
-                  onPress={() => setDeliveryAvailable(false)}
-                />
-              </View>
-            ) : null}
+            <View style={styles.deliveryChoice}>
+              <AppText weight="semibold" style={styles.deliveryHeading}>
+                {t(
+                  isBuyer
+                    ? 'equipmentListing.deliveryHeadingRequest'
+                    : 'equipmentListing.deliveryHeading',
+                )}
+              </AppText>
+              <AppText style={styles.deliveryHint}>
+                {t(
+                  isBuyer
+                    ? 'equipmentListing.deliveryHintRequest'
+                    : 'equipmentListing.deliveryHint',
+                )}
+              </AppText>
+              <OfferChoiceCard
+                compact
+                selected={deliveryAvailable}
+                icon="car-outline"
+                title={t(
+                  isBuyer
+                    ? 'equipmentListing.deliveryYesRequest'
+                    : 'equipmentListing.deliveryYes',
+                )}
+                subtitle={t(
+                  isBuyer
+                    ? 'equipmentListing.deliveryYesRequestSubtitle'
+                    : 'equipmentListing.deliveryYesSubtitle',
+                )}
+                onPress={() => setDeliveryAvailable(true)}
+              />
+              <OfferChoiceCard
+                compact
+                selected={!deliveryAvailable}
+                icon="storefront-outline"
+                title={t(
+                  isBuyer ? 'equipmentListing.deliveryNoRequest' : 'equipmentListing.deliveryNo',
+                )}
+                subtitle={t(
+                  isBuyer
+                    ? 'equipmentListing.deliveryNoRequestSubtitle'
+                    : 'equipmentListing.deliveryNoSubtitle',
+                )}
+                onPress={() => setDeliveryAvailable(false)}
+              />
+            </View>
 
             {!isBuyer && deliveryAvailable ? (
               <View style={styles.deliveryTypeBlock}>
