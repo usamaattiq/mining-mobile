@@ -84,7 +84,7 @@
       "selected": "Awaiting confirmation",
       "confirmed": "Accepted",
       "withdrawn": "Withdrawn",
-      "declined": "Rejected",
+      "declined": "Declined",
       "timedOut": "Timed out",
       "lapsed": "Lapsed",
       "returned": "Returned"

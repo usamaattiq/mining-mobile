@@ -586,8 +586,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const rfq = equipmentListing?.rfq ?? serviceListing?.rfq ?? goldListing?.rfq;
   const hasSentOffer =
     Boolean(
-      rfq?.myOfferStatus && ['active', 'selected', 'confirmed'].includes(rfq.myOfferStatus),
-    ) || rfq?.status === 'offer-submitted';
+      rfq?.myOfferStatus &&
+        ['active', 'selected', 'confirmed', 'declined', 'timed_out'].includes(rfq.myOfferStatus),
+    ) ||
+    rfq?.status === 'offer-submitted' ||
+    rfq?.status === 'declined' ||
+    rfq?.status === 'timed-out';
   const isOwner = Boolean(ownerId && profileId && ownerId === profileId);
   const canEditListing = isOwner && !listingIsEngaged(rfq);
   const canOffer =
@@ -1056,14 +1060,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
           {showOwnerOffers &&
           (equipmentListing?.postedAs !== 'supplier' ||
-            (rfq?.offers ?? []).some(
-              (offer) => offer.status === 'active' || offer.status === 'selected',
+            (rfq?.offers ?? []).some((offer) =>
+              ['active', 'selected', 'declined', 'timed_out'].includes(offer.status),
             )) ? (
             <ListingOffersPanel
               offers={
                 equipmentListing?.postedAs === 'supplier'
-                  ? (rfq?.offers ?? []).filter(
-                      (offer) => offer.status === 'active' || offer.status === 'selected',
+                  ? (rfq?.offers ?? []).filter((offer) =>
+                      ['active', 'selected', 'declined', 'timed_out'].includes(offer.status),
                     )
                   : (rfq?.offers ?? [])
               }
@@ -1172,10 +1176,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           </AppText>
                         </View>
                       ) : null}
-                      {offer.status === 'selected' ? (
+                      {offer.status === 'selected' ||
+                      offer.status === 'declined' ||
+                      offer.status === 'timed_out' ? (
                         <View style={styles.myOfferStatusBadge}>
                           <AppText weight="semibold" style={styles.myOfferStatusText}>
-                            {t('rfq.offerStatus.selected')}
+                            {t(
+                              `rfq.offerStatus.${
+                                offer.status === 'timed_out' ? 'timedOut' : offer.status
+                              }`,
+                            )}
                           </AppText>
                         </View>
                       ) : null}
@@ -1621,9 +1631,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               ? t('rfq.offerStatus.selected')
               : rfq?.myOfferStatus === 'confirmed'
                 ? t('rfq.offerStatus.confirmed')
-                : category === 'gold'
-                  ? t('rfq.yourOffer')
-                  : t('rfq.offerSubmitted')
+                : rfq?.myOfferStatus === 'declined' || rfq?.status === 'declined'
+                  ? t('rfq.offerStatus.declined')
+                  : rfq?.myOfferStatus === 'timed_out' || rfq?.status === 'timed-out'
+                    ? t('rfq.offerStatus.timedOut')
+                    : category === 'gold'
+                      ? t('rfq.yourOffer')
+                      : t('rfq.offerSubmitted')
           }
           confirmLabel={t('rfq.confirm')}
           declineLabel={t('rfq.decline')}

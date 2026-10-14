@@ -111,7 +111,12 @@ export function ListingOffersPanel({
           const statusKey = OFFER_STATUS_KEY[offer.status] ?? 'active';
           const canDecide = requestIsLive && canDecideOffers && offer.status === 'active';
           const busy = actingOfferId === offer.id;
-          const isLeader = showLeader && offer.rank === 1;
+          const isLeader =
+            showLeader &&
+            offer.rank === 1 &&
+            offer.status !== 'declined' &&
+            offer.status !== 'timed_out' &&
+            offer.status !== 'withdrawn';
           const totalAmount = parsePositiveAmount(offer.price);
           const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : null;
           const unitAmount =
@@ -201,15 +206,6 @@ export function ListingOffersPanel({
                 </View>
                 )}
               </View>
-              {compact && statusKey !== 'active' && statusKey !== 'confirmed' ? (
-                <View style={styles.badges}>
-                  <View style={styles.statusBadge}>
-                    <AppText weight="semibold" style={styles.statusBadgeText}>
-                      {t(`rfq.offerStatus.${statusKey}`)}
-                    </AppText>
-                  </View>
-                </View>
-              ) : null}
               {!compact && offer.createdAt ? (
                 <AppText style={styles.sentAt} numberOfLines={1}>
                   {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
