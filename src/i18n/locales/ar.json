@@ -454,7 +454,7 @@
     "weeklyRental": "أسبوعي ({currency})",
     "yearlyRental": "سنوي ({currency})",
     "rentPeriod": "كيف يتم احتساب الإيجار؟",
-    "rentPeriodPlaceholder": "اختر بالساعة أو أسبوعي أو شهري أو سنوي",
+    "rentPeriodPlaceholder": "بالساعة",
     "rentalAmount": "سعر الإيجار ({currency})",
     "rentPrice": "سعر الإيجار",
     "perHour": "في الساعة",

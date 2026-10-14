@@ -475,7 +475,7 @@
     "weeklyRental": "Weekly ({currency})",
     "yearlyRental": "Yearly ({currency})",
     "rentPeriod": "How often is rent charged?",
-    "rentPeriodPlaceholder": "Choose hourly, weekly, monthly, or yearly",
+    "rentPeriodPlaceholder": "Hourly",
     "rentalAmount": "Rental price ({currency})",
     "rentPrice": "Rent price",
     "perHour": "per hour",
