@@ -1,5 +1,13 @@
 const MIN_AUCTION_HOURS = 0.5;
 const MAX_AUCTION_HOURS = 24;
+const HOUR_MS = 60 * 60 * 1000;
+
+/** True while the listing is still live and less than one hour remains. */
+export function isEndingSoon(endsAt: number | null | undefined, now = Date.now()): boolean {
+  if (endsAt == null) return false;
+  const remainingMs = endsAt - now;
+  return remainingMs > 0 && remainingMs < HOUR_MS;
+}
 
 export function clampAuctionHours(hours: number): number {
   const snapped = Math.round(hours / MIN_AUCTION_HOURS) * MIN_AUCTION_HOURS;

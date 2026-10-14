@@ -92,6 +92,7 @@
     "status": {
       "comingSoon": "قريباً",
       "live": "مباشر",
+      "endingSoon": "ينتهي قريباً",
       "awaitingConfirmation": "بانتظار التأكيد",
       "awaitingAction": "مطلوب إجراء",
       "offerSubmitted": "تم تقديم عرض",
@@ -628,7 +629,7 @@
     "auctionDurationHours": "{count} ساعات",
     "auctionDurationHrs": "ساعة",
     "auctionDurationMinutes": "{count} د",
-    "auctionDurationOneMinute": "دقيقة واحدة",
+    "auctionDurationOneMinute": "3 دقائق",
     "auctionDurationHoursMinutes": "{hours} س {minutes} د",
     "auctionEndDate": "تاريخ ووقت انتهاء المزاد",
     "highestBid": "أعلى عرض",

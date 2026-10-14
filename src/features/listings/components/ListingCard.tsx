@@ -14,6 +14,7 @@ import type {
   ListingCardBadge,
   ListingCardProps,
 } from '@/features/listings/types/listingCard.types';
+import { isEndingSoon } from '@/features/listings/utils/listingExpiry';
 
 const LISTING_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const COUNTDOWN_TICK_MS = 1000;
@@ -22,13 +23,20 @@ const DAY_MS = 24 * HOUR_MS;
 const MINUTE_MS = 60 * 1000;
 const BADGE_ROW_HEIGHT = 20;
 
-function useRemainingTime(createdAt: number, expiresAt?: number): string {
+function useRemainingTime(
+  createdAt: number,
+  expiresAt: number | undefined,
+  endingSoonLabel: string,
+): string {
   const end = expiresAt ?? createdAt + LISTING_LIFETIME_MS;
   const ahead = Math.max(0, end - Date.now());
   const tickMs = ahead >= HOUR_MS ? 60_000 : ahead >= MINUTE_MS ? 15_000 : COUNTDOWN_TICK_MS;
   const now = useSharedNow(tickMs);
   const remainingMs = Math.max(0, end - now);
 
+  if (isEndingSoon(end, now)) {
+    return endingSoonLabel;
+  }
   if (remainingMs > DAY_MS) {
     return `${Math.floor(remainingMs / DAY_MS)}d`;
   }
@@ -118,7 +126,7 @@ function ListingCardComponent({
   hasNewOffer,
 }: ListingCardProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
-  const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt);
+  const timeLeft = useRemainingTime(createdAt ?? 0, expiresAt, t('rfq.status.endingSoon'));
   const windowWidth = useWindowDimensions().width;
   const thumbnailUri = thumbnail;
   const [imageSide, setImageSide] = React.useState(96);

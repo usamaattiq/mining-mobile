@@ -201,7 +201,7 @@ export function ListingOffersPanel({
                 </View>
                 )}
               </View>
-              {compact && statusKey !== 'active' ? (
+              {compact && statusKey !== 'active' && statusKey !== 'confirmed' ? (
                 <View style={styles.badges}>
                   <View style={styles.statusBadge}>
                     <AppText weight="semibold" style={styles.statusBadgeText}>

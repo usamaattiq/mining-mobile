@@ -92,6 +92,7 @@
     "status": {
       "comingSoon": "Coming soon",
       "live": "Live",
+      "endingSoon": "Ending soon",
       "awaitingConfirmation": "Awaiting confirmation",
       "awaitingAction": "Action required",
       "offerSubmitted": "Offer submitted",
@@ -648,7 +649,7 @@
     "auctionDurationHours": "{count} hours",
     "auctionDurationHrs": "hrs",
     "auctionDurationMinutes": "{count} min",
-    "auctionDurationOneMinute": "1 minute",
+    "auctionDurationOneMinute": "3 minutes",
     "auctionDurationHoursMinutes": "{hours}h {minutes}m",
     "auctionEndDate": "Auction end date & time",
     "highestBid": "Highest bid",

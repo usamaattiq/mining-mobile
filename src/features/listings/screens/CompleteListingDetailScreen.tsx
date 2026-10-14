@@ -54,6 +54,7 @@ import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
+import { isEndingSoon } from '@/features/listings/utils/listingExpiry';
 import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { myOfferAttentionKey, openOfferIds } from '@/features/listings/utils/unseenOffers';
@@ -199,7 +200,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     (equipmentListing ?? serviceListing ?? goldListing)?.rfq?.expiresAt ??
     goldListing?.auctionEndDate ??
     null;
-  const timeLeft = useCountdown(countdownEnd);
+  const timeLeft = useCountdown(countdownEnd, t('rfq.status.endingSoon'));
 
   const backButton = (
     <Pressable
@@ -650,8 +651,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     countdownEnd != null &&
     !isEndedRfqStatus(rfq?.status) &&
     timeLeft != null;
-  const headerBadge =
-    rfqStatusBadge(t, rfq) ??
+  const endingSoon =
+    (rfq?.status === 'live' || rfq?.status === 'offer-submitted' || rfq?.status == null) &&
+    isEndingSoon(countdownEnd);
+  const headerBadge = endingSoon
+    ? {
+        key: 'ending-soon',
+        label: t('rfq.status.endingSoon'),
+        variant: 'warning' as const,
+      }
+    : rfqStatusBadge(t, rfq) ??
     (equipmentListing && equipmentListing.postedAs !== 'buyer'
       ? {
           key: 'mode',
@@ -1833,12 +1842,13 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
 const MINUTE_MS = 60 * 1000;
 
-function useCountdown(endsAt: number | null | undefined): string | null {
+function useCountdown(endsAt: number | null | undefined, endingSoonLabel: string): string | null {
   const ahead = endsAt == null ? HOUR_MS : Math.max(0, endsAt - Date.now());
   const tickMs = ahead >= HOUR_MS ? 60_000 : ahead >= MINUTE_MS ? 15_000 : 1000;
   const now = useSharedNow(tickMs);
 
   if (endsAt == null) return null;
+  if (isEndingSoon(endsAt, now)) return endingSoonLabel;
   const remainingMs = Math.max(0, endsAt - now);
   if (remainingMs > DAY_MS) return `${Math.floor(remainingMs / DAY_MS)}d`;
   if (remainingMs >= HOUR_MS) return `${Math.floor(remainingMs / HOUR_MS)}h`;

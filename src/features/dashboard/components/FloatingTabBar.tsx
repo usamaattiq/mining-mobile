@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { i18n as appI18n } from '@/i18n';
+import type { RootStackParamList } from '@/navigation/types';
 import { AppText } from '@/shared/components/AppText';
 import { BlinkingDot } from '@/shared/components/BlinkingDot';
 import { hasUnseenMyOffer, hasUnseenOffers } from '@/features/listings/utils/unseenOffers';

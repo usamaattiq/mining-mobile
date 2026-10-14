@@ -11,13 +11,14 @@ const MIN_HOURS = 0.5;
 const MAX_HOURS = 24;
 const SLIDER_STEP_HOURS = 0.5;
 const TICK_HOURS = [6, 12, 18, 24];
-export const ONE_MINUTE_HOURS = 1 / 60;
+const DEV_AUCTION_MINUTES = 3;
+export const ONE_MINUTE_HOURS = DEV_AUCTION_MINUTES / 60;
 
 type DurationSliderProps = {
   value: number;
   onChange: (hours: number) => void;
   label: string;
-  /** Development shortcut so a gold auction can end in one minute. */
+  /** Development shortcut so a gold auction can end in a few minutes. */
   allowOneMinute?: boolean;
 };
 
