@@ -710,13 +710,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     !isAdmin && !isOwner && category === 'services' && serviceListing?.postedAs === 'supplier';
   const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
   const respondingToBuyer =
-    !isAdmin &&
-    !isOwner &&
-    postedAs === 'buyer' &&
-    !isAuction &&
-    hasSentOffer &&
-    (category === 'services' || Boolean(rfq?.myOfferId));
-  const editingBuyerServiceOffer = respondingToBuyer && category === 'services';
+    !isAdmin && !isOwner && postedAs === 'buyer' && !isAuction && hasSentOffer;
   const showMyOfferCards = supplierBuyer || supplierServiceSender || respondingToBuyer;
   const mySupplierOffers = supplierBuyer
     ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
@@ -749,7 +743,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     !isAdmin &&
     (supplierBuyer
       ? unitsLeft > 0 && rfq?.canSubmitOffer !== false && !hasOpenSupplierOffer
-      : !editingBuyerServiceOffer &&
+      : !respondingToBuyer &&
         !awaitingConfirm &&
         (canOffer || (isAuction && hasSentOffer && rfq?.status === 'live')));
   const canWithdraw =
@@ -995,7 +989,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               price,
               category === 'services' ? undefined : editOfferUnits,
               equipmentListing?.mode === 'both' ? editOfferKind : undefined,
-              category === 'services'
+              category === 'services' || respondingToBuyer
                 ? undefined
                 : equipmentListing?.deliveryAvailable
                   ? editOfferHandover
@@ -1299,7 +1293,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         : t('messages.fallbackName')}
                     </AppText>
                     <View style={styles.myOfferBadges}>
-                      {offer.handover === 'delivery' ? (
+                      {!respondingToBuyer && offer.handover === 'delivery' ? (
                         <View style={styles.myOfferKindBadge}>
                           <AppText weight="semibold" style={styles.myOfferKindText}>
                             {t('equipmentListing.deliveryBadge')}
@@ -1320,7 +1314,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         <View style={styles.myOfferKindBadge}>
                           <AppText weight="semibold" style={styles.myOfferKindText}>
                             {offer.kind === 'sale'
-                              ? t('equipmentListing.buy')
+                              ? respondingToBuyer
+                                ? t('equipmentListing.sell')
+                                : t('equipmentListing.buy')
                               : t('equipmentListing.rent')}
                           </AppText>
                         </View>
@@ -1359,11 +1355,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       ) : null}
                     </View>
                   ) : null}
-                  {(supplierBuyer || editingBuyerServiceOffer) &&
+                  {(supplierBuyer || respondingToBuyer) &&
                   offer.status === 'active' &&
                   editingOfferId === offer.id ? (
                     <View style={styles.myOfferEdit}>
-                      {equipmentListing?.mode === 'both' ? (
+                      {(supplierBuyer ||
+                        (respondingToBuyer && equipmentListing?.mode === 'both')) ? (
                         <View style={styles.editChoiceRow}>
                           {(['rent', 'sale'] as const).map((kind) => {
                             const selected = editOfferKind === kind;
@@ -1382,14 +1379,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                 >
                                   {kind === 'rent'
                                     ? t('equipmentListing.rent')
-                                    : t('equipmentListing.buy')}
+                                    : respondingToBuyer
+                                      ? t('equipmentListing.sell')
+                                      : t('equipmentListing.buy')}
                                 </AppText>
                               </Pressable>
                             );
                           })}
                         </View>
                       ) : null}
-                      {editingBuyerServiceOffer && serviceListing?.serviceType === 'both' ? (
+                      {respondingToBuyer && serviceListing?.serviceType === 'both' ? (
                         <View style={styles.editChoiceRow}>
                           {(['onsite', 'online'] as const).map((mode) => {
                             const selected = editOfferDelivery === mode;
@@ -1415,7 +1414,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           })}
                         </View>
                       ) : null}
-                      {equipmentListing?.deliveryAvailable ? (
+                      {!respondingToBuyer && equipmentListing?.deliveryAvailable ? (
                         <View style={styles.editChoiceRow}>
                           {(['delivery', 'pickup'] as const).map((mode) => {
                             const selected = editOfferHandover === mode;
@@ -1458,7 +1457,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           onChangeText={setEditOfferPrice}
                           keyboardType="decimal-pad"
                           placeholder={
-                            editingBuyerServiceOffer
+                            respondingToBuyer && category === 'services'
                               ? t('rfq.offerAmountPlaceholder')
                               : t('rfq.unitPriceAmountPlaceholder')
                           }
@@ -1466,12 +1465,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           style={styles.myOfferPriceInput}
                         />
                       </View>
-                      {editingBuyerServiceOffer ? null : (
+                      {category === 'services' ? null : (
                         <CounterField
                           label={t('rfq.unitsLabel')}
                           value={editOfferUnits}
                           min={1}
-                          max={Math.max(unitsLeft, offer.quantity ?? 1)}
+                          max={Math.max(
+                            respondingToBuyer
+                              ? (equipmentListing?.units ?? 1)
+                              : unitsLeft,
+                            offer.quantity ?? 1,
+                          )}
                           onChange={setEditOfferUnits}
                         />
                       )}
@@ -1500,7 +1504,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     </View>
                   ) : null}
-                  {(supplierBuyer || editingBuyerServiceOffer) &&
+                  {(supplierBuyer || respondingToBuyer) &&
                   offer.status === 'active' &&
                   editingOfferId !== offer.id ? (
                     <View style={styles.myOfferActions}>
@@ -1518,8 +1522,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       />
                     </View>
                   ) : null}
-                  {(supplierServiceSender || (respondingToBuyer && !editingBuyerServiceOffer)) &&
-                  offer.status === 'active' ? (
+                  {supplierServiceSender && offer.status === 'active' ? (
                     <View style={styles.myOfferActions}>
                       <Button
                         label={t('rfq.withdraw')}
@@ -1790,7 +1793,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </Pressable>
       ) : null}
 
-      {canWithdraw && !supplierBuyer && !editingBuyerServiceOffer ? (
+      {canWithdraw && !supplierBuyer && !respondingToBuyer ? (
         <Pressable
           onPress={() => handleResponderOffer('withdraw')}
           disabled={offerSubmitting}
@@ -1853,13 +1856,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }
           maxUnits={category === 'equipment' && !isAuction ? Math.max(unitsLeft, 0) : undefined}
           offerTypeLabel={
-            (category === 'equipment' && equipmentListing?.postedAs === 'supplier') ||
+            (category === 'equipment' && !isAuction && Boolean(equipmentListing)) ||
             (category === 'services' && serviceListing?.serviceType === 'both')
               ? t('rfq.offerType')
               : undefined
           }
           fulfillmentModes={
-            category === 'equipment' && equipmentListing?.postedAs === 'supplier'
+            category === 'equipment' && !isAuction && equipmentListing
               ? equipmentListing.mode === 'both'
                 ? ['rent', 'sale']
                 : equipmentListing.mode === 'sell'
@@ -1871,12 +1874,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }
           fulfillmentLabels={{
             rent: t('equipmentListing.rent'),
-            sale: t('equipmentListing.buy'),
+            sale:
+              equipmentListing?.postedAs === 'buyer'
+                ? t('equipmentListing.sell')
+                : t('equipmentListing.buy'),
             onsite: t('serviceListing.onsite'),
             online: t('serviceListing.online'),
           }}
           fulfillmentRentLabel={t('equipmentListing.rent')}
-          fulfillmentSaleLabel={t('equipmentListing.buy')}
+          fulfillmentSaleLabel={
+            equipmentListing?.postedAs === 'buyer'
+              ? t('equipmentListing.sell')
+              : t('equipmentListing.buy')
+          }
           handoverModes={
             category === 'equipment' && equipmentListing?.postedAs === 'supplier'
               ? equipmentListing.deliveryAvailable
