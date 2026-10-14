@@ -515,7 +515,7 @@
     "requiredUnits": "Required units",
     "unitsLeft": "{count} left",
     "manageUnits": "Rent & sale units",
-    "viewUnitDetails": "View Unit Details",
+    "viewUnitDetails": "Unit Details",
     "viewUnitDetailsHint": "See rented and sold units",
     "deleteListingTitle": "Delete this listing?",
     "deleteListingMessage": "It will be removed from the marketplace.",
