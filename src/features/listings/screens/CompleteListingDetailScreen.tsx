@@ -2070,7 +2070,7 @@ function listingIsEngaged(
 function supplierUnitsLeft(id: string, sources: Array<ListingDto | null | undefined>): number {
   for (const listing of sources) {
     if (!listing || !isEquipmentListing(listing) || listing.id !== id) continue;
-    if (listing.postedAs === 'supplier' && listing.availableUnits != null) {
+    if (listing.availableUnits != null) {
       return listing.availableUnits;
     }
   }

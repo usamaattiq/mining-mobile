@@ -147,8 +147,16 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     if (!sourceListing || filledRepost.current) return;
     filledRepost.current = true;
     const period = isBuyer ? null : rentPeriodFromListing(sourceListing);
-    setOfferRent(!isBuyer && (sourceListing.mode === 'rent' || sourceListing.mode === 'both'));
-    setOfferSell(isBuyer || sourceListing.mode === 'sell' || sourceListing.mode === 'both');
+    setOfferRent(
+      isBuyer
+        ? sourceListing.mode === 'rent'
+        : sourceListing.mode === 'rent' || sourceListing.mode === 'both',
+    );
+    setOfferSell(
+      isBuyer
+        ? sourceListing.mode === 'sell' || sourceListing.mode === 'both'
+        : sourceListing.mode === 'sell' || sourceListing.mode === 'both',
+    );
     setEquipmentType(
       matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel) ??
         (sourceListing.equipmentTypeLabel.trim() || null),
@@ -522,7 +530,14 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               subtitle={
                 isBuyer ? t('equipmentListing.rentRequestSubtitle') : t('equipmentListing.rentSubtitle')
               }
-              onPress={() => setOfferRent((current) => !current)}
+              onPress={() => {
+                if (isBuyer) {
+                  setOfferRent(true);
+                  setOfferSell(false);
+                  return;
+                }
+                setOfferRent((current) => !current);
+              }}
             />
             <OfferChoiceCard
               selected={offerSell}
@@ -531,7 +546,14 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               subtitle={
                 isBuyer ? t('equipmentListing.buyRequestSubtitle') : t('equipmentListing.sellSubtitle')
               }
-              onPress={() => setOfferSell((current) => !current)}
+              onPress={() => {
+                if (isBuyer) {
+                  setOfferSell(true);
+                  setOfferRent(false);
+                  return;
+                }
+                setOfferSell((current) => !current);
+              }}
             />
           </View>
         ) : null}
