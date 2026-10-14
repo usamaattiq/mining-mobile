@@ -39,6 +39,7 @@ import { useCurrency } from '@/shared/hooks/useCurrency';
 import {
   formatAmountWithCommas,
   parsePositiveAmount,
+  sanitizeGoldWeight,
   sanitizeStepPrice,
 } from '@/shared/utils/formatAmount';
 import {
@@ -122,7 +123,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     filledRepost.current = true;
     setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
     setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
-    setWeight(sourceListing.weight ?? '');
+    setWeight(sanitizeGoldWeight(sourceListing.weight ?? ''));
     setPurity(
       matchSelectOption(purityOptions, sourceListing.purityLabel) ??
         (sourceListing.purityLabel.trim() || null),
@@ -174,7 +175,11 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
   };
 
   const detailsValid = Boolean(
-    title.trim() && description.trim() && weight.trim() && purity && parsePositiveAmount(price),
+    title.trim() &&
+      description.trim() &&
+      parsePositiveAmount(weight) &&
+      purity &&
+      parsePositiveAmount(price),
   );
   const mediaValid = media.length > 0 && Boolean(auctionStartDate) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;
@@ -205,7 +210,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         category: 'gold' as const,
         title,
         description,
-        weight,
+        weight: weight.replace(/\.$/, ''),
         purityLabel: purity ?? '',
         price,
         auctionStartDate: start.getTime(),
@@ -339,9 +344,9 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
                 <FormInput
                   label={t('goldListing.fieldWeight')}
                   value={weight}
-                  onChangeText={setWeight}
+                  onChangeText={(value) => setWeight(sanitizeGoldWeight(value))}
                   placeholder={t('goldListing.weightPlaceholder')}
-                  keyboardType="numeric"
+                  keyboardType="decimal-pad"
                   rightAdornment={weightAdornment}
                   required
                 />

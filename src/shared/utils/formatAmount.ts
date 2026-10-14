@@ -1,3 +1,20 @@
+/**
+ * Gold weight: digits and one `.` only. The point is allowed only after 0–9
+ * (".5" becomes "5"; a leading "." is dropped). Extra dots in the fraction are stripped.
+ */
+export function sanitizeGoldWeight(raw: string): string {
+  const cleaned = raw.replace(/,/g, '.').replace(/[^\d.]/g, '');
+  const firstDot = cleaned.indexOf('.');
+  const wholeRaw = firstDot === -1 ? cleaned : cleaned.slice(0, firstDot);
+  const fraction = firstDot === -1 ? null : cleaned.slice(firstDot + 1).replace(/\./g, '');
+  const whole = wholeRaw.replace(/^0+(?=\d)/, '');
+  if (whole === '') {
+    return fraction ? fraction.replace(/^0+(?=\d)/, '') : '';
+  }
+  if (fraction != null) return `${whole}.${fraction}`;
+  return whole;
+}
+
 /** Keeps a lone 0 so the field can show an error, and drops it once another digit is typed. */
 export function sanitizeStepPrice(raw: string): string {
   const cleaned = raw.replace(/[^\d.]/g, '');
