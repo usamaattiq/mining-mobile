@@ -256,9 +256,24 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   };
 
   const detailRows = [
-    { label: t('serviceListing.fieldTitle'), value: title },
-    { label: t('serviceListing.fieldDescription'), value: description },
-    { label: t('serviceListing.fieldServiceCategory'), value: serviceCategoryLabel ?? '' },
+    {
+      label: t(isBuyer ? 'serviceListing.fieldTitleRequest' : 'serviceListing.fieldTitle'),
+      value: title,
+    },
+    {
+      label: t(
+        isBuyer ? 'serviceListing.fieldDescriptionRequest' : 'serviceListing.fieldDescription',
+      ),
+      value: description,
+    },
+    {
+      label: t(
+        isBuyer
+          ? 'serviceListing.fieldServiceCategoryRequest'
+          : 'serviceListing.fieldServiceCategory',
+      ),
+      value: serviceCategoryLabel ?? '',
+    },
     {
       label: t(
         isBuyer ? 'serviceListing.yearsOfExperienceWanted' : 'serviceListing.yearsOfExperience',
@@ -287,7 +302,10 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                 : '',
           },
         ]),
-    { label: t('serviceListing.fieldLocation'), value: location },
+    {
+      label: t(isBuyer ? 'serviceListing.fieldLocationRequest' : 'serviceListing.fieldLocation'),
+      value: location,
+    },
     {
       label: t('serviceListing.listedUntil'),
       value: new Intl.DateTimeFormat(currentLanguage, {
@@ -309,7 +327,19 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       <AppTopBar
         left="back"
         variant="gold"
-        title={editingId ? t('serviceListing.editFormTitle') : t('serviceListing.formTitle')}
+        title={
+          editingId
+            ? t(isBuyer ? 'serviceListing.editRequestFormTitle' : 'serviceListing.editFormTitle')
+            : isBuyer
+              ? onsite && online
+                ? t('serviceListing.bothRequestFormTitle')
+                : onsite
+                  ? t('serviceListing.onsiteRequestFormTitle')
+                  : online
+                    ? t('serviceListing.onlineRequestFormTitle')
+                    : t('serviceListing.requestFormTitle')
+              : t('serviceListing.formTitle')
+        }
         onBackPress={handleBack}
         style={styles.header}
       />
@@ -360,20 +390,32 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         {step === 1 ? (
           <View style={styles.stepBlock}>
             <FormInput
-              label={t('serviceListing.fieldTitle')}
+              label={t(isBuyer ? 'serviceListing.fieldTitleRequest' : 'serviceListing.fieldTitle')}
               value={title}
               onChangeText={setTitle}
-              placeholder={t('serviceListing.titlePlaceholder')}
+              placeholder={t(
+                isBuyer
+                  ? 'serviceListing.titlePlaceholderRequest'
+                  : 'serviceListing.titlePlaceholder',
+              )}
               required
               maxLength={LISTING_TITLE_MAX_LENGTH}
               showCounter
             />
 
             <FormInput
-              label={t('serviceListing.fieldDescription')}
+              label={t(
+                isBuyer
+                  ? 'serviceListing.fieldDescriptionRequest'
+                  : 'serviceListing.fieldDescription',
+              )}
               value={description}
               onChangeText={setDescription}
-              placeholder={t('serviceListing.descriptionPlaceholder')}
+              placeholder={t(
+                isBuyer
+                  ? 'serviceListing.descriptionPlaceholderRequest'
+                  : 'serviceListing.descriptionPlaceholder',
+              )}
               multiline
               numberOfLines={4}
               style={styles.descriptionInput}
@@ -383,9 +425,17 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <SelectField
-              label={t('serviceListing.fieldServiceCategory')}
+              label={t(
+                isBuyer
+                  ? 'serviceListing.fieldServiceCategoryRequest'
+                  : 'serviceListing.fieldServiceCategory',
+              )}
               placeholder={t('serviceListing.serviceCategoryPlaceholder')}
-              sheetTitle={t('serviceListing.fieldServiceCategory')}
+              sheetTitle={t(
+                isBuyer
+                  ? 'serviceListing.fieldServiceCategoryRequest'
+                  : 'serviceListing.fieldServiceCategory',
+              )}
               options={serviceCategoryOptions}
               value={serviceCategory}
               onChange={setServiceCategory}
@@ -458,7 +508,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <LocationField
-              label={t('serviceListing.fieldLocation')}
+              label={t(
+                isBuyer ? 'serviceListing.fieldLocationRequest' : 'serviceListing.fieldLocation',
+              )}
               value={location}
               required
               loading={locationLoading}
@@ -479,7 +531,11 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
             <AttachmentsSection documents={documents} downloadable={false} />
             <Button
-              label={editingId ? t('serviceListing.update') : t('serviceListing.publish')}
+              label={
+                editingId
+                  ? t(isBuyer ? 'serviceListing.updateRequest' : 'serviceListing.update')
+                  : t(isBuyer ? 'serviceListing.publishRequest' : 'serviceListing.publish')
+              }
               onPress={handlePublish}
               loading={publishing}
               style={styles.publishButton}

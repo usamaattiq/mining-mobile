@@ -363,9 +363,26 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   };
 
   const detailRows = [
-    { label: t('equipmentListing.fieldTitle'), value: title },
-    { label: t('equipmentListing.fieldDescription'), value: description },
-    { label: t('equipmentListing.fieldEquipmentType'), value: equipmentTypeLabel ?? '' },
+    {
+      label: t(isBuyer ? 'equipmentListing.fieldTitleRequest' : 'equipmentListing.fieldTitle'),
+      value: title,
+    },
+    {
+      label: t(
+        isBuyer
+          ? 'equipmentListing.fieldDescriptionRequest'
+          : 'equipmentListing.fieldDescription',
+      ),
+      value: description,
+    },
+    {
+      label: t(
+        isBuyer
+          ? 'equipmentListing.fieldEquipmentTypeRequest'
+          : 'equipmentListing.fieldEquipmentType',
+      ),
+      value: equipmentTypeLabel ?? '',
+    },
     ...(isBuyer
       ? []
       : [
@@ -422,7 +439,12 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           },
         ]
       : []),
-    { label: t('equipmentListing.fieldLocation'), value: location },
+    {
+      label: t(
+        isBuyer ? 'equipmentListing.fieldLocationRequest' : 'equipmentListing.fieldLocation',
+      ),
+      value: location,
+    },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
   const deliverySubtitle =
@@ -441,9 +463,19 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         variant="gold"
         title={
           editingId
-            ? t('equipmentListing.editFormTitle')
+            ? t(
+                isBuyer
+                  ? 'equipmentListing.editRequestFormTitle'
+                  : 'equipmentListing.editFormTitle',
+              )
             : isBuyer
-              ? t('equipmentListing.modeTitle')
+              ? mode === 'sell'
+                ? t('equipmentListing.buyRequestFormTitle')
+                : mode === 'both'
+                  ? t('equipmentListing.bothRequestFormTitle')
+                  : mode === 'rent'
+                    ? t('equipmentListing.rentRequestFormTitle')
+                    : t('equipmentListing.requestModeTitle')
               : mode === 'sell'
                 ? t('equipmentListing.sellFormTitle')
                 : mode === 'both'
@@ -523,20 +555,34 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             ) : null}
 
             <FormInput
-              label={t('equipmentListing.fieldTitle')}
+              label={t(
+                isBuyer ? 'equipmentListing.fieldTitleRequest' : 'equipmentListing.fieldTitle',
+              )}
               value={title}
               onChangeText={setTitle}
-              placeholder={t('equipmentListing.titlePlaceholder')}
+              placeholder={t(
+                isBuyer
+                  ? 'equipmentListing.titlePlaceholderRequest'
+                  : 'equipmentListing.titlePlaceholder',
+              )}
               required
               maxLength={LISTING_TITLE_MAX_LENGTH}
               showCounter
             />
 
             <FormInput
-              label={t('equipmentListing.fieldDescription')}
+              label={t(
+                isBuyer
+                  ? 'equipmentListing.fieldDescriptionRequest'
+                  : 'equipmentListing.fieldDescription',
+              )}
               value={description}
               onChangeText={setDescription}
-              placeholder={t('equipmentListing.descriptionPlaceholder')}
+              placeholder={t(
+                isBuyer
+                  ? 'equipmentListing.descriptionPlaceholderRequest'
+                  : 'equipmentListing.descriptionPlaceholder',
+              )}
               multiline
               numberOfLines={4}
               style={styles.descriptionInput}
@@ -545,9 +591,17 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             />
 
             <SelectField
-              label={t('equipmentListing.fieldEquipmentType')}
+              label={t(
+                isBuyer
+                  ? 'equipmentListing.fieldEquipmentTypeRequest'
+                  : 'equipmentListing.fieldEquipmentType',
+              )}
               placeholder={t('equipmentListing.equipmentTypePlaceholder')}
-              sheetTitle={t('equipmentListing.fieldEquipmentType')}
+              sheetTitle={t(
+                isBuyer
+                  ? 'equipmentListing.fieldEquipmentTypeRequest'
+                  : 'equipmentListing.fieldEquipmentType',
+              )}
               options={equipmentTypeOptions}
               value={equipmentType}
               onChange={setEquipmentType}
@@ -656,7 +710,11 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               </>
             ) : null}
             <LocationField
-              label={t('equipmentListing.fieldLocation')}
+              label={t(
+                isBuyer
+                  ? 'equipmentListing.fieldLocationRequest'
+                  : 'equipmentListing.fieldLocation',
+              )}
               value={location}
               required
               loading={locationLoading}
@@ -730,7 +788,13 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
             onChangeMedia={() => setStep(2)}
             onPublish={handlePublish}
             publishing={publishing}
-            publishLabel={editingId ? t('equipmentListing.update') : undefined}
+            publishLabel={
+              editingId
+                ? t(isBuyer ? 'equipmentListing.updateRequest' : 'equipmentListing.update')
+                : isBuyer
+                  ? t('equipmentListing.publishRequest')
+                  : undefined
+            }
           />
         ) : null}
 
