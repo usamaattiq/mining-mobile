@@ -39,6 +39,7 @@ import {
   isEquipmentListing,
   isGoldListing,
   isServiceListing,
+  type ListingDto,
 } from '@/features/listings/api/listingsApi';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { useMessagesStore } from '@/store/messagesStore';
@@ -66,6 +67,16 @@ type Props = CompositeScreenProps<
   BottomTabScreenProps<DashboardTabParamList, 'HomeTab'>,
   NativeStackScreenProps<RootStackParamList>
 >;
+
+/** Home feed: awaiting your confirmation, then live, then offer submitted, then the rest. */
+function homeFeedSortRank(listing: ListingDto): number {
+  const status = listing.rfq?.status;
+  const mine = listing.rfq?.myOfferStatus;
+  if (status === 'awaiting-your-confirmation' || mine === 'selected') return 0;
+  if (status === 'live' || status == null) return 1;
+  if (status === 'offer-submitted' || mine === 'active') return 2;
+  return 3;
+}
 
 type HomeFilters = {
   type: HomeTypeFilter;
@@ -109,7 +120,10 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           if (listingHasMyOffer(listing)) return true;
           return listing.rfq?.status === 'live';
         })
-        .sort((a, b) => Number(listingHasMyOffer(b)) - Number(listingHasMyOffer(a))),
+        .sort(
+          (a, b) =>
+            homeFeedSortRank(a) - homeFeedSortRank(b) || b.createdAt - a.createdAt,
+        ),
     [storedListings],
   );
   const equipmentListings = React.useMemo(() => marketListings.filter(isEquipmentListing), [marketListings]);
