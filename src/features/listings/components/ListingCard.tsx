@@ -49,17 +49,6 @@ function useRemainingTime(
   return `${Math.floor(remainingMs / 1000)}s`;
 }
 
-function SmallBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement {
-  return (
-    <View style={styles.smallBadge}>
-      {badge.icon ? <Ionicons name={badge.icon} size={10} color={palette.gold} /> : null}
-      <AppText weight="semibold" style={styles.smallBadgeText}>
-        {badge.label}
-      </AppText>
-    </View>
-  );
-}
-
 function statusBadgeStyle(variant: ListingCardBadge['variant']) {
   if (variant === 'muted') return styles.statusBadge_muted;
   if (variant === 'warning') return styles.statusBadge_warning;
@@ -111,9 +100,7 @@ function ListingCardComponent({
   unitsIcon = 'layers-outline',
   typeBadge,
   city,
-  deliveryBadge,
   requestBadge,
-  statusBadges,
   priceText,
   priceUnit,
   priceLines,
@@ -192,14 +179,10 @@ function ListingCardComponent({
               <Ionicons name={placeholderIcon} size={56} color={palette.goldDark} />
             </View>
           )}
-          {requestBadge ? (
-            <View style={styles.gridRequestOverlay}>
-              <StatusBadge badge={requestBadge} />
-            </View>
-          ) : null}
-          {typeBadge ? (
+          {requestBadge || typeBadge ? (
             <View style={styles.gridRfqOverlay}>
-              <StatusBadge badge={typeBadge} />
+              {requestBadge ? <StatusBadge badge={requestBadge} /> : null}
+              {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
             </View>
           ) : null}
         </View>
@@ -261,10 +244,6 @@ function ListingCardComponent({
           <View style={styles.gridFooter}>
             <View style={styles.gridFooterLeft}>
               {hasNewOffer ? <BlinkingDot /> : null}
-              {deliveryBadge ? <SmallBadge badge={deliveryBadge} /> : null}
-              {(statusBadges ?? []).map((badge) => (
-                <StatusBadge key={badge.key} badge={badge} />
-              ))}
             </View>
             {timer}
             {repostButton}
@@ -304,13 +283,16 @@ function ListingCardComponent({
             if (next > 0 && next !== imageSide) setImageSide(next);
           }}
         >
-          {typeBadge || showTimer || hasNewOffer ? (
+          {typeBadge || requestBadge || showTimer || hasNewOffer ? (
             <View style={styles.badgeRow}>
               <View style={styles.badgeRowStart}>
                 {hasNewOffer ? <BlinkingDot /> : null}
                 {showTimer ? timer : null}
               </View>
-              {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
+              <View style={styles.badgeRowEnd}>
+                {requestBadge ? <StatusBadge badge={requestBadge} /> : null}
+                {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
+              </View>
             </View>
           ) : null}
           <View style={styles.titleRow}>
@@ -398,17 +380,14 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
     gap: 4,
   },
-  gridRequestOverlay: {
-    position: 'absolute',
-    top: spacing.xs + 2,
-    left: spacing.xs + 2,
-    zIndex: 1,
-  },
   gridRfqOverlay: {
     position: 'absolute',
     top: spacing.xs + 2,
     right: spacing.xs + 2,
     zIndex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   gridPrices: {
     gap: 2,
@@ -509,6 +488,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  badgeRowEnd: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    flexShrink: 0,
   },
   titleRow: {
     flexDirection: 'row',
@@ -624,19 +609,6 @@ const styles = StyleSheet.create({
   },
   timerSlot: {
     flexShrink: 0,
-  },
-  smallBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    backgroundColor: palette.softGold,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 2,
-  },
-  smallBadgeText: {
-    fontSize: 10,
-    color: palette.gold,
   },
   title: {
     flex: 1,

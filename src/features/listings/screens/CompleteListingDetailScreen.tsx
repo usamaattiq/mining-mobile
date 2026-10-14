@@ -332,6 +332,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 equipmentListing.createdAt,
             ),
           },
+          {
+            label: t('equipmentListing.deliveryPreference'),
+            value: equipmentListing.deliveryAvailable
+              ? t('equipmentListing.deliveryRequested')
+              : t('equipmentListing.pickupFromSupplier'),
+          },
         ].filter((row) => (row.value ?? '').trim().length > 0)
       : [
       { label: t('common.reference'), value: equipmentListing.reference ?? '' },
@@ -371,6 +377,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             {
               label: t('equipmentListing.listedUntilRequest'),
               value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
+            },
+            {
+              label: t('equipmentListing.deliveryPreference'),
+              value: equipmentListing.deliveryAvailable
+                ? t('equipmentListing.deliveryRequested')
+                : t('equipmentListing.pickupFromSupplier'),
             },
           ]),
     ].filter((row) => (row.value ?? '').trim().length > 0);
@@ -725,6 +737,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const endingSoon =
     (rfq?.status === 'live' || rfq?.status === 'offer-submitted' || rfq?.status == null) &&
     isEndingSoon(countdownEnd);
+  const requestModeBadge =
+    equipmentListing?.postedAs === 'buyer'
+      ? {
+          key: 'request-mode',
+          label:
+            equipmentListing.requestMode === 'auction'
+              ? t('equipmentListing.requestAuction')
+              : t('equipmentListing.requestRfq'),
+          variant: equipmentListing.requestMode === 'auction' ? ('auction' as const) : ('rfq' as const),
+        }
+      : null;
   const headerBadge = endingSoon
     ? {
         key: 'ending-soon',
@@ -979,18 +1002,36 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }
           style={styles.carousel}
           statusBadge={
-            headerBadge ? (
-              <View
-                style={[
-                  styles.rfqStatusChip,
-                  headerBadge.variant === 'muted' && styles.rfqStatusChipMuted,
-                  headerBadge.variant === 'warning' && styles.rfqStatusChipWarning,
-                  headerBadge.variant === 'success' && styles.rfqStatusChipSuccess,
-                ]}
-              >
-                <AppText weight="semibold" style={styles.rfqStatusChipText}>
-                  {headerBadge.label}
-                </AppText>
+            requestModeBadge || headerBadge ? (
+              <View style={styles.carouselBadgeRow}>
+                {requestModeBadge ? (
+                  <View
+                    style={[
+                      styles.rfqStatusChip,
+                      requestModeBadge.variant === 'auction'
+                        ? styles.rfqStatusChipAuction
+                        : styles.rfqStatusChipRfq,
+                    ]}
+                  >
+                    <AppText weight="semibold" style={styles.rfqStatusChipText}>
+                      {requestModeBadge.label}
+                    </AppText>
+                  </View>
+                ) : null}
+                {headerBadge ? (
+                  <View
+                    style={[
+                      styles.rfqStatusChip,
+                      headerBadge.variant === 'muted' && styles.rfqStatusChipMuted,
+                      headerBadge.variant === 'warning' && styles.rfqStatusChipWarning,
+                      headerBadge.variant === 'success' && styles.rfqStatusChipSuccess,
+                    ]}
+                  >
+                    <AppText weight="semibold" style={styles.rfqStatusChipText}>
+                      {headerBadge.label}
+                    </AppText>
+                  </View>
+                ) : null}
               </View>
             ) : null
           }
@@ -2305,6 +2346,17 @@ const styles = StyleSheet.create({
   },
   rfqStatusChipSuccess: {
     backgroundColor: palette.gold,
+  },
+  rfqStatusChipRfq: {
+    backgroundColor: '#2F6F8F',
+  },
+  rfqStatusChipAuction: {
+    backgroundColor: '#6B4C9A',
+  },
+  carouselBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   rfqStatusChipText: {
     fontSize: 11,

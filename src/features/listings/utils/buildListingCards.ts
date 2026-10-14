@@ -194,20 +194,25 @@ export function buildListingCards({
             : undefined,
         city: cityFromLocation(listing.location),
         durationBadges,
-        deliveryBadge:
-          listing.postedAs !== 'buyer' &&
-          listing.deliveryAvailable &&
-          listing.deliveryType === 'perKm' &&
-          Boolean(parsePositiveAmount(listing.deliveryPricePerKm))
-            ? {
-                key: 'delivery',
-                label: t('equipmentListing.deliveryBadge'),
-                icon: 'car-outline',
-              }
-            : undefined,
+        deliveryBadge: listing.deliveryAvailable
+          ? {
+              key: 'delivery',
+              label: t('equipmentListing.deliveryBadge'),
+              icon: 'car-outline',
+            }
+          : undefined,
         statusBadges:
           listing.postedAs === 'buyer'
-            ? []
+            ? [
+                {
+                  key: 'request-mode',
+                  label:
+                    listing.requestMode === 'auction'
+                      ? t('equipmentListing.requestAuction')
+                      : t('equipmentListing.requestRfq'),
+                  variant: listing.requestMode === 'auction' ? 'auction' : 'rfq',
+                },
+              ]
             : [
                 offersRent ? { key: 'rent', label: t('equipmentListing.rent') } : null,
                 offersSell ? { key: 'sell', label: t('equipmentListing.sell') } : null,
