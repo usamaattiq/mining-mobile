@@ -114,6 +114,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [editUnits, setEditUnits] = React.useState(1);
   const [savingUnits, setSavingUnits] = React.useState(false);
   const [deletingListing, setDeletingListing] = React.useState(false);
+  const skipPromptKeyRef = React.useRef<string | null>(null);
 
   const applyListing = React.useCallback((listing: ListingDto) => {
     setFetchedListing(listing);
@@ -709,7 +710,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       .finally(() => setOfferSubmitting(false));
   };
 
-  const handleDecideOffer = (offerId: string, action: 'accept' | 'reject') => {
+  const handleDecideOffer = (
+    offerId: string,
+    action: 'accept' | 'reject',
+    alreadyConfirmed = false,
+  ) => {
     if (
       action === 'accept' &&
       category === 'equipment' &&
@@ -747,7 +752,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         .finally(() => setActingOfferId(null));
     };
 
-    if (action === 'accept' && category === 'gold') {
+    if (action === 'accept' && category === 'gold' && !alreadyConfirmed) {
       showAppAlert(t('goldListing.sendConfirmationTitle'), undefined, [
         { text: t('common.cancel'), style: 'cancel' },
         { text: t('common.confirm'), onPress: run },
@@ -768,6 +773,24 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       { text: t('rfq.reject'), style: 'destructive', onPress: run },
     ]);
   };
+
+  React.useEffect(() => {
+    if (!isOwner || isAdmin || !rfq?.needsOwnerSkipConfirm) return;
+    const offerId =
+      (rfq.offers ?? []).find((offer) => offer.status === 'selected')?.id ??
+      (rfq.offers ?? []).find((offer) => offer.status === 'active')?.id;
+    if (!offerId) return;
+    const key = `${id}:${offerId}`;
+    if (skipPromptKeyRef.current === key) return;
+    skipPromptKeyRef.current = key;
+    showAppAlert(t('goldListing.skipTimedOutTitle'), t('goldListing.skipTimedOutMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('goldListing.skipTimedOutConfirm'),
+        onPress: () => handleDecideOffer(offerId, 'accept', true),
+      },
+    ]);
+  }, [id, isAdmin, isOwner, rfq, t]);
 
   const handleResponderOffer = (
     action: 'confirm' | 'decline' | 'withdraw',
