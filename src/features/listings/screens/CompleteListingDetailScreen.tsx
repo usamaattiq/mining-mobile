@@ -625,8 +625,10 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   // Block the other rent/sale offer until this one is accepted (confirmed).
   // Set to false to allow both kinds again while one is still open.
   const limitToOneOpenOffer = true;
+  const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
   const hasOpenSupplierOffer =
     limitToOneOpenOffer &&
+    !isAuction &&
     (mySupplierOffers.some((offer) => offer.status === 'active' || offer.status === 'selected') ||
       rfq?.myOfferStatus === 'active' ||
       rfq?.myOfferStatus === 'selected');
@@ -643,7 +645,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       rfq?.myOfferStatus === 'active' ||
       rfq?.status === 'offer-submitted');
   const showOwnerOffers = (isOwner || isAdmin) && Boolean(rfq);
-  const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
   const showBidderLeaderboard =
     isAuction && !isOwner && !isAdmin && hasSentOffer && (rfq?.offers?.length ?? 0) > 0;
   const showCountdown =
