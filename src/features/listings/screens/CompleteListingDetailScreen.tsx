@@ -87,14 +87,19 @@ function AuctionPriceCard({
   highestBid,
   startingLabel,
   highestLabel,
+  unitsLabel,
+  unitsCaption,
 }: {
   currencyCode: string;
   startingPrice?: string;
   highestBid?: string;
   startingLabel: string;
   highestLabel: string;
+  unitsLabel?: string;
+  unitsCaption?: string;
 }): React.ReactElement | null {
-  if (!startingPrice && !highestBid) return null;
+  const showHighest = Boolean(highestBid) || Boolean(unitsLabel);
+  if (!startingPrice && !showHighest) return null;
   return (
     <View style={styles.unitPriceCard}>
       {startingPrice ? (
@@ -108,15 +113,27 @@ function AuctionPriceCard({
           </AppText>
         </View>
       ) : null}
-      {startingPrice && highestBid ? <View style={styles.unitPriceDivider} /> : null}
-      {highestBid ? (
+      {startingPrice && showHighest ? <View style={styles.unitPriceDivider} /> : null}
+      {showHighest ? (
         <View style={styles.unitPriceCell}>
           <View style={styles.unitPriceHeading}>
             <Ionicons name="trophy-outline" size={18} color={palette.charcoal} />
             <AppText style={styles.unitPriceCaption}>{highestLabel}</AppText>
           </View>
           <AppText weight="bold" style={styles.unitPriceAmount}>
-            {currencyCode} {formatAmountWithCommas(highestBid)}
+            {highestBid ? `${currencyCode} ${formatAmountWithCommas(highestBid)}` : '—'}
+          </AppText>
+        </View>
+      ) : null}
+      {showHighest && unitsLabel ? <View style={styles.unitPriceDivider} /> : null}
+      {unitsLabel ? (
+        <View style={styles.unitPriceCell}>
+          <View style={styles.unitPriceHeading}>
+            <Ionicons name="layers-outline" size={18} color={palette.charcoal} />
+            <AppText style={styles.unitPriceCaption}>{unitsCaption ?? unitsLabel}</AppText>
+          </View>
+          <AppText weight="bold" style={styles.unitPriceAmount}>
+            {unitsLabel}
           </AppText>
         </View>
       ) : null}
@@ -467,6 +484,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           highestBid={equipmentListing.rfq?.currentPrice}
           startingLabel={t('goldListing.startingPrice')}
           highestLabel={t('goldListing.highestBid')}
+          unitsCaption={t('equipmentListing.requiredUnits')}
+          unitsLabel={String(equipmentListing.units)}
         />
       );
     } else {

@@ -511,6 +511,7 @@
     "fieldLocationRequest": "Where do you need the equipment?",
     "unitsCount": "{count} Units",
     "availableUnits": "Available units",
+    "requiredUnits": "Required units",
     "unitsLeft": "{count} left",
     "manageUnits": "Rent & sale units",
     "viewUnitDetails": "View Unit Details",

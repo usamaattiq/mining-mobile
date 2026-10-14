@@ -490,6 +490,7 @@
     "fieldLocationRequest": "أين تحتاج المعدة؟",
     "unitsCount": "{count} وحدة",
     "availableUnits": "الوحدات المتاحة",
+    "requiredUnits": "الوحدات المطلوبة",
     "unitsLeft": "المتبقي {count}",
     "manageUnits": "وحدات الإيجار والبيع",
     "viewUnitDetails": "عرض تفاصيل الوحدات",
