@@ -416,6 +416,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 15,
     color: palette.charcoal,
+    marginTop: 2,
   },
   gridMetaRow: {
     flexDirection: 'row',
@@ -499,6 +500,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 6,
   },
   locationRow: {
     flexDirection: 'row',
