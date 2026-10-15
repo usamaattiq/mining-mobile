@@ -158,7 +158,11 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
           subtitle={t(role === 'buyer' ? 'offers.emptySubtitle' : 'offers.emptySubtitleSupplier')}
         />
       ) : (
-        cards.map(({ id, ...card }) => <ListingCard key={`${category}-${id}`} {...card} />)
+        <View style={styles.list}>
+          {cards.map(({ id, ...card }) => (
+            <ListingCard key={`${category}-${id}`} {...card} />
+          ))}
+        </View>
       )}
     </GoldSheetScreen>
   );
@@ -172,5 +176,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl,
     backgroundColor: palette.gold,
+  },
+  list: {
+    gap: spacing.md,
   },
 });

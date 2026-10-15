@@ -2378,7 +2378,7 @@ const styles = StyleSheet.create({
   withdrawDisabled: {
     opacity: 0.4,
   },
-  myOffers: { gap: spacing.xs },
+  myOffers: { gap: spacing.md },
   myOffersTitle: { fontSize: 16, color: palette.charcoal },
   myOfferCard: {
     backgroundColor: palette.warmWhite,

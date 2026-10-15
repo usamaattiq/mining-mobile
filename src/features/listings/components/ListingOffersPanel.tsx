@@ -332,10 +332,10 @@ export function ListingOffersPanel({
 
 const styles = StyleSheet.create({
   root: {
-    gap: spacing.xs,
+    gap: spacing.md,
   },
   rootCompact: {
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   title: {
     fontSize: 15,
