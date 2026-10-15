@@ -12,6 +12,7 @@ type Loader = (signal: AbortSignal) => Promise<void>;
 export function useAbortableFocusLoad(
   loader: Loader,
   deps: React.DependencyList,
+  options?: { minIntervalMs?: number },
 ): {
   loadError: boolean;
   refreshing: boolean;
@@ -22,13 +23,20 @@ export function useAbortableFocusLoad(
   const [refreshing, setRefreshing] = React.useState(false);
   const loaderRef = React.useRef(loader);
   loaderRef.current = loader;
+  const optionsRef = React.useRef(options);
+  optionsRef.current = options;
+  const lastSuccessAt = React.useRef(0);
+  const lastDeps = React.useRef<React.DependencyList | null>(null);
   const pullAbortRef = React.useRef<AbortController | null>(null);
 
   const run = React.useCallback(async (signal: AbortSignal, asPull = false) => {
     if (asPull) setRefreshing(true);
     try {
       await loaderRef.current(signal);
-      if (!signal.aborted) setLoadError(false);
+      if (!signal.aborted) {
+        lastSuccessAt.current = Date.now();
+        setLoadError(false);
+      }
     } catch (error) {
       if (isAbortError(error) || signal.aborted) return;
       setLoadError(true);
@@ -39,6 +47,19 @@ export function useAbortableFocusLoad(
 
   useFocusEffect(
     React.useCallback(() => {
+      const depsChanged =
+        lastDeps.current == null ||
+        lastDeps.current.length !== deps.length ||
+        lastDeps.current.some((value, index) => value !== deps[index]);
+      lastDeps.current = deps;
+      const minIntervalMs = optionsRef.current?.minIntervalMs ?? 0;
+      if (
+        !depsChanged &&
+        minIntervalMs > 0 &&
+        Date.now() - lastSuccessAt.current < minIntervalMs
+      ) {
+        return undefined;
+      }
       const ac = new AbortController();
       void run(ac.signal);
       return () => {

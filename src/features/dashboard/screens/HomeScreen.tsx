@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -59,6 +59,7 @@ import {
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
 import { AppText } from '@/shared/components/AppText';
 import { useCurrency } from '@/shared/hooks/useCurrency';
+import { useFloatingTabBarContentPadding } from '@/features/dashboard/components/FloatingTabBar';
 import { useAbortableFocusLoad } from '@/shared/hooks/useAbortableFocusLoad';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { palette, radius, spacing } from '@/theme';
@@ -138,6 +139,8 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
 
   const [category, setCategory] = React.useState<ListingCategory>('equipment');
   const [query, setQuery] = React.useState('');
+  const [debouncedQuery, setDebouncedQuery] = React.useState('');
+  const tabBarPadding = useFloatingTabBarContentPadding();
   const [filters, setFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [draftFilters, setDraftFilters] = React.useState<HomeFilters>(EMPTY_FILTERS);
   const [filterOpen, setFilterOpen] = React.useState(false);
@@ -155,7 +158,13 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       ]);
     },
     [role],
+    { minIntervalMs: 30_000 },
   );
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 200);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const openProfile = () => {
     navigation.navigate('Profile');
@@ -319,7 +328,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       if (!inNumericRange(goldListingAmount(listing), priceMin, priceMax)) return false;
       return matchesCityAndDate(listing.location, listing.auctionEndDate ?? listing.createdAt);
     });
-    const needle = query.trim().toLowerCase();
+    const needle = debouncedQuery.trim().toLowerCase();
     return buildListingCards({
       category,
       equipmentListings: visibleEquipment,
@@ -348,7 +357,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     goldListings,
     kindOptions,
     navigation,
-    query,
+    debouncedQuery,
     serviceListings,
     t,
   ]);
@@ -432,69 +441,89 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           />
         </View>
       }
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.gold} />
-      }
+      scroll={false}
     >
-      <View style={styles.searchRow}>
-        <View style={styles.searchField}>
-          <SearchField
-            value={query}
-            onChangeText={setQuery}
-            placeholder={t(
-              category === 'services'
-                ? 'dashboardHome.searchServices'
-                : category === 'gold'
-                  ? 'dashboardHome.searchGold'
-                  : 'dashboardHome.searchEquipment',
-            )}
-          />
-        </View>
-        <Pressable
-          onPress={() => setViewMode((current) => (current === 'list' ? 'grid' : 'list'))}
-          accessibilityRole="button"
-          accessibilityLabel={
-            viewMode === 'list' ? t('dashboardHome.viewGrid') : t('dashboardHome.viewList')
-          }
-          style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
-        >
-          <Ionicons
-            name={viewMode === 'list' ? 'grid-outline' : 'list-outline'}
-            size={20}
-            color={palette.gold}
-          />
-        </Pressable>
-        <Pressable
-          onPress={openFilter}
-          accessibilityRole="button"
-          accessibilityLabel={t('dashboardHome.filter')}
-          style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
-        >
-          <Ionicons name="options-outline" size={20} color={palette.gold} />
-        </Pressable>
-      </View>
-
-      {loadError && !hasCachedData ? (
-        <ErrorState
-          title={t('common.loadFailed')}
-          subtitle={t('common.loadFailedSubtitle')}
-          retryLabel={t('common.retry')}
-          onRetry={retry}
-        />
-      ) : cards.length === 0 ? (
-        <EmptyState
-          title={t('dashboardHome.emptyTitle')}
-          subtitle={t('dashboardHome.emptySubtitle')}
-        />
-      ) : viewMode === 'grid' ? (
-        <View style={styles.listingGrid}>
-          {cards.map(({ id, ...card }) => (
-            <ListingCard key={`${category}-${id}`} layout="grid" {...card} />
-          ))}
-        </View>
-      ) : (
-        cards.map(({ id, ...card }) => <ListingCard key={`${category}-${id}`} {...card} />)
-      )}
+      <FlatList
+        key={viewMode}
+        style={styles.feed}
+        data={cards}
+        keyExtractor={(item) => `${category}-${item.id}`}
+        numColumns={viewMode === 'grid' ? 2 : 1}
+        columnWrapperStyle={viewMode === 'grid' ? styles.gridRow : undefined}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        initialNumToRender={8}
+        windowSize={7}
+        contentContainerStyle={[
+          styles.feedContent,
+          tabBarPadding > 0 && { paddingBottom: spacing.md + tabBarPadding },
+        ]}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.gold} />
+        }
+        ListHeaderComponent={
+          <View style={styles.searchRow}>
+            <View style={styles.searchField}>
+              <SearchField
+                value={query}
+                onChangeText={setQuery}
+                placeholder={t(
+                  category === 'services'
+                    ? 'dashboardHome.searchServices'
+                    : category === 'gold'
+                      ? 'dashboardHome.searchGold'
+                      : 'dashboardHome.searchEquipment',
+                )}
+              />
+            </View>
+            <Pressable
+              onPress={() => setViewMode((current) => (current === 'list' ? 'grid' : 'list'))}
+              accessibilityRole="button"
+              accessibilityLabel={
+                viewMode === 'list' ? t('dashboardHome.viewGrid') : t('dashboardHome.viewList')
+              }
+              style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
+            >
+              <Ionicons
+                name={viewMode === 'list' ? 'grid-outline' : 'list-outline'}
+                size={20}
+                color={palette.gold}
+              />
+            </Pressable>
+            <Pressable
+              onPress={openFilter}
+              accessibilityRole="button"
+              accessibilityLabel={t('dashboardHome.filter')}
+              style={({ pressed }) => [styles.filterButton, pressed && styles.filterPressed]}
+            >
+              <Ionicons name="options-outline" size={20} color={palette.gold} />
+            </Pressable>
+          </View>
+        }
+        ListEmptyComponent={
+          loadError && !hasCachedData ? (
+            <ErrorState
+              title={t('common.loadFailed')}
+              subtitle={t('common.loadFailedSubtitle')}
+              retryLabel={t('common.retry')}
+              onRetry={retry}
+            />
+          ) : (
+            <EmptyState
+              title={t('dashboardHome.emptyTitle')}
+              subtitle={t('dashboardHome.emptySubtitle')}
+            />
+          )
+        }
+        renderItem={({ item }) => {
+          const { id: _id, ...card } = item;
+          return (
+            <View style={viewMode === 'grid' ? styles.gridCell : undefined}>
+              <ListingCard layout={viewMode === 'grid' ? 'grid' : 'row'} {...card} />
+            </View>
+          );
+        }}
+      />
 
       <HomeFilterSheet
         visible={filterOpen}
@@ -635,11 +664,21 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
-  listingGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: spacing.md,
+  feed: {
+    flex: 1,
+  },
+  feedContent: {
+    flexGrow: 1,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+    gap: spacing.md,
+  },
+  gridRow: {
+    gap: spacing.md,
+  },
+  gridCell: {
+    flex: 1,
   },
   filterButton: {
     width: 48,

@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   gridCard: {
-    width: '48%',
+    width: '100%',
     backgroundColor: palette.warmWhite,
     borderRadius: radius.lg,
   },

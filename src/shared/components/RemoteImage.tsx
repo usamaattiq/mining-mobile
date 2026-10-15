@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Image, type ImageContentFit, type ImageSource } from 'expo-image';
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -33,12 +34,18 @@ export function RemoteImage({
   }, [sourceKey]);
 
   useEffect(() => {
+    if (loaded) {
+      cancelAnimation(shimmer);
+      return;
+    }
+    shimmer.value = -1;
     shimmer.value = withRepeat(
       withTiming(1, { duration: 1100, easing: Easing.inOut(Easing.ease) }),
       -1,
       false,
     );
-  }, [shimmer]);
+    return () => cancelAnimation(shimmer);
+  }, [loaded, shimmer]);
 
   const shimmerStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: -90 + shimmer.value * 480 }],
