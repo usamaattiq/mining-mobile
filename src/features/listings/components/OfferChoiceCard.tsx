@@ -13,6 +13,8 @@ type OfferChoiceCardProps = {
   onPress: () => void;
   /** Match form field text (15) instead of the larger first-step title. */
   compact?: boolean;
+  /** Navigation cards do not need the selection circle. */
+  hideCheck?: boolean;
 };
 
 /** Large selectable card for the first step of a listing — rent/sell or onsite/online. */
@@ -23,6 +25,7 @@ export function OfferChoiceCard({
   subtitle,
   onPress,
   compact = false,
+  hideCheck = false,
 }: OfferChoiceCardProps): React.ReactElement {
   return (
     <Pressable
@@ -46,9 +49,11 @@ export function OfferChoiceCard({
         </AppText>
         <AppText style={styles.subtitle}>{subtitle}</AppText>
       </View>
-      <View style={[styles.check, selected && styles.checkSelected]}>
-        {selected ? <Ionicons name="checkmark" size={16} color={palette.pureWhite} /> : null}
-      </View>
+      {hideCheck ? null : (
+        <View style={[styles.check, selected && styles.checkSelected]}>
+          {selected ? <Ionicons name="checkmark" size={16} color={palette.pureWhite} /> : null}
+        </View>
+      )}
     </Pressable>
   );
 }

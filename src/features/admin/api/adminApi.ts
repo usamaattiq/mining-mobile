@@ -124,4 +124,10 @@ export const adminApi = {
   deleteCategory(id: string): Promise<{ id: string }> {
     return apiFetch(`/admin/categories/${id}`, { method: 'DELETE' });
   },
+  settings(): Promise<{ messageOnSend: boolean }> {
+    return apiFetch('/admin/settings');
+  },
+  setMessageOnSend(messageOnSend: boolean): Promise<{ messageOnSend: boolean }> {
+    return apiFetch('/admin/settings', { method: 'PATCH', body: { messageOnSend } });
+  },
 };

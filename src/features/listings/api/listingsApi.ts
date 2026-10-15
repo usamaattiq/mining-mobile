@@ -175,4 +175,8 @@ export const listingsApi = {
   }> {
     return apiFetch(`/listings/catalog?category=${category}`);
   },
+
+  appSettings(): Promise<{ messageOnSend: boolean }> {
+    return apiFetch('/listings/settings');
+  },
 };

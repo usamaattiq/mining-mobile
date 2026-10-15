@@ -33,6 +33,8 @@ export type RootStackParamList = {
   GoldListingForm: { repostId?: string; editId?: string } | undefined;
   CompleteListingDetail: { id: string; category: ListingCategory };
   EquipmentStock: { id: string };
+  AdminSystemMessage: undefined;
+  AdminSystemCategories: undefined;
   Conversation: { conversationId: string };
   Messages: undefined;
   Notifications: undefined;

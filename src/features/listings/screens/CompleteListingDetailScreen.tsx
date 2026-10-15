@@ -260,6 +260,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [detailsOpen, setDetailsOpen] = React.useState(false);
   const [selectedDuration, setSelectedDuration] = React.useState<RentalDuration | null>(null);
   const [messageOpen, setMessageOpen] = React.useState(false);
+  const [messageOnSend, setMessageOnSend] = React.useState(true);
   const [messagePeer, setMessagePeer] = React.useState<{
     id: string;
     fullName: string;
@@ -273,6 +274,12 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [editOfferKind, setEditOfferKind] = React.useState<'rent' | 'sale'>('rent');
   const [editOfferHandover, setEditOfferHandover] = React.useState<'pickup' | 'delivery'>('pickup');
   const [editOfferDelivery, setEditOfferDelivery] = React.useState<'onsite' | 'online'>('onsite');
+  React.useEffect(() => {
+    void listingsApi
+      .appSettings()
+      .then((settings) => setMessageOnSend(settings.messageOnSend))
+      .catch(() => undefined);
+  }, []);
   const countdownEnd =
     (equipmentListing ?? serviceListing ?? goldListing)?.rfq?.expiresAt ??
     goldListing?.auctionEndDate ??
@@ -1282,6 +1289,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               listingReference={
                 equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
               }
+              messageOnSend={messageOnSend}
               confirmationOfferId={
                 isAuction && isOwner && rfq?.canDecideOffers
                   ? (rfq.offers ?? []).find((offer) => offer.status === 'active')?.id
@@ -1312,6 +1320,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               }
               contactName={owner?.fullName}
               contactPhone={rfq?.ownerPhone}
+              messageOnSend={messageOnSend}
               onAccept={() => undefined}
               onReject={() => undefined}
             />
@@ -1600,7 +1609,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         />
                       </View>
                     ) : null}
-                    {editingOfferId !== offer.id ? (
+                    {editingOfferId !== offer.id &&
+                    (messageOnSend || offer.status === 'confirmed') ? (
                       <View style={[styles.myOfferActions, styles.myOfferMessageActions]}>
                         <Button
                           label={t('messages.message')}
@@ -2042,7 +2052,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           messageLabel={t('messages.message')}
           whatsappLabel={t('common.whatsapp')}
           onMessage={
-            hasSentOffer && owner
+            owner && (messageOnSend ? hasSentOffer : rfq?.myOfferStatus === 'confirmed')
               ? () => {
                   setMessagePeer({
                     id: owner.id,

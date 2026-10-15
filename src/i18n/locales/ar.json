@@ -282,7 +282,13 @@
     "blockUser": "حظر المستخدم",
     "unblockUser": "إلغاء الحظر",
     "blockUserConfirm": "حظر هذا المستخدم؟ لن يتمكن من تسجيل الدخول.",
-    "unblockUserConfirm": "إلغاء حظر هذا المستخدم ليتمكن من تسجيل الدخول؟"
+    "unblockUserConfirm": "إلغاء حظر هذا المستخدم ليتمكن من تسجيل الدخول؟",
+    "messageOnSend": "الرسالة بعد إرسال العرض",
+    "messageOnSendHint": "إظهار زر الرسالة على العرض فور إرساله.",
+    "sectionMessage": "الرسائل",
+    "sectionMessageDetail": "متى يظهر زر الرسالة على العرض.",
+    "sectionCategories": "التصنيفات",
+    "sectionCategoriesDetail": "تسميات المعدات والخدمات والذهب."
   },
   "tabs": {
     "home": "الرئيسية",
@@ -292,7 +298,7 @@
     "profile": "حسابي",
     "users": "المستخدمون",
     "listings": "الإعلانات",
-    "categories": "التصنيفات",
+    "categories": "Systemetics",
     "createListing": "إنشاء إعلان",
     "createRequest": "إنشاء طلب"
   },

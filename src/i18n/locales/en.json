@@ -282,7 +282,13 @@
     "blockUser": "Block user",
     "unblockUser": "Unblock user",
     "blockUserConfirm": "Block this user? They will not be able to sign in.",
-    "unblockUserConfirm": "Unblock this user so they can sign in again?"
+    "unblockUserConfirm": "Unblock this user so they can sign in again?",
+    "messageOnSend": "Message after sending an offer",
+    "messageOnSendHint": "Show the message button on an offer as soon as it is sent.",
+    "sectionMessage": "Message",
+    "sectionMessageDetail": "When the message button appears on an offer.",
+    "sectionCategories": "Categories",
+    "sectionCategoriesDetail": "Equipment, services, and gold labels."
   },
   "tabs": {
     "home": "Home",
@@ -292,7 +298,7 @@
     "profile": "Profile",
     "users": "User",
     "listings": "Listing",
-    "categories": "Categories",
+    "categories": "Systemetics",
     "createListing": "Create Listing",
     "createRequest": "Create Request"
   },

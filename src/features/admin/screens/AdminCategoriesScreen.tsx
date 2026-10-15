@@ -1,11 +1,15 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import type { RootStackParamList } from '@/navigation/types';
 import { i18n as appI18n } from '@/i18n';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { adminApi, type AdminCategoryItem } from '@/features/admin/api/adminApi';
 import { invalidateCatalogCache } from '@/features/listings/utils/catalogLabels';
+import { OfferChoiceCard } from '@/features/listings/components/OfferChoiceCard';
 import { SegmentedSwitcher } from '@/shared/components/SegmentedSwitcher';
 import { SearchField } from '@/shared/components/SearchField';
 import { AppBottomSheet } from '@/shared/components/AppBottomSheet';
@@ -46,6 +50,40 @@ function filterTree(nodes: LabelNode[], query: string): LabelNode[] {
 
 export function AdminCategoriesScreen(): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  return (
+    <GoldSheetScreen
+      title={t('tabs.categories')}
+      titleAlign="left"
+      titleSize="lg"
+      headerStyle={styles.hubHeader}
+    >
+      <View style={styles.stepBlock}>
+        <OfferChoiceCard
+          selected={false}
+          hideCheck
+          icon="chatbubble-ellipses-outline"
+          title={t('admin.sectionMessage')}
+          subtitle={t('admin.sectionMessageDetail')}
+          onPress={() => navigation.navigate('AdminSystemMessage')}
+        />
+        <OfferChoiceCard
+          selected={false}
+          hideCheck
+          icon="grid-outline"
+          title={t('admin.sectionCategories')}
+          subtitle={t('admin.sectionCategoriesDetail')}
+          onPress={() => navigation.navigate('AdminSystemCategories')}
+        />
+      </View>
+    </GoldSheetScreen>
+  );
+}
+
+export function AdminSystemCategoriesScreen(): React.ReactElement {
+  const { t } = useTranslation(undefined, { i18n: appI18n });
+  const navigation = useNavigation();
   const [items, setItems] = React.useState<AdminCategoryItem[]>([]);
   const [domain, setDomain] = React.useState<CategoryKey>('equipment');
   const [query, setQuery] = React.useState('');
@@ -114,10 +152,12 @@ export function AdminCategoriesScreen(): React.ReactElement {
   return (
     <>
       <GoldSheetScreen
-        title={t('tabs.categories')}
+        title={t('admin.sectionCategories')}
         titleAlign="left"
         titleSize="lg"
         headerStyle={styles.header}
+        left="back"
+        onBackPress={() => navigation.goBack()}
         rightSlot={
           <Pressable
             onPress={() => setDraft({ id: null, name: '', nameAr: '', parentId: null })}
@@ -312,6 +352,7 @@ function CategoryBranch({
 }
 
 const styles = StyleSheet.create({
+  hubHeader: { paddingBottom: spacing.xl },
   header: { paddingBottom: spacing.lg },
   headerAdd: {
     width: 36,
@@ -325,9 +366,52 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl,
     backgroundColor: palette.gold,
+    gap: spacing.sm,
   },
   body: {
     gap: spacing.md,
+  },
+  stepBlock: {
+    gap: spacing.md,
+  },
+  offerHeading: {
+    fontSize: 20,
+    lineHeight: 26,
+    color: palette.charcoal,
+    marginBottom: spacing.sm,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: palette.pureWhite,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    padding: spacing.md,
+  },
+  settingCopy: { flex: 1, gap: 2 },
+  settingTitle: { fontSize: 15, color: palette.charcoal },
+  settingHint: { fontSize: 12, color: palette.muted },
+  toggle: {
+    width: 48,
+    height: 28,
+    borderRadius: 14,
+    padding: 3,
+    backgroundColor: '#D9D3C7',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  toggleOn: {
+    backgroundColor: palette.gold,
+    justifyContent: 'flex-end',
+  },
+  toggleThumb: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: palette.pureWhite,
   },
   loader: { marginTop: spacing.xl },
   card: {

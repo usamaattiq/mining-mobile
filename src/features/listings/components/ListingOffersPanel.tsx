@@ -48,6 +48,8 @@ export type ListingOffersPanelProps = {
   listingCategory?: ListingShareCategory;
   listingTitle?: string;
   listingReference?: string;
+  /** When true, Message shows as soon as the offer is sent. Otherwise only after it is confirmed. */
+  messageOnSend?: boolean;
   onPressResponder?: (offer: ListingRfqOffer) => void;
 };
 
@@ -94,6 +96,7 @@ export function ListingOffersPanel({
   listingCategory,
   listingTitle,
   listingReference,
+  messageOnSend = true,
   onPressResponder,
 }: ListingOffersPanelProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
@@ -267,7 +270,10 @@ export function ListingOffersPanel({
                 </View>
               ) : null}
               {onMessage &&
-              ['active', 'selected', 'confirmed'].includes(offer.status) &&
+              (messageOnSend
+                ? ['active', 'selected', 'confirmed']
+                : ['confirmed']
+              ).includes(offer.status) &&
               (!contactResponderId || offer.responderId === contactResponderId) ? (
                 <View style={[styles.actions, styles.messageActions]}>
                   <Button
