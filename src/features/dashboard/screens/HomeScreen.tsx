@@ -120,14 +120,17 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
           if (listingHasMyOffer(listing)) return true;
           return listing.rfq?.status === 'live';
         })
-        .sort(
-          (a, b) =>
-            homeFeedSortRank(a) - homeFeedSortRank(b) || b.createdAt - a.createdAt,
-        ),
+        .sort((a, b) => homeFeedSortRank(a) - homeFeedSortRank(b) || b.createdAt - a.createdAt),
     [storedListings],
   );
-  const equipmentListings = React.useMemo(() => marketListings.filter(isEquipmentListing), [marketListings]);
-  const serviceListings = React.useMemo(() => marketListings.filter(isServiceListing), [marketListings]);
+  const equipmentListings = React.useMemo(
+    () => marketListings.filter(isEquipmentListing),
+    [marketListings],
+  );
+  const serviceListings = React.useMemo(
+    () => marketListings.filter(isServiceListing),
+    [marketListings],
+  );
   const goldListings = React.useMemo(() => marketListings.filter(isGoldListing), [marketListings]);
   const name = profile?.fullName?.trim() || '—';
   const firstName = name === '—' ? name : (name.split(/\s+/)[0] ?? name);
@@ -223,50 +226,50 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
 
   const filterOptions = React.useMemo(
     () =>
-    category === 'equipment'
-      ? [
-          { key: 'rent' as const, label: t('equipmentListing.rent') },
-          { key: 'sell' as const, label: t('equipmentListing.sell') },
-        ]
-      : category === 'services'
+      category === 'equipment'
         ? [
-            { key: 'onsite' as const, label: t('serviceListing.onsite') },
-            { key: 'online' as const, label: t('serviceListing.online') },
+            { key: 'rent' as const, label: t('equipmentListing.rent') },
+            { key: 'sell' as const, label: t('equipmentListing.sell') },
           ]
-        : [
-            { key: '18k' as const, label: t('goldListing.karatValue', { karat: 18 }) },
-            { key: '21k' as const, label: t('goldListing.karatValue', { karat: 21 }) },
-            { key: '22k' as const, label: t('goldListing.karatValue', { karat: 22 }) },
-            { key: '24k' as const, label: t('goldListing.karatValue', { karat: 24 }) },
-          ],
+        : category === 'services'
+          ? [
+              { key: 'onsite' as const, label: t('serviceListing.onsite') },
+              { key: 'online' as const, label: t('serviceListing.online') },
+            ]
+          : [
+              { key: '18k' as const, label: t('goldListing.karatValue', { karat: 18 }) },
+              { key: '21k' as const, label: t('goldListing.karatValue', { karat: 21 }) },
+              { key: '22k' as const, label: t('goldListing.karatValue', { karat: 22 }) },
+              { key: '24k' as const, label: t('goldListing.karatValue', { karat: 24 }) },
+            ],
     [category, t],
   );
 
   const kindOptions = React.useMemo(
     () =>
-    category === 'equipment'
-      ? [
-          { key: 'excavator', label: t('equipmentListing.type.excavator') },
-          { key: 'bulldozer', label: t('equipmentListing.type.bulldozer') },
-          { key: 'drillRig', label: t('equipmentListing.type.drillRig') },
-          { key: 'loader', label: t('equipmentListing.type.loader') },
-          { key: 'crusher', label: t('equipmentListing.type.crusher') },
-          { key: 'other', label: t('equipmentListing.type.other') },
-        ]
-      : category === 'services'
+      category === 'equipment'
         ? [
-            { key: 'consulting', label: t('serviceListing.category.consulting') },
-            { key: 'drilling', label: t('serviceListing.category.drilling') },
-            { key: 'assayTesting', label: t('serviceListing.category.assayTesting') },
-            { key: 'transportLogistics', label: t('serviceListing.category.transportLogistics') },
-            { key: 'equipmentRepair', label: t('serviceListing.category.equipmentRepair') },
-            {
-              key: 'environmentalPermitting',
-              label: t('serviceListing.category.environmentalPermitting'),
-            },
-            { key: 'other', label: t('serviceListing.category.other') },
+            { key: 'excavator', label: t('equipmentListing.type.excavator') },
+            { key: 'bulldozer', label: t('equipmentListing.type.bulldozer') },
+            { key: 'drillRig', label: t('equipmentListing.type.drillRig') },
+            { key: 'loader', label: t('equipmentListing.type.loader') },
+            { key: 'crusher', label: t('equipmentListing.type.crusher') },
+            { key: 'other', label: t('equipmentListing.type.other') },
           ]
-        : undefined,
+        : category === 'services'
+          ? [
+              { key: 'consulting', label: t('serviceListing.category.consulting') },
+              { key: 'drilling', label: t('serviceListing.category.drilling') },
+              { key: 'assayTesting', label: t('serviceListing.category.assayTesting') },
+              { key: 'transportLogistics', label: t('serviceListing.category.transportLogistics') },
+              { key: 'equipmentRepair', label: t('serviceListing.category.equipmentRepair') },
+              {
+                key: 'environmentalPermitting',
+                label: t('serviceListing.category.environmentalPermitting'),
+              },
+              { key: 'other', label: t('serviceListing.category.other') },
+            ]
+          : undefined,
     [category, t],
   );
 
@@ -414,7 +417,9 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         <View style={styles.headerExtra}>
           <HomeCategoryCards
             heading={
-              role === 'buyer' ? t('dashboardHome.buyerHeading') : t('dashboardHome.supplierHeading')
+              role === 'buyer'
+                ? t('dashboardHome.buyerHeading')
+                : t('dashboardHome.supplierHeading')
             }
             description={
               role === 'buyer'

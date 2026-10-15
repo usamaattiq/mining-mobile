@@ -3,9 +3,12 @@ import type { ListingCategory } from '@/navigation/types';
 import type { EquipmentListing } from '@/features/listings/types/equipmentListing.types';
 import type { ServiceListing } from '@/features/listings/types/serviceListing.types';
 import type { GoldListing } from '@/features/listings/types/goldListing.types';
-import type { ListingCardProps, ListingCardBadge } from '@/features/listings/types/listingCard.types';
+import type {
+  ListingCardProps,
+  ListingCardBadge,
+} from '@/features/listings/types/listingCard.types';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
-import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { rfqStatusBadge, isEndedRfqStatus } from '@/features/listings/utils/rfqStatus';
 import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 

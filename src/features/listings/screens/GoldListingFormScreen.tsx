@@ -176,10 +176,10 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
 
   const detailsValid = Boolean(
     title.trim() &&
-      description.trim() &&
-      parsePositiveAmount(weight) &&
-      purity &&
-      parsePositiveAmount(price),
+    description.trim() &&
+    parsePositiveAmount(weight) &&
+    purity &&
+    parsePositiveAmount(price),
   );
   const mediaValid = media.length > 0 && Boolean(auctionStartDate) && location.trim().length > 0;
   const canGoNext = step === 0 ? detailsValid : step === 1 ? mediaValid : true;

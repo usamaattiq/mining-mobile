@@ -177,47 +177,48 @@ export function ListingOffersPanel({
                   <Ionicons name="trophy" size={18} color={palette.gold} />
                 ) : null}
                 {compact ? null : (
-                <View style={styles.badges}>
-                  {showUnits && offer.handover === 'delivery' ? (
-                    <View style={styles.kindBadge}>
-                      <AppText weight="semibold" style={styles.kindBadgeText}>
-                        {t('equipmentListing.deliveryBadge')}
-                      </AppText>
-                    </View>
-                  ) : null}
-                  {showUnits && offer.kind ? (
-                    <View style={styles.kindBadge}>
-                      <AppText weight="semibold" style={styles.kindBadgeText}>
-                        {offer.kind === 'rent'
-                          ? t('equipmentListing.rent')
-                          : t('equipmentListing.sell')}
-                      </AppText>
-                    </View>
-                  ) : null}
-                  {offer.delivery ? (
-                    <View style={styles.kindBadge}>
-                      <AppText weight="semibold" style={styles.kindBadgeText}>
-                        {offer.delivery === 'onsite'
-                          ? t('serviceListing.onsite')
-                          : t('serviceListing.online')}
-                      </AppText>
-                    </View>
-                  ) : null}
-                  {statusKey !== 'active' ? (
-                    <View style={styles.statusBadge}>
-                      <AppText weight="semibold" style={styles.statusBadgeText}>
-                        {t(`rfq.offerStatus.${statusKey}`)}
-                      </AppText>
-                    </View>
-                  ) : null}
-                </View>
+                  <View style={styles.badges}>
+                    {showUnits && offer.handover === 'delivery' ? (
+                      <View style={styles.kindBadge}>
+                        <AppText weight="semibold" style={styles.kindBadgeText}>
+                          {t('equipmentListing.deliveryBadge')}
+                        </AppText>
+                      </View>
+                    ) : null}
+                    {showUnits && offer.kind ? (
+                      <View style={styles.kindBadge}>
+                        <AppText weight="semibold" style={styles.kindBadgeText}>
+                          {offer.kind === 'rent'
+                            ? t('equipmentListing.rent')
+                            : t('equipmentListing.sell')}
+                        </AppText>
+                      </View>
+                    ) : null}
+                    {offer.delivery ? (
+                      <View style={styles.kindBadge}>
+                        <AppText weight="semibold" style={styles.kindBadgeText}>
+                          {offer.delivery === 'onsite'
+                            ? t('serviceListing.onsite')
+                            : t('serviceListing.online')}
+                        </AppText>
+                      </View>
+                    ) : null}
+                    {statusKey !== 'active' ? (
+                      <View style={styles.statusBadge}>
+                        <AppText weight="semibold" style={styles.statusBadgeText}>
+                          {t(`rfq.offerStatus.${statusKey}`)}
+                        </AppText>
+                      </View>
+                    ) : null}
+                  </View>
                 )}
               </View>
               {!compact && offer.createdAt ? (
                 <AppText style={styles.sentAt} numberOfLines={1}>
-                  {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
-                    new Date(offer.createdAt),
-                  )}
+                  {new Intl.DateTimeFormat(appI18n.language, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  }).format(new Date(offer.createdAt))}
                 </AppText>
               ) : null}
               {compact ? null : showUnits && unitAmount != null && units ? (
@@ -270,9 +271,11 @@ export function ListingOffersPanel({
                     onPress={() => onMessage(offer)}
                     style={styles.actionButton}
                   />
-                  {(contactResponderId && offer.responderId === contactResponderId
-                    ? contactPhone
-                    : offer.responderPhone) ? (
+                  {(
+                    contactResponderId && offer.responderId === contactResponderId
+                      ? contactPhone
+                      : offer.responderPhone
+                  ) ? (
                     <Button
                       label={t('common.whatsapp')}
                       icon="logo-whatsapp"
@@ -283,7 +286,9 @@ export function ListingOffersPanel({
                         );
                         const phone = contactingOwner ? contactPhone : offer.responderPhone;
                         if (!phone) return;
-                        const recipient = (contactingOwner ? contactName : offer.responderName)?.trim();
+                        const recipient = (
+                          contactingOwner ? contactName : offer.responderName
+                        )?.trim();
                         openWhatsApp(
                           phone,
                           recipient && senderName && listingTitle && listingReference

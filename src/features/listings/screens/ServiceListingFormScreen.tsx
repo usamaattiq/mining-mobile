@@ -361,9 +361,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         {step === 0 ? (
           <View style={styles.stepBlock}>
             <AppText weight="bold" style={styles.offerHeading}>
-              {t(
-                isBuyer ? 'serviceListing.offerHeadingRequest' : 'serviceListing.offerHeading',
-              )}
+              {t(isBuyer ? 'serviceListing.offerHeadingRequest' : 'serviceListing.offerHeading')}
             </AppText>
             <OfferChoiceCard
               selected={onsite}
@@ -596,11 +594,6 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     color: palette.charcoal,
     marginBottom: spacing.md,
-  },
-  choiceRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    alignItems: 'stretch',
   },
   descriptionInput: {
     minHeight: 96,

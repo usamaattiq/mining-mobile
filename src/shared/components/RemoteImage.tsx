@@ -26,7 +26,7 @@ export function RemoteImage({
 }: RemoteImageProps): React.ReactElement {
   const [loaded, setLoaded] = useState(false);
   const shimmer = useSharedValue(-1);
-  const sourceKey = typeof source === 'string' ? source : recyclingKey ?? '';
+  const sourceKey = typeof source === 'string' ? source : (recyclingKey ?? '');
 
   useEffect(() => {
     setLoaded(false);

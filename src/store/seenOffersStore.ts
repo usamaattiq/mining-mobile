@@ -20,7 +20,9 @@ export const useSeenOffersStore = create<SeenOffersState>((set, get) => ({
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       const parsed = raw ? (JSON.parse(raw) as unknown) : [];
       set({
-        ids: Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : [],
+        ids: Array.isArray(parsed)
+          ? parsed.filter((id): id is string => typeof id === 'string')
+          : [],
         hydrated: true,
       });
     } catch {

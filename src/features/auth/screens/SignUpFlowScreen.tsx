@@ -536,9 +536,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
               <AppText weight="semibold" style={styles.faceCardTitle}>
                 {faceTitle}
               </AppText>
-              <AppText style={styles.faceCardBody}>
-                {faceBody}
-              </AppText>
+              <AppText style={styles.faceCardBody}>{faceBody}</AppText>
             </View>
             <Switch
               value={biometricEnabled}

@@ -295,6 +295,36 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     (category === 'equipment' && !equipmentListing) ||
     (category === 'services' && !serviceListing) ||
     (category === 'gold' && !goldListing);
+  const skipRfq = equipmentListing?.rfq ?? serviceListing?.rfq ?? goldListing?.rfq;
+  const skipOwnerId =
+    equipmentListing?.ownerId ??
+    serviceListing?.ownerId ??
+    goldListing?.ownerId ??
+    equipmentListing?.owner?.id ??
+    serviceListing?.owner?.id ??
+    goldListing?.owner?.id;
+  const skipIsOwner = Boolean(skipOwnerId && profileId && skipOwnerId === profileId);
+  const decideOfferRef = React.useRef<
+    (offerId: string, action: 'accept' | 'reject', alreadyConfirmed?: boolean) => void
+  >(() => undefined);
+
+  React.useEffect(() => {
+    if (!skipIsOwner || isAdmin || !skipRfq?.needsOwnerSkipConfirm) return;
+    const offerId =
+      (skipRfq.offers ?? []).find((offer) => offer.status === 'selected')?.id ??
+      (skipRfq.offers ?? []).find((offer) => offer.status === 'active')?.id;
+    if (!offerId) return;
+    const key = `${id}:${offerId}`;
+    if (skipPromptKeyRef.current === key) return;
+    skipPromptKeyRef.current = key;
+    showAppAlert(t('goldListing.skipTimedOutTitle'), t('goldListing.skipTimedOutMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('goldListing.skipTimedOutConfirm'),
+        onPress: () => decideOfferRef.current(offerId, 'accept', true),
+      },
+    ]);
+  }, [id, isAdmin, skipIsOwner, skipRfq, t]);
 
   if (missing && loadFailed) return notFound;
   if (missing) {
@@ -358,52 +388,52 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           },
         ].filter((row) => (row.value ?? '').trim().length > 0)
       : [
-      { label: t('common.reference'), value: equipmentListing.reference ?? '' },
-      {
-        label: t('equipmentListing.equipmentType'),
-        value: catalogLabel('equipment', equipmentListing.equipmentTypeLabel),
-      },
-      {
-        label: t(
-          equipmentListing.postedAs === 'supplier'
-            ? 'equipmentListing.availableUnits'
-            : 'equipmentListing.units',
-        ),
-        value: String(
-          equipmentListing.postedAs === 'supplier' ? unitsLeft : equipmentListing.units,
-        ),
-        ...(ownerCanEditUnits
-          ? {
-              onEdit: () => {
-                setEditUnits(unitsLeft);
-                setUnitsEditorOpen(true);
-              },
-            }
-          : {}),
-      },
-      {
-        label: t('equipmentListing.neededDate'),
-        value: formatListingDate(currentLanguage, equipmentListing.neededDate),
-      },
-      {
-        label: t('common.postedOn'),
-        value: formatListingDate(currentLanguage, equipmentListing.createdAt),
-      },
-      ...(equipmentListing.postedAs === 'supplier'
-        ? []
-        : [
-            {
-              label: t('equipmentListing.listedUntilRequest'),
-              value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
-            },
-            {
-              label: t('equipmentListing.deliveryPreference'),
-              value: equipmentListing.deliveryAvailable
-                ? t('equipmentListing.deliveryRequested')
-                : t('equipmentListing.pickupFromSupplier'),
-            },
-          ]),
-    ].filter((row) => (row.value ?? '').trim().length > 0);
+          { label: t('common.reference'), value: equipmentListing.reference ?? '' },
+          {
+            label: t('equipmentListing.equipmentType'),
+            value: catalogLabel('equipment', equipmentListing.equipmentTypeLabel),
+          },
+          {
+            label: t(
+              equipmentListing.postedAs === 'supplier'
+                ? 'equipmentListing.availableUnits'
+                : 'equipmentListing.units',
+            ),
+            value: String(
+              equipmentListing.postedAs === 'supplier' ? unitsLeft : equipmentListing.units,
+            ),
+            ...(ownerCanEditUnits
+              ? {
+                  onEdit: () => {
+                    setEditUnits(unitsLeft);
+                    setUnitsEditorOpen(true);
+                  },
+                }
+              : {}),
+          },
+          {
+            label: t('equipmentListing.neededDate'),
+            value: formatListingDate(currentLanguage, equipmentListing.neededDate),
+          },
+          {
+            label: t('common.postedOn'),
+            value: formatListingDate(currentLanguage, equipmentListing.createdAt),
+          },
+          ...(equipmentListing.postedAs === 'supplier'
+            ? []
+            : [
+                {
+                  label: t('equipmentListing.listedUntilRequest'),
+                  value: formatListingDate(currentLanguage, equipmentListing.rfq?.expiresAt),
+                },
+                {
+                  label: t('equipmentListing.deliveryPreference'),
+                  value: equipmentListing.deliveryAvailable
+                    ? t('equipmentListing.deliveryRequested')
+                    : t('equipmentListing.pickupFromSupplier'),
+                },
+              ]),
+        ].filter((row) => (row.value ?? '').trim().length > 0);
 
     if (equipmentListing.postedAs !== 'buyer' && equipmentListing.deliveryAvailable) {
       detailRows.push({
@@ -492,51 +522,55 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     } else {
       unitPriceCard =
         equipmentListing.postedAs === 'buyer' || (!showSalePrice && !showRentPrice) ? null : (
-        <View style={styles.unitPriceCard}>
-          {showSalePrice ? (
-            <View style={styles.unitPriceCell}>
-              <View style={styles.unitPriceHeading}>
-                <Ionicons name="pricetag-outline" size={18} color={palette.charcoal} />
-                <AppText style={styles.unitPriceCaption}>{t('equipmentListing.salePrice')}</AppText>
-              </View>
-              <AppText weight="bold" style={styles.unitPriceAmount}>
-                {currency.code} {formatAmountWithCommas(equipmentListing.salePrice)}
-              </AppText>
-            </View>
-          ) : null}
-          {showSalePrice && showRentPrice ? <View style={styles.unitPriceDivider} /> : null}
-          {showRentPrice && activeDuration ? (
-            <View style={styles.unitPriceCell}>
-              <View style={styles.unitPriceHeading}>
-                <Ionicons name="key-outline" size={18} color={palette.charcoal} />
-                <AppText style={styles.unitPriceCaption}>{t('equipmentListing.rentPrice')}</AppText>
-              </View>
-              <AppText weight="bold" style={styles.unitPriceAmount}>
-                {currency.code} {formatAmountWithCommas(activeDuration.amount)}
-              </AppText>
-              {rentPeriodLabel ? (
-                <AppText style={styles.unitPricePeriod}>{rentPeriodLabel}</AppText>
-              ) : null}
-              {durationOptions.length > 1 ? (
-                <View style={styles.durationDropdown}>
-                  <SelectField
-                    placeholder={t('equipmentListing.durationPlaceholder')}
-                    sheetTitle={t('equipmentListing.durationPlaceholder')}
-                    options={durationOptions.map((option) => ({
-                      value: option.key,
-                      label: option.label,
-                    }))}
-                    value={activeDuration.key}
-                    onChange={(next) => setSelectedDuration(next as RentalDuration)}
-                    compact
-                    dropdown
-                  />
+          <View style={styles.unitPriceCard}>
+            {showSalePrice ? (
+              <View style={styles.unitPriceCell}>
+                <View style={styles.unitPriceHeading}>
+                  <Ionicons name="pricetag-outline" size={18} color={palette.charcoal} />
+                  <AppText style={styles.unitPriceCaption}>
+                    {t('equipmentListing.salePrice')}
+                  </AppText>
                 </View>
-              ) : null}
-            </View>
-          ) : null}
-        </View>
-      );
+                <AppText weight="bold" style={styles.unitPriceAmount}>
+                  {currency.code} {formatAmountWithCommas(equipmentListing.salePrice)}
+                </AppText>
+              </View>
+            ) : null}
+            {showSalePrice && showRentPrice ? <View style={styles.unitPriceDivider} /> : null}
+            {showRentPrice && activeDuration ? (
+              <View style={styles.unitPriceCell}>
+                <View style={styles.unitPriceHeading}>
+                  <Ionicons name="key-outline" size={18} color={palette.charcoal} />
+                  <AppText style={styles.unitPriceCaption}>
+                    {t('equipmentListing.rentPrice')}
+                  </AppText>
+                </View>
+                <AppText weight="bold" style={styles.unitPriceAmount}>
+                  {currency.code} {formatAmountWithCommas(activeDuration.amount)}
+                </AppText>
+                {rentPeriodLabel ? (
+                  <AppText style={styles.unitPricePeriod}>{rentPeriodLabel}</AppText>
+                ) : null}
+                {durationOptions.length > 1 ? (
+                  <View style={styles.durationDropdown}>
+                    <SelectField
+                      placeholder={t('equipmentListing.durationPlaceholder')}
+                      sheetTitle={t('equipmentListing.durationPlaceholder')}
+                      options={durationOptions.map((option) => ({
+                        value: option.key,
+                        label: option.label,
+                      }))}
+                      value={activeDuration.key}
+                      onChange={(next) => setSelectedDuration(next as RentalDuration)}
+                      compact
+                      dropdown
+                    />
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
+        );
     }
   } else if (category === 'services' && serviceListing) {
     title = serviceListing.title;
@@ -645,17 +679,16 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
     unitPriceCard =
-      (goldListing.postedAs === 'buyer' || !goldListing.price) && !goldListing.rfq?.currentPrice
-        ? null
-        : (
-            <AuctionPriceCard
-              currencyCode={currency.code}
-              startingPrice={goldListing.price || undefined}
-              highestBid={goldListing.rfq?.currentPrice}
-              startingLabel={t('goldListing.startingPrice')}
-              highestLabel={t('goldListing.highestBid')}
-            />
-          );
+      (goldListing.postedAs === 'buyer' || !goldListing.price) &&
+      !goldListing.rfq?.currentPrice ? null : (
+        <AuctionPriceCard
+          currencyCode={currency.code}
+          startingPrice={goldListing.price || undefined}
+          highestBid={goldListing.rfq?.currentPrice}
+          startingLabel={t('goldListing.startingPrice')}
+          highestLabel={t('goldListing.highestBid')}
+        />
+      );
 
     extraSection = <AttachmentsSection documents={documents} />;
   }
@@ -687,7 +720,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       ? false
       : Boolean(
           rfq?.myOfferStatus &&
-            ['active', 'selected', 'confirmed', 'declined', 'timed_out'].includes(rfq.myOfferStatus),
+          ['active', 'selected', 'confirmed', 'declined', 'timed_out'].includes(rfq.myOfferStatus),
         ) ||
         rfq?.status === 'offer-submitted' ||
         rfq?.status === 'declined' ||
@@ -771,7 +804,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             equipmentListing.requestMode === 'auction'
               ? t('equipmentListing.requestAuction')
               : t('equipmentListing.requestRfq'),
-          variant: equipmentListing.requestMode === 'auction' ? ('auction' as const) : ('rfq' as const),
+          variant:
+            equipmentListing.requestMode === 'auction' ? ('auction' as const) : ('rfq' as const),
         }
       : null;
   const headerBadge = endingSoon
@@ -780,23 +814,23 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         label: t('rfq.status.endingSoon'),
         variant: 'warning' as const,
       }
-    : rfqStatusBadge(t, rfq) ??
-    (equipmentListing && equipmentListing.postedAs !== 'buyer'
-      ? {
-          key: 'mode',
-          label: [
-            equipmentListing.mode === 'rent' || equipmentListing.mode === 'both'
-              ? t('equipmentListing.rent')
-              : null,
-            equipmentListing.mode === 'sell' || equipmentListing.mode === 'both'
-              ? t('equipmentListing.sell')
-              : null,
-          ]
-            .filter(Boolean)
-            .join(' · '),
-          variant: 'accent' as const,
-        }
-      : null);
+    : (rfqStatusBadge(t, rfq) ??
+      (equipmentListing && equipmentListing.postedAs !== 'buyer'
+        ? {
+            key: 'mode',
+            label: [
+              equipmentListing.mode === 'rent' || equipmentListing.mode === 'both'
+                ? t('equipmentListing.rent')
+                : null,
+              equipmentListing.mode === 'sell' || equipmentListing.mode === 'both'
+                ? t('equipmentListing.sell')
+                : null,
+            ]
+              .filter(Boolean)
+              .join(' · '),
+            variant: 'accent' as const,
+          }
+        : null));
 
   const handleSubmitOffer = (
     price: string,
@@ -815,7 +849,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         category === 'equipment' && !isAuction ? units : undefined,
         fulfillment,
         delivery,
-        category === 'equipment' && equipmentListing?.postedAs === 'supplier' ? handover : undefined,
+        category === 'equipment' && equipmentListing?.postedAs === 'supplier'
+          ? handover
+          : undefined,
       )
       .then((listing) => {
         applyListing(listing);
@@ -891,24 +927,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       { text: t('rfq.reject'), style: 'destructive', onPress: run },
     ]);
   };
-
-  React.useEffect(() => {
-    if (!isOwner || isAdmin || !rfq?.needsOwnerSkipConfirm) return;
-    const offerId =
-      (rfq.offers ?? []).find((offer) => offer.status === 'selected')?.id ??
-      (rfq.offers ?? []).find((offer) => offer.status === 'active')?.id;
-    if (!offerId) return;
-    const key = `${id}:${offerId}`;
-    if (skipPromptKeyRef.current === key) return;
-    skipPromptKeyRef.current = key;
-    showAppAlert(t('goldListing.skipTimedOutTitle'), t('goldListing.skipTimedOutMessage'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('goldListing.skipTimedOutConfirm'),
-        onPress: () => handleDecideOffer(offerId, 'accept', true),
-      },
-    ]);
-  }, [id, isAdmin, isOwner, rfq, t]);
+  decideOfferRef.current = handleDecideOffer;
 
   const handleResponderOffer = (
     action: 'confirm' | 'decline' | 'withdraw',
@@ -1266,9 +1285,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               canDecideOffers={false}
               rfqStatus={rfq?.status}
               showUnits={category === 'equipment' && !isAuction}
-              placeholderIcon={
-                category === 'gold' ? 'diamond-outline' : 'construct-outline'
-              }
+              placeholderIcon={category === 'gold' ? 'diamond-outline' : 'construct-outline'}
               showLeader
               compact
               title={t('rfq.leaderboardTitle')}
@@ -1279,29 +1296,312 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             />
           ) : null}
 
-          {showMyOfferCards && mySupplierOffers.some((offer) => offer.status !== 'confirmed' && offer.status !== 'returned') ? (
+          {showMyOfferCards &&
+          mySupplierOffers.some(
+            (offer) => offer.status !== 'confirmed' && offer.status !== 'returned',
+          ) ? (
             <View style={styles.myOffers}>
               <AppText weight="bold" style={styles.myOffersTitle}>
                 {t('rfq.yourOffer')}
               </AppText>
-              {mySupplierOffers.filter((offer) => offer.status !== 'confirmed' && offer.status !== 'returned').map((offer) => (
-                <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
-                  <View style={styles.myOfferRow}>
-                    <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
-                      {owner?.fullName?.trim()
-                        ? `${owner.fullName.trim().slice(0, 2)}******`
-                        : t('messages.fallbackName')}
-                    </AppText>
-                    <View style={styles.myOfferBadges}>
-                      {!respondingToBuyer && offer.handover === 'delivery' ? (
-                        <View style={styles.myOfferKindBadge}>
-                          <AppText weight="semibold" style={styles.myOfferKindText}>
-                            {t('equipmentListing.deliveryBadge')}
+              {mySupplierOffers
+                .filter((offer) => offer.status !== 'confirmed' && offer.status !== 'returned')
+                .map((offer) => (
+                  <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
+                    <View style={styles.myOfferRow}>
+                      <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
+                        {owner?.fullName?.trim()
+                          ? `${owner.fullName.trim().slice(0, 2)}******`
+                          : t('messages.fallbackName')}
+                      </AppText>
+                      <View style={styles.myOfferBadges}>
+                        {!respondingToBuyer && offer.handover === 'delivery' ? (
+                          <View style={styles.myOfferKindBadge}>
+                            <AppText weight="semibold" style={styles.myOfferKindText}>
+                              {t('equipmentListing.deliveryBadge')}
+                            </AppText>
+                          </View>
+                        ) : null}
+                        {category === 'services' ? (
+                          offer.delivery ? (
+                            <View style={styles.myOfferKindBadge}>
+                              <AppText weight="semibold" style={styles.myOfferKindText}>
+                                {offer.delivery === 'online'
+                                  ? t('serviceListing.online')
+                                  : t('serviceListing.onsite')}
+                              </AppText>
+                            </View>
+                          ) : null
+                        ) : offer.kind ? (
+                          <View style={styles.myOfferKindBadge}>
+                            <AppText weight="semibold" style={styles.myOfferKindText}>
+                              {offer.kind === 'sale'
+                                ? respondingToBuyer
+                                  ? t('equipmentListing.sell')
+                                  : t('equipmentListing.buy')
+                                : t('equipmentListing.rent')}
+                            </AppText>
+                          </View>
+                        ) : null}
+                        {offer.status === 'selected' ||
+                        offer.status === 'declined' ||
+                        offer.status === 'timed_out' ? (
+                          <View style={styles.myOfferStatusBadge}>
+                            <AppText weight="semibold" style={styles.myOfferStatusText}>
+                              {t(
+                                `rfq.offerStatus.${
+                                  offer.status === 'timed_out' ? 'timedOut' : offer.status
+                                }`,
+                              )}
+                            </AppText>
+                          </View>
+                        ) : null}
+                      </View>
+                    </View>
+                    {offer.createdAt ? (
+                      <AppText style={styles.myOfferDate} numberOfLines={1}>
+                        {new Intl.DateTimeFormat(appI18n.language, {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        }).format(new Date(offer.createdAt))}
+                      </AppText>
+                    ) : null}
+                    {offer.price ? (
+                      <View style={styles.myOfferPriceRow}>
+                        <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
+                          {currency.code} {formatAmountWithCommas(offer.price)}
+                        </AppText>
+                        {category === 'equipment' && offer.quantity ? (
+                          <AppText
+                            weight="semibold"
+                            style={styles.myOfferPerUnit}
+                            numberOfLines={1}
+                          >
+                            {t('equipmentListing.unitsCount', { count: offer.quantity })}
                           </AppText>
+                        ) : null}
+                      </View>
+                    ) : null}
+                    {(supplierBuyer || respondingToBuyer) &&
+                    offer.status === 'active' &&
+                    editingOfferId === offer.id ? (
+                      <View style={styles.myOfferEdit}>
+                        {supplierBuyer ||
+                        (respondingToBuyer && equipmentListing?.mode === 'both') ? (
+                          <View style={styles.editChoiceRow}>
+                            {(['rent', 'sale'] as const).map((kind) => {
+                              const selected = editOfferKind === kind;
+                              return (
+                                <Pressable
+                                  key={kind}
+                                  onPress={() => setEditOfferKind(kind)}
+                                  style={[styles.editChoice, selected && styles.editChoiceSelected]}
+                                >
+                                  <AppText
+                                    weight="semibold"
+                                    style={[
+                                      styles.editChoiceLabel,
+                                      selected && styles.editChoiceLabelSelected,
+                                    ]}
+                                  >
+                                    {kind === 'rent'
+                                      ? t('equipmentListing.rent')
+                                      : respondingToBuyer
+                                        ? t('equipmentListing.sell')
+                                        : t('equipmentListing.buy')}
+                                  </AppText>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        ) : null}
+                        {respondingToBuyer && serviceListing?.serviceType === 'both' ? (
+                          <View style={styles.editChoiceRow}>
+                            {(['onsite', 'online'] as const).map((mode) => {
+                              const selected = editOfferDelivery === mode;
+                              return (
+                                <Pressable
+                                  key={mode}
+                                  onPress={() => setEditOfferDelivery(mode)}
+                                  style={[styles.editChoice, selected && styles.editChoiceSelected]}
+                                >
+                                  <AppText
+                                    weight="semibold"
+                                    style={[
+                                      styles.editChoiceLabel,
+                                      selected && styles.editChoiceLabelSelected,
+                                    ]}
+                                  >
+                                    {mode === 'onsite'
+                                      ? t('serviceListing.onsite')
+                                      : t('serviceListing.online')}
+                                  </AppText>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        ) : null}
+                        {!respondingToBuyer && equipmentListing?.deliveryAvailable ? (
+                          <View style={styles.editChoiceRow}>
+                            {(['delivery', 'pickup'] as const).map((mode) => {
+                              const selected = editOfferHandover === mode;
+                              return (
+                                <Pressable
+                                  key={mode}
+                                  onPress={() => setEditOfferHandover(mode)}
+                                  accessibilityRole="radio"
+                                  accessibilityState={{ selected }}
+                                  style={[
+                                    styles.editHandoverOption,
+                                    selected && styles.editHandoverOptionSelected,
+                                  ]}
+                                >
+                                  <View
+                                    style={[styles.editRadio, selected && styles.editRadioSelected]}
+                                  >
+                                    {selected ? <View style={styles.editRadioDot} /> : null}
+                                  </View>
+                                  <MaterialCommunityIcons
+                                    name={
+                                      mode === 'delivery' ? 'truck-fast' : 'package-variant-closed'
+                                    }
+                                    size={20}
+                                    color={selected ? palette.gold : palette.muted}
+                                  />
+                                  <AppText
+                                    weight={selected ? 'semibold' : 'regular'}
+                                    numberOfLines={1}
+                                    style={styles.editHandoverLabel}
+                                  >
+                                    {mode === 'delivery'
+                                      ? t('equipmentListing.deliveryBadge')
+                                      : t('equipmentListing.pickup')}
+                                  </AppText>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        ) : null}
+                        <View style={styles.myOfferPriceWrap}>
+                          <AppText weight="semibold" style={styles.myOfferCurrency}>
+                            {currency.code}
+                          </AppText>
+                          <TextInput
+                            value={editOfferPrice}
+                            onChangeText={setEditOfferPrice}
+                            keyboardType="decimal-pad"
+                            placeholder={
+                              respondingToBuyer && category === 'services'
+                                ? t('rfq.offerAmountPlaceholder')
+                                : t('rfq.unitPriceAmountPlaceholder')
+                            }
+                            placeholderTextColor={palette.muted}
+                            style={styles.myOfferPriceInput}
+                          />
                         </View>
-                      ) : null}
-                      {category === 'services' ? (
-                        offer.delivery ? (
+                        {category === 'services' ? null : (
+                          <CounterField
+                            label={t('rfq.unitsLabel')}
+                            value={editOfferUnits}
+                            min={1}
+                            max={Math.max(
+                              respondingToBuyer ? (equipmentListing?.units ?? 1) : unitsLeft,
+                              offer.quantity ?? 1,
+                            )}
+                            onChange={setEditOfferUnits}
+                          />
+                        )}
+                        <View style={styles.myOfferActions}>
+                          <Button
+                            label={t('common.cancel')}
+                            variant="outline"
+                            onPress={() =>
+                              showAppAlert(t('rfq.discardEditTitle'), t('rfq.discardEditMessage'), [
+                                { text: t('common.cancel'), style: 'cancel' },
+                                {
+                                  text: t('rfq.discardEdit'),
+                                  style: 'destructive',
+                                  onPress: () => setEditingOfferId(null),
+                                },
+                              ])
+                            }
+                            style={styles.myOfferAction}
+                          />
+                          <Button
+                            label={t('common.save')}
+                            loading={offerSubmitting}
+                            onPress={() => handleSaveOffer(offer.id)}
+                            style={styles.myOfferAction}
+                          />
+                        </View>
+                      </View>
+                    ) : null}
+                    {(supplierBuyer || respondingToBuyer) &&
+                    offer.status === 'active' &&
+                    editingOfferId !== offer.id ? (
+                      <View style={styles.myOfferActions}>
+                        <Button
+                          label={t('rfq.update')}
+                          variant="outline"
+                          onPress={() => beginEditOffer(offer)}
+                          style={styles.myOfferAction}
+                        />
+                        <Button
+                          label={t('rfq.withdraw')}
+                          variant="outline"
+                          onPress={() => handleResponderOffer('withdraw', offer.id)}
+                          style={styles.myOfferAction}
+                        />
+                      </View>
+                    ) : null}
+                    {supplierServiceSender && offer.status === 'active' ? (
+                      <View style={styles.myOfferActions}>
+                        <Button
+                          label={t('rfq.withdraw')}
+                          variant="outline"
+                          onPress={() => handleResponderOffer('withdraw', offer.id)}
+                          style={styles.myOfferAction}
+                        />
+                      </View>
+                    ) : null}
+                    {offer.status === 'selected' ? (
+                      <View style={styles.myOfferActions}>
+                        <Button
+                          label={t('rfq.decline')}
+                          variant="outline"
+                          onPress={() => handleResponderOffer('decline', offer.id)}
+                          style={styles.myOfferAction}
+                        />
+                        <Button
+                          label={t('rfq.confirm')}
+                          onPress={() => handleResponderOffer('confirm', offer.id)}
+                          style={styles.myOfferAction}
+                        />
+                      </View>
+                    ) : null}
+                  </View>
+                ))}
+            </View>
+          ) : null}
+
+          {showMyOfferCards &&
+          mySupplierOffers.some(
+            (offer) => offer.status === 'confirmed' || offer.status === 'returned',
+          ) ? (
+            <View style={styles.myOffers}>
+              <AppText weight="bold" style={styles.myOffersTitle}>
+                {t('profile.history')}
+              </AppText>
+              {mySupplierOffers
+                .filter((offer) => offer.status === 'confirmed' || offer.status === 'returned')
+                .map((offer) => (
+                  <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
+                    <View style={styles.myOfferRow}>
+                      <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
+                        {owner?.fullName?.trim() || t('messages.fallbackName')}
+                      </AppText>
+                      <View style={styles.myOfferBadges}>
+                        {category === 'services' && offer.delivery ? (
                           <View style={styles.myOfferKindBadge}>
                             <AppText weight="semibold" style={styles.myOfferKindText}>
                               {offer.delivery === 'online'
@@ -1309,344 +1609,86 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                 : t('serviceListing.onsite')}
                             </AppText>
                           </View>
-                        ) : null
-                      ) : offer.kind ? (
-                        <View style={styles.myOfferKindBadge}>
-                          <AppText weight="semibold" style={styles.myOfferKindText}>
-                            {offer.kind === 'sale'
-                              ? respondingToBuyer
-                                ? t('equipmentListing.sell')
-                                : t('equipmentListing.buy')
-                              : t('equipmentListing.rent')}
-                          </AppText>
-                        </View>
-                      ) : null}
-                      {offer.status === 'selected' ||
-                      offer.status === 'declined' ||
-                      offer.status === 'timed_out' ? (
+                        ) : null}
+                        {offer.handover === 'delivery' ? (
+                          <View style={styles.myOfferKindBadge}>
+                            <AppText weight="semibold" style={styles.myOfferKindText}>
+                              {t('equipmentListing.deliveryBadge')}
+                            </AppText>
+                          </View>
+                        ) : null}
                         <View style={styles.myOfferStatusBadge}>
                           <AppText weight="semibold" style={styles.myOfferStatusText}>
                             {t(
-                              `rfq.offerStatus.${
-                                offer.status === 'timed_out' ? 'timedOut' : offer.status
-                              }`,
+                              `rfq.offerStatus.${offer.status === 'returned' ? 'returned' : 'confirmed'}`,
                             )}
                           </AppText>
                         </View>
-                      ) : null}
+                      </View>
                     </View>
-                  </View>
-                  {offer.createdAt ? (
-                    <AppText style={styles.myOfferDate} numberOfLines={1}>
-                      {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
-                        new Date(offer.createdAt),
-                      )}
-                    </AppText>
-                  ) : null}
-                  {offer.price ? (
-                    <View style={styles.myOfferPriceRow}>
-                      <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
-                        {currency.code} {formatAmountWithCommas(offer.price)}
+                    {offer.createdAt ? (
+                      <AppText style={styles.myOfferDate} numberOfLines={1}>
+                        {new Intl.DateTimeFormat(appI18n.language, {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        }).format(new Date(offer.createdAt))}
                       </AppText>
-                      {category === 'equipment' && offer.quantity ? (
-                        <AppText weight="semibold" style={styles.myOfferPerUnit} numberOfLines={1}>
-                          {t('equipmentListing.unitsCount', { count: offer.quantity })}
-                        </AppText>
-                      ) : null}
-                    </View>
-                  ) : null}
-                  {(supplierBuyer || respondingToBuyer) &&
-                  offer.status === 'active' &&
-                  editingOfferId === offer.id ? (
-                    <View style={styles.myOfferEdit}>
-                      {(supplierBuyer ||
-                        (respondingToBuyer && equipmentListing?.mode === 'both')) ? (
-                        <View style={styles.editChoiceRow}>
-                          {(['rent', 'sale'] as const).map((kind) => {
-                            const selected = editOfferKind === kind;
-                            return (
-                              <Pressable
-                                key={kind}
-                                onPress={() => setEditOfferKind(kind)}
-                                style={[styles.editChoice, selected && styles.editChoiceSelected]}
-                              >
-                                <AppText
-                                  weight="semibold"
-                                  style={[
-                                    styles.editChoiceLabel,
-                                    selected && styles.editChoiceLabelSelected,
-                                  ]}
-                                >
-                                  {kind === 'rent'
-                                    ? t('equipmentListing.rent')
-                                    : respondingToBuyer
-                                      ? t('equipmentListing.sell')
-                                      : t('equipmentListing.buy')}
-                                </AppText>
-                              </Pressable>
-                            );
-                          })}
-                        </View>
-                      ) : null}
-                      {respondingToBuyer && serviceListing?.serviceType === 'both' ? (
-                        <View style={styles.editChoiceRow}>
-                          {(['onsite', 'online'] as const).map((mode) => {
-                            const selected = editOfferDelivery === mode;
-                            return (
-                              <Pressable
-                                key={mode}
-                                onPress={() => setEditOfferDelivery(mode)}
-                                style={[styles.editChoice, selected && styles.editChoiceSelected]}
-                              >
-                                <AppText
-                                  weight="semibold"
-                                  style={[
-                                    styles.editChoiceLabel,
-                                    selected && styles.editChoiceLabelSelected,
-                                  ]}
-                                >
-                                  {mode === 'onsite'
-                                    ? t('serviceListing.onsite')
-                                    : t('serviceListing.online')}
-                                </AppText>
-                              </Pressable>
-                            );
-                          })}
-                        </View>
-                      ) : null}
-                      {!respondingToBuyer && equipmentListing?.deliveryAvailable ? (
-                        <View style={styles.editChoiceRow}>
-                          {(['delivery', 'pickup'] as const).map((mode) => {
-                            const selected = editOfferHandover === mode;
-                            return (
-                              <Pressable
-                                key={mode}
-                                onPress={() => setEditOfferHandover(mode)}
-                                accessibilityRole="radio"
-                                accessibilityState={{ selected }}
-                                style={[styles.editHandoverOption, selected && styles.editHandoverOptionSelected]}
-                              >
-                                <View style={[styles.editRadio, selected && styles.editRadioSelected]}>
-                                  {selected ? <View style={styles.editRadioDot} /> : null}
-                                </View>
-                                <MaterialCommunityIcons
-                                  name={mode === 'delivery' ? 'truck-fast' : 'package-variant-closed'}
-                                  size={20}
-                                  color={selected ? palette.gold : palette.muted}
-                                />
-                                <AppText
-                                  weight={selected ? 'semibold' : 'regular'}
-                                  numberOfLines={1}
-                                  style={styles.editHandoverLabel}
-                                >
-                                  {mode === 'delivery'
-                                    ? t('equipmentListing.deliveryBadge')
-                                    : t('equipmentListing.pickup')}
-                                </AppText>
-                              </Pressable>
-                            );
-                          })}
-                        </View>
-                      ) : null}
-                      <View style={styles.myOfferPriceWrap}>
-                        <AppText weight="semibold" style={styles.myOfferCurrency}>
-                          {currency.code}
-                        </AppText>
-                        <TextInput
-                          value={editOfferPrice}
-                          onChangeText={setEditOfferPrice}
-                          keyboardType="decimal-pad"
-                          placeholder={
-                            respondingToBuyer && category === 'services'
-                              ? t('rfq.offerAmountPlaceholder')
-                              : t('rfq.unitPriceAmountPlaceholder')
-                          }
-                          placeholderTextColor={palette.muted}
-                          style={styles.myOfferPriceInput}
-                        />
-                      </View>
-                      {category === 'services' ? null : (
-                        <CounterField
-                          label={t('rfq.unitsLabel')}
-                          value={editOfferUnits}
-                          min={1}
-                          max={Math.max(
-                            respondingToBuyer
-                              ? (equipmentListing?.units ?? 1)
-                              : unitsLeft,
-                            offer.quantity ?? 1,
-                          )}
-                          onChange={setEditOfferUnits}
-                        />
-                      )}
-                      <View style={styles.myOfferActions}>
-                        <Button
-                          label={t('common.cancel')}
-                          variant="outline"
-                          onPress={() =>
-                            showAppAlert(t('rfq.discardEditTitle'), t('rfq.discardEditMessage'), [
-                              { text: t('common.cancel'), style: 'cancel' },
-                              {
-                                text: t('rfq.discardEdit'),
-                                style: 'destructive',
-                                onPress: () => setEditingOfferId(null),
-                              },
-                            ])
-                          }
-                          style={styles.myOfferAction}
-                        />
-                        <Button
-                          label={t('common.save')}
-                          loading={offerSubmitting}
-                          onPress={() => handleSaveOffer(offer.id)}
-                          style={styles.myOfferAction}
-                        />
-                      </View>
-                    </View>
-                  ) : null}
-                  {(supplierBuyer || respondingToBuyer) &&
-                  offer.status === 'active' &&
-                  editingOfferId !== offer.id ? (
-                    <View style={styles.myOfferActions}>
-                      <Button
-                        label={t('rfq.update')}
-                        variant="outline"
-                        onPress={() => beginEditOffer(offer)}
-                        style={styles.myOfferAction}
-                      />
-                      <Button
-                        label={t('rfq.withdraw')}
-                        variant="outline"
-                        onPress={() => handleResponderOffer('withdraw', offer.id)}
-                        style={styles.myOfferAction}
-                      />
-                    </View>
-                  ) : null}
-                  {supplierServiceSender && offer.status === 'active' ? (
-                    <View style={styles.myOfferActions}>
-                      <Button
-                        label={t('rfq.withdraw')}
-                        variant="outline"
-                        onPress={() => handleResponderOffer('withdraw', offer.id)}
-                        style={styles.myOfferAction}
-                      />
-                    </View>
-                  ) : null}
-                  {offer.status === 'selected' ? (
-                    <View style={styles.myOfferActions}>
-                      <Button
-                        label={t('rfq.decline')}
-                        variant="outline"
-                        onPress={() => handleResponderOffer('decline', offer.id)}
-                        style={styles.myOfferAction}
-                      />
-                      <Button
-                        label={t('rfq.confirm')}
-                        onPress={() => handleResponderOffer('confirm', offer.id)}
-                        style={styles.myOfferAction}
-                      />
-                    </View>
-                  ) : null}
-                </View>
-              ))}
-            </View>
-          ) : null}
-
-          {showMyOfferCards && mySupplierOffers.some((offer) => offer.status === 'confirmed' || offer.status === 'returned') ? (
-            <View style={styles.myOffers}>
-              <AppText weight="bold" style={styles.myOffersTitle}>
-                {t('profile.history')}
-              </AppText>
-              {mySupplierOffers.filter((offer) => offer.status === 'confirmed' || offer.status === 'returned').map((offer) => (
-                <View key={offer.id} style={[styles.myOfferCard, cardBackShadow]}>
-                  <View style={styles.myOfferRow}>
-                    <AppText weight="semibold" style={styles.myOfferUnits} numberOfLines={1}>
-                      {owner?.fullName?.trim() || t('messages.fallbackName')}
-                    </AppText>
-                    <View style={styles.myOfferBadges}>
-                      {category === 'services' && offer.delivery ? (
-                        <View style={styles.myOfferKindBadge}>
-                          <AppText weight="semibold" style={styles.myOfferKindText}>
-                            {offer.delivery === 'online'
-                              ? t('serviceListing.online')
-                              : t('serviceListing.onsite')}
-                          </AppText>
-                        </View>
-                      ) : null}
-                      {offer.handover === 'delivery' ? (
-                        <View style={styles.myOfferKindBadge}>
-                          <AppText weight="semibold" style={styles.myOfferKindText}>
-                            {t('equipmentListing.deliveryBadge')}
-                          </AppText>
-                        </View>
-                      ) : null}
-                      <View style={styles.myOfferStatusBadge}>
-                        <AppText weight="semibold" style={styles.myOfferStatusText}>
-                          {t(
-                            `rfq.offerStatus.${offer.status === 'returned' ? 'returned' : 'confirmed'}`,
-                          )}
-                        </AppText>
-                      </View>
-                    </View>
-                  </View>
-                  {offer.createdAt ? (
-                    <AppText style={styles.myOfferDate} numberOfLines={1}>
-                      {new Intl.DateTimeFormat(appI18n.language, { dateStyle: 'medium', timeStyle: 'short' }).format(
-                        new Date(offer.createdAt),
-                      )}
-                    </AppText>
-                  ) : null}
-                  {offer.price ? (
-                    <View style={styles.myOfferPriceRow}>
-                      <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
-                        {currency.code} {formatAmountWithCommas(offer.price)}
-                      </AppText>
-                      {category === 'equipment' && offer.quantity ? (
-                        <AppText weight="semibold" style={styles.myOfferPerUnit} numberOfLines={1}>
-                          {t('equipmentListing.unitsCount', { count: offer.quantity })}
-                        </AppText>
-                      ) : null}
-                    </View>
-                  ) : null}
-                  <View style={styles.myOfferActions}>
-                    <Button
-                      label={t('messages.message')}
-                      icon="chatbubble-ellipses-outline"
-                      onPress={() => setMessageOpen(true)}
-                      style={styles.myOfferAction}
-                    />
-                    {rfq?.ownerPhone ? (
-                      <Button
-                        label={t('common.whatsapp')}
-                        icon="logo-whatsapp"
-                        variant="whatsapp"
-                        onPress={() =>
-                          openWhatsApp(
-                            rfq.ownerPhone!,
-                            owner?.fullName?.trim() &&
-                              senderName &&
-                              title &&
-                              (equipmentListing?.reference ??
-                                serviceListing?.reference ??
-                                goldListing?.reference)
-                              ? t('common.whatsappListingMessage', {
-                                  recipient: owner.fullName.trim(),
-                                  sender: senderName,
-                                  listing: title,
-                                  reference:
-                                    equipmentListing?.reference ??
-                                    serviceListing?.reference ??
-                                    goldListing?.reference,
-                                })
-                              : undefined,
-                          )
-                        }
-                        style={styles.myOfferAction}
-                      />
                     ) : null}
+                    {offer.price ? (
+                      <View style={styles.myOfferPriceRow}>
+                        <AppText weight="bold" style={styles.myOfferPrice} numberOfLines={1}>
+                          {currency.code} {formatAmountWithCommas(offer.price)}
+                        </AppText>
+                        {category === 'equipment' && offer.quantity ? (
+                          <AppText
+                            weight="semibold"
+                            style={styles.myOfferPerUnit}
+                            numberOfLines={1}
+                          >
+                            {t('equipmentListing.unitsCount', { count: offer.quantity })}
+                          </AppText>
+                        ) : null}
+                      </View>
+                    ) : null}
+                    <View style={styles.myOfferActions}>
+                      <Button
+                        label={t('messages.message')}
+                        icon="chatbubble-ellipses-outline"
+                        onPress={() => setMessageOpen(true)}
+                        style={styles.myOfferAction}
+                      />
+                      {rfq?.ownerPhone ? (
+                        <Button
+                          label={t('common.whatsapp')}
+                          icon="logo-whatsapp"
+                          variant="whatsapp"
+                          onPress={() =>
+                            openWhatsApp(
+                              rfq.ownerPhone!,
+                              owner?.fullName?.trim() &&
+                                senderName &&
+                                title &&
+                                (equipmentListing?.reference ??
+                                  serviceListing?.reference ??
+                                  goldListing?.reference)
+                                ? t('common.whatsappListingMessage', {
+                                    recipient: owner.fullName.trim(),
+                                    sender: senderName,
+                                    listing: title,
+                                    reference:
+                                      equipmentListing?.reference ??
+                                      serviceListing?.reference ??
+                                      goldListing?.reference,
+                                  })
+                                : undefined,
+                            )
+                          }
+                          style={styles.myOfferAction}
+                        />
+                      ) : null}
+                    </View>
                   </View>
-                </View>
-              ))}
+                ))}
             </View>
           ) : null}
 
@@ -1814,7 +1856,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         </Pressable>
       ) : null}
 
-      {(showOfferInput || (!showMyOfferCards && hasSentOffer)) ? (
+      {showOfferInput || (!showMyOfferCards && hasSentOffer) ? (
         <ListingOfferComposer
           currencyCode={currency.code}
           placeholder={
@@ -2178,37 +2220,6 @@ const styles = StyleSheet.create({
   withdrawDisabled: {
     opacity: 0.4,
   },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-  },
-  priceValueRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    flexWrap: 'wrap',
-    flex: 1,
-    gap: spacing.xs,
-  },
-  highestBid: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xs,
-    backgroundColor: palette.warmWhite,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: palette.softGold,
-  },
-  highestBidLabel: {
-    fontSize: 12,
-    color: palette.muted,
-  },
-  highestBidAmount: {
-    fontSize: 12,
-    color: palette.charcoal,
-  },
   myOffers: { gap: spacing.xs },
   myOffersTitle: { fontSize: 16, color: palette.charcoal },
   myOfferCard: {
@@ -2325,41 +2336,8 @@ const styles = StyleSheet.create({
     color: palette.charcoal,
     paddingVertical: 0,
   },
-  priceAmount: {
-    fontSize: 28,
-    color: palette.charcoal,
-  },
-  priceUnit: {
-    fontSize: 15,
-    color: palette.muted,
-  },
   durationDropdown: {
     width: 90,
-  },
-  serviceModeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  serviceModeButton: {
-    minHeight: 36,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: palette.softGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  serviceModeButtonSelected: {
-    backgroundColor: palette.gold,
-    borderColor: palette.gold,
-  },
-  serviceModeLabel: {
-    fontSize: 13,
-    color: palette.charcoal,
-  },
-  serviceModeLabelSelected: {
-    color: palette.pureWhite,
   },
   titleBlock: {
     gap: spacing.xs,

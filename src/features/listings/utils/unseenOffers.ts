@@ -17,7 +17,10 @@ export function openOfferIds(rfq: ListingRfq | undefined): string[] {
     .map((offer) => offer.id);
 }
 
-export function hasUnseenOffers(rfq: ListingRfq | undefined, seenIds: ReadonlySet<string>): boolean {
+export function hasUnseenOffers(
+  rfq: ListingRfq | undefined,
+  seenIds: ReadonlySet<string>,
+): boolean {
   return openOfferIds(rfq).some((id) => !seenIds.has(id));
 }
 

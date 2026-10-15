@@ -26,7 +26,10 @@ function notify(): void {
   listeners.forEach((listener) => listener());
 }
 
-export function catalogDisplayName(item: { name: string; nameAr?: string | null }, language: string): string {
+export function catalogDisplayName(
+  item: { name: string; nameAr?: string | null },
+  language: string,
+): string {
   const arabic = item.nameAr?.trim();
   return language.startsWith('ar') && arabic ? arabic : item.name;
 }
@@ -88,7 +91,10 @@ export function useCatalogOptions(category: CatalogCategory): SelectFieldOption[
   }));
 }
 
-export function useLocalizedCatalogLabel(): (category: CatalogCategory, storedName: string) => string {
+export function useLocalizedCatalogLabel(): (
+  category: CatalogCategory,
+  storedName: string,
+) => string {
   const { currentLanguage } = useLanguage();
   const catalog = useCatalogCache();
   return React.useCallback(

@@ -24,7 +24,10 @@ import {
 import { useOfferedListingsStore } from '@/store/offeredListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { refreshOfferedListings } from '@/features/listings/utils/refreshListings';
-import { listingHasMyOffer, listingOfferIsSettled } from '@/features/listings/utils/listingOfferState';
+import {
+  listingHasMyOffer,
+  listingOfferIsSettled,
+} from '@/features/listings/utils/listingOfferState';
 import { hasUnseenMyOffer } from '@/features/listings/utils/unseenOffers';
 import { useSeenOffersStore } from '@/store/seenOffersStore';
 import { buildListingCards } from '@/features/listings/utils/buildListingCards';
@@ -65,7 +68,8 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
     );
     const unseen = (category: ListingCategory) =>
       sent.some(
-        (listing) => listing.category === category && hasUnseenMyOffer(listing.id, listing.rfq, seen),
+        (listing) =>
+          listing.category === category && hasUnseenMyOffer(listing.id, listing.rfq, seen),
       );
     return {
       equipment: unseen('equipment'),
@@ -117,10 +121,24 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
             value={category}
             onChange={setCategory}
             options={[
-              { key: 'equipment' as const, label: t('requests.categoryEquipment'), alert: categoryAlerts.equipment },
-              { key: 'services' as const, label: t('requests.categoryServices'), alert: categoryAlerts.services },
+              {
+                key: 'equipment' as const,
+                label: t('requests.categoryEquipment'),
+                alert: categoryAlerts.equipment,
+              },
+              {
+                key: 'services' as const,
+                label: t('requests.categoryServices'),
+                alert: categoryAlerts.services,
+              },
               ...(role === 'buyer'
-                ? [{ key: 'gold' as const, label: t('requests.categoryGold'), alert: categoryAlerts.gold }]
+                ? [
+                    {
+                      key: 'gold' as const,
+                      label: t('requests.categoryGold'),
+                      alert: categoryAlerts.gold,
+                    },
+                  ]
                 : []),
             ]}
           />
@@ -137,9 +155,7 @@ export function MyOffersScreen({ navigation }: Props): React.ReactElement {
       ) : cards.length === 0 ? (
         <EmptyState
           title={t('offers.emptyTitle')}
-          subtitle={t(
-            role === 'buyer' ? 'offers.emptySubtitle' : 'offers.emptySubtitleSupplier',
-          )}
+          subtitle={t(role === 'buyer' ? 'offers.emptySubtitle' : 'offers.emptySubtitleSupplier')}
         />
       ) : (
         cards.map(({ id, ...card }) => <ListingCard key={`${category}-${id}`} {...card} />)

@@ -194,9 +194,7 @@ export function FloatingTabBar({ state, navigation }: BottomTabBarProps): React.
       <TabBarItem
         key={route.key}
         focused={focused}
-        label={t(
-          route.name === 'Requests' && isBuyer ? 'tabs.myRequests' : visual.labelKey,
-        )}
+        label={t(route.name === 'Requests' && isBuyer ? 'tabs.myRequests' : visual.labelKey)}
         icon={visual.icon}
         iconFocused={visual.iconFocused}
         onPress={onPress}

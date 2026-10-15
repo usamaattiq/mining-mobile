@@ -61,7 +61,9 @@ function CategoryCard({
   }));
 
   return (
-    <Animated.View style={[styles.shadowWrap, selected && styles.shadowWrapSelected, animatedStyle]}>
+    <Animated.View
+      style={[styles.shadowWrap, selected && styles.shadowWrapSelected, animatedStyle]}
+    >
       <Pressable
         onPress={onPress}
         accessibilityRole="button"
@@ -76,7 +78,11 @@ function CategoryCard({
         <View style={[styles.iconWrap, selected && styles.iconWrapSelected]}>
           <Image source={icon} style={styles.icon} resizeMode="contain" />
         </View>
-        <AppText weight="bold" style={[styles.title, selected && styles.titleSelected]} numberOfLines={2}>
+        <AppText
+          weight="bold"
+          style={[styles.title, selected && styles.titleSelected]}
+          numberOfLines={2}
+        >
           {title}
         </AppText>
         <AppText style={[styles.subtitle, selected && styles.subtitleSelected]} numberOfLines={2}>

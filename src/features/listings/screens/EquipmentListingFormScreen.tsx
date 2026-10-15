@@ -253,7 +253,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     location.trim().length > 0 &&
     deliveryValid &&
     (!isBuyer || requestMode !== 'auction' || auctionStartDate != null);
-  const canGoNext = step === 0 ? Boolean(mode) : step === 1 ? detailsValid : step === 2 ? mediaValid : true;
+  const canGoNext =
+    step === 0 ? Boolean(mode) : step === 1 ? detailsValid : step === 2 ? mediaValid : true;
 
   const rentalByPeriod = {
     hourly: offerRent && rentPeriod === 'hourly' ? rentalAmount : '',
@@ -377,9 +378,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     },
     {
       label: t(
-        isBuyer
-          ? 'equipmentListing.fieldDescriptionRequest'
-          : 'equipmentListing.fieldDescription',
+        isBuyer ? 'equipmentListing.fieldDescriptionRequest' : 'equipmentListing.fieldDescription',
       ),
       value: description,
     },
@@ -418,7 +417,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               ]
             : []),
         ]),
-    { label: t(isBuyer ? 'equipmentListing.unitsRequest' : 'equipmentListing.units'), value: String(units) },
+    {
+      label: t(isBuyer ? 'equipmentListing.unitsRequest' : 'equipmentListing.units'),
+      value: String(units),
+    },
     ...(isBuyer && requestMode === 'rfq'
       ? [
           {
@@ -518,9 +520,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           <View style={styles.stepBlock}>
             <AppText weight="bold" style={styles.offerHeading}>
               {t(
-                isBuyer
-                  ? 'equipmentListing.offerHeadingRequest'
-                  : 'equipmentListing.offerHeading',
+                isBuyer ? 'equipmentListing.offerHeadingRequest' : 'equipmentListing.offerHeading',
               )}
             </AppText>
             <OfferChoiceCard
@@ -528,7 +528,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               icon="key-outline"
               title={t('equipmentListing.rent')}
               subtitle={
-                isBuyer ? t('equipmentListing.rentRequestSubtitle') : t('equipmentListing.rentSubtitle')
+                isBuyer
+                  ? t('equipmentListing.rentRequestSubtitle')
+                  : t('equipmentListing.rentSubtitle')
               }
               onPress={() => {
                 if (isBuyer) {
@@ -544,7 +546,9 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               icon="pricetag-outline"
               title={isBuyer ? t('equipmentListing.buy') : t('equipmentListing.sell')}
               subtitle={
-                isBuyer ? t('equipmentListing.buyRequestSubtitle') : t('equipmentListing.sellSubtitle')
+                isBuyer
+                  ? t('equipmentListing.buyRequestSubtitle')
+                  : t('equipmentListing.sellSubtitle')
               }
               onPress={() => {
                 if (isBuyer) {
@@ -771,9 +775,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
                 selected={deliveryAvailable}
                 icon="car-outline"
                 title={t(
-                  isBuyer
-                    ? 'equipmentListing.deliveryYesRequest'
-                    : 'equipmentListing.deliveryYes',
+                  isBuyer ? 'equipmentListing.deliveryYesRequest' : 'equipmentListing.deliveryYes',
                 )}
                 subtitle={t(
                   isBuyer

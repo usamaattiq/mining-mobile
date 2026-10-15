@@ -21,8 +21,6 @@ const COUNTDOWN_TICK_MS = 1000;
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 const MINUTE_MS = 60 * 1000;
-const BADGE_ROW_HEIGHT = 20;
-
 function useRemainingTime(
   createdAt: number,
   expiresAt: number | undefined,
@@ -67,7 +65,9 @@ function StatusBadge({ badge }: { badge: ListingCardBadge }): React.ReactElement
         <Ionicons
           name={badge.icon}
           size={10}
-          color={variant === 'muted' ? palette.muted : onGold ? palette.goldDark : palette.pureWhite}
+          color={
+            variant === 'muted' ? palette.muted : onGold ? palette.goldDark : palette.pureWhite
+          }
         />
       ) : variant === 'accent' ? (
         <View style={styles.liveDot} />
@@ -169,11 +169,7 @@ function ListingCardComponent({
           ]}
         >
           {thumbnail ? (
-            <RemoteImage
-              source={thumbnail}
-              style={styles.gridImage}
-              recyclingKey={thumbnail}
-            />
+            <RemoteImage source={thumbnail} style={styles.gridImage} recyclingKey={thumbnail} />
           ) : (
             <View style={[styles.gridImage, styles.imagePlaceholder]}>
               <Ionicons name={placeholderIcon} size={56} color={palette.goldDark} />
@@ -242,9 +238,7 @@ function ListingCardComponent({
           ) : null}
 
           <View style={styles.gridFooter}>
-            <View style={styles.gridFooterLeft}>
-              {hasNewOffer ? <BlinkingDot /> : null}
-            </View>
+            <View style={styles.gridFooterLeft}>{hasNewOffer ? <BlinkingDot /> : null}</View>
             {timer}
             {repostButton}
           </View>
@@ -550,68 +544,6 @@ const styles = StyleSheet.create({
     backgroundColor: palette.lightGold,
     marginHorizontal: spacing.sm,
   },
-  modeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: 4,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.xs,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.xs,
-    minHeight: BADGE_ROW_HEIGHT,
-    marginBottom: spacing.xs,
-  },
-  topRight: {
-    flexShrink: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: spacing.xs,
-  },
-  topLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: spacing.xs,
-    minWidth: 0,
-  },
-  badgeSlot: {
-    height: BADGE_ROW_HEIGHT,
-    width: 1,
-  },
-  body: {
-    flex: 1,
-    gap: 2,
-    minWidth: 0,
-  },
-  prices: {
-    flex: 1,
-    minWidth: 0,
-    alignItems: 'flex-end',
-    gap: 2,
-  },
-  priceLine: {
-    marginTop: 'auto',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.xs,
-    minWidth: 0,
-    overflow: 'hidden',
-  },
-  timerSlot: {
-    flexShrink: 0,
-  },
   title: {
     flex: 1,
     minWidth: 0,
@@ -619,61 +551,11 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: palette.charcoal,
   },
-  subtitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    minHeight: 14,
-  },
-  modeBadges: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 4,
-  },
-  subtitle: {
-    flex: 1,
-    fontSize: 12,
-    lineHeight: 14,
-    color: palette.muted,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'baseline',
-    flexWrap: 'nowrap',
-    gap: spacing.xs,
-    maxWidth: '100%',
-    minWidth: 0,
-    minHeight: 20,
-  },
   price: {
     fontSize: 15,
     lineHeight: 18,
     color: palette.charcoal,
     includeFontPadding: false,
-  },
-  priceUnit: {
-    flexShrink: 0,
-    fontSize: 12,
-    lineHeight: 16,
-    color: palette.muted,
-    includeFontPadding: false,
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: spacing.xs,
-    minHeight: BADGE_ROW_HEIGHT,
-  },
-  bottomRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
   },
   statusBadge: {
     flexDirection: 'row',

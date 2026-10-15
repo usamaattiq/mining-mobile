@@ -113,7 +113,10 @@ export function ListingOfferComposer({
           <View style={styles.card}>
             <View style={styles.cardPriceRow}>
               <View style={styles.cardTitleBlock}>
-                <AppText weight="semibold" style={acceptedOwnerName ? styles.cardOwner : styles.cardTitle}>
+                <AppText
+                  weight="semibold"
+                  style={acceptedOwnerName ? styles.cardOwner : styles.cardTitle}
+                >
                   {acceptedOwnerName ?? submittedLabel}
                 </AppText>
                 {acceptedOwnerName ? (
@@ -196,9 +199,17 @@ export function ListingOfferComposer({
                   onPress={onMessage}
                   accessibilityRole="button"
                   accessibilityLabel={messageLabel}
-                  style={({ pressed }) => [styles.send, styles.confirm, pressed && styles.sendPressed]}
+                  style={({ pressed }) => [
+                    styles.send,
+                    styles.confirm,
+                    pressed && styles.sendPressed,
+                  ]}
                 >
-                  <Ionicons name="chatbubble-ellipses-outline" size={16} color={palette.pureWhite} />
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={16}
+                    color={palette.pureWhite}
+                  />
                   <AppText weight="bold" style={styles.sendLabel}>
                     {messageLabel}
                   </AppText>

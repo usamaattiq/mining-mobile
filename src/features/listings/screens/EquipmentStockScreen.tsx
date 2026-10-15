@@ -84,9 +84,11 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
   const saleHolds = stock?.holds.filter((hold) => hold.kind === 'sale') ?? [];
   const rentHolds = stock?.holds.filter((hold) => hold.kind === 'rent') ?? [];
   const posted = equipment
-    ? new Intl.DateTimeFormat(appI18n.language, { day: 'numeric', month: 'short', year: 'numeric' }).format(
-        new Date(equipment.createdAt),
-      )
+    ? new Intl.DateTimeFormat(appI18n.language, {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date(equipment.createdAt))
     : '';
 
   return (
@@ -262,7 +264,10 @@ function TabButton({
 }): React.ReactElement {
   return (
     <Pressable onPress={onPress} style={styles.tab}>
-      <AppText weight={active ? 'bold' : 'medium'} style={[styles.tabLabel, active && styles.tabLabelActive]}>
+      <AppText
+        weight={active ? 'bold' : 'medium'}
+        style={[styles.tabLabel, active && styles.tabLabelActive]}
+      >
         {label}
       </AppText>
       {active ? <View style={styles.tabLine} /> : <View style={styles.tabLineSpacer} />}

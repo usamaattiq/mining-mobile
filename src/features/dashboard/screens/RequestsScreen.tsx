@@ -74,8 +74,16 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
   }, [equipmentListings, goldListings, seenOfferIds, serviceListings]);
 
   const categoryOptions = [
-    { key: 'equipment' as const, label: t('requests.categoryEquipment'), alert: categoryAlerts.equipment },
-    { key: 'services' as const, label: t('requests.categoryServices'), alert: categoryAlerts.services },
+    {
+      key: 'equipment' as const,
+      label: t('requests.categoryEquipment'),
+      alert: categoryAlerts.equipment,
+    },
+    {
+      key: 'services' as const,
+      label: t('requests.categoryServices'),
+      alert: categoryAlerts.services,
+    },
     ...(role === 'supplier'
       ? [{ key: 'gold' as const, label: t('requests.categoryGold'), alert: categoryAlerts.gold }]
       : []),
@@ -137,16 +145,8 @@ export function RequestsScreen({ navigation, route }: Props): React.ReactElement
     lifeFilter === 'live' ? t('requests.emptyLiveTitle') : t('requests.emptyPastTitle');
   const emptySubtitle =
     lifeFilter === 'live'
-      ? t(
-          role === 'buyer'
-            ? 'requests.emptyLiveSubtitleRequest'
-            : 'requests.emptyLiveSubtitle',
-        )
-      : t(
-          role === 'buyer'
-            ? 'requests.emptyPastSubtitleRequest'
-            : 'requests.emptyPastSubtitle',
-        );
+      ? t(role === 'buyer' ? 'requests.emptyLiveSubtitleRequest' : 'requests.emptyLiveSubtitle')
+      : t(role === 'buyer' ? 'requests.emptyPastSubtitleRequest' : 'requests.emptyPastSubtitle');
 
   const lifeOptions: { key: LifeFilter; label: string }[] = [
     { key: 'live', label: t('requests.filterLive') },

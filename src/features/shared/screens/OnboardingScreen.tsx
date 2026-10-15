@@ -1,5 +1,12 @@
 import React from 'react';
-import { Image as RNImage, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import {
+  Image as RNImage,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -74,7 +81,12 @@ export function OnboardingScreen({ navigation }: Props): React.ReactElement {
         <View style={styles.topBar}>
           <View style={styles.logoRow}>
             <View style={styles.logoMark}>
-              <Image source={splashLogoImage} style={styles.logoImage} contentFit="contain" cachePolicy="memory-disk" />
+              <Image
+                source={splashLogoImage}
+                style={styles.logoImage}
+                contentFit="contain"
+                cachePolicy="memory-disk"
+              />
             </View>
             <Text style={styles.brand}>
               <Text style={styles.brandMine}>Da</Text>

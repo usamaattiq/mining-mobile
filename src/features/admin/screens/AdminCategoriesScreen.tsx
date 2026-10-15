@@ -78,7 +78,13 @@ export function AdminCategoriesScreen(): React.ReactElement {
     setSaving(true);
     try {
       if (draft.id) await adminApi.renameCategory(draft.id, draft.name.trim(), draft.nameAr.trim());
-      else await adminApi.createCategory(domain, draft.name.trim(), draft.nameAr.trim(), draft.parentId);
+      else
+        await adminApi.createCategory(
+          domain,
+          draft.name.trim(),
+          draft.nameAr.trim(),
+          draft.parentId,
+        );
       invalidateCatalogCache();
       setDraft(null);
       await load();

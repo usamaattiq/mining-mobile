@@ -21,7 +21,11 @@ function LeadingIcon({
   if (iconImage) {
     return (
       <View style={[styles.iconWrap, styles.iconImageWrap, compact && styles.iconWrapCompact]}>
-        <Image source={iconImage} style={compact ? styles.iconImageCompact : styles.iconImage} contentFit="contain" />
+        <Image
+          source={iconImage}
+          style={compact ? styles.iconImageCompact : styles.iconImage}
+          contentFit="contain"
+        />
       </View>
     );
   }
@@ -76,10 +80,11 @@ export function OptionRowCard({
             <LinearGradient
               colors={[palette.warmWhite, 'rgba(252, 249, 240, 0)']}
               start={{ x: 0, y: 0.5 }}
-              end={{ x: 0.9
-                
-                
-                , y: 0.5 }}
+              end={{
+                x: 0.9,
+
+                y: 0.5,
+              }}
               style={styles.sideFade}
             />
           </View>
@@ -94,37 +99,32 @@ export function OptionRowCard({
           </View>
         </View>
       ) : (
-      <View
-        style={[
-          styles.heading,
-          compact && styles.headingCompact,
-        ]}
-      >
-        <LeadingIcon icon={icon} iconImage={iconImage} compact={compact} />
+        <View style={[styles.heading, compact && styles.headingCompact]}>
+          <LeadingIcon icon={icon} iconImage={iconImage} compact={compact} />
 
-        <View style={styles.copy}>
-          <AppText weight="bold" style={[styles.title, compact && styles.titleCompact]}>
-            {title}
-          </AppText>
-          {compact || !subtitle ? null : <AppText style={styles.subtitle}>{subtitle}</AppText>}
-        </View>
-
-        {compact ? (
-          selected ? (
-            <Ionicons name="checkmark-circle" size={20} color={palette.gold} />
-          ) : (
-            <View style={styles.radio} />
-          )
-        ) : image ? null : (
-          <View style={styles.chevronWrap}>
-            <Ionicons
-              name={selected ? 'checkmark' : 'chevron-forward'}
-              size={20}
-              color={palette.gold}
-            />
+          <View style={styles.copy}>
+            <AppText weight="bold" style={[styles.title, compact && styles.titleCompact]}>
+              {title}
+            </AppText>
+            {compact || !subtitle ? null : <AppText style={styles.subtitle}>{subtitle}</AppText>}
           </View>
-        )}
-      </View>
+
+          {compact ? (
+            selected ? (
+              <Ionicons name="checkmark-circle" size={20} color={palette.gold} />
+            ) : (
+              <View style={styles.radio} />
+            )
+          ) : image ? null : (
+            <View style={styles.chevronWrap}>
+              <Ionicons
+                name={selected ? 'checkmark' : 'chevron-forward'}
+                size={20}
+                color={palette.gold}
+              />
+            </View>
+          )}
+        </View>
       )}
 
       {compact && subtitle ? <AppText style={styles.subtitleCompact}>{subtitle}</AppText> : null}

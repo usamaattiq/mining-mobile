@@ -130,7 +130,9 @@ export function EquipmentDealsSection({
 }
 
 function formatDealDate(locale: string, epoch: number): string {
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(epoch));
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(
+    new Date(epoch),
+  );
 }
 
 const styles = StyleSheet.create({

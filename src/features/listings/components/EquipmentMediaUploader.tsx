@@ -166,11 +166,14 @@ export function EquipmentMediaUploader({
           {required ? <AppText style={styles.required}> *</AppText> : null}
         </AppText>
         <AppText style={styles.subtitle}>
-          {t(isRequest ? 'equipmentListing.mediaSubtitleRequest' : 'equipmentListing.mediaSubtitle', {
-            photos: MAX_PHOTOS,
-            videos: MAX_VIDEOS,
-            mb: MAX_VIDEO_MB,
-          })}
+          {t(
+            isRequest ? 'equipmentListing.mediaSubtitleRequest' : 'equipmentListing.mediaSubtitle',
+            {
+              photos: MAX_PHOTOS,
+              videos: MAX_VIDEOS,
+              mb: MAX_VIDEO_MB,
+            },
+          )}
         </AppText>
       </View>
 
@@ -181,7 +184,9 @@ export function EquipmentMediaUploader({
               <>
                 <Pressable
                   style={styles.slotImage}
-                  onPress={() => setViewerIndex(previewMedia.findIndex((entry) => entry.id === item.id))}
+                  onPress={() =>
+                    setViewerIndex(previewMedia.findIndex((entry) => entry.id === item.id))
+                  }
                   accessibilityRole="imagebutton"
                   accessibilityLabel={t('equipmentListing.addPhoto')}
                 >

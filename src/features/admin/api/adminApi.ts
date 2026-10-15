@@ -17,7 +17,13 @@ export type AdminListingItem = ListingDto;
 export type AdminCategoryItem = {
   key: 'equipment' | 'services' | 'gold';
   count: number;
-  labels: { id: string; name: string; nameAr: string | null; parentId: string | null; count: number }[];
+  labels: {
+    id: string;
+    name: string;
+    nameAr: string | null;
+    parentId: string | null;
+    count: number;
+  }[];
 };
 
 export type AdminUserDetail = {

@@ -67,7 +67,9 @@ export function formatAmountWithCommas(value: string | null | undefined): string
   const digits = sign ? integerPart!.slice(1) : integerPart!;
   if (!/^\d+$/.test(digits)) return trimmed;
 
-  const numeric = Number(rest.length > 0 ? `${sign}${digits}.${rest.join('')}` : `${sign}${digits}`);
+  const numeric = Number(
+    rest.length > 0 ? `${sign}${digits}.${rest.join('')}` : `${sign}${digits}`,
+  );
   const large = Number.isFinite(numeric) ? formatLargeAmount(numeric) : null;
   if (large) return large;
 
