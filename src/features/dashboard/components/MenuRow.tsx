@@ -71,6 +71,11 @@ const styles = StyleSheet.create({
     backgroundColor: palette.gold,
     borderRadius: radius.lg,
     minHeight: 72,
+    shadowColor: '#000000',
+    shadowOpacity: 0.18,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 14,
+    elevation: 6,
   },
   rowBorder: {
     borderBottomWidth: StyleSheet.hairlineWidth,

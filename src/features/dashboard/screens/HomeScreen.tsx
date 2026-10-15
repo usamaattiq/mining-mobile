@@ -422,6 +422,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         </View>
       }
       headerStyle={styles.header}
+      sheetStyle={styles.sheet}
       headerExtra={
         <View style={styles.headerExtra}>
           <HomeCategoryCards
@@ -625,6 +626,9 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingBottom: spacing.sm,
+  },
+  sheet: {
+    backgroundColor: palette.pureWhite,
   },
   headerExtra: {
     paddingHorizontal: spacing.md,
