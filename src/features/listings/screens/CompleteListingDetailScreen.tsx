@@ -843,13 +843,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     (mySupplierOffers.some((offer) => offer.status === 'active' || offer.status === 'selected') ||
       rfq?.myOfferStatus === 'active' ||
       rfq?.myOfferStatus === 'selected');
+  const hasOpenSenderOffer = mySupplierOffers.some(
+    (offer) => offer.status === 'active' || offer.status === 'selected',
+  );
+  const onlyPastSenderOffers =
+    mySupplierOffers.length > 0 &&
+    mySupplierOffers.every((offer) => pastOfferStatuses.has(offer.status));
   const showOfferInput =
     !isAdmin &&
+    !awaitingConfirm &&
+    !hasOpenSenderOffer &&
     (supplierBuyer
       ? unitsLeft > 0 && rfq?.canSubmitOffer !== false && !hasOpenSupplierOffer
-      : !respondingToBuyer &&
-        !awaitingConfirm &&
-        (canOffer || (isAuction && hasSentOffer && rfq?.status === 'live')));
+      :         canOffer ||
+        (onlyPastSenderOffers && !isEndedRfqStatus(rfq?.status)) ||
+        (isAuction && hasSentOffer && rfq?.status === 'live'));
   const canWithdraw =
     !isAdmin &&
     !awaitingConfirm &&
