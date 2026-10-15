@@ -179,4 +179,8 @@ export const listingsApi = {
   appSettings(): Promise<{ messageOnSend: boolean }> {
     return apiFetch('/listings/settings');
   },
+
+  units(): Promise<{ items: { id: string; name: string; nameAr: string | null }[] }> {
+    return apiFetch('/listings/units');
+  },
 };

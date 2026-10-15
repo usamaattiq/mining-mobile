@@ -288,7 +288,9 @@
     "sectionMessage": "الرسائل",
     "sectionMessageDetail": "متى يظهر زر الرسالة على العرض.",
     "sectionCategories": "التصنيفات",
-    "sectionCategoriesDetail": "تسميات المعدات والخدمات والذهب."
+    "sectionCategoriesDetail": "تسميات المعدات والخدمات والذهب.",
+    "sectionUnits": "الوحدات",
+    "sectionUnitsDetail": "وحدات التسعير مثل بالساعة أو بالقدم."
   },
   "tabs": {
     "home": "الرئيسية",
@@ -436,6 +438,10 @@
     "fieldEquipmentType": "ما نوع هذه المعدة؟",
     "fieldEquipmentTypeRequest": "ما نوع المعدة التي تحتاجها؟",
     "equipmentTypePlaceholder": "اختر نوع المعدة",
+    "fieldUnit": "الوحدة",
+    "fieldUnitOptional": "الوحدة (اختياري)",
+    "unitPlaceholder": "اختر وحدة",
+    "fieldUnitPrice": "السعر",
     "searchTypes": "ابحث عن نوع المعدة",
     "type": {
       "excavator": "حفارة",

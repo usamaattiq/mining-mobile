@@ -109,6 +109,24 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const equipmentTypeOptions = useCatalogOptions('equipment');
 
   const [equipmentType, setEquipmentType] = React.useState<string | null>(null);
+  const [unitOptions, setUnitOptions] = React.useState<{ value: string; label: string }[]>([]);
+  const [unitLabel, setUnitLabel] = React.useState<string | null>(null);
+  const [unitPrice, setUnitPrice] = React.useState('');
+
+  React.useEffect(() => {
+    if (!isBuyer) return;
+    void listingsApi
+      .units()
+      .then((result) =>
+        setUnitOptions(
+          result.items.map((item) => ({
+            value: item.name,
+            label: currentLanguage.startsWith('ar') && item.nameAr ? item.nameAr : item.name,
+          })),
+        ),
+      )
+      .catch(() => undefined);
+  }, [currentLanguage, isBuyer]);
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [rentPeriod, setRentPeriod] = React.useState<RentPeriod | null>(null);
@@ -161,6 +179,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       matchSelectOption(equipmentTypeOptions, sourceListing.equipmentTypeLabel) ??
         (sourceListing.equipmentTypeLabel.trim() || null),
     );
+    setUnitLabel(sourceListing.unitLabel?.trim() || null);
+    setUnitPrice(sourceListing.unitPrice ?? '');
     setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
     setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setRentPeriod(period);
@@ -241,6 +261,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     (isBuyer ||
       ((offerRent ? Boolean(rentPeriod && parsePositiveAmount(rentalAmount)) : true) &&
         (offerSell ? Boolean(parsePositiveAmount(salePrice)) : true))),
+    (!isBuyer || !unitLabel || Boolean(parsePositiveAmount(unitPrice))),
   );
   const deliveryValid =
     isBuyer ||
@@ -322,6 +343,8 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         deliveryAvailable,
         deliveryType: isBuyer ? 'free' : deliveryType,
         deliveryPricePerKm: isBuyer ? '' : deliveryPricePerKm,
+        unitLabel: isBuyer ? (unitLabel ?? '') : '',
+        unitPrice: isBuyer && unitLabel ? unitPrice : '',
         neededDate: null,
         expiryHours:
           isBuyer && requestMode === 'auction'
@@ -390,6 +413,18 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
       ),
       value: equipmentTypeLabel ?? '',
     },
+    ...(isBuyer && unitLabel
+      ? [
+          {
+            label: t('equipmentListing.fieldUnit'),
+            value: unitOptions.find((option) => option.value === unitLabel)?.label ?? unitLabel,
+          },
+          {
+            label: t('equipmentListing.fieldUnitPrice'),
+            value: unitPrice ? `${currency.code} ${formatAmountWithCommas(unitPrice)}` : '',
+          },
+        ]
+      : []),
     ...(isBuyer
       ? []
       : [
@@ -641,6 +676,37 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
               tallWhenMany
               searchPlaceholder={t('equipmentListing.searchTypes')}
             />
+
+            {isBuyer ? (
+              <>
+                <SelectField
+                  label={t('equipmentListing.fieldUnitOptional')}
+                  placeholder={t('equipmentListing.unitPlaceholder')}
+                  sheetTitle={t('equipmentListing.fieldUnit')}
+                  options={unitOptions}
+                  value={unitLabel}
+                  onChange={(next) => {
+                    setUnitLabel(next);
+                    if (!next) setUnitPrice('');
+                  }}
+                />
+                {unitLabel ? (
+                  <FormInput
+                    label={t('equipmentListing.fieldUnitPrice')}
+                    value={unitPrice}
+                    onChangeText={(value) => setUnitPrice(sanitizeStepPrice(value))}
+                    keyboardType="numeric"
+                    placeholder={currency.code}
+                    required
+                    error={
+                      unitPrice && !parsePositiveAmount(unitPrice)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
+                  />
+                ) : null}
+              </>
+            ) : null}
 
             {!isBuyer && offerRent ? (
               <View style={styles.priceRow}>

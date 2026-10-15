@@ -120,9 +120,12 @@ export function buildListingCards({
       const offersSell = listing.mode === 'sell' || listing.mode === 'both';
       const rental = rentalPrice(listing, t, currencyCode);
       const saleAmount = priceText(currencyCode, listing.salePrice);
+      const buyerUnitPrice = priceText(currencyCode, listing.unitPrice ?? '');
       const priceLines =
         listing.postedAs === 'buyer'
-          ? undefined
+          ? buyerUnitPrice && listing.unitLabel
+            ? [{ text: buyerUnitPrice, unit: listing.unitLabel }]
+            : undefined
           : [
               offersSell && saleAmount
                 ? {

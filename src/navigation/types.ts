@@ -35,6 +35,7 @@ export type RootStackParamList = {
   EquipmentStock: { id: string };
   AdminSystemMessage: undefined;
   AdminSystemCategories: undefined;
+  AdminSystemUnits: undefined;
   Conversation: { conversationId: string };
   Messages: undefined;
   Notifications: undefined;

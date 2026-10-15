@@ -124,6 +124,25 @@ export const adminApi = {
   deleteCategory(id: string): Promise<{ id: string }> {
     return apiFetch(`/admin/categories/${id}`, { method: 'DELETE' });
   },
+  units(): Promise<{ items: { id: string; name: string; nameAr: string | null }[] }> {
+    return apiFetch('/admin/units');
+  },
+  createUnit(
+    name: string,
+    nameAr: string,
+  ): Promise<{ id: string; name: string; nameAr: string | null }> {
+    return apiFetch('/admin/units', { method: 'POST', body: { name, nameAr } });
+  },
+  renameUnit(
+    id: string,
+    name: string,
+    nameAr: string,
+  ): Promise<{ id: string; name: string; nameAr: string | null }> {
+    return apiFetch(`/admin/units/${id}`, { method: 'PATCH', body: { name, nameAr } });
+  },
+  deleteUnit(id: string): Promise<{ id: string }> {
+    return apiFetch(`/admin/units/${id}`, { method: 'DELETE' });
+  },
   settings(): Promise<{ messageOnSend: boolean }> {
     return apiFetch('/admin/settings');
   },

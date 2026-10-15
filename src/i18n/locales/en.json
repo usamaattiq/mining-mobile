@@ -288,7 +288,9 @@
     "sectionMessage": "Message",
     "sectionMessageDetail": "When the message button appears on an offer.",
     "sectionCategories": "Categories",
-    "sectionCategoriesDetail": "Equipment, services, and gold labels."
+    "sectionCategoriesDetail": "Equipment, services, and gold labels.",
+    "sectionUnits": "Units",
+    "sectionUnitsDetail": "Pricing units such as hourly or per foot."
   },
   "tabs": {
     "home": "Home",
@@ -457,6 +459,10 @@
     "fieldEquipmentType": "What kind of equipment is this?",
     "fieldEquipmentTypeRequest": "What kind of equipment do you need?",
     "equipmentTypePlaceholder": "Choose equipment type",
+    "fieldUnit": "Unit",
+    "fieldUnitOptional": "Unit (optional)",
+    "unitPlaceholder": "Choose a unit",
+    "fieldUnitPrice": "Price",
     "searchTypes": "Search equipment types",
     "type": {
       "excavator": "Excavator",

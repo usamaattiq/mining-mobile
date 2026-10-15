@@ -453,6 +453,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               ]),
         ].filter((row) => (row.value ?? '').trim().length > 0);
 
+    if (equipmentListing.unitLabel) {
+      detailRows.push({
+        label: t('equipmentListing.fieldUnit'),
+        value: equipmentListing.unitLabel,
+      });
+    }
+    if (equipmentListing.unitPrice) {
+      detailRows.push({
+        label: t('equipmentListing.fieldUnitPrice'),
+        value: `${currency.code} ${formatAmountWithCommas(equipmentListing.unitPrice)}`,
+      });
+    }
+
     if (equipmentListing.postedAs !== 'buyer' && equipmentListing.deliveryAvailable) {
       detailRows.push({
         label: t('equipmentListing.deliveryBadge'),
@@ -536,6 +549,24 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           unitsCaption={t('equipmentListing.requiredUnits')}
           unitsLabel={String(equipmentListing.units)}
         />
+      );
+    } else if (
+      equipmentListing.postedAs === 'buyer' &&
+      equipmentListing.unitLabel &&
+      equipmentListing.unitPrice
+    ) {
+      unitPriceCard = (
+        <View style={styles.unitPriceCard}>
+          <View style={styles.unitPriceCell}>
+            <View style={styles.unitPriceHeading}>
+              <Ionicons name="pricetag-outline" size={18} color={palette.charcoal} />
+              <AppText style={styles.unitPriceCaption}>{equipmentListing.unitLabel}</AppText>
+            </View>
+            <AppText weight="bold" style={styles.unitPriceAmount}>
+              {currency.code} {formatAmountWithCommas(equipmentListing.unitPrice)}
+            </AppText>
+          </View>
+        </View>
       );
     } else {
       unitPriceCard =
