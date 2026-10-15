@@ -2201,6 +2201,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 }
 
 const ENGAGED_LISTING_STATUSES = new Set([
+  'offer-submitted',
   'awaiting-confirmation',
   'awaiting-your-confirmation',
   'awaiting-action',
