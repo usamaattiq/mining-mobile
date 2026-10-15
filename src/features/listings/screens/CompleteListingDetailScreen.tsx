@@ -397,11 +397,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
             label: t(
               equipmentListing.postedAs === 'supplier'
                 ? 'equipmentListing.availableUnits'
-                : 'equipmentListing.units',
+                : 'equipmentListing.requiredUnits',
             ),
-            value: String(
-              equipmentListing.postedAs === 'supplier' ? unitsLeft : equipmentListing.units,
-            ),
+            value: String(unitsLeft),
             ...(ownerCanEditUnits
               ? {
                   onEdit: () => {

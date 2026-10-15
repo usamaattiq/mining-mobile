@@ -166,7 +166,7 @@ export function buildListingCards({
         subtitleIcon: 'construct-outline',
         unitsLabel: t('equipmentListing.unitsCount', {
           count:
-            listing.postedAs === 'supplier'
+            listing.postedAs === 'supplier' || listing.requestMode !== 'auction'
               ? (listing.availableUnits ?? listing.units)
               : listing.units,
         }),
