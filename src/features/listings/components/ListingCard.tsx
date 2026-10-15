@@ -328,7 +328,13 @@ function ListingCardComponent({
                           </AppText>
                         </View>
                       ) : null}
-                      <AppText weight="bold" style={styles.price} numberOfLines={1}>
+                      <AppText
+                        weight="bold"
+                        style={styles.price}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.65}
+                      >
                         {line.text}
                       </AppText>
                     </View>
@@ -552,6 +558,7 @@ const styles = StyleSheet.create({
     color: palette.charcoal,
   },
   price: {
+    width: '100%',
     fontSize: 15,
     lineHeight: 18,
     color: palette.charcoal,

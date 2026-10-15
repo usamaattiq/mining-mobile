@@ -108,7 +108,13 @@ function AuctionPriceCard({
             <Ionicons name="diamond-outline" size={18} color={palette.charcoal} />
             <AppText style={styles.unitPriceCaption}>{startingLabel}</AppText>
           </View>
-          <AppText weight="bold" style={styles.unitPriceAmount}>
+          <AppText
+            weight="bold"
+            style={styles.unitPriceAmount}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
+          >
             {currencyCode} {formatAmountWithCommas(startingPrice)}
           </AppText>
         </View>
@@ -120,7 +126,13 @@ function AuctionPriceCard({
             <Ionicons name="trophy-outline" size={18} color={palette.charcoal} />
             <AppText style={styles.unitPriceCaption}>{highestLabel}</AppText>
           </View>
-          <AppText weight="bold" style={styles.unitPriceAmount}>
+          <AppText
+            weight="bold"
+            style={styles.unitPriceAmount}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.6}
+          >
             {highestBid ? `${currencyCode} ${formatAmountWithCommas(highestBid)}` : '—'}
           </AppText>
         </View>
@@ -2367,6 +2379,7 @@ const styles = StyleSheet.create({
     color: palette.charcoal,
   },
   unitPriceAmount: {
+    alignSelf: 'stretch',
     fontSize: 20,
     color: palette.charcoal,
     marginLeft: 18 + spacing.xs,

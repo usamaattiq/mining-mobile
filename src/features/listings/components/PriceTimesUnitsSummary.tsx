@@ -28,7 +28,13 @@ export function PriceTimesUnitsSummary({
     return (
       <View style={styles.compactWrap}>
         <View style={styles.compactPriceRow}>
-          <AppText weight="bold" style={styles.compactPrice} numberOfLines={1}>
+          <AppText
+            weight="bold"
+            style={styles.compactPrice}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.55}
+          >
             {totalText}
           </AppText>
           <AppText weight="semibold" style={styles.compactUnits} numberOfLines={1}>
@@ -46,7 +52,13 @@ export function PriceTimesUnitsSummary({
     <View style={styles.card}>
       <View style={styles.line}>
         <View style={styles.part}>
-          <AppText weight="bold" style={styles.unitAmount} numberOfLines={1}>
+          <AppText
+            weight="bold"
+            style={styles.unitAmount}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.65}
+          >
             {unitText}
           </AppText>
           <AppText style={styles.hint} numberOfLines={1}>
@@ -64,7 +76,13 @@ export function PriceTimesUnitsSummary({
         </View>
         <AppText style={styles.op}>=</AppText>
         <View style={[styles.part, styles.totalPart]}>
-          <AppText weight="bold" style={styles.totalAmount} numberOfLines={1}>
+          <AppText
+            weight="bold"
+            style={styles.totalAmount}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.65}
+          >
             {totalText}
           </AppText>
           <AppText style={styles.hint} numberOfLines={1}>
@@ -98,6 +116,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   unitAmount: {
+    width: '100%',
     fontSize: 15,
     color: palette.charcoal,
   },
