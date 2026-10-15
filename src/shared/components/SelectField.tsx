@@ -217,7 +217,7 @@ export function SelectField({
           visible={open}
           onClose={() => setOpen(false)}
           heightRatio={
-            searchable || hierarchical ? (tallWhenMany && options.length > 3 ? 0.46 : 0.3) : 0.55
+            searchable || hierarchical ? (tallWhenMany && options.length > 3 ? 0.54 : 0.38) : 0.62
           }
           fitContent={!searchable && !hierarchical}
         >
