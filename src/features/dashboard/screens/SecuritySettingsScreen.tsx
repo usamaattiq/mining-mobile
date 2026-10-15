@@ -13,6 +13,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { useDeviceBiometric } from '@/shared/hooks/useDeviceBiometric';
 import { getDeviceId } from '@/shared/utils/deviceId';
 import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
@@ -29,7 +30,7 @@ const MPIN_LENGTH = 4;
 const RESEND_SECONDS = 30;
 
 function errorMessage(error: unknown, fallback: string): string {
-  if (error instanceof ApiError) return error.message;
+  if (error instanceof ApiError) return localizeApiMessage(error.message);
   return fallback;
 }
 

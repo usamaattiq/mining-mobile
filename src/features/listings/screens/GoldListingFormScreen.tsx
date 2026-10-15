@@ -28,6 +28,7 @@ import { AttachmentsSection } from '@/features/listings/components/AttachmentsSe
 import { palette, radius, spacing } from '@/theme';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 import { listingsApi, isGoldListing } from '@/features/listings/api/listingsApi';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
@@ -244,7 +245,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
     } catch (error) {
       showAppAlert(
         t('common.error'),
-        error instanceof ApiError ? error.message : t('common.error'),
+        error instanceof ApiError ? localizeApiMessage(error.message) : t('common.error'),
       );
     } finally {
       setPublishing(false);

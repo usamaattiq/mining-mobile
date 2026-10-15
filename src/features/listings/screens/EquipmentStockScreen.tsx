@@ -19,6 +19,7 @@ import { EmptyState } from '@/shared/components/EmptyState';
 import { Button } from '@/shared/components/Button';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { cardBackShadow, palette, radius, spacing } from '@/theme';
@@ -44,7 +45,7 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
         setListing(nextListing);
       })
       .catch((error: unknown) => {
-        const message = error instanceof ApiError ? error.message : t('common.error');
+        const message = error instanceof ApiError ? localizeApiMessage(error.message) : t('common.error');
         showAppAlert(t('common.error'), message);
       })
       .finally(() => setLoading(false));
@@ -68,7 +69,7 @@ export function EquipmentStockScreen({ navigation, route }: Props): React.ReactE
               .returnRentedUnits(id, hold.id)
               .then(setStock)
               .catch((error: unknown) => {
-                const message = error instanceof ApiError ? error.message : t('common.error');
+                const message = error instanceof ApiError ? localizeApiMessage(error.message) : t('common.error');
                 showAppAlert(t('common.error'), message);
               })
               .finally(() => setReturningId(null));

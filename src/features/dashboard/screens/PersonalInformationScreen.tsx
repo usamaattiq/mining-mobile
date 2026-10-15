@@ -8,6 +8,7 @@ import { i18n as appI18n } from '@/i18n';
 import type { RootStackParamList } from '@/navigation/types';
 import { authApi } from '@/features/auth/api/authApi';
 import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 import { useProfileStore } from '@/store/profileStore';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { GoldSheetScreen } from '@/features/dashboard/components/GoldSheetScreen';
@@ -105,10 +106,10 @@ export function PersonalInformationScreen({ navigation }: Props): React.ReactEle
       navigation.goBack();
     } catch (error) {
       if (error instanceof ApiError && error.status === 409 && /email/i.test(error.message)) {
-        setEmailServerError(error.message);
+        setEmailServerError(localizeApiMessage(error.message));
         return;
       }
-      const message = error instanceof ApiError ? error.message : t('profile.saveError');
+      const message = error instanceof ApiError ? localizeApiMessage(error.message) : t('profile.saveError');
       showAppAlert(t('common.error'), message);
     } finally {
       setSaving(false);

@@ -35,6 +35,7 @@ import { EquipmentListingReview } from '@/features/listings/components/Equipment
 import { palette, radius, spacing } from '@/theme';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 import { listingsApi, isEquipmentListing } from '@/features/listings/api/listingsApi';
 import { cacheListing } from '@/features/listings/utils/refreshListings';
 import { persistListingMedia } from '@/features/listings/utils/persistListingMedia';
@@ -380,7 +381,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         ],
       });
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : '';
+      const message = error instanceof ApiError ? localizeApiMessage(error.message) : '';
       if (message.includes('already rented or sold')) {
         showAppAlert(t('equipmentListing.unitsBelowCommitted'));
         return;

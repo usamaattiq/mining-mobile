@@ -17,6 +17,7 @@ import { useDevicePrefsStore } from '@/store/devicePrefsStore';
 import { useProfileStore } from '@/store/profileStore';
 import { getDeviceId } from '@/shared/utils/deviceId';
 import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { CodeInput } from '@/shared/components/CodeInput';
@@ -52,7 +53,7 @@ const STEP_INDEX: Record<LoginStep, number> = {
 };
 
 function errorMessage(error: unknown, fallback: string): string {
-  if (error instanceof ApiError) return error.message;
+  if (error instanceof ApiError) return localizeApiMessage(error.message);
   return fallback;
 }
 

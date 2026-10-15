@@ -1,6 +1,9 @@
 import React from 'react';
 import * as ImagePicker from 'expo-image-picker';
+import { i18n } from '@/i18n';
 import { uploadMedia, type UploadableContentType } from '@/shared/services/media';
+import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 
 export interface MediaUploadState {
   uploading: boolean;
@@ -71,7 +74,10 @@ export function useMediaUpload() {
       setState({
         uploading: false,
         progress: 'error',
-        error: error instanceof Error ? error.message : 'Upload failed',
+        error:
+          error instanceof ApiError
+            ? localizeApiMessage(error.message)
+            : i18n.t('common.error'),
       });
       return null;
     }

@@ -44,6 +44,7 @@ import { Button } from '@/shared/components/Button';
 import { CounterField } from '@/shared/components/CounterField';
 import { showAppAlert } from '@/shared/services/appAlert';
 import { ApiError } from '@/shared/services/api';
+import { localizeApiMessage } from '@/shared/utils/localizeApiMessage';
 import { useCurrency } from '@/shared/hooks/useCurrency';
 import { useListingsStore } from '@/store/listingsStore';
 import { useMarketListingsStore } from '@/store/marketListingsStore';
@@ -905,7 +906,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         applyListing(listing);
       })
       .catch((error: unknown) => {
-        const message = error instanceof ApiError ? error.message : t('rfq.offerFailed');
+        const message = error instanceof ApiError ? localizeApiMessage(error.message) : t('rfq.offerFailed');
         if (message === 'You already have an open offer of this type') return;
         showAppAlert(t('common.error'), message);
       })
@@ -936,7 +937,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           applyListing(listing);
         })
         .catch((error: unknown) => {
-          const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+          const message = error instanceof ApiError ? localizeApiMessage(error.message) : t('rfq.actionFailed');
           if (message === 'No units available') {
             showAppAlert(t('rfq.noUnitsAvailable'));
             return;
@@ -991,7 +992,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           applyListing(listing);
         })
         .catch((error: unknown) => {
-          const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+          const message = error instanceof ApiError ? localizeApiMessage(error.message) : t('rfq.actionFailed');
           showAppAlert(t('common.error'), message);
         })
         .finally(() => setOfferSubmitting(false));
@@ -1066,7 +1067,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               setEditingOfferId(null);
             })
             .catch((error: unknown) => {
-              const message = error instanceof ApiError ? error.message : t('rfq.actionFailed');
+              const message = error instanceof ApiError ? localizeApiMessage(error.message) : t('rfq.actionFailed');
               showAppAlert(t('common.error'), message);
             })
             .finally(() => setOfferSubmitting(false));
@@ -1911,7 +1912,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       })
                       .catch((error: unknown) => {
                         const message =
-                          error instanceof ApiError ? error.message : t('common.error');
+                          error instanceof ApiError ? localizeApiMessage(error.message) : t('common.error');
                         showAppAlert(message);
                       })
                       .finally(() => setDeletingListing(false));
@@ -2168,7 +2169,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     setUnitsEditorOpen(false);
                   })
                   .catch((error: unknown) => {
-                    const message = error instanceof ApiError ? error.message : '';
+                    const message = error instanceof ApiError ? localizeApiMessage(error.message) : '';
                     if (message.includes('already rented or sold')) {
                       showAppAlert(t('equipmentListing.unitsBelowCommitted'));
                       return;
