@@ -575,8 +575,8 @@
     "deliveryAvailableSubtitle": "قدّم التوصيل إلى موقع المشتري",
     "deliveryType": "نوع التوصيل",
     "deliveryFree": "مجاني",
-    "deliveryPerKm": "لكل كم",
-    "deliveryPricePerKm": "السعر لكل كم ({currency})",
+    "deliveryPerKm": "لكل KM",
+    "deliveryPricePerKm": "السعر لكل KM ({currency})",
     "deliveryPricePerKmPlaceholder": "مثال: 5",
     "publish": "نشر الإعلان",
     "publishRequest": "نشر الطلب"
