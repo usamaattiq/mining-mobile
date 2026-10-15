@@ -8,6 +8,7 @@ import { Button } from '@/shared/components/Button';
 import { EmptyState } from '@/shared/components/EmptyState';
 import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import { listingShareUrl, type ListingShareCategory } from '@/shared/utils/listingShareUrl';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
@@ -43,6 +44,8 @@ export type ListingOffersPanelProps = {
   /** Name shown in the prefilled WhatsApp message when contacting the listing owner. */
   contactName?: string;
   senderName?: string;
+  listingId?: string;
+  listingCategory?: ListingShareCategory;
   listingTitle?: string;
   listingReference?: string;
   onPressResponder?: (offer: ListingRfqOffer) => void;
@@ -87,6 +90,8 @@ export function ListingOffersPanel({
   contactPhone,
   contactName,
   senderName,
+  listingId,
+  listingCategory,
   listingTitle,
   listingReference,
   onPressResponder,
@@ -289,14 +294,19 @@ export function ListingOffersPanel({
                         const recipient = (
                           contactingOwner ? contactName : offer.responderName
                         )?.trim();
+                        const link =
+                          listingId && listingCategory
+                            ? listingShareUrl(listingCategory, listingId)
+                            : '';
                         openWhatsApp(
                           phone,
-                          recipient && senderName && listingTitle && listingReference
+                          recipient && senderName && listingTitle && link
                             ? t('common.whatsappListingMessage', {
                                 recipient,
                                 sender: senderName,
                                 listing: listingTitle,
-                                reference: listingReference,
+                                reference: listingReference ?? '',
+                                link,
                               })
                             : undefined,
                         );

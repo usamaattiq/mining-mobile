@@ -31,7 +31,7 @@
     "date": "Date",
     "postedOn": "Posted on",
     "reference": "Reference",
-    "whatsappListingMessage": "Hello {recipient},\n\nMy name is {sender}. I am contacting you through Dahabi regarding \"{listing}\".\n\nReference: {reference}\n\nI would appreciate the chance to discuss the details at a time that suits you.\n\nThank you.",
+    "whatsappListingMessage": "Hello {recipient},\n\nMy name is {sender}. I am contacting you through Dahabi regarding \"{listing}\".\n\nReference: {reference}\n\n{link}\n\nI would appreciate the chance to discuss the details at a time that suits you.\n\nThank you.",
     "whatsappContactMessage": "Hello {recipient},\n\nMy name is {sender}. I am contacting you through Dahabi.\n\nPlease reply when it is convenient for you.\n\nThank you."
   },
   "rfq": {

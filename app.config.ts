@@ -88,6 +88,11 @@ const config: ExpoConfig = {
           { scheme: 'miningmobile', host: 'requests', pathPrefix: '/' },
           { scheme: 'miningmobile', host: 'conversation', pathPrefix: '/' },
           { scheme: 'miningmobile', host: 'listing', pathPrefix: '/' },
+          {
+            scheme: 'https',
+            host: 'api.dahabi-sudan.com',
+            pathPrefix: '/open/listing',
+          },
           { scheme: 'miningmobile', host: 'messages' },
           { scheme: 'miningmobile', host: 'notifications' },
           { scheme: 'miningmobile', host: 'offers' },
@@ -104,6 +109,7 @@ const config: ExpoConfig = {
   ios: {
     ...baseExpo.ios,
     supportsTablet: false,
+    associatedDomains: ['applinks:api.dahabi-sudan.com'],
     infoPlist: {
       ...baseExpo.ios?.infoPlist,
       ITSAppUsesNonExemptEncryption: false,

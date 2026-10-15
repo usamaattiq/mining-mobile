@@ -7,6 +7,7 @@ import { listingsApi, type EquipmentStockHold } from '@/features/listings/api/li
 import { AppText } from '@/shared/components/AppText';
 import { Button } from '@/shared/components/Button';
 import { useCurrency } from '@/shared/hooks/useCurrency';
+import { listingShareUrl } from '@/shared/utils/listingShareUrl';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { palette, radius, spacing } from '@/theme';
 
@@ -70,12 +71,13 @@ export function EquipmentDealsSection({
             onPress={() =>
               openWhatsApp(
                 phone,
-                hold.buyerName.trim() && senderName && listingTitle && listingReference
+                hold.buyerName.trim() && senderName && listingTitle
                   ? t('common.whatsappListingMessage', {
                       recipient: hold.buyerName.trim(),
                       sender: senderName,
                       listing: listingTitle,
-                      reference: listingReference,
+                      reference: listingReference ?? '',
+                      link: listingShareUrl('equipment', listingId),
                     })
                   : undefined,
               )

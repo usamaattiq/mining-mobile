@@ -9,6 +9,7 @@ import { FORGOT_MPIN_STEPS, LOGIN_STEPS } from '@/features/auth/constants/onboar
 import { authApi } from '@/features/auth/api/authApi';
 import { useBiometricLogin } from '@/features/auth/hooks/useBiometricLogin';
 import type { RootStackParamList } from '@/navigation/types';
+import { routesAfterAuth } from '@/navigation/pendingListingLink';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { useAuthStore } from '@/store/authStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
@@ -185,7 +186,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       if (keepBiometric) await setCachedMpin(mpinValue);
       else await clearCachedMpin();
       await setDeviceBiometricEnabled(keepBiometric);
-      navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
+      navigation.reset(routesAfterAuth());
     } catch (error) {
       setMpin('');
 
@@ -255,7 +256,7 @@ export function LoginScreen({ navigation }: Props): React.ReactElement {
       if (keepBiometric) await setCachedMpin(newMpin);
       else await clearCachedMpin();
       await setDeviceBiometricEnabled(keepBiometric);
-      navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
+      navigation.reset(routesAfterAuth());
     } catch (error) {
       showAppAlert(t('common.error'), errorMessage(error, t('loginMpin.loginFailed')));
       setConfirmNewMpin('');

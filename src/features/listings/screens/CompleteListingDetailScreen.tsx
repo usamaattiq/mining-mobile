@@ -53,6 +53,7 @@ import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { listingShareUrl } from '@/shared/utils/listingShareUrl';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
 import { isEndingSoon } from '@/features/listings/utils/listingExpiry';
@@ -1275,6 +1276,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     }
               }
               senderName={senderName}
+              listingId={id}
+              listingCategory={category}
               listingTitle={title}
               listingReference={
                 equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
@@ -1301,6 +1304,14 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               title={t('rfq.leaderboardTitle')}
               contactResponderId={profileId}
               senderName={senderName}
+              listingId={id}
+              listingCategory={category}
+              listingTitle={title}
+              listingReference={
+                equipmentListing?.reference ?? serviceListing?.reference ?? goldListing?.reference
+              }
+              contactName={owner?.fullName}
+              contactPhone={rfq?.ownerPhone}
               onAccept={() => undefined}
               onReject={() => undefined}
             />
@@ -1618,7 +1629,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                       reference:
                                         equipmentListing?.reference ??
                                         serviceListing?.reference ??
-                                        goldListing?.reference,
+                                        goldListing?.reference ??
+                                        '',
+                                      link: listingShareUrl(category, id),
                                     })
                                   : undefined,
                               )
@@ -1727,7 +1740,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                                     reference:
                                       equipmentListing?.reference ??
                                       serviceListing?.reference ??
-                                      goldListing?.reference,
+                                      goldListing?.reference ??
+                                      '',
+                                    link: listingShareUrl(category, id),
                                   })
                                 : undefined,
                             )
@@ -2056,7 +2071,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           reference:
                             equipmentListing?.reference ??
                             serviceListing?.reference ??
-                            goldListing?.reference,
+                            goldListing?.reference ??
+                            '',
+                          link: listingShareUrl(category, id),
                         })
                       : undefined,
                   )

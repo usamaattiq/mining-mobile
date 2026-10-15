@@ -20,6 +20,7 @@ import {
   sanitizePhoneDigits,
 } from '@/features/auth/utils/phoneInput';
 import type { RootStackParamList } from '@/navigation/types';
+import { welcomeAfterSignUp } from '@/navigation/pendingListingLink';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { useAuthStore } from '@/store/authStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
@@ -284,7 +285,7 @@ export function SignUpFlowScreen({ navigation }: Props): React.ReactElement {
         })();
       }
 
-      navigation.replace('Welcome');
+      navigation.replace('Welcome', welcomeAfterSignUp());
     } catch (error) {
       if (error instanceof ApiError && error.status === 409 && /email/i.test(error.message)) {
         setEmailError(t('signUpPersonalInfo.emailAlreadyExists'));
