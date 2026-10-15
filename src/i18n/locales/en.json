@@ -85,6 +85,7 @@
       "confirmed": "Accepted",
       "withdrawn": "Withdrawn",
       "declined": "Declined",
+      "canceled": "Canceled",
       "timedOut": "Timed out",
       "lapsed": "Lapsed",
       "returned": "Returned"

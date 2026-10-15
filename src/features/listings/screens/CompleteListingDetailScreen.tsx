@@ -791,27 +791,49 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const supplierServiceSender =
     !isAdmin && !isOwner && category === 'services' && serviceListing?.postedAs === 'supplier';
   const isAuction = category === 'gold' || equipmentListing?.requestMode === 'auction';
+  const pastOfferStatuses = new Set([
+    'withdrawn',
+    'declined',
+    'canceled',
+    'cancelled',
+    'rejected',
+    'timed_out',
+    'timed-out',
+  ]);
+  const senderOfferHistory = (rfq?.myOffers ?? []).slice().sort((left, right) => {
+    const leftPast = pastOfferStatuses.has(left.status) ? 1 : 0;
+    const rightPast = pastOfferStatuses.has(right.status) ? 1 : 0;
+    if (leftPast !== rightPast) return leftPast - rightPast;
+    return (right.createdAt ?? 0) - (left.createdAt ?? 0);
+  });
   const respondingToBuyer =
-    !isAdmin && !isOwner && postedAs === 'buyer' && !isAuction && hasSentOffer;
+    !isAdmin &&
+    !isOwner &&
+    postedAs === 'buyer' &&
+    !isAuction &&
+    (hasSentOffer || senderOfferHistory.length > 0 || rfq?.myOfferStatus === 'withdrawn');
   const showMyOfferCards = supplierBuyer || supplierServiceSender || respondingToBuyer;
-  const mySupplierOffers = supplierBuyer
-    ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
-    : (supplierServiceSender || respondingToBuyer) && (rfq?.myOfferId || hasSentOffer)
-      ? [
-          {
-            id: rfq?.myOfferId ?? 'mine',
-            responderId: profileId ?? '',
-            responderName: '',
-            status: rfq?.myOfferStatus ?? 'active',
-            price: rfq?.myOfferPrice,
-            quantity: rfq?.myOfferQuantity,
-            kind: rfq?.myOfferKind,
-            handover: rfq?.myOfferHandover,
-            delivery: rfq?.myOfferDelivery,
-            createdAt: rfq?.myOfferCreatedAt,
-          },
-        ]
-      : [];
+  const mySupplierOffers =
+    senderOfferHistory.length > 0
+      ? senderOfferHistory
+      : supplierBuyer
+        ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
+        : (supplierServiceSender || respondingToBuyer) && (rfq?.myOfferId || hasSentOffer)
+          ? [
+              {
+                id: rfq?.myOfferId ?? 'mine',
+                responderId: profileId ?? '',
+                responderName: '',
+                status: rfq?.myOfferStatus ?? 'active',
+                price: rfq?.myOfferPrice,
+                quantity: rfq?.myOfferQuantity,
+                kind: rfq?.myOfferKind,
+                handover: rfq?.myOfferHandover,
+                delivery: rfq?.myOfferDelivery,
+                createdAt: rfq?.myOfferCreatedAt,
+              },
+            ]
+          : [];
   // Block the other rent/sale offer until this one is accepted (confirmed).
   // Set to false to allow both kinds again while one is still open.
   const limitToOneOpenOffer = true;
@@ -1399,12 +1421,20 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         ) : null}
                         {offer.status === 'selected' ||
                         offer.status === 'declined' ||
+                        offer.status === 'withdrawn' ||
+                        offer.status === 'canceled' ||
+                        offer.status === 'cancelled' ||
+                        offer.status === 'rejected' ||
                         offer.status === 'timed_out' ? (
                           <View style={styles.myOfferStatusBadge}>
                             <AppText weight="semibold" style={styles.myOfferStatusText}>
                               {t(
                                 `rfq.offerStatus.${
-                                  offer.status === 'timed_out' ? 'timedOut' : offer.status
+                                  offer.status === 'timed_out'
+                                    ? 'timedOut'
+                                    : offer.status === 'cancelled' || offer.status === 'rejected'
+                                      ? 'canceled'
+                                      : offer.status
                                 }`,
                               )}
                             </AppText>
@@ -1634,6 +1664,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     ) : null}
                     {editingOfferId !== offer.id &&
+                    !pastOfferStatuses.has(offer.status) &&
                     (messageOnSend || offer.status === 'confirmed') ? (
                       <View style={[styles.myOfferActions, styles.myOfferMessageActions]}>
                         <Button

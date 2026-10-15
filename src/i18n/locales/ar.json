@@ -85,6 +85,7 @@
       "confirmed": "مقبول",
       "withdrawn": "مسحوب",
       "declined": "مرفوض",
+      "canceled": "ملغى",
       "timedOut": "انتهت المهلة",
       "lapsed": "منتهٍ",
       "returned": "مُرجَع"

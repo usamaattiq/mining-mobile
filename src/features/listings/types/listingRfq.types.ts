@@ -40,4 +40,5 @@ export type ListingRfq = {
   ownerPhone?: string;
   isLeading?: boolean;
   offers?: ListingRfqOffer[];
+  myOffers?: ListingRfqOffer[];
 };
