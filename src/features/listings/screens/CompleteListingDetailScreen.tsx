@@ -1226,9 +1226,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     <AppText weight="semibold" style={styles.viewDetailsLabel} numberOfLines={1}>
                       {t('equipmentListing.viewUnitDetails')}
                     </AppText>
-                    <AppText style={styles.viewDetailsHint} numberOfLines={1}>
-                      {t('equipmentListing.viewUnitDetailsHint')}
-                    </AppText>
                   </View>
                   <Ionicons name="chevron-forward" size={16} color={palette.muted} />
                 </Pressable>
