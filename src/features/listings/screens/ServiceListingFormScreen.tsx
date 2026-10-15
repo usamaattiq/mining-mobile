@@ -87,6 +87,24 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const isBuyer = editingId ? sourceListing?.postedAs === 'buyer' : roleIsBuyer;
 
   const [serviceCategory, setServiceCategory] = React.useState<string | null>(null);
+  const [unitOptions, setUnitOptions] = React.useState<{ value: string; label: string }[]>([]);
+  const [unitLabel, setUnitLabel] = React.useState<string | null>(null);
+  const [unitPrice, setUnitPrice] = React.useState('');
+
+  React.useEffect(() => {
+    if (!isBuyer) return;
+    void listingsApi
+      .units()
+      .then((result) =>
+        setUnitOptions(
+          result.items.map((item) => ({
+            value: item.name,
+            label: currentLanguage.startsWith('ar') && item.nameAr ? item.nameAr : item.name,
+          })),
+        ),
+      )
+      .catch(() => undefined);
+  }, [currentLanguage, isBuyer]);
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [yearsOfExperience, setYearsOfExperience] = React.useState(1);
@@ -124,6 +142,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       matchSelectOption(serviceCategoryOptions, sourceListing.serviceCategoryLabel) ??
         (sourceListing.serviceCategoryLabel.trim() || null),
     );
+    setUnitLabel(sourceListing.unitLabel?.trim() || null);
+    setUnitPrice(sourceListing.unitPrice ?? '');
     setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
     setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setYearsOfExperience(Math.max(Number(sourceListing.yearsOfExperience) || 1, 1));
@@ -174,6 +194,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     (isBuyer ||
       ((onsite ? Boolean(parsePositiveAmount(onsitePrice)) : true) &&
         (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
+    (!isBuyer || !unitLabel || Boolean(parsePositiveAmount(unitPrice))),
   );
   const mediaValid = (isBuyer || media.length > 0) && location.trim().length > 0;
   const canGoNext =
@@ -221,6 +242,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         onsitePrice: isBuyer || !onsite ? '' : onsitePrice,
         onlinePrice: isBuyer || !online ? '' : onlinePrice,
         price: isBuyer ? '' : onsite ? onsitePrice : onlinePrice,
+        unitLabel: isBuyer ? (unitLabel ?? '') : '',
+        unitPrice: isBuyer && unitLabel ? unitPrice : '',
         serviceDate: null,
         expiryHours: expiryHoursUntil(listedUntil),
         location,
@@ -277,6 +300,18 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
       ),
       value: serviceCategoryLabel ?? '',
     },
+    ...(isBuyer && unitLabel
+      ? [
+          {
+            label: t('equipmentListing.fieldUnit'),
+            value: unitOptions.find((option) => option.value === unitLabel)?.label ?? unitLabel,
+          },
+          {
+            label: t('equipmentListing.fieldUnitPrice'),
+            value: unitPrice ? `${currency.code} ${formatAmountWithCommas(unitPrice)}` : '',
+          },
+        ]
+      : []),
     ...(isBuyer
       ? []
       : [
@@ -441,6 +476,37 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               tallWhenMany
               searchPlaceholder={t('serviceListing.searchServiceTypes')}
             />
+
+            {isBuyer ? (
+              <>
+                <SelectField
+                  label={t('equipmentListing.fieldUnitOptional')}
+                  placeholder={t('equipmentListing.unitPlaceholder')}
+                  sheetTitle={t('equipmentListing.fieldUnit')}
+                  options={unitOptions}
+                  value={unitLabel}
+                  onChange={(next) => {
+                    setUnitLabel(next);
+                    if (!next) setUnitPrice('');
+                  }}
+                />
+                {unitLabel ? (
+                  <FormInput
+                    label={t('equipmentListing.fieldUnitPrice')}
+                    value={unitPrice}
+                    onChangeText={(value) => setUnitPrice(sanitizeStepPrice(value))}
+                    keyboardType="numeric"
+                    placeholder={currency.code}
+                    required
+                    error={
+                      unitPrice && !parsePositiveAmount(unitPrice)
+                        ? t('common.priceGreaterThanZero')
+                        : undefined
+                    }
+                  />
+                ) : null}
+              </>
+            ) : null}
 
             {isBuyer ? null : (
               <CounterField

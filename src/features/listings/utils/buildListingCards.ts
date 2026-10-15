@@ -120,12 +120,9 @@ export function buildListingCards({
       const offersSell = listing.mode === 'sell' || listing.mode === 'both';
       const rental = rentalPrice(listing, t, currencyCode);
       const saleAmount = priceText(currencyCode, listing.salePrice);
-      const buyerUnitPrice = priceText(currencyCode, listing.unitPrice ?? '');
       const priceLines =
         listing.postedAs === 'buyer'
-          ? buyerUnitPrice && listing.unitLabel
-            ? [{ text: buyerUnitPrice, unit: listing.unitLabel }]
-            : undefined
+          ? undefined
           : [
               offersSell && saleAmount
                 ? {
@@ -248,9 +245,16 @@ export function buildListingCards({
     return serviceListings.map((listing) => {
       const prices = resolveServicePrices(listing);
       const priceLines =
-        listing.postedAs === 'buyer'
-          ? undefined
-          : [
+        listing.postedAs === 'buyer' && listing.unitLabel && listing.unitPrice
+          ? [
+              {
+                text: `${currencyCode} ${formatAmountWithCommas(listing.unitPrice)}`,
+                unit: listing.unitLabel,
+              },
+            ]
+          : listing.postedAs === 'buyer'
+            ? undefined
+            : [
               prices.onsitePrice
                 ? {
                     text: `${currencyCode} ${formatAmountWithCommas(prices.onsitePrice)}`,

@@ -18,6 +18,8 @@ export type ServiceListing = {
   /** Epoch ms of the requested service date/time, or null if not set. */
   serviceDate: number | null;
   location: string;
+  unitLabel?: string;
+  unitPrice?: string;
   media: ServiceMediaAsset[];
   postedAs: 'buyer' | 'supplier';
   ownerId?: string;

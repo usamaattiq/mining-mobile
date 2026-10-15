@@ -442,6 +442,7 @@
     "fieldUnitOptional": "الوحدة (اختياري)",
     "unitPlaceholder": "اختر وحدة",
     "fieldUnitPrice": "السعر",
+    "unitPriceTitle": "سعر {unit}",
     "searchTypes": "ابحث عن نوع المعدة",
     "type": {
       "excavator": "حفارة",

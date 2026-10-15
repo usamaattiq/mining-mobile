@@ -463,6 +463,7 @@
     "fieldUnitOptional": "Unit (optional)",
     "unitPlaceholder": "Choose a unit",
     "fieldUnitPrice": "Price",
+    "unitPriceTitle": "{unit} price",
     "searchTypes": "Search equipment types",
     "type": {
       "excavator": "Excavator",

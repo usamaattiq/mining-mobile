@@ -15,6 +15,8 @@ export type ListingOfferComposerProps = {
   unitsLabel?: string;
   maxUnits?: number;
   unitPricePlaceholder?: string;
+  /** Buyer request pricing unit, shown as a title above the offer amount. */
+  pricingUnitLabel?: string;
   hasOffer: boolean;
   leading?: boolean;
   showInput: boolean;

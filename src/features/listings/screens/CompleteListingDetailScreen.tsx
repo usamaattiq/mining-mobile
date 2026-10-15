@@ -453,19 +453,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               ]),
         ].filter((row) => (row.value ?? '').trim().length > 0);
 
-    if (equipmentListing.unitLabel) {
-      detailRows.push({
-        label: t('equipmentListing.fieldUnit'),
-        value: equipmentListing.unitLabel,
-      });
-    }
-    if (equipmentListing.unitPrice) {
-      detailRows.push({
-        label: t('equipmentListing.fieldUnitPrice'),
-        value: `${currency.code} ${formatAmountWithCommas(equipmentListing.unitPrice)}`,
-      });
-    }
-
     if (equipmentListing.postedAs !== 'buyer' && equipmentListing.deliveryAvailable) {
       detailRows.push({
         label: t('equipmentListing.deliveryBadge'),
@@ -549,24 +536,6 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           unitsCaption={t('equipmentListing.requiredUnits')}
           unitsLabel={String(equipmentListing.units)}
         />
-      );
-    } else if (
-      equipmentListing.postedAs === 'buyer' &&
-      equipmentListing.unitLabel &&
-      equipmentListing.unitPrice
-    ) {
-      unitPriceCard = (
-        <View style={styles.unitPriceCard}>
-          <View style={styles.unitPriceCell}>
-            <View style={styles.unitPriceHeading}>
-              <Ionicons name="pricetag-outline" size={18} color={palette.charcoal} />
-              <AppText style={styles.unitPriceCaption}>{equipmentListing.unitLabel}</AppText>
-            </View>
-            <AppText weight="bold" style={styles.unitPriceAmount}>
-              {currency.code} {formatAmountWithCommas(equipmentListing.unitPrice)}
-            </AppText>
-          </View>
-        </View>
       );
     } else {
       unitPriceCard =
@@ -659,6 +628,19 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       },
     ].filter((row) => (row.value ?? '').trim().length > 0);
 
+    if (serviceListing.unitLabel) {
+      detailRows.push({
+        label: t('equipmentListing.fieldUnit'),
+        value: serviceListing.unitLabel,
+      });
+    }
+    if (serviceListing.unitPrice) {
+      detailRows.push({
+        label: t('equipmentListing.fieldUnitPrice'),
+        value: `${currency.code} ${formatAmountWithCommas(serviceListing.unitPrice)}`,
+      });
+    }
+
     const servicePrices = resolveServicePrices(serviceListing);
     const servicePriceOptions = (
       [
@@ -679,7 +661,21 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       ] as const
     ).filter((option): option is NonNullable<typeof option> => option !== null);
     unitPriceCard =
-      serviceListing.postedAs === 'buyer' || servicePriceOptions.length === 0 ? null : (
+      serviceListing.postedAs === 'buyer' && serviceListing.unitLabel && serviceListing.unitPrice ? (
+        <View style={styles.unitPriceCard}>
+          <View style={styles.unitPriceCell}>
+            <View style={styles.unitPriceHeading}>
+              <Ionicons name="pricetag-outline" size={18} color={palette.charcoal} />
+              <AppText style={styles.unitPriceCaption}>
+                {t('equipmentListing.unitPriceTitle', { unit: serviceListing.unitLabel })}
+              </AppText>
+            </View>
+            <AppText weight="bold" style={styles.unitPriceAmount}>
+              {currency.code} {formatAmountWithCommas(serviceListing.unitPrice)}
+            </AppText>
+          </View>
+        </View>
+      ) : serviceListing.postedAs === 'buyer' || servicePriceOptions.length === 0 ? null : (
         <View style={styles.unitPriceCard}>
           {servicePriceOptions.map((option, index) => (
             <React.Fragment key={option.key}>
@@ -2002,6 +1998,13 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           }
           unitPricePlaceholder={
             category === 'equipment' && !isAuction ? t('rfq.unitPriceAmountPlaceholder') : undefined
+          }
+          pricingUnitLabel={
+            category === 'services' &&
+            serviceListing?.postedAs === 'buyer' &&
+            serviceListing.unitLabel
+              ? t('equipmentListing.unitPriceTitle', { unit: serviceListing.unitLabel })
+              : undefined
           }
           maxUnits={category === 'equipment' && !isAuction ? Math.max(unitsLeft, 0) : undefined}
           offerTypeLabel={

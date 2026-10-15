@@ -7,6 +7,8 @@ import { CounterField } from '@/shared/components/CounterField';
 import { AppText } from '@/shared/components/AppText';
 import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTimesUnitsSummary';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
+import { useTranslation } from 'react-i18next';
+import { i18n as appI18n } from '@/i18n';
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { getFontFamily, palette, radius, spacing } from '@/theme';
 import type { ListingOfferComposerProps } from '@/features/listings/types/listingOfferComposer.types';
@@ -25,6 +27,7 @@ export function ListingOfferComposer({
   unitsLabel,
   maxUnits,
   unitPricePlaceholder,
+  pricingUnitLabel,
   hasOffer,
   leading = false,
   showInput,
@@ -52,6 +55,7 @@ export function ListingOfferComposer({
 }: ListingOfferComposerProps): React.ReactElement {
   const insets = useSafeAreaInsets();
   const { currentLanguage } = useLanguage();
+  const { t } = useTranslation(undefined, { i18n: appI18n });
   const keyboardVisible = useKeyboardState((state) => state.isVisible);
   const [price, setPrice] = React.useState('');
   const [units, setUnits] = React.useState(1);
@@ -322,22 +326,32 @@ export function ListingOfferComposer({
             <View style={styles.row}>
               {maxUnits != null ? (
                 <View style={styles.unitsWrapInline}>
+                  <AppText weight="semibold" style={styles.unitsCaption}>
+                    {t('rfq.unitsLabel')}
+                  </AppText>
                   <CounterField value={units} onChange={setUnits} min={1} max={unitCap} required />
                 </View>
               ) : null}
-              <View style={styles.inputWrap}>
-                <AppText weight="semibold" style={styles.currency}>
-                  {currencyCode}
-                </AppText>
-                <TextInput
-                  value={price}
-                  onChangeText={setPrice}
-                  placeholder={unitPricePlaceholder ?? placeholder}
-                  placeholderTextColor={palette.muted}
-                  keyboardType="decimal-pad"
-                  editable={!submitting}
-                  style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
-                />
+              <View style={styles.priceField}>
+                {pricingUnitLabel ? (
+                  <AppText weight="semibold" style={styles.unitsCaption}>
+                    {pricingUnitLabel}
+                  </AppText>
+                ) : null}
+                <View style={[styles.inputWrap, styles.inputWrapStacked]}>
+                  <AppText weight="semibold" style={styles.currency}>
+                    {currencyCode}
+                  </AppText>
+                  <TextInput
+                    value={price}
+                    onChangeText={setPrice}
+                    placeholder={unitPricePlaceholder ?? placeholder}
+                    placeholderTextColor={palette.muted}
+                    keyboardType="decimal-pad"
+                    editable={!submitting}
+                    style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
+                  />
+                </View>
               </View>
               <Pressable
                 onPress={handleSend}
@@ -450,17 +464,29 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: spacing.sm,
+  },
+  priceField: {
+    flex: 1,
+    minWidth: 0,
+    gap: 4,
+    justifyContent: 'flex-end',
+  },
+  inputWrapStacked: {
+    flex: 0,
+    width: '100%',
   },
   unitsCaption: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 16,
     color: palette.charcoal,
   },
   unitsWrapInline: {
     width: 128,
     flexShrink: 0,
+    gap: 4,
+    justifyContent: 'flex-end',
   },
   sendInline: {
     width: 44,
