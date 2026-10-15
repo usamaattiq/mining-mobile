@@ -914,11 +914,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     action: 'accept' | 'reject',
     alreadyConfirmed = false,
   ) => {
-    if (
-      action === 'accept' &&
-      category === 'equipment' &&
-      equipmentListing?.postedAs === 'supplier'
-    ) {
+    if (action === 'accept' && category === 'equipment' && !isAuction) {
       const requested = rfq?.offers?.find((offer) => offer.id === offerId)?.quantity ?? 1;
       if (unitsLeft <= 0) {
         showAppAlert(t('rfq.noUnitsAvailable'));
