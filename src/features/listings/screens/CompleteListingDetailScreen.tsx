@@ -2595,10 +2595,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: palette.charcoal,
   },
-  viewDetailsHint: {
-    fontSize: 12,
-    color: palette.muted,
-  },
   notFoundWrap: {
     flex: 1,
     alignItems: 'center',
