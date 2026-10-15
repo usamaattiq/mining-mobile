@@ -290,7 +290,14 @@
     "sectionCategories": "التصنيفات",
     "sectionCategoriesDetail": "تسميات المعدات والخدمات والذهب.",
     "sectionUnits": "الوحدات",
-    "sectionUnitsDetail": "وحدات التسعير مثل بالساعة أو بالقدم."
+    "sectionUnitsDetail": "وحدات التسعير مثل بالساعة أو بالقدم.",
+    "sectionBuyerRequests": "طلبات المعدات",
+    "sectionBuyerRequestsDetail": "إظهار طلب عرض السعر أو المزاد أو كليهما عند طلب المشتري للمعدات.",
+    "buyerRequestRfq": "طلب عرض سعر",
+    "buyerRequestRfqHint": "يمكن للمشتري نشر طلب معدات كطلب عرض سعر.",
+    "buyerRequestAuction": "مزاد",
+    "buyerRequestAuctionHint": "يمكن للمشتري نشر طلب معدات كمزاد.",
+    "buyerRequestKeepOne": "أبقِ نوع طلب واحدًا على الأقل مفعّلاً."
   },
   "tabs": {
     "home": "الرئيسية",

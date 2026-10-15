@@ -127,7 +127,11 @@ export function OptionRowCard({
         </View>
       )}
 
-      {compact && subtitle ? <AppText style={styles.subtitleCompact}>{subtitle}</AppText> : null}
+      {compact && subtitle ? (
+        <AppText style={styles.subtitleCompact} numberOfLines={3}>
+          {subtitle}
+        </AppText>
+      ) : null}
     </Pressable>
   );
 }
@@ -182,7 +186,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   cardCompact: {
-    flex: 1,
+    alignSelf: 'stretch',
+    width: '100%',
     minWidth: 0,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
@@ -236,6 +241,7 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
+    minWidth: 0,
     gap: 3,
   },
   title: {
@@ -251,6 +257,7 @@ const styles = StyleSheet.create({
     color: palette.muted,
   },
   subtitleCompact: {
+    flexShrink: 1,
     fontSize: 11,
     lineHeight: 15,
     color: palette.muted,

@@ -36,6 +36,7 @@ export type RootStackParamList = {
   AdminSystemMessage: undefined;
   AdminSystemCategories: undefined;
   AdminSystemUnits: undefined;
+  AdminSystemRequests: undefined;
   Conversation: { conversationId: string };
   Messages: undefined;
   Notifications: undefined;

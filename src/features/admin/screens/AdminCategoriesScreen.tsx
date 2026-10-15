@@ -84,6 +84,14 @@ export function AdminCategoriesScreen(): React.ReactElement {
           subtitle={t('admin.sectionUnitsDetail')}
           onPress={() => navigation.navigate('AdminSystemUnits')}
         />
+        <OfferChoiceCard
+          selected={false}
+          hideCheck
+          icon="hammer-outline"
+          title={t('admin.sectionBuyerRequests')}
+          subtitle={t('admin.sectionBuyerRequestsDetail')}
+          onPress={() => navigation.navigate('AdminSystemRequests')}
+        />
       </View>
     </GoldSheetScreen>
   );

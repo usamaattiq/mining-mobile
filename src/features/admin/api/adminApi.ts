@@ -143,10 +143,23 @@ export const adminApi = {
   deleteUnit(id: string): Promise<{ id: string }> {
     return apiFetch(`/admin/units/${id}`, { method: 'DELETE' });
   },
-  settings(): Promise<{ messageOnSend: boolean }> {
+  settings(): Promise<{
+    messageOnSend: boolean;
+    buyerEquipmentRfq: boolean;
+    buyerEquipmentAuction: boolean;
+  }> {
     return apiFetch('/admin/settings');
   },
   setMessageOnSend(messageOnSend: boolean): Promise<{ messageOnSend: boolean }> {
     return apiFetch('/admin/settings', { method: 'PATCH', body: { messageOnSend } });
+  },
+  setBuyerEquipmentMode(
+    mode: 'rfq' | 'auction',
+    enabled: boolean,
+  ): Promise<{ buyerEquipmentRfq: boolean; buyerEquipmentAuction: boolean }> {
+    return apiFetch('/admin/settings', {
+      method: 'PATCH',
+      body: mode === 'rfq' ? { buyerEquipmentRfq: enabled } : { buyerEquipmentAuction: enabled },
+    });
   },
 };

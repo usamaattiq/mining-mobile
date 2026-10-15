@@ -83,6 +83,23 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
   const sourceId = editingId ?? route.params?.repostId;
   const roleIsBuyer = useMarketplaceRoleStore((state) => state.role === 'buyer');
   const [requestMode, setRequestMode] = React.useState<'rfq' | 'auction'>('rfq');
+  const [rfqEnabled, setRfqEnabled] = React.useState(true);
+  const [auctionEnabled, setAuctionEnabled] = React.useState(true);
+  React.useEffect(() => {
+    void listingsApi
+      .appSettings()
+      .then((settings) => {
+        setRfqEnabled(settings.buyerEquipmentRfq !== false);
+        setAuctionEnabled(settings.buyerEquipmentAuction !== false);
+      })
+      .catch(() => undefined);
+  }, []);
+
+  React.useEffect(() => {
+    if (editingId) return;
+    if (requestMode === 'rfq' && !rfqEnabled && auctionEnabled) setRequestMode('auction');
+    if (requestMode === 'auction' && !auctionEnabled && rfqEnabled) setRequestMode('rfq');
+  }, [auctionEnabled, editingId, requestMode, rfqEnabled]);
   const [offerRent, setOfferRent] = React.useState(false);
   const [offerSell, setOfferSell] = React.useState(false);
   const mode = offerRent && offerSell ? 'both' : offerRent ? 'rent' : offerSell ? 'sell' : null;
@@ -240,7 +257,10 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     units > 0 &&
     (isBuyer ||
       ((offerRent ? Boolean(rentPeriod && parsePositiveAmount(rentalAmount)) : true) &&
-        (offerSell ? Boolean(parsePositiveAmount(salePrice)) : true))),
+        (offerSell ? Boolean(parsePositiveAmount(salePrice)) : true))) &&
+    (!isBuyer ||
+      Boolean(editingId) ||
+      (requestMode === 'auction' ? auctionEnabled : rfqEnabled)),
   );
   const deliveryValid =
     isBuyer ||
@@ -566,22 +586,53 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
           <View style={styles.stepBlock}>
             {isBuyer ? (
               <View style={styles.choiceRow}>
-                <OptionRowCard
-                  compact
-                  selected={requestMode === 'rfq'}
-                  icon="document-text-outline"
-                  title={t('equipmentListing.requestRfq')}
-                  subtitle={t('equipmentListing.requestRfqSubtitle')}
-                  onPress={() => setRequestMode('rfq')}
-                />
-                <OptionRowCard
-                  compact
-                  selected={requestMode === 'auction'}
-                  icon="hammer-outline"
-                  title={t('equipmentListing.requestAuction')}
-                  subtitle={t('equipmentListing.requestAuctionSubtitle')}
-                  onPress={() => setRequestMode('auction')}
-                />
+                {(
+                  [
+                    rfqEnabled || (Boolean(editingId) && requestMode === 'rfq')
+                      ? {
+                          key: 'rfq',
+                          selected: requestMode === 'rfq',
+                          icon: 'document-text-outline' as const,
+                          title: t('equipmentListing.requestRfq'),
+                          subtitle: t('equipmentListing.requestRfqSubtitle'),
+                          onPress: () => setRequestMode('rfq'),
+                        }
+                      : null,
+                    auctionEnabled || (Boolean(editingId) && requestMode === 'auction')
+                      ? {
+                          key: 'auction',
+                          selected: requestMode === 'auction',
+                          icon: 'hammer-outline' as const,
+                          title: t('equipmentListing.requestAuction'),
+                          subtitle: t('equipmentListing.requestAuctionSubtitle'),
+                          onPress: () => setRequestMode('auction'),
+                        }
+                      : null,
+                  ].filter((card) => card != null) as {
+                    key: string;
+                    selected: boolean;
+                    icon: 'document-text-outline' | 'hammer-outline';
+                    title: string;
+                    subtitle: string;
+                    onPress: () => void;
+                  }[]
+                ).map((card) => (
+                  <View key={card.key} style={styles.choiceSlot}>
+                    <OptionRowCard
+                      compact
+                      selected={card.selected}
+                      icon={card.icon}
+                      title={card.title}
+                      subtitle={card.subtitle}
+                      onPress={card.onPress}
+                    />
+                  </View>
+                ))}
+                {(rfqEnabled || (Boolean(editingId) && requestMode === 'rfq') ? 1 : 0) +
+                  (auctionEnabled || (Boolean(editingId) && requestMode === 'auction') ? 1 : 0) ===
+                1 ? (
+                  <View style={styles.choiceSlot} />
+                ) : null}
               </View>
             ) : null}
 
@@ -904,6 +955,9 @@ const styles = StyleSheet.create({
   choiceRow: {
     flexDirection: 'row',
     gap: spacing.sm,
+  },
+  choiceSlot: {
+    flex: 1,
   },
   deliveryChoice: {
     gap: spacing.sm,

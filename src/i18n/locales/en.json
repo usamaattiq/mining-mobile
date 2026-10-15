@@ -290,7 +290,14 @@
     "sectionCategories": "Categories",
     "sectionCategoriesDetail": "Equipment, services, and gold labels.",
     "sectionUnits": "Units",
-    "sectionUnitsDetail": "Pricing units such as hourly or per foot."
+    "sectionUnitsDetail": "Pricing units such as hourly or per foot.",
+    "sectionBuyerRequests": "Equipment requests",
+    "sectionBuyerRequestsDetail": "Show RFQ, auction, or both when a buyer requests equipment.",
+    "buyerRequestRfq": "RFQ",
+    "buyerRequestRfqHint": "Buyers can post an equipment request as an RFQ.",
+    "buyerRequestAuction": "Auction",
+    "buyerRequestAuctionHint": "Buyers can post an equipment request as an auction.",
+    "buyerRequestKeepOne": "Keep at least one request type on."
   },
   "tabs": {
     "home": "Home",

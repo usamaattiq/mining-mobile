@@ -16,6 +16,7 @@ import { EquipmentStockScreen } from '@/features/listings/screens/EquipmentStock
 import { AdminSystemCategoriesScreen } from '@/features/admin/screens/AdminCategoriesScreen';
 import { AdminSystemMessageScreen } from '@/features/admin/screens/AdminSystemMessageScreen';
 import { AdminSystemUnitsScreen } from '@/features/admin/screens/AdminSystemUnitsScreen';
+import { AdminSystemRequestsScreen } from '@/features/admin/screens/AdminSystemRequestsScreen';
 import { QuickCreateScreen } from '@/features/dashboard/screens/QuickCreateScreen';
 import { ConversationScreen } from '@/features/messages/screens/ConversationScreen';
 import { MessagesScreen } from '@/features/messages/screens/MessagesScreen';
@@ -70,6 +71,7 @@ export function AppNavigator(): React.ReactElement {
       <Stack.Screen name="AdminSystemMessage" component={AdminSystemMessageScreen} />
       <Stack.Screen name="AdminSystemCategories" component={AdminSystemCategoriesScreen} />
       <Stack.Screen name="AdminSystemUnits" component={AdminSystemUnitsScreen} />
+      <Stack.Screen name="AdminSystemRequests" component={AdminSystemRequestsScreen} />
       <Stack.Screen
         name="Messages"
         component={MessagesScreen}
