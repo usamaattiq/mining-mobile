@@ -83,12 +83,14 @@ export const adminApi = {
   listListings(params: {
     search?: string;
     category?: string;
+    postedAs?: 'buyer' | 'supplier';
     status?: string;
     page?: number;
-  }): Promise<Page<AdminListingItem>> {
+  }): Promise<Page<AdminListingItem> & { hasMore?: boolean }> {
     const query = new URLSearchParams();
     if (params.search) query.set('search', params.search);
     if (params.category) query.set('category', params.category);
+    if (params.postedAs) query.set('postedAs', params.postedAs);
     if (params.status) query.set('status', params.status);
     if (params.page) query.set('page', String(params.page));
     const suffix = query.toString() ? `?${query.toString()}` : '';
