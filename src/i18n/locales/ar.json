@@ -709,7 +709,7 @@
     "skipTimedOutConfirm": "إرسال للمزايد التالي",
     "auctionEndDatePlaceholder": "اختر التاريخ والوقت",
     "location": "الموقع",
-    "fieldLocation": "أين يوجد الذهب",
+    "fieldLocation": "أين سيُقام المزاد؟",
     "publish": "نشر المزاد"
   },
   "offers": {

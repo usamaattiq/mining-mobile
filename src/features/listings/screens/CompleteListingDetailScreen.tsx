@@ -53,6 +53,7 @@ import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { listingShareUrl } from '@/shared/utils/listingShareUrl';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
 import { isEndedRfqStatus, rfqStatusBadge } from '@/features/listings/utils/rfqStatus';
@@ -748,6 +749,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   }));
   const descriptionText = description.trim();
   const locationLabel = location;
+  const locationLine =
+    category === 'gold' ? cityFromLocationLabel(locationLabel) || locationLabel : locationLabel;
 
   const handleOpenLocation = () => {
     if (!locationLabel.trim()) return;
@@ -1155,7 +1158,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 {title}
               </AppText>
 
-              {locationLabel.trim() ? (
+              {locationLine.trim() ? (
                 <Pressable
                   onPress={handleOpenLocation}
                   style={({ pressed }) => [
@@ -1163,11 +1166,11 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                     pressed && styles.locationRowPressed,
                   ]}
                   accessibilityRole="button"
-                  accessibilityLabel={locationLabel}
+                  accessibilityLabel={locationLine}
                 >
                   <Ionicons name="location-outline" size={16} color={palette.gold} />
                   <AppText style={styles.locationText} numberOfLines={1}>
-                    {locationLabel}
+                    {locationLine}
                   </AppText>
                   <Ionicons name="open-outline" size={14} color={palette.muted} />
                 </Pressable>

@@ -17,6 +17,7 @@ import {
   formatAuctionDurationLabel,
 } from '@/features/listings/components/DurationSlider';
 import { LocationField } from '@/shared/components/LocationField';
+import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { useAutoCurrentLocation } from '@/shared/hooks/useAutoCurrentLocation';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { Button } from '@/shared/components/Button';
@@ -275,7 +276,10 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
       label: t('goldListing.auctionDuration'),
       value: formatAuctionDurationLabel(durationHours, t),
     },
-    { label: t('goldListing.fieldLocation'), value: location },
+    {
+      label: t('goldListing.fieldLocation'),
+      value: cityFromLocationLabel(location) || location,
+    },
   ].filter((row) => (row.value ?? '').trim().length > 0);
 
   const photoMedia = media
@@ -401,6 +405,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
             <LocationField
               label={t('goldListing.fieldLocation')}
               value={location}
+              cityOnly
               required
               loading={locationLoading}
               onChangeText={setLocation}

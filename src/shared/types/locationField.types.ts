@@ -6,4 +6,6 @@ export type LocationFieldProps = {
   onChangeText?: (value: string) => void;
   onUseCurrentLocation: () => void;
   onSelectOnMap: () => void;
+  /** Show the city only. The stored value stays the full address. */
+  cityOnly?: boolean;
 };
