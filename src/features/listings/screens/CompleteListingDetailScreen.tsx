@@ -812,28 +812,39 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     postedAs === 'buyer' &&
     !isAuction &&
     (hasSentOffer || senderOfferHistory.length > 0 || rfq?.myOfferStatus === 'withdrawn');
-  const showMyOfferCards = supplierBuyer || supplierServiceSender || respondingToBuyer;
-  const mySupplierOffers =
+  const senderSide = !isAdmin && !isOwner && !isAuction;
+  const currentSenderOffer =
+    rfq?.myOfferId || rfq?.myOfferStatus
+      ? {
+          id: rfq?.myOfferId ?? 'mine',
+          responderId: profileId ?? '',
+          responderName: '',
+          status: rfq?.myOfferStatus ?? 'active',
+          price: rfq?.myOfferPrice,
+          quantity: rfq?.myOfferQuantity,
+          kind: rfq?.myOfferKind,
+          handover: rfq?.myOfferHandover,
+          delivery: rfq?.myOfferDelivery,
+          createdAt: rfq?.myOfferCreatedAt,
+        }
+      : undefined;
+  const showMyOfferCards =
+    senderSide && (supplierBuyer || supplierServiceSender || respondingToBuyer || senderOfferHistory.length > 0);
+  const listedSenderOffers =
     senderOfferHistory.length > 0
       ? senderOfferHistory
       : supplierBuyer
         ? (rfq?.offers ?? []).filter((offer) => offer.responderId === profileId)
         : (supplierServiceSender || respondingToBuyer) && (rfq?.myOfferId || hasSentOffer)
-          ? [
-              {
-                id: rfq?.myOfferId ?? 'mine',
-                responderId: profileId ?? '',
-                responderName: '',
-                status: rfq?.myOfferStatus ?? 'active',
-                price: rfq?.myOfferPrice,
-                quantity: rfq?.myOfferQuantity,
-                kind: rfq?.myOfferKind,
-                handover: rfq?.myOfferHandover,
-                delivery: rfq?.myOfferDelivery,
-                createdAt: rfq?.myOfferCreatedAt,
-              },
-            ]
+          ? currentSenderOffer
+            ? [currentSenderOffer]
+            : []
           : [];
+  const mySupplierOffers =
+    currentSenderOffer &&
+    !listedSenderOffers.some((offer) => offer.id === currentSenderOffer.id)
+      ? [currentSenderOffer, ...listedSenderOffers]
+      : listedSenderOffers;
   // Block the other rent/sale offer until this one is accepted (confirmed).
   // Set to false to allow both kinds again while one is still open.
   const limitToOneOpenOffer = true;
