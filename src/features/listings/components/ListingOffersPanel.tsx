@@ -262,9 +262,9 @@ export function ListingOffersPanel({
                 </View>
               ) : null}
               {onMessage &&
-              offer.status === 'confirmed' &&
+              ['active', 'selected', 'confirmed'].includes(offer.status) &&
               (!contactResponderId || offer.responderId === contactResponderId) ? (
-                <View style={styles.actions}>
+                <View style={[styles.actions, styles.messageActions]}>
                   <Button
                     label={t('messages.message')}
                     icon="chatbubble-ellipses-outline"
@@ -399,6 +399,9 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     gap: spacing.sm,
+  },
+  messageActions: {
+    marginTop: spacing.sm,
   },
   actionButton: {
     flex: 1,

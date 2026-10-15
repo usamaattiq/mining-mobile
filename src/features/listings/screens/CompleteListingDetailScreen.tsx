@@ -1589,6 +1589,45 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         />
                       </View>
                     ) : null}
+                    {editingOfferId !== offer.id ? (
+                      <View style={[styles.myOfferActions, styles.myOfferMessageActions]}>
+                        <Button
+                          label={t('messages.message')}
+                          icon="chatbubble-ellipses-outline"
+                          onPress={() => setMessageOpen(true)}
+                          style={styles.myOfferAction}
+                        />
+                        {rfq?.ownerPhone ? (
+                          <Button
+                            label={t('common.whatsapp')}
+                            icon="logo-whatsapp"
+                            variant="whatsapp"
+                            onPress={() =>
+                              openWhatsApp(
+                                rfq.ownerPhone!,
+                                owner?.fullName?.trim() &&
+                                  senderName &&
+                                  title &&
+                                  (equipmentListing?.reference ??
+                                    serviceListing?.reference ??
+                                    goldListing?.reference)
+                                  ? t('common.whatsappListingMessage', {
+                                      recipient: owner.fullName.trim(),
+                                      sender: senderName,
+                                      listing: title,
+                                      reference:
+                                        equipmentListing?.reference ??
+                                        serviceListing?.reference ??
+                                        goldListing?.reference,
+                                    })
+                                  : undefined,
+                              )
+                            }
+                            style={styles.myOfferAction}
+                          />
+                        ) : null}
+                      </View>
+                    ) : null}
                   </View>
                 ))}
             </View>
@@ -1988,7 +2027,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           messageLabel={t('messages.message')}
           whatsappLabel={t('common.whatsapp')}
           onMessage={
-            rfq?.myOfferStatus === 'confirmed' && owner
+            hasSentOffer && owner
               ? () => {
                   setMessagePeer({
                     id: owner.id,
@@ -2275,6 +2314,7 @@ const styles = StyleSheet.create({
   myOfferPrice: { flex: 1, fontSize: 22, color: palette.charcoal },
   myOfferPerUnit: { fontSize: 16, color: palette.muted },
   myOfferActions: { flexDirection: 'row', gap: spacing.sm },
+  myOfferMessageActions: { marginTop: spacing.sm },
   myOfferAction: {
     flex: 1,
     minHeight: 36,

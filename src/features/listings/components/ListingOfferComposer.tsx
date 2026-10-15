@@ -193,7 +193,7 @@ export function ListingOfferComposer({
                 </Pressable>
               </View>
             ) : null}
-            {onMessage && !awaitingConfirm ? (
+            {onMessage ? (
               <View style={styles.confirmRow}>
                 <Pressable
                   onPress={onMessage}
