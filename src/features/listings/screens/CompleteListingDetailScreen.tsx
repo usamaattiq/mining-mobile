@@ -762,12 +762,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   }));
   const descriptionText = description.trim();
   const locationLabel = location;
+  const locationPlaces = locationLabel
+    .split(' · ')
+    .map((part) => part.trim())
+    .filter(Boolean);
   const locationLine =
     category === 'gold' ? cityFromLocationLabel(locationLabel) || locationLabel : locationLabel;
 
-  const handleOpenLocation = () => {
-    if (!locationLabel.trim()) return;
-    const query = encodeURIComponent(locationLabel);
+  const handleOpenLocation = (place: string) => {
+    const target = place.trim();
+    if (!target) return;
+    const query = encodeURIComponent(target);
     void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
   };
 
@@ -1217,9 +1222,51 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                 {title}
               </AppText>
 
-              {locationLine.trim() ? (
+              {locationPlaces.length > 1 ? (
+                <View style={styles.locationLine}>
+                  {locationPlaces.slice(0, 2).map((place) => (
+                    <Pressable
+                      key={place}
+                      onPress={() => handleOpenLocation(place)}
+                      style={({ pressed }) => [
+                        styles.locationRow,
+                        styles.locationRowShrink,
+                        pressed && styles.locationRowPressed,
+                      ]}
+                      accessibilityRole="button"
+                      accessibilityLabel={place}
+                    >
+                      <Ionicons name="location-outline" size={16} color={palette.gold} />
+                      <AppText style={styles.locationText} numberOfLines={1}>
+                        {place}
+                      </AppText>
+                      <Ionicons name="open-outline" size={14} color={palette.muted} />
+                    </Pressable>
+                  ))}
+                  {locationPlaces.length > 2 ? (
+                    <Pressable
+                      onPress={() =>
+                        showAppAlert(
+                          t('serviceListing.allLocations'),
+                          undefined,
+                          undefined,
+                          locationPlaces.map((place) => ({
+                            text: place,
+                            onPress: () => handleOpenLocation(place),
+                          })),
+                        )
+                      }
+                      accessibilityRole="button"
+                    >
+                      <AppText weight="semibold" style={styles.viewMoreLocations}>
+                        {t('serviceListing.viewMoreLocations')}
+                      </AppText>
+                    </Pressable>
+                  ) : null}
+                </View>
+              ) : locationLine.trim() ? (
                 <Pressable
-                  onPress={handleOpenLocation}
+                  onPress={() => handleOpenLocation(locationLine)}
                   style={({ pressed }) => [
                     styles.locationRow,
                     pressed && styles.locationRowPressed,
@@ -2641,16 +2688,29 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: palette.pureWhite,
   },
+  locationLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     alignSelf: 'flex-start',
   },
+  locationRowShrink: {
+    flexShrink: 1,
+  },
   locationRowPressed: {
     opacity: 0.7,
   },
+  viewMoreLocations: {
+    fontSize: 14,
+    color: palette.gold,
+  },
   locationText: {
+    flexShrink: 1,
     fontSize: 14,
     color: palette.gold,
     textDecorationLine: 'underline',

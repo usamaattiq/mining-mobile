@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
 import { AppText } from '@/shared/components/AppText';
@@ -46,6 +47,27 @@ export function AppAlertHost(): React.ReactElement | null {
             {request.title}
           </AppText>
           {request.message ? <AppText style={styles.message}>{request.message}</AppText> : null}
+          {request.links && request.links.length > 0 ? (
+            <ScrollView style={styles.linkList} keyboardShouldPersistTaps="handled">
+              {request.links.map((link, index) => (
+                <Pressable
+                  key={`${link.text}_${index}`}
+                  onPress={() => {
+                    setRequest(null);
+                    link.onPress?.();
+                  }}
+                  style={({ pressed }) => [styles.linkRow, pressed && styles.linkPressed]}
+                  accessibilityRole="link"
+                >
+                  <Ionicons name="location-outline" size={16} color={palette.gold} />
+                  <AppText style={styles.linkText} numberOfLines={1}>
+                    {link.text}
+                  </AppText>
+                  <Ionicons name="open-outline" size={14} color={palette.muted} />
+                </Pressable>
+              ))}
+            </ScrollView>
+          ) : null}
 
           <View style={[styles.buttonRow, stacked && styles.buttonColumn]}>
             {buttons.map((button, index) => (
@@ -100,6 +122,25 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: palette.muted,
     textAlign: 'center',
+  },
+  linkList: {
+    maxHeight: 240,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
+  linkPressed: {
+    opacity: 0.7,
+  },
+  linkText: {
+    flexShrink: 1,
+    fontSize: 14,
+    color: palette.gold,
+    textDecorationLine: 'underline',
   },
   buttonRow: {
     flexDirection: 'row',

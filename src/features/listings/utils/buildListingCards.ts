@@ -51,10 +51,17 @@ function activityBadge(
   );
 }
 
-function cityFromLocation(location: string | undefined): string | undefined {
-  const first = (location ?? '').split(' · ')[0] ?? '';
-  const city = cityFromLocationLabel(first);
-  return city || first.trim() || undefined;
+function cityFromLocation(location: string | undefined, t: TFunction): string | undefined {
+  const places = (location ?? '')
+    .split(' · ')
+    .map((part) => {
+      const trimmed = part.trim();
+      return cityFromLocationLabel(trimmed) || trimmed;
+    })
+    .filter(Boolean);
+  if (places.length === 0) return undefined;
+  if (places.length === 1) return places[0];
+  return `${places[0]} ${t('serviceListing.manyMoreLocations')}`;
 }
 
 /** Long owner statuses that need the title on its own row under the badge. */
@@ -196,7 +203,7 @@ export function buildListingCards({
                 variant: listing.requestMode === 'auction' ? 'auction' : 'rfq',
               }
             : undefined,
-        city: cityFromLocation(listing.location),
+        city: cityFromLocation(listing.location, t),
         durationBadges,
         deliveryBadge: listing.deliveryAvailable
           ? {
@@ -294,7 +301,7 @@ export function buildListingCards({
           }),
         ),
         titleBelowStatus: titleBelowStatus(listing.rfq?.status),
-        city: cityFromLocation(listing.location),
+        city: cityFromLocation(listing.location, t),
         statusBadges: [
           ...serviceTypeLabels(t, listing.serviceType).map((label) => ({
             key: label,
@@ -329,7 +336,7 @@ export function buildListingCards({
       ]
         .filter((part): part is string => Boolean(part))
         .join(' · ') || undefined,
-    city: cityFromLocation(listing.location),
+    city: cityFromLocation(listing.location, t),
     typeBadge: activityBadge(
       t,
       listing.rfq,

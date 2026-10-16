@@ -29,6 +29,7 @@ type ServicePlacesFieldProps = {
   places: ServiceAreaPlace[];
   onChange: (places: ServiceAreaPlace[]) => void;
   required?: boolean;
+  onFocusChange?: (focused: boolean) => void;
 };
 
 export function ServicePlacesField({
@@ -36,6 +37,7 @@ export function ServicePlacesField({
   places,
   onChange,
   required = false,
+  onFocusChange,
 }: ServicePlacesFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
@@ -50,7 +52,6 @@ export function ServicePlacesField({
       !places.some((selected) => selected.id === place.id || selected.label === place.label) &&
       !townCoveredBySelectedCity(place, places),
   );
-
   React.useEffect(() => {
     const trimmed = query.trim();
     if (trimmed.length < 2) {
@@ -108,7 +109,7 @@ export function ServicePlacesField({
       </AppText>
       <AppText style={styles.hint}>{t('serviceListing.placesHint')}</AppText>
 
-      <View style={styles.inputBox}>
+      <Pressable style={styles.inputBox} onPress={() => inputRef.current?.focus()}>
         {places.map((place) => (
           <View key={place.id} style={styles.chip}>
             <AppText style={styles.chipText} numberOfLines={1}>
@@ -127,12 +128,14 @@ export function ServicePlacesField({
           ref={inputRef}
           value={query}
           onChangeText={setQuery}
+          onFocus={() => onFocusChange?.(true)}
+          onBlur={() => onFocusChange?.(false)}
           placeholder={places.length === 0 ? t('serviceListing.placesPlaceholder') : ''}
           placeholderTextColor={palette.muted}
           style={[styles.input, { fontFamily: getFontFamily(currentLanguage) }]}
         />
         {loading ? <ActivityIndicator size="small" color={palette.gold} /> : null}
-      </View>
+      </Pressable>
 
       {visibleResults.length > 0 ? (
         <ScrollView style={styles.results} keyboardShouldPersistTaps="handled" nestedScrollEnabled>

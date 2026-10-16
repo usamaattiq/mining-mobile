@@ -78,6 +78,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   ];
   const lastStep = steps.length - 1;
   const [step, setStep] = React.useState(0);
+  const [placesFieldFocused, setPlacesFieldFocused] = React.useState(false);
   const [publishing, setPublishing] = React.useState(false);
   const addListing = useServiceListingsStore((state) => state.addListing);
   const storedRepost = useServiceListingsStore((state) =>
@@ -434,7 +435,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-        bottomOffset={96}
+        bottomOffset={placesFieldFocused ? 260 : 96}
         extraKeyboardSpace={0}
         disableScrollOnKeyboardHide
       >
@@ -625,6 +626,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
                 places={places}
                 onChange={setPlaces}
                 required
+                onFocusChange={setPlacesFieldFocused}
               />
             ) : (
               <LocationField
