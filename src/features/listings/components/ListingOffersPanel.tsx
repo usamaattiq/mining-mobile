@@ -10,6 +10,7 @@ import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTime
 import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
 import { listingShareUrl, type ListingShareCategory } from '@/shared/utils/listingShareUrl';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
+import { showAppAlert } from '@/shared/services/appAlert';
 import { palette, radius, spacing } from '@/theme';
 import { cardBackShadow } from '@/theme/cardShadow';
 import type { ListingRfqOffer } from '@/features/listings/types/listingRfq.types';
@@ -242,7 +243,17 @@ export function ListingOffersPanel({
                 </AppText>
               ) : null}
               {offer.description ? (
-                <AppText style={styles.description}>{offer.description}</AppText>
+                <Pressable
+                  onPress={() =>
+                    showAppAlert(t('rfq.noteTitle'), offer.description ?? '')
+                  }
+                  accessibilityRole="button"
+                  style={({ pressed }) => [pressed && styles.pressed]}
+                >
+                  <AppText weight="semibold" style={styles.viewNoteLabel}>
+                    {t('rfq.viewNote')}
+                  </AppText>
+                </Pressable>
               ) : null}
               {confirmationOfferId && offer.id === confirmationOfferId ? (
                 <View style={styles.actions}>
@@ -407,10 +418,14 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   statusBadgeText: { fontSize: 11, color: palette.charcoal },
-  description: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: palette.muted,
+  viewNoteLabel: {
+    fontSize: 14,
+    color: palette.gold,
+    textDecorationLine: 'underline',
+    marginBottom: spacing.xs,
+  },
+  pressed: {
+    opacity: 0.7,
   },
   price: {
     fontSize: 18,

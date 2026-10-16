@@ -52,6 +52,8 @@
     "sendOffer": "Send offer",
     "offerDescription": "Want to add a note? (optional)",
     "offerDescriptionPlaceholder": "Add a note about this offer",
+    "viewNote": "View Note",
+    "noteTitle": "Note",
     "offerType": "Offer type",
     "offerSubmitted": "Offer submitted",
     "offerFailed": "Could not send your offer. Try again.",

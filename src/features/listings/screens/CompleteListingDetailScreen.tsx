@@ -1550,7 +1550,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     ) : null}
                     {offer.description && editingOfferId !== offer.id ? (
-                      <AppText style={styles.myOfferDescription}>{offer.description}</AppText>
+                      <Pressable
+                        onPress={() =>
+                          showAppAlert(t('rfq.noteTitle'), offer.description ?? '')
+                        }
+                        accessibilityRole="button"
+                        style={({ pressed }) => [pressed && styles.pressed]}
+                      >
+                        <AppText weight="semibold" style={styles.viewNoteLabel}>
+                          {t('rfq.viewNote')}
+                        </AppText>
+                      </Pressable>
                     ) : null}
                     {(supplierBuyer || respondingToBuyer) &&
                     offer.status === 'active' &&
@@ -1878,7 +1888,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                       </View>
                     ) : null}
                     {offer.description ? (
-                      <AppText style={styles.myOfferDescription}>{offer.description}</AppText>
+                      <Pressable
+                        onPress={() =>
+                          showAppAlert(t('rfq.noteTitle'), offer.description ?? '')
+                        }
+                        accessibilityRole="button"
+                        style={({ pressed }) => [pressed && styles.pressed]}
+                      >
+                        <AppText weight="semibold" style={styles.viewNoteLabel}>
+                          {t('rfq.viewNote')}
+                        </AppText>
+                      </Pressable>
                     ) : null}
                     <View style={styles.myOfferActions}>
                       <Button
@@ -2505,7 +2525,16 @@ const styles = StyleSheet.create({
   },
   myOfferPrice: { flex: 1, fontSize: 22, color: palette.charcoal },
   myOfferPerUnit: { fontSize: 16, color: palette.muted },
-  myOfferDescription: { fontSize: 13, lineHeight: 18, color: palette.muted },
+  viewNoteLabel: {
+    alignSelf: 'flex-start',
+    fontSize: 14,
+    color: palette.gold,
+    textDecorationLine: 'underline',
+    marginBottom: spacing.xs,
+  },
+  pressed: {
+    opacity: 0.7,
+  },
   myOfferDescriptionField: { gap: 4 },
   myOfferDescriptionLabel: { fontSize: 13, color: palette.charcoal },
   myOfferDescriptionInput: {

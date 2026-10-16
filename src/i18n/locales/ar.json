@@ -52,6 +52,8 @@
     "sendOffer": "إرسال العرض",
     "offerDescription": "هل تريد إضافة ملاحظة؟ (اختياري)",
     "offerDescriptionPlaceholder": "أضف ملاحظة عن هذا العرض",
+    "viewNote": "عرض الملاحظة",
+    "noteTitle": "ملاحظة",
     "offerType": "نوع العرض",
     "offerSubmitted": "تم تقديم العرض",
     "offerFailed": "تعذر إرسال العرض. حاول مرة أخرى.",
