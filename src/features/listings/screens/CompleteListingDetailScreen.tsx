@@ -53,7 +53,7 @@ import { useProfileStore } from '@/store/profileStore';
 import { useServiceListingsStore } from '@/store/serviceListingsStore';
 import { useGoldListingsStore } from '@/store/goldListingsStore';
 import { useMarketplaceRoleStore } from '@/store/marketplaceRoleStore';
-import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
+import { formatAmountWithCommas, sanitizeStepPrice } from '@/shared/utils/formatAmount';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { listingShareUrl } from '@/shared/utils/listingShareUrl';
 import { openWhatsApp } from '@/shared/utils/openWhatsApp';
@@ -1111,7 +1111,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
       Number.isFinite(total) && total > 0 ? Math.round((total / units) * 100) / 100 : '';
     setEditingOfferId(offer.id);
     setEditOfferUnits(units);
-    setEditOfferPrice(unitPrice === '' ? '' : String(unitPrice));
+    setEditOfferPrice(unitPrice === '' ? '' : sanitizeStepPrice(String(unitPrice)));
     setEditOfferKind(offer.kind === 'sale' ? 'sale' : 'rent');
     setEditOfferHandover(offer.handover === 'delivery' ? 'delivery' : 'pickup');
     setEditOfferDelivery(offer.delivery === 'online' ? 'online' : 'onsite');
@@ -1119,7 +1119,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   };
 
   const handleSaveOffer = (offerId: string) => {
-    const price = editOfferPrice.trim();
+    const price = editOfferPrice.replace(/,/g, '').trim();
     if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) return;
     showAppAlert(t('rfq.updateConfirmTitle'), t('rfq.updateConfirmMessage'), [
       { text: t('common.cancel'), style: 'cancel' },
@@ -1687,7 +1687,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           </AppText>
                           <TextInput
                             value={editOfferPrice}
-                            onChangeText={setEditOfferPrice}
+                            onChangeText={(value) => setEditOfferPrice(sanitizeStepPrice(value))}
                             keyboardType="decimal-pad"
                             placeholder={
                               respondingToBuyer && category === 'services'

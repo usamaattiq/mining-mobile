@@ -33,6 +33,7 @@ import {
   serviceListingAmount,
 } from '@/features/dashboard/utils/homeFilterMatch';
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
+import { sanitizeStepPrice } from '@/shared/utils/formatAmount';
 import { serviceTypeFlags } from '@/features/listings/utils/serviceType';
 import { ListingCard } from '@/features/listings/components/ListingCard';
 import {
@@ -580,8 +581,12 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         onChangeKind={(listingKind) => setDraftFilters((current) => ({ ...current, listingKind }))}
         onChangeCity={(city) => setDraftFilters((current) => ({ ...current, city }))}
         onChangeDateKey={(dateKey) => setDraftFilters((current) => ({ ...current, dateKey }))}
-        onChangePriceMin={(next) => setDraftFilters((current) => ({ ...current, priceMin: next }))}
-        onChangePriceMax={(next) => setDraftFilters((current) => ({ ...current, priceMax: next }))}
+        onChangePriceMin={(next) =>
+          setDraftFilters((current) => ({ ...current, priceMin: sanitizeStepPrice(next) }))
+        }
+        onChangePriceMax={(next) =>
+          setDraftFilters((current) => ({ ...current, priceMax: sanitizeStepPrice(next) }))
+        }
         onChangeWeightMin={(next) =>
           setDraftFilters((current) => ({ ...current, weightMin: next }))
         }

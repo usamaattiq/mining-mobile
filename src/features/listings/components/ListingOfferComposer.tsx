@@ -9,7 +9,11 @@ import { PriceTimesUnitsSummary } from '@/features/listings/components/PriceTime
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { useTranslation } from 'react-i18next';
 import { i18n as appI18n } from '@/i18n';
-import { formatAmountWithCommas, parsePositiveAmount } from '@/shared/utils/formatAmount';
+import {
+  formatAmountWithCommas,
+  parsePositiveAmount,
+  sanitizeStepPrice,
+} from '@/shared/utils/formatAmount';
 import { getFontFamily, palette, radius, spacing } from '@/theme';
 import type { ListingOfferComposerProps } from '@/features/listings/types/listingOfferComposer.types';
 
@@ -83,8 +87,9 @@ export function ListingOfferComposer({
     if (next && !open.includes(fulfillment)) setFulfillment(next);
   }, [blockedModes, fulfillment, fulfillmentModes]);
   const kindBlocked = blockedModes.has(fulfillment);
+  const plainPrice = price.replace(/,/g, '').trim();
   const canSend =
-    /^\d+(\.\d{1,2})?$/.test(price.trim()) && Number(price) > 0 && !submitting && !kindBlocked;
+    /^\d+(\.\d{1,2})?$/.test(plainPrice) && Number(plainPrice) > 0 && !submitting && !kindBlocked;
   const draftUnitAmount = parsePositiveAmount(price);
   const submittedTotal = parsePositiveAmount(offerPrice);
   const submittedUnits = offerUnits != null && offerUnits > 0 ? offerUnits : null;
@@ -94,7 +99,7 @@ export function ListingOfferComposer({
       : submittedTotal;
 
   const handleSend = () => {
-    const value = price.trim();
+    const value = plainPrice;
     if (!canSend || kindBlocked) return;
     setPrice('');
     setDescription('');
@@ -348,7 +353,7 @@ export function ListingOfferComposer({
                   </AppText>
                   <TextInput
                     value={price}
-                    onChangeText={setPrice}
+                    onChangeText={(value) => setPrice(sanitizeStepPrice(value))}
                     placeholder={unitPricePlaceholder ?? placeholder}
                     placeholderTextColor={palette.muted}
                     keyboardType="decimal-pad"
