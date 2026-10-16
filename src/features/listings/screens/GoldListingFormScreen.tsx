@@ -130,7 +130,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
       matchSelectOption(purityOptions, sourceListing.purityLabel) ??
         (sourceListing.purityLabel.trim() || null),
     );
-    setPrice(sourceListing.price ?? '');
+    setPrice(sanitizeStepPrice(sourceListing.price ?? ''));
     if (editingId) {
       const end = sourceListing.auctionEndDate ?? sourceListing.rfq?.expiresAt ?? null;
       if (end && end > Date.now()) {
@@ -214,7 +214,7 @@ export function GoldListingFormScreen({ navigation, route }: Props): React.React
         description,
         weight: weight.replace(/\.$/, ''),
         purityLabel: purity ?? '',
-        price,
+        price: price.replace(/,/g, ''),
         auctionStartDate: start.getTime(),
         auctionEndDate: start.getTime() + durationHours * 60 * 60 * 1000,
         location,

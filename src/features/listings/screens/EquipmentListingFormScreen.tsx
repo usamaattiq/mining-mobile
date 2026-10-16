@@ -183,19 +183,21 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setRentPeriod(period);
     setRentalAmount(
-      isBuyer
-        ? ''
-        : period === 'hourly'
-          ? (sourceListing.hourlyRental ?? '')
-          : period === 'weekly'
-            ? (sourceListing.weeklyRental ?? '')
-            : period === 'monthly'
-              ? (sourceListing.monthlyRental ?? '')
-              : period === 'yearly'
-                ? (sourceListing.yearlyRental ?? '')
-                : '',
+      sanitizeStepPrice(
+        isBuyer
+          ? ''
+          : period === 'hourly'
+            ? (sourceListing.hourlyRental ?? '')
+            : period === 'weekly'
+              ? (sourceListing.weeklyRental ?? '')
+              : period === 'monthly'
+                ? (sourceListing.monthlyRental ?? '')
+                : period === 'yearly'
+                  ? (sourceListing.yearlyRental ?? '')
+                  : '',
+      ),
     );
-    setSalePrice(isBuyer ? '' : (sourceListing.salePrice ?? ''));
+    setSalePrice(isBuyer ? '' : sanitizeStepPrice(sourceListing.salePrice ?? ''));
     setUnits(Math.max(sourceListing.units ?? 1, 1));
     if (sourceListing.requestMode === 'auction' || sourceListing.requestMode === 'rfq') {
       setRequestMode(sourceListing.requestMode);
@@ -210,7 +212,7 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
     );
     setDeliveryAvailable(Boolean(sourceListing.deliveryAvailable));
     setDeliveryType(sourceListing.deliveryType ?? 'free');
-    setDeliveryPricePerKm(sourceListing.deliveryPricePerKm ?? '');
+    setDeliveryPricePerKm(sanitizeStepPrice(sourceListing.deliveryPricePerKm ?? ''));
     if (editingId) {
       const until = sourceListing.rfq?.expiresAt ?? null;
       if (until) {
@@ -332,17 +334,17 @@ export function EquipmentListingFormScreen({ navigation, route }: Props): React.
         equipmentTypeLabel: equipmentType ?? '',
         title,
         description,
-        hourlyRental: isBuyer ? '' : rentalByPeriod.hourly,
-        monthlyRental: isBuyer ? '' : rentalByPeriod.monthly,
-        weeklyRental: isBuyer ? '' : rentalByPeriod.weekly,
-        yearlyRental: isBuyer ? '' : rentalByPeriod.yearly,
-        salePrice: isBuyer || !offerSell ? '' : salePrice,
+        hourlyRental: isBuyer ? '' : rentalByPeriod.hourly.replace(/,/g, ''),
+        monthlyRental: isBuyer ? '' : rentalByPeriod.monthly.replace(/,/g, ''),
+        weeklyRental: isBuyer ? '' : rentalByPeriod.weekly.replace(/,/g, ''),
+        yearlyRental: isBuyer ? '' : rentalByPeriod.yearly.replace(/,/g, ''),
+        salePrice: isBuyer || !offerSell ? '' : salePrice.replace(/,/g, ''),
         units,
         location,
         media: persistedMedia,
         deliveryAvailable,
         deliveryType: isBuyer ? 'free' : deliveryType,
-        deliveryPricePerKm: isBuyer ? '' : deliveryPricePerKm,
+        deliveryPricePerKm: isBuyer ? '' : deliveryPricePerKm.replace(/,/g, ''),
         neededDate: null,
         expiryHours:
           isBuyer && requestMode === 'auction'

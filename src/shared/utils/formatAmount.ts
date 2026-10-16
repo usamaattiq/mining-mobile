@@ -23,11 +23,11 @@ export function sanitizeStepPrice(raw: string): string {
   const fraction = dot === -1 ? null : cleaned.slice(dot + 1).replace(/\./g, '');
   if (fraction != null) {
     const whole = wholeRaw.replace(/^0+(?=\d)/, '') || '0';
-    return `${whole}.${fraction}`;
+    return `${formatAmountWithCommas(whole)}.${fraction}`;
   }
   if (wholeRaw === '') return '';
   if (/^0+$/.test(wholeRaw)) return '0';
-  return wholeRaw.replace(/^0+/, '');
+  return formatAmountWithCommas(wholeRaw.replace(/^0+/, ''));
 }
 
 export function parsePositiveAmount(value: string | null | undefined): number | null {

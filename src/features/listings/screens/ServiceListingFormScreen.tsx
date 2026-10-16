@@ -148,13 +148,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         (sourceListing.serviceCategoryLabel.trim() || null),
     );
     setUnitLabel(sourceListing.unitLabel?.trim() || null);
-    setUnitPrice(sourceListing.unitPrice ?? '');
+    setUnitPrice(sanitizeStepPrice(sourceListing.unitPrice ?? ''));
     setTitle(sourceListing.title.slice(0, LISTING_TITLE_MAX_LENGTH));
     setDescription((sourceListing.description ?? '').slice(0, LISTING_DESCRIPTION_MAX_LENGTH));
     setYearsOfExperience(Math.max(Number(sourceListing.yearsOfExperience) || 1, 1));
     const prices = resolveServicePrices(sourceListing);
-    setOnsitePrice(isBuyer ? '' : prices.onsitePrice);
-    setOnlinePrice(isBuyer ? '' : prices.onlinePrice);
+    setOnsitePrice(isBuyer ? '' : sanitizeStepPrice(prices.onsitePrice));
+    setOnlinePrice(isBuyer ? '' : sanitizeStepPrice(prices.onlinePrice));
     setLocation(sourceListing.location ?? '');
     if (flags.onsite && sourceListing.postedAs !== 'buyer') {
       setPlaces(
@@ -281,11 +281,11 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         title,
         description,
         yearsOfExperience: isBuyer ? '' : String(yearsOfExperience),
-        onsitePrice: isBuyer || !onsite ? '' : onsitePrice,
-        onlinePrice: isBuyer || !online ? '' : onlinePrice,
-        price: isBuyer ? '' : onsite ? onsitePrice : onlinePrice,
+        onsitePrice: isBuyer || !onsite ? '' : onsitePrice.replace(/,/g, ''),
+        onlinePrice: isBuyer || !online ? '' : onlinePrice.replace(/,/g, ''),
+        price: isBuyer ? '' : (onsite ? onsitePrice : onlinePrice).replace(/,/g, ''),
         unitLabel: unitLabel ?? '',
-        unitPrice: isBuyer && unitLabel ? unitPrice : '',
+        unitPrice: isBuyer && unitLabel ? unitPrice.replace(/,/g, '') : '',
         serviceDate: null,
         expiryHours: expiryHoursUntil(listedUntil),
         location: offeredLocation,
