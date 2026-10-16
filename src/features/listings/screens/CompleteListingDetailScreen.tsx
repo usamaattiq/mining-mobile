@@ -540,9 +540,24 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           unitsLabel={String(equipmentListing.units)}
         />
       );
+    } else if (equipmentListing.postedAs === 'buyer') {
+      unitPriceCard = (
+        <View style={styles.unitPriceCard}>
+          <View style={styles.unitPriceCell}>
+            <View style={styles.unitPriceHeading}>
+              <Ionicons name="layers-outline" size={18} color={palette.charcoal} />
+              <AppText style={styles.unitPriceCaption}>
+                {t('equipmentListing.requiredUnits')}
+              </AppText>
+            </View>
+            <AppText weight="bold" style={styles.unitPriceAmount}>
+              {String(unitsLeft)}
+            </AppText>
+          </View>
+        </View>
+      );
     } else {
-      unitPriceCard =
-        equipmentListing.postedAs === 'buyer' || (!showSalePrice && !showRentPrice) ? null : (
+      unitPriceCard = !showSalePrice && !showRentPrice ? null : (
           <View style={styles.unitPriceCard}>
             {showSalePrice ? (
               <View style={styles.unitPriceCell}>
@@ -2145,10 +2160,8 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               : undefined
           }
           unitsLabel={
-            category === 'equipment' && !isAuction
-              ? equipmentListing?.postedAs === 'buyer'
-                ? `${t('equipmentListing.requiredUnits')}: ${unitsLeft}`
-                : `${t('equipmentListing.availableUnits')}: ${unitsLeft}`
+            category === 'equipment' && !isAuction && equipmentListing?.postedAs !== 'buyer'
+              ? `${t('equipmentListing.availableUnits')}: ${unitsLeft}`
               : undefined
           }
           unitPricePlaceholder={
