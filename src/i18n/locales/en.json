@@ -335,7 +335,8 @@
     "filterPast": "Past",
     "notFound": "This listing is no longer available.",
     "notFoundRequest": "This request is no longer available.",
-    "repost": "Repost"
+    "repost": "Repost",
+    "openToOffers": "Open to offers"
   },
   "listingDetail": {
     "attachments": "Attachments"

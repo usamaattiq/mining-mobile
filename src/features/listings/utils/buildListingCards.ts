@@ -229,6 +229,7 @@ export function buildListingCards({
                 offersSell ? { key: 'sell', label: t('equipmentListing.sell') } : null,
               ].filter((badge): badge is { key: string; label: string } => Boolean(badge)),
         priceLines,
+        reservePriceSlot: listing.postedAs === 'buyer',
         createdAt: listing.postedAs === 'supplier' ? undefined : listing.createdAt,
         expiresAt:
           listing.postedAs === 'supplier'
@@ -309,6 +310,7 @@ export function buildListingCards({
           })),
         ],
         priceLines,
+        reservePriceSlot: listing.postedAs === 'buyer',
         createdAt: listing.createdAt,
         expiresAt: listing.rfq?.expiresAt ?? undefined,
         ended: listingHasEnded({
@@ -357,6 +359,7 @@ export function buildListingCards({
               unit: t('goldListing.startingPrice'),
             },
           ],
+    reservePriceSlot: listing.postedAs === 'buyer',
     createdAt: listing.createdAt,
     expiresAt: listing.rfq?.expiresAt ?? listing.auctionEndDate ?? undefined,
     ended: listingHasEnded({

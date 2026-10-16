@@ -335,7 +335,8 @@
     "filterPast": "السابقة",
     "notFound": "هذا الإعلان لم يعد متاحًا.",
     "notFoundRequest": "هذا الطلب لم يعد متاحًا.",
-    "repost": "إعادة النشر"
+    "repost": "إعادة النشر",
+    "openToOffers": "مفتوح للعروض"
   },
   "listingDetail": {
     "attachments": "المرفقات"

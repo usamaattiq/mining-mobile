@@ -42,10 +42,13 @@ export type ListingCardProps = {
   /** Grey period/type label after the amount, same as details. */
   priceUnit?: string;
   /** When set, each line is amount + grey unit (onsite/online or rent period). */
+  /** Buyer requests always keep a price row so the card height stays stable. */
+  reservePriceSlot?: boolean;
   priceLines?: Array<{
     text: string;
     unit?: string;
     icon?: keyof typeof Ionicons.glyphMap;
+    placeholder?: boolean;
   }>;
   /** Epoch ms the listing was created — countdown, bottom right. */
   createdAt?: number;

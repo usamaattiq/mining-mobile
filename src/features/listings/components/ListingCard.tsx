@@ -104,6 +104,7 @@ function ListingCardComponent({
   priceText,
   priceUnit,
   priceLines,
+  reservePriceSlot,
   createdAt,
   expiresAt,
   ended,
@@ -128,6 +129,12 @@ function ListingCardComponent({
       ? priceLines
       : priceText || priceUnit
         ? [{ text: priceText ?? ' ', unit: priceUnit }]
+        : [];
+  const displayPriceLines =
+    resolvedPriceLines.length > 0
+      ? resolvedPriceLines
+      : reservePriceSlot
+        ? [{ text: t('requests.openToOffers'), placeholder: true }]
         : [];
 
   const timer = showTimer ? (
@@ -184,21 +191,25 @@ function ListingCardComponent({
         </View>
 
         <View style={styles.gridBody}>
-          {resolvedPriceLines.length > 0 ? (
-            <View style={styles.gridPrices}>
-              {resolvedPriceLines.map((line, index) => (
-                <View key={`${line.text}-${line.unit ?? index}`} style={styles.gridPriceRow}>
-                  <AppText weight="bold" style={styles.gridPrice} numberOfLines={1}>
-                    {line.text}
+          {displayPriceLines.length > 0 ? (
+          <View style={styles.gridPrices}>
+            {displayPriceLines.map((line, index) => (
+              <View key={`${line.text}-${line.unit ?? index}`} style={styles.gridPriceRow}>
+                <AppText
+                  weight="bold"
+                  style={[styles.gridPrice, line.placeholder && styles.pricePlaceholder]}
+                  numberOfLines={1}
+                >
+                  {line.text}
+                </AppText>
+                {line.unit ? (
+                  <AppText style={styles.gridPriceUnit} numberOfLines={1}>
+                    {line.unit}
                   </AppText>
-                  {line.unit ? (
-                    <AppText style={styles.gridPriceUnit} numberOfLines={1}>
-                      {line.unit}
-                    </AppText>
-                  ) : null}
-                </View>
-              ))}
-            </View>
+                ) : null}
+              </View>
+            ))}
+          </View>
           ) : null}
 
           <AppText weight="bold" style={styles.gridTitle} numberOfLines={2}>
@@ -303,46 +314,46 @@ function ListingCardComponent({
             <Ionicons name="chevron-forward" size={18} color={palette.muted} />
           </View>
 
-          {resolvedPriceLines.length > 0 ? (
+          {displayPriceLines.length > 0 ? (
             <>
-              <View style={styles.divider} />
-              <View style={styles.priceColumns}>
-                {resolvedPriceLines.map((line, index) => (
-                  <React.Fragment key={`${line.text}-${line.unit ?? index}`}>
-                    {index > 0 ? <View style={styles.priceDivider} /> : null}
-                    <View style={styles.priceColumn}>
-                      {line.unit ? (
-                        <View style={styles.priceLabelRow}>
-                          {line.unit === t('serviceListing.onsite') ||
-                          line.unit.startsWith(`${t('serviceListing.onsite')} /`) ? (
-                            <Feather name="map-pin" size={11} color={palette.gold} />
-                          ) : line.unit === t('serviceListing.online') ||
-                            line.unit.startsWith(`${t('serviceListing.online')} /`) ? (
-                            <Feather name="wifi" size={11} color={palette.gold} />
-                          ) : line.unit.toLowerCase().includes('rent') ||
-                            line.unit.includes('إيجار') ? (
-                            <Feather name="key" size={11} color={palette.gold} />
-                          ) : (
-                            <Ionicons name="pricetag-outline" size={11} color={palette.gold} />
-                          )}
-                          <AppText style={styles.priceLabel} numberOfLines={1}>
-                            {line.unit}
-                          </AppText>
-                        </View>
-                      ) : null}
-                      <AppText
-                        weight="bold"
-                        style={styles.price}
-                        numberOfLines={1}
-                        adjustsFontSizeToFit
-                        minimumFontScale={0.65}
-                      >
-                        {line.text}
+          <View style={styles.divider} />
+          <View style={styles.priceColumns}>
+            {displayPriceLines.map((line, index) => (
+              <React.Fragment key={`${line.text}-${line.unit ?? index}`}>
+                {index > 0 ? <View style={styles.priceDivider} /> : null}
+                <View style={styles.priceColumn}>
+                  {line.unit ? (
+                    <View style={styles.priceLabelRow}>
+                      {line.unit === t('serviceListing.onsite') ||
+                      line.unit.startsWith(`${t('serviceListing.onsite')} /`) ? (
+                        <Feather name="map-pin" size={11} color={palette.gold} />
+                      ) : line.unit === t('serviceListing.online') ||
+                        line.unit.startsWith(`${t('serviceListing.online')} /`) ? (
+                        <Feather name="wifi" size={11} color={palette.gold} />
+                      ) : line.unit.toLowerCase().includes('rent') ||
+                        line.unit.includes('إيجار') ? (
+                        <Feather name="key" size={11} color={palette.gold} />
+                      ) : (
+                        <Ionicons name="pricetag-outline" size={11} color={palette.gold} />
+                      )}
+                      <AppText style={styles.priceLabel} numberOfLines={1}>
+                        {line.unit}
                       </AppText>
                     </View>
-                  </React.Fragment>
-                ))}
-              </View>
+                  ) : null}
+                  <AppText
+                    weight="bold"
+                    style={[styles.price, line.placeholder && styles.pricePlaceholder]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.65}
+                  >
+                    {line.text}
+                  </AppText>
+                </View>
+              </React.Fragment>
+            ))}
+          </View>
             </>
           ) : null}
         </View>
@@ -394,6 +405,8 @@ const styles = StyleSheet.create({
   gridPrices: {
     gap: 2,
     minWidth: 0,
+    minHeight: 16,
+    justifyContent: 'center',
   },
   gridPriceRow: {
     flexDirection: 'row',
@@ -530,8 +543,10 @@ const styles = StyleSheet.create({
   priceColumn: {
     flex: 1,
     alignItems: 'flex-start',
+    justifyContent: 'center',
     gap: 2,
     minWidth: 0,
+    minHeight: 34,
   },
   priceLabelRow: {
     flexDirection: 'row',
@@ -564,6 +579,10 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: palette.charcoal,
     includeFontPadding: false,
+  },
+  pricePlaceholder: {
+    color: palette.muted,
+    fontSize: 13,
   },
   statusBadge: {
     flexDirection: 'row',
