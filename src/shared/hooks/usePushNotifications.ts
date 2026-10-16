@@ -1,6 +1,9 @@
 import React from 'react';
 import { Linking, Platform } from 'react-native';
-import { isPushAvailable } from '@/shared/services/pushNotifications';
+import {
+  ensureAndroidNotificationChannel,
+  isPushAvailable,
+} from '@/shared/services/pushNotifications';
 import { navigationRef } from '@/navigation/navigationRef';
 import type { ListingCategory } from '@/navigation/types';
 
@@ -76,12 +79,7 @@ export function usePushNotifications(): void {
       });
 
       if (Platform.OS === 'android') {
-        void Notifications.setNotificationChannelAsync('default', {
-          name: 'default',
-          importance: Notifications.AndroidImportance.HIGH,
-          vibrationPattern: [0, 250, 250, 250],
-          sound: 'default',
-        });
+        void ensureAndroidNotificationChannel(Notifications);
       }
 
       receivedSub = Notifications.addNotificationReceivedListener((notification) => {

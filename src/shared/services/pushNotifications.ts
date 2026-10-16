@@ -15,6 +15,12 @@ const EAS_PROJECT_ID = Constants.expoConfig?.extra?.eas?.projectId;
 // and only when not running in Expo Go.
 export const isPushAvailable = Constants.appOwnership !== 'expo';
 
+// Must match the file bundled by the expo-notifications plugin and the
+// sound/channel sent by mining-api. Android ignores sound changes on an
+// existing channel, so this is a new id (not the old `default` channel).
+export const NOTIFICATION_CHANNEL_ID = 'wave_ring';
+export const NOTIFICATION_SOUND = 'wave_ring.wav';
+
 type NotificationsModule = typeof ExpoNotifications;
 
 let notificationsModulePromise: Promise<NotificationsModule> | null = null;
@@ -34,6 +40,17 @@ async function loadNotifications(): Promise<NotificationsModule> {
     });
   }
   return notificationsModulePromise;
+}
+
+export async function ensureAndroidNotificationChannel(
+  Notifications: NotificationsModule,
+): Promise<void> {
+  await Notifications.setNotificationChannelAsync(NOTIFICATION_CHANNEL_ID, {
+    name: 'Notifications',
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 250, 250, 250],
+    sound: NOTIFICATION_SOUND,
+  });
 }
 
 export class PushPermissionDeniedError extends Error {
@@ -59,12 +76,7 @@ export async function getExpoPushToken(): Promise<string | null> {
   const Notifications = await loadNotifications();
 
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 250, 250],
-      sound: 'default',
-    });
+    await ensureAndroidNotificationChannel(Notifications);
   }
 
   const existing = await Notifications.getPermissionsAsync();

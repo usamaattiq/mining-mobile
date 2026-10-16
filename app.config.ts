@@ -34,7 +34,11 @@ const config: ExpoConfig = {
         // notification-icon.png was easy to miss in the upload archive).
         icon: './assets/images/splash-logo.png',
         color: '#222222',
-        defaultChannel: 'default',
+        // Bundled into the native projects at prebuild. iOS plays it when the
+        // push payload sound is `wave_ring.wav`; Android plays it from the
+        // `wave_ring` channel (see pushNotifications.ts).
+        sounds: ['./assets/wave_ring.wav'],
+        defaultChannel: 'wave_ring',
         mode: notificationMode,
       },
     ],
