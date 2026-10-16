@@ -184,9 +184,9 @@ function ListingCardComponent({
         </View>
 
         <View style={styles.gridBody}>
-          <View style={styles.gridPrices}>
-            {(resolvedPriceLines.length > 0 ? resolvedPriceLines : [{ text: ' ', unit: ' ' }]).map(
-              (line, index) => (
+          {resolvedPriceLines.length > 0 ? (
+            <View style={styles.gridPrices}>
+              {resolvedPriceLines.map((line, index) => (
                 <View key={`${line.text}-${line.unit ?? index}`} style={styles.gridPriceRow}>
                   <AppText weight="bold" style={styles.gridPrice} numberOfLines={1}>
                     {line.text}
@@ -197,39 +197,45 @@ function ListingCardComponent({
                     </AppText>
                   ) : null}
                 </View>
-              ),
-            )}
-          </View>
+              ))}
+            </View>
+          ) : null}
 
           <AppText weight="bold" style={styles.gridTitle} numberOfLines={2}>
             {title}
           </AppText>
 
-          <View style={styles.gridMetaRow}>
-            {subtitleIcon ? <Ionicons name={subtitleIcon} size={12} color={palette.gold} /> : null}
-            {subtitle ? (
-              <AppText style={styles.gridMeta} numberOfLines={1}>
-                {subtitle}
-              </AppText>
-            ) : (
-              <View style={styles.gridMetaSpacer} />
-            )}
-            {unitsLabel ? (
-              <View style={styles.gridUnits}>
-                <Ionicons name={unitsIcon} size={12} color={palette.gold} />
+          {subtitle || unitsLabel ? (
+            <View style={styles.gridMetaRow}>
+              {subtitleIcon ? (
+                <Ionicons name={subtitleIcon} size={12} color={palette.gold} />
+              ) : null}
+              {subtitle ? (
                 <AppText style={styles.gridMeta} numberOfLines={1}>
-                  {unitsLabel}
+                  {subtitle}
                 </AppText>
-              </View>
-            ) : null}
-          </View>
+              ) : (
+                <View style={styles.gridMetaSpacer} />
+              )}
+              {unitsLabel ? (
+                <View style={styles.gridUnits}>
+                  <Ionicons name={unitsIcon} size={12} color={palette.gold} />
+                  <AppText style={styles.gridMeta} numberOfLines={1}>
+                    {unitsLabel}
+                  </AppText>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
 
-          <View style={styles.gridMetaRow}>
-            <Ionicons name="location-outline" size={12} color={palette.gold} />
-            <AppText style={styles.gridMeta} numberOfLines={1}>
-              {city ?? ' '}
-            </AppText>
-          </View>
+          {city ? (
+            <View style={styles.gridMetaRow}>
+              <Ionicons name="location-outline" size={12} color={palette.gold} />
+              <AppText style={styles.gridMeta} numberOfLines={1}>
+                {city}
+              </AppText>
+            </View>
+          ) : null}
 
           <View style={styles.gridFooter}>
             <View style={styles.gridFooterLeft}>{hasNewOffer ? <BlinkingDot /> : null}</View>
@@ -271,16 +277,18 @@ function ListingCardComponent({
             if (next > 0 && next !== imageSide) setImageSide(next);
           }}
         >
-          <View style={styles.badgeRow}>
-            <View style={styles.badgeRowStart}>
-              {hasNewOffer ? <BlinkingDot /> : null}
-              {showTimer ? timer : null}
+          {typeBadge || requestBadge || showTimer || hasNewOffer ? (
+            <View style={styles.badgeRow}>
+              <View style={styles.badgeRowStart}>
+                {hasNewOffer ? <BlinkingDot /> : null}
+                {showTimer ? timer : null}
+              </View>
+              <View style={styles.badgeRowEnd}>
+                {requestBadge ? <StatusBadge badge={requestBadge} /> : null}
+                {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
+              </View>
             </View>
-            <View style={styles.badgeRowEnd}>
-              {requestBadge ? <StatusBadge badge={requestBadge} /> : null}
-              {typeBadge ? <StatusBadge badge={typeBadge} /> : null}
-            </View>
-          </View>
+          ) : null}
           <View style={styles.titleRow}>
             <AppText weight="bold" style={styles.title} numberOfLines={1}>
               {title}
@@ -295,16 +303,15 @@ function ListingCardComponent({
             <Ionicons name="chevron-forward" size={18} color={palette.muted} />
           </View>
 
-          <View style={styles.divider} />
-          <View style={styles.priceColumns}>
-            {(resolvedPriceLines.length > 0
-              ? resolvedPriceLines
-              : [{ text: ' ', unit: ' ' }]
-            ).map((line, index) => (
+          {resolvedPriceLines.length > 0 ? (
+            <>
+              <View style={styles.divider} />
+              <View style={styles.priceColumns}>
+                {resolvedPriceLines.map((line, index) => (
                   <React.Fragment key={`${line.text}-${line.unit ?? index}`}>
                     {index > 0 ? <View style={styles.priceDivider} /> : null}
                     <View style={styles.priceColumn}>
-                      {line.unit?.trim() ? (
+                      {line.unit ? (
                         <View style={styles.priceLabelRow}>
                           {line.unit === t('serviceListing.onsite') ||
                           line.unit.startsWith(`${t('serviceListing.onsite')} /`) ? (
@@ -322,9 +329,7 @@ function ListingCardComponent({
                             {line.unit}
                           </AppText>
                         </View>
-                      ) : (
-                        <View style={styles.priceLabelRow} />
-                      )}
+                      ) : null}
                       <AppText
                         weight="bold"
                         style={styles.price}
@@ -336,8 +341,10 @@ function ListingCardComponent({
                       </AppText>
                     </View>
                   </React.Fragment>
-            ))}
-          </View>
+                ))}
+              </View>
+            </>
+          ) : null}
         </View>
       </View>
     </Pressable>
@@ -387,7 +394,6 @@ const styles = StyleSheet.create({
   gridPrices: {
     gap: 2,
     minWidth: 0,
-    minHeight: 34,
   },
   gridPriceRow: {
     flexDirection: 'row',
@@ -413,13 +419,11 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     color: palette.charcoal,
     marginTop: 2,
-    minHeight: 30,
   },
   gridMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    minHeight: 14,
   },
   gridUnits: {
     marginLeft: 'auto',
@@ -442,7 +446,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.xs,
-    minHeight: 18,
   },
   gridFooterLeft: {
     flex: 1,
@@ -482,7 +485,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 22,
   },
   badgeRowStart: {
     flexDirection: 'row',
@@ -524,7 +526,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     minWidth: 0,
-    minHeight: 34,
   },
   priceColumn: {
     flex: 1,
@@ -537,7 +538,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
     maxWidth: '100%',
-    minHeight: 14,
   },
   priceLabel: {
     flexShrink: 1,

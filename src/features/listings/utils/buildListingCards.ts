@@ -10,11 +10,7 @@ import type {
 import { cityFromLocationLabel } from '@/shared/utils/locationLabel';
 import { formatAmountWithCommas } from '@/shared/utils/formatAmount';
 import { rfqStatusBadge, isEndedRfqStatus } from '@/features/listings/utils/rfqStatus';
-import {
-  serviceTypeFlags,
-  serviceTypeLabels,
-  resolveServicePrices,
-} from '@/features/listings/utils/serviceType';
+import { serviceTypeLabels, resolveServicePrices } from '@/features/listings/utils/serviceType';
 
 export type ListingCardItem = ListingCardProps & { id: string };
 
@@ -132,22 +128,25 @@ export function buildListingCards({
       const offersSell = listing.mode === 'sell' || listing.mode === 'both';
       const rental = rentalPrice(listing, t, currencyCode);
       const saleAmount = priceText(currencyCode, listing.salePrice);
-      const priceLines = [
-        offersSell && saleAmount
-          ? {
-              text: saleAmount,
-              unit: t('equipmentListing.salePrice'),
-            }
-          : null,
-        offersRent && rental.priceText
-          ? {
-              text: rental.priceText,
-              unit: rental.priceUnit
-                ? `${t('equipmentListing.rent')} (per ${rental.priceUnit.replace(/^\/\s*/, '').trim()})`
-                : t('equipmentListing.rent'),
-            }
-          : null,
-      ].filter((line): line is { text: string; unit: string } => Boolean(line));
+      const priceLines =
+        listing.postedAs === 'buyer'
+          ? undefined
+          : [
+              offersSell && saleAmount
+                ? {
+                    text: saleAmount,
+                    unit: t('equipmentListing.salePrice'),
+                  }
+                : null,
+              offersRent && rental.priceText
+                ? {
+                    text: rental.priceText,
+                    unit: rental.priceUnit
+                      ? `${t('equipmentListing.rent')} (per ${rental.priceUnit.replace(/^\/\s*/, '').trim()})`
+                      : t('equipmentListing.rent'),
+                  }
+                : null,
+            ].filter((line): line is { text: string; unit: string } => Boolean(line));
       const durationBadges = offersRent
         ? [
             listing.hourlyRental
@@ -252,38 +251,38 @@ export function buildListingCards({
 
   if (category === 'services') {
     return serviceListings.map((listing) => {
-      const resolved = resolveServicePrices(listing);
+      const prices = resolveServicePrices(listing);
       const unitName = listing.unitLabel?.trim() ?? '';
-      const buyerUnitOnly =
-        listing.postedAs === 'buyer' &&
-        listing.unitPrice &&
-        !resolved.onsitePrice &&
-        !resolved.onlinePrice;
-      const flags = buyerUnitOnly ? serviceTypeFlags(listing.serviceType) : null;
-      const prices = buyerUnitOnly
-        ? {
-            onsitePrice: flags?.onsite ? listing.unitPrice! : '',
-            onlinePrice: flags?.online && !flags.onsite ? listing.unitPrice! : '',
-          }
-        : resolved;
-      const priceLines = [
-        prices.onsitePrice
+      const unitLine =
+        listing.postedAs === 'buyer' && unitName && listing.unitPrice
           ? {
-              text: `${currencyCode} ${formatAmountWithCommas(prices.onsitePrice)}`,
-              unit: unitName
-                ? `${t('serviceListing.onsite')} / ${unitName}`
-                : t('serviceListing.onsite'),
+              text: `${currencyCode} ${formatAmountWithCommas(listing.unitPrice)}`,
+              unit: unitName,
             }
-          : null,
-        prices.onlinePrice
-          ? {
-              text: `${currencyCode} ${formatAmountWithCommas(prices.onlinePrice)}`,
-              unit: unitName
-                ? `${t('serviceListing.online')} / ${unitName}`
-                : t('serviceListing.online'),
-            }
-          : null,
-      ].filter((line): line is { text: string; unit: string } => Boolean(line));
+          : null;
+      const priceLines =
+        listing.postedAs === 'buyer'
+          ? unitLine
+            ? [unitLine]
+            : undefined
+          : [
+              prices.onsitePrice
+                ? {
+                    text: `${currencyCode} ${formatAmountWithCommas(prices.onsitePrice)}`,
+                    unit: unitName
+                      ? `${t('serviceListing.onsite')} / ${unitName}`
+                      : t('serviceListing.onsite'),
+                  }
+                : null,
+              prices.onlinePrice
+                ? {
+                    text: `${currencyCode} ${formatAmountWithCommas(prices.onlinePrice)}`,
+                    unit: unitName
+                      ? `${t('serviceListing.online')} / ${unitName}`
+                      : t('serviceListing.online'),
+                  }
+                : null,
+            ].filter((line): line is { text: string; unit: string } => Boolean(line));
       return {
         id: listing.id,
         title: listing.title,
@@ -349,7 +348,8 @@ export function buildListingCards({
       }),
     ),
     titleBelowStatus: titleBelowStatus(listing.rfq?.status),
-    priceLines: !listing.price
+    priceLines:
+      listing.postedAs === 'buyer' || !listing.price
         ? undefined
         : [
             {
