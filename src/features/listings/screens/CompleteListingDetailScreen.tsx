@@ -633,13 +633,17 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
 
     if (serviceListing.unitLabel) {
       detailRows.push({
-        label: t('equipmentListing.fieldUnit'),
+        label: t(
+          serviceListing.postedAs === 'buyer'
+            ? 'serviceListing.fieldUnitRequest'
+            : 'serviceListing.fieldUnit',
+        ),
         value: serviceListing.unitLabel,
       });
     }
     if (serviceListing.postedAs === 'buyer' && serviceListing.unitPrice) {
       detailRows.push({
-        label: t('equipmentListing.fieldUnitPrice'),
+        label: t('serviceListing.fieldUnitPrice'),
         value: `${currency.code} ${formatAmountWithCommas(serviceListing.unitPrice)}`,
       });
     }

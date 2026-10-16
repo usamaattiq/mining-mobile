@@ -345,13 +345,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     ...(unitLabel
       ? [
           {
-            label: t('equipmentListing.fieldUnit'),
+            label: t('serviceListing.fieldUnit'),
             value: unitDisplay,
           },
           ...(isBuyer
             ? [
                 {
-                  label: t('equipmentListing.fieldUnitPrice'),
+                  label: t('serviceListing.fieldUnitPrice'),
                   value: unitPrice ? `${currency.code} ${formatAmountWithCommas(unitPrice)}` : '',
                 },
               ]
@@ -524,11 +524,9 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
 
             <SelectField
-              label={t(
-                isBuyer ? 'equipmentListing.fieldUnitOptional' : 'equipmentListing.fieldUnit',
-              )}
-              placeholder={t('equipmentListing.unitPlaceholder')}
-              sheetTitle={t('equipmentListing.fieldUnit')}
+              label={t(isBuyer ? 'serviceListing.fieldUnitRequest' : 'serviceListing.fieldUnit')}
+              placeholder={t('serviceListing.unitPlaceholder')}
+              sheetTitle={t('serviceListing.fieldUnit')}
               options={unitOptions}
               value={unitLabel}
               onChange={(next) => {
@@ -539,7 +537,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
             {isBuyer && unitLabel ? (
               <FormInput
-                label={t('equipmentListing.fieldUnitPrice')}
+                label={t('serviceListing.fieldUnitPrice')}
                 value={unitPrice}
                 onChangeText={(value) => setUnitPrice(sanitizeStepPrice(value))}
                 keyboardType="numeric"
