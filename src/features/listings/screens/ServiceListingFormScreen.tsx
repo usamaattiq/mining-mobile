@@ -16,6 +16,8 @@ import { SelectField } from '@/shared/components/SelectField';
 import { DateTimeField } from '@/shared/components/DateTimeField';
 import { defaultListingEnd, expiryHoursUntil } from '@/features/listings/utils/listingExpiry';
 import { LocationField } from '@/shared/components/LocationField';
+import { ServicePlacesField } from '@/features/listings/components/ServicePlacesField';
+import type { ServiceAreaPlace } from '@/shared/utils/location-map-geocode';
 import { useAutoCurrentLocation } from '@/shared/hooks/useAutoCurrentLocation';
 import { useLocationMapPicker } from '@/shared/hooks/useLocationMapPicker';
 import { Button } from '@/shared/components/Button';
@@ -112,6 +114,8 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
   const [onlinePrice, setOnlinePrice] = React.useState('');
   const [listedUntil, setListedUntil] = React.useState(defaultListingEnd);
   const [location, setLocation] = React.useState('');
+  const [places, setPlaces] = React.useState<ServiceAreaPlace[]>([]);
+  const offerPlaces = !isBuyer && onsite;
   const [locationCoords, setLocationCoords] = React.useState<{
     latitude: number;
     longitude: number;
@@ -151,6 +155,21 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setOnsitePrice(isBuyer ? '' : prices.onsitePrice);
     setOnlinePrice(isBuyer ? '' : prices.onlinePrice);
     setLocation(sourceListing.location ?? '');
+    if (flags.onsite && sourceListing.postedAs !== 'buyer') {
+      setPlaces(
+        (sourceListing.location ?? '')
+          .split(' · ')
+          .map((label) => label.trim())
+          .filter(Boolean)
+          .map((label) => ({
+            id: label,
+            label,
+            name: label.split(',')[0]?.trim() || label,
+            kind: 'city' as const,
+            parentCity: '',
+          })),
+      );
+    }
     if (editingId && sourceListing.rfq?.expiresAt) {
       originalListedUntil.current = sourceListing.rfq.expiresAt;
       setListedUntil(new Date(sourceListing.rfq.expiresAt));
@@ -177,7 +196,11 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
     setLocationCoords({ latitude: selection.latitude, longitude: selection.longitude });
   }, [getCurrentLocation]);
 
-  useAutoCurrentLocation(step === 2, location.trim().length > 0, handleUseCurrentLocation);
+  useAutoCurrentLocation(
+    step === 2 && !offerPlaces,
+    location.trim().length > 0,
+    handleUseCurrentLocation,
+  );
 
   const handleSelectOnMap = () => {
     openMapPickerForSelection((selection) => {
@@ -197,7 +220,13 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         (online ? Boolean(parsePositiveAmount(onlinePrice)) : true))),
     (!isBuyer || !unitLabel || Boolean(parsePositiveAmount(unitPrice))),
   );
-  const mediaValid = (isBuyer || media.length > 0) && location.trim().length > 0;
+  const offeredLocation = offerPlaces
+    ? places
+        .map((place) => (place.name || place.label).trim())
+        .filter(Boolean)
+        .join(' · ')
+    : location;
+  const mediaValid = (isBuyer || media.length > 0) && offeredLocation.trim().length > 0;
   const canGoNext =
     step === 0 ? Boolean(serviceType) : step === 1 ? detailsValid : step === 2 ? mediaValid : true;
 
@@ -258,7 +287,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         unitPrice: isBuyer && unitLabel ? unitPrice : '',
         serviceDate: null,
         expiryHours: expiryHoursUntil(listedUntil),
-        location,
+        location: offeredLocation,
         media: persistedMedia,
         postedAs: editingId
           ? (sourceListing?.postedAs ?? 'supplier')
@@ -360,7 +389,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
         ]),
     {
       label: t(isBuyer ? 'serviceListing.fieldLocationRequest' : 'serviceListing.fieldLocation'),
-      value: location,
+      value: offeredLocation,
     },
     {
       label: t(isBuyer ? 'serviceListing.listedUntilRequest' : 'serviceListing.listedUntil'),
@@ -590,17 +619,26 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
               onChange={setListedUntil}
             />
 
-            <LocationField
-              label={t(
-                isBuyer ? 'serviceListing.fieldLocationRequest' : 'serviceListing.fieldLocation',
-              )}
-              value={location}
-              required
-              loading={locationLoading}
-              onChangeText={setLocation}
-              onUseCurrentLocation={() => void handleUseCurrentLocation()}
-              onSelectOnMap={handleSelectOnMap}
-            />
+            {offerPlaces ? (
+              <ServicePlacesField
+                label={t('serviceListing.fieldLocation')}
+                places={places}
+                onChange={setPlaces}
+                required
+              />
+            ) : (
+              <LocationField
+                label={t(
+                  isBuyer ? 'serviceListing.fieldLocationRequest' : 'serviceListing.fieldLocation',
+                )}
+                value={location}
+                required
+                loading={locationLoading}
+                onChangeText={setLocation}
+                onUseCurrentLocation={() => void handleUseCurrentLocation()}
+                onSelectOnMap={handleSelectOnMap}
+              />
+            )}
           </View>
         ) : null}
 

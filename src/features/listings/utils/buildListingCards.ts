@@ -52,8 +52,9 @@ function activityBadge(
 }
 
 function cityFromLocation(location: string | undefined): string | undefined {
-  const city = cityFromLocationLabel(location ?? '');
-  return city || undefined;
+  const first = (location ?? '').split(' · ')[0] ?? '';
+  const city = cityFromLocationLabel(first);
+  return city || first.trim() || undefined;
 }
 
 /** Long owner statuses that need the title on its own row under the badge. */
