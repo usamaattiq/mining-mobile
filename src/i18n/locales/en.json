@@ -50,7 +50,7 @@
     "offerCalculation": "{price} × {count}",
     "offerTotal": "Total {amount}",
     "sendOffer": "Send offer",
-    "offerDescription": "Description (optional)",
+    "offerDescription": "Want to add a note? (optional)",
     "offerDescriptionPlaceholder": "Add a note about this offer",
     "offerType": "Offer type",
     "offerSubmitted": "Offer submitted",

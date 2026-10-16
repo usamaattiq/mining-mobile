@@ -50,7 +50,7 @@
     "offerCalculation": "{price} × {count}",
     "offerTotal": "الإجمالي {amount}",
     "sendOffer": "إرسال العرض",
-    "offerDescription": "الوصف (اختياري)",
+    "offerDescription": "هل تريد إضافة ملاحظة؟ (اختياري)",
     "offerDescriptionPlaceholder": "أضف ملاحظة عن هذا العرض",
     "offerType": "نوع العرض",
     "offerSubmitted": "تم تقديم العرض",
