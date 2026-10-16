@@ -469,7 +469,7 @@
     "requestRfq": "RFQ",
     "requestRfqSubtitle": "Collect offers from suppliers",
     "requestAuction": "Auction",
-    "requestAuctionSubtitle": "Suppliers bid until the request ends",
+    "requestAuctionSubtitle": "Suppliers place bids",
     "equipmentType": "Equipment Type",
     "fieldEquipmentType": "What kind of equipment is this?",
     "fieldEquipmentTypeRequest": "What kind of equipment do you need?",

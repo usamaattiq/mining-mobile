@@ -448,7 +448,7 @@
     "requestRfq": "طلب عرض",
     "requestRfqSubtitle": "اجمع عروض الموردين",
     "requestAuction": "مزاد",
-    "requestAuctionSubtitle": "يقدم الموردون عروضهم حتى انتهاء الطلب",
+    "requestAuctionSubtitle": "يقدم الموردون عروضهم",
     "equipmentType": "نوع المعدة",
     "fieldEquipmentType": "ما نوع هذه المعدة؟",
     "fieldEquipmentTypeRequest": "ما نوع المعدة التي تحتاجها؟",
