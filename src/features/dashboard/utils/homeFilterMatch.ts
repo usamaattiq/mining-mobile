@@ -40,10 +40,11 @@ export function equipmentListingAmount(listing: EquipmentListing): number | null
 }
 
 export function serviceListingAmount(listing: ServiceListing): number | null {
-  const onsite = parseFilterNumber(listing.onsitePrice);
-  const online = parseFilterNumber(listing.onlinePrice);
-  if (onsite != null && online != null) return Math.min(onsite, online);
-  return onsite ?? online ?? parseFilterNumber(listing.price);
+  const amounts = [listing.onsitePrice, listing.onlinePrice, listing.unitPrice, listing.price]
+    .map((value) => parseFilterNumber(value))
+    .filter((value): value is number => value != null);
+  if (amounts.length === 0) return null;
+  return Math.min(...amounts);
 }
 
 export function goldListingAmount(listing: GoldListing): number | null {

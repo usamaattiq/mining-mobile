@@ -15,6 +15,7 @@ const EXACT: Record<string, string> = {
   'No units left on this listing': 'apiErrors.noUnitsLeft',
   'Choose rent or sale for this offer': 'apiErrors.chooseRentOrSale',
   'Choose onsite or online for this offer': 'apiErrors.chooseOnsiteOrOnline',
+  'Choose a unit for this service': 'apiErrors.chooseServiceUnit',
   'Enter a bid of at least 1': 'apiErrors.bidAtLeastOne',
   'Only the listing owner can decide offers': 'apiErrors.ownerDecideOnly',
   'The listing owner cannot confirm this offer': 'apiErrors.ownerCannotConfirm',

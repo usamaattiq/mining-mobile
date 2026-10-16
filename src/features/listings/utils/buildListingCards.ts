@@ -244,27 +244,34 @@ export function buildListingCards({
   if (category === 'services') {
     return serviceListings.map((listing) => {
       const prices = resolveServicePrices(listing);
+      const unitName = listing.unitLabel?.trim() ?? '';
+      const unitLine =
+        listing.postedAs === 'buyer' && unitName && listing.unitPrice
+          ? {
+              text: `${currencyCode} ${formatAmountWithCommas(listing.unitPrice)}`,
+              unit: unitName,
+            }
+          : null;
       const priceLines =
-        listing.postedAs === 'buyer' && listing.unitLabel && listing.unitPrice
-          ? [
-              {
-                text: `${currencyCode} ${formatAmountWithCommas(listing.unitPrice)}`,
-                unit: listing.unitLabel,
-              },
-            ]
-          : listing.postedAs === 'buyer'
-            ? undefined
-            : [
+        listing.postedAs === 'buyer'
+          ? unitLine
+            ? [unitLine]
+            : undefined
+          : [
               prices.onsitePrice
                 ? {
                     text: `${currencyCode} ${formatAmountWithCommas(prices.onsitePrice)}`,
-                    unit: t('serviceListing.onsite'),
+                    unit: unitName
+                      ? `${t('serviceListing.onsite')} / ${unitName}`
+                      : t('serviceListing.onsite'),
                   }
                 : null,
               prices.onlinePrice
                 ? {
                     text: `${currencyCode} ${formatAmountWithCommas(prices.onlinePrice)}`,
-                    unit: t('serviceListing.online'),
+                    unit: unitName
+                      ? `${t('serviceListing.online')} / ${unitName}`
+                      : t('serviceListing.online'),
                   }
                 : null,
             ].filter((line): line is { text: string; unit: string } => Boolean(line));

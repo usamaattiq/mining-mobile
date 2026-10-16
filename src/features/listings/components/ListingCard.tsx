@@ -313,9 +313,11 @@ function ListingCardComponent({
                     <View style={styles.priceColumn}>
                       {line.unit ? (
                         <View style={styles.priceLabelRow}>
-                          {line.unit === t('serviceListing.onsite') ? (
+                          {line.unit === t('serviceListing.onsite') ||
+                          line.unit.startsWith(`${t('serviceListing.onsite')} /`) ? (
                             <Feather name="map-pin" size={11} color={palette.gold} />
-                          ) : line.unit === t('serviceListing.online') ? (
+                          ) : line.unit === t('serviceListing.online') ||
+                            line.unit.startsWith(`${t('serviceListing.online')} /`) ? (
                             <Feather name="wifi" size={11} color={palette.gold} />
                           ) : line.unit.toLowerCase().includes('rent') ||
                             line.unit.includes('إيجار') ? (
