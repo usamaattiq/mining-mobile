@@ -351,7 +351,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
           ...(isBuyer
             ? [
                 {
-                  label: t('serviceListing.fieldUnitPrice'),
+                  label: t('serviceListing.fieldUnitPrice', { unit: unitDisplay }),
                   value: unitPrice ? `${currency.code} ${formatAmountWithCommas(unitPrice)}` : '',
                 },
               ]
@@ -537,7 +537,7 @@ export function ServiceListingFormScreen({ navigation, route }: Props): React.Re
             />
             {isBuyer && unitLabel ? (
               <FormInput
-                label={t('serviceListing.fieldUnitPrice')}
+                label={t('serviceListing.fieldUnitPrice', { unit: unitDisplay })}
                 value={unitPrice}
                 onChangeText={(value) => setUnitPrice(sanitizeStepPrice(value))}
                 keyboardType="numeric"

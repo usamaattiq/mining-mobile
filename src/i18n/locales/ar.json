@@ -645,7 +645,7 @@
     "fieldUnit": "كيف تحتسب أجر هذه الخدمة؟",
     "fieldUnitRequest": "كيف يجب تسعير العروض؟ (اختياري)",
     "unitPlaceholder": "اختر التسعير",
-    "fieldUnitPrice": "ما السعر الذي تريده لهذه الوحدة؟",
+    "fieldUnitPrice": "ما السعر الذي تريده لـ {unit}؟",
     "yearsOfExperience": "كم سنة خبرة لديك؟",
     "yearsOfExperienceWanted": "كم سنة خبرة تريد؟",
     "yearsOfExperiencePlaceholder": "مثال: 5",

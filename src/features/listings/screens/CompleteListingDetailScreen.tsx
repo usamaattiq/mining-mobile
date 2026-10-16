@@ -658,7 +658,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     }
     if (serviceListing.postedAs === 'buyer' && serviceListing.unitPrice) {
       detailRows.push({
-        label: t('serviceListing.fieldUnitPrice'),
+        label: t('serviceListing.fieldUnitPrice', { unit: serviceListing.unitLabel }),
         value: `${currency.code} ${formatAmountWithCommas(serviceListing.unitPrice)}`,
       });
     }
