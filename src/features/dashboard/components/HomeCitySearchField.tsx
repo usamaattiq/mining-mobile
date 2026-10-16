@@ -13,7 +13,11 @@ import { i18n as appI18n } from '@/i18n';
 import { useLanguage } from '@/i18n/hooks/useLanguage';
 import { AppText } from '@/shared/components/AppText';
 import { googleMapsJsApiKey } from '@/shared/config/env';
-import { searchCities, type CitySearchResult } from '@/shared/utils/location-map-geocode';
+import {
+  searchCities,
+  searchServiceAreas,
+  type CitySearchResult,
+} from '@/shared/utils/location-map-geocode';
 import { getFontFamily, palette, radius, spacing } from '@/theme';
 
 const RESULT_ROW_HEIGHT = 48;
@@ -22,11 +26,14 @@ const RESULTS_MAX_HEIGHT = RESULT_ROW_HEIGHT * 3;
 type HomeCitySearchFieldProps = {
   value: string | null;
   onChange: (city: string | null) => void;
+  /** Services filter can also pick an area inside a city. */
+  includeAreas?: boolean;
 };
 
 export function HomeCitySearchField({
   value,
   onChange,
+  includeAreas = false,
 }: HomeCitySearchFieldProps): React.ReactElement {
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const { currentLanguage } = useLanguage();
@@ -74,7 +81,11 @@ export function HomeCitySearchField({
     const timer = setTimeout(() => {
       setLoading(true);
       setShowEmpty(false);
-      void searchCities(trimmed, googleMapsJsApiKey, currentLanguage)
+      void (includeAreas ? searchServiceAreas : searchCities)(
+        trimmed,
+        googleMapsJsApiKey,
+        currentLanguage,
+      )
         .then((items) => {
           setResults(items);
           setShowEmpty(items.length === 0);
@@ -83,7 +94,7 @@ export function HomeCitySearchField({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [currentLanguage, isFocused, query]);
+  }, [currentLanguage, includeAreas, isFocused, query]);
 
   const handleSelect = (city: CitySearchResult) => {
     skipSearchRef.current = true;
@@ -111,7 +122,7 @@ export function HomeCitySearchField({
   return (
     <View style={styles.wrap}>
       <AppText weight="semibold" style={styles.label}>
-        {t('dashboardHome.filterCity')}
+        {t(includeAreas ? 'dashboardHome.filterAreaOrCity' : 'dashboardHome.filterCity')}
       </AppText>
 
       {value && !isFocused ? (
@@ -122,7 +133,7 @@ export function HomeCitySearchField({
         >
           <Ionicons name="location-outline" size={16} color={palette.gold} />
           <AppText style={styles.chipText} numberOfLines={1}>
-            {value}
+            {includeAreas ? value.split(',')[0]?.trim() || value : value}
           </AppText>
           <Pressable onPress={handleClear} hitSlop={8} accessibilityRole="button">
             <Ionicons name="close-circle" size={16} color={palette.muted} />
@@ -142,7 +153,11 @@ export function HomeCitySearchField({
               setResults([]);
               setShowEmpty(false);
             }}
-            placeholder={t('dashboardHome.filterCityPlaceholder')}
+            placeholder={t(
+              includeAreas
+                ? 'dashboardHome.filterAreaPlaceholder'
+                : 'dashboardHome.filterCityPlaceholder',
+            )}
             placeholderTextColor={palette.muted}
             autoCorrect={false}
             autoCapitalize="words"

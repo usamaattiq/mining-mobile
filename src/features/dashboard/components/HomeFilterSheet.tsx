@@ -30,6 +30,7 @@ type HomeFilterSheetProps = {
   kindPlaceholder?: string;
   kindOptions?: HomeFilterSheetOption[];
   showWeight: boolean;
+  includeAreas?: boolean;
   currencyCode: string;
   locale: string;
   draftType: HomeTypeFilter;
@@ -86,6 +87,7 @@ export function HomeFilterSheet({
   kindPlaceholder,
   kindOptions,
   showWeight,
+  includeAreas = false,
   currencyCode,
   locale,
   draftType,
@@ -188,7 +190,7 @@ export function HomeFilterSheet({
             })}
           </View>
 
-          <HomeCitySearchField value={draftCity} onChange={onChangeCity} />
+          <HomeCitySearchField value={draftCity} onChange={onChangeCity} includeAreas={includeAreas} />
 
           {kindOptions && kindOptions.length > 0 && kindTitle ? (
             <MultiSelectDropdown

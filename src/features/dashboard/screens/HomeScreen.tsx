@@ -296,11 +296,31 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
     const priceMax = parseFilterNumber(filters.priceMax);
     const weightMin = parseFilterNumber(filters.weightMin);
     const weightMax = parseFilterNumber(filters.weightMax);
-    const matchesCityAndDate = (location: string, epoch: number): boolean => {
+    const matchesCityAndDate = (location: string, epoch: number, allowAreas = false): boolean => {
       if (filters.city) {
-        const selectedCity = cityFromLocationLabel(filters.city).toLowerCase();
-        const listingCity = cityFromLocationLabel(location).toLowerCase();
-        if (!selectedCity || listingCity !== selectedCity) return false;
+        const selectedNames = new Set<string>();
+        const firstName = filters.city.split(',')[0]?.trim().toLowerCase();
+        const cityName = (
+          cityFromLocationLabel(filters.city) ||
+          filters.city.split(',')[0] ||
+          ''
+        )
+          .trim()
+          .toLowerCase();
+        if (allowAreas && firstName) selectedNames.add(firstName);
+        if (cityName) selectedNames.add(cityName);
+        const listingPlaces = location.split(' · ').map((part) => {
+          const trimmed = part.trim();
+          return (cityFromLocationLabel(trimmed) || trimmed.split(',')[0] || trimmed)
+            .trim()
+            .toLowerCase();
+        });
+        if (
+          selectedNames.size === 0 ||
+          !listingPlaces.some((place) => selectedNames.has(place))
+        ) {
+          return false;
+        }
       }
       if (filters.dateKey && dayKeyFromEpoch(epoch) !== filters.dateKey) return false;
       return true;
@@ -320,7 +340,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
       }
       if (!matchesListingKind(listing.serviceCategoryLabel)) return false;
       if (!inNumericRange(serviceListingAmount(listing), priceMin, priceMax)) return false;
-      return matchesCityAndDate(listing.location, listing.serviceDate ?? listing.createdAt);
+      return matchesCityAndDate(listing.location, listing.serviceDate ?? listing.createdAt, true);
     });
     const visibleGold = goldListings.filter((listing) => {
       if (!matchesGoldKarat(listing.purityLabel, filters.type)) return false;
@@ -545,6 +565,7 @@ export function HomeScreen({ navigation }: Props): React.ReactElement {
         }
         kindOptions={kindOptions}
         showWeight={category === 'gold'}
+        includeAreas={role === 'buyer' && category === 'services'}
         currencyCode={currency.code}
         locale={currentLanguage}
         draftType={draftFilters.type}
