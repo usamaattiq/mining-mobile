@@ -31,6 +31,7 @@ export function ListingOfferComposer({
   hasOffer,
   leading = false,
   showInput,
+  showDescription = true,
   awaitingConfirm,
   submitting,
   offerTypeLabel,
@@ -58,6 +59,7 @@ export function ListingOfferComposer({
   const { t } = useTranslation(undefined, { i18n: appI18n });
   const keyboardVisible = useKeyboardState((state) => state.isVisible);
   const [price, setPrice] = React.useState('');
+  const [description, setDescription] = React.useState('');
   const [units, setUnits] = React.useState(1);
   const [fulfillment, setFulfillment] = React.useState<'rent' | 'sale' | 'onsite' | 'online'>(
     fulfillmentModes?.[0] ?? 'sale',
@@ -95,11 +97,13 @@ export function ListingOfferComposer({
     const value = price.trim();
     if (!canSend || kindBlocked) return;
     setPrice('');
+    setDescription('');
     onSubmit(
       value,
       maxUnits != null ? units : undefined,
       fulfillmentModes && fulfillmentModes.length > 0 ? fulfillment : undefined,
       handoverModes && handoverModes.length > 0 ? handover : undefined,
+      showDescription ? description.trim() || undefined : undefined,
     );
   };
 
@@ -372,6 +376,23 @@ export function ListingOfferComposer({
                 )}
               </Pressable>
             </View>
+            {showDescription ? (
+              <View style={styles.descriptionBlock}>
+                <AppText weight="semibold" style={styles.unitsCaption}>
+                  {t('rfq.offerDescription')}
+                </AppText>
+                <TextInput
+                  value={description}
+                  onChangeText={setDescription}
+                  placeholder={t('rfq.offerDescriptionPlaceholder')}
+                  placeholderTextColor={palette.muted}
+                  editable={!submitting}
+                  multiline
+                  maxLength={200}
+                  style={[styles.descriptionInput, { fontFamily: getFontFamily(currentLanguage) }]}
+                />
+              </View>
+            ) : null}
             {draftUnitAmount != null && maxUnits != null ? (
               <PriceTimesUnitsSummary
                 currencyCode={currencyCode}
@@ -518,6 +539,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: palette.charcoal,
     paddingVertical: 0,
+  },
+  descriptionBlock: {
+    gap: 4,
+  },
+  descriptionInput: {
+    minHeight: 72,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: palette.pureWhite,
+    fontSize: 15,
+    color: palette.charcoal,
+    textAlignVertical: 'top',
   },
   send: {
     flexDirection: 'row',

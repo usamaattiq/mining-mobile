@@ -272,6 +272,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
   const [actingOfferId, setActingOfferId] = React.useState<string | null>(null);
   const [editingOfferId, setEditingOfferId] = React.useState<string | null>(null);
   const [editOfferPrice, setEditOfferPrice] = React.useState('');
+  const [editOfferDescription, setEditOfferDescription] = React.useState('');
   const [editOfferUnits, setEditOfferUnits] = React.useState(1);
   const [editOfferKind, setEditOfferKind] = React.useState<'rent' | 'sale'>('rent');
   const [editOfferHandover, setEditOfferHandover] = React.useState<'pickup' | 'delivery'>('pickup');
@@ -927,6 +928,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     units?: number,
     choice?: 'rent' | 'sale' | 'onsite' | 'online',
     handover?: 'pickup' | 'delivery',
+    description?: string,
   ) => {
     if (hasOpenSupplierOffer) return;
     const fulfillment = choice === 'rent' || choice === 'sale' ? choice : undefined;
@@ -942,6 +944,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
         category === 'equipment' && equipmentListing?.postedAs === 'supplier'
           ? handover
           : undefined,
+        description,
       )
       .then((listing) => {
         applyListing(listing);
@@ -1065,6 +1068,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     kind?: 'rent' | 'sale';
     handover?: 'pickup' | 'delivery';
     delivery?: 'onsite' | 'online';
+    description?: string;
   }) => {
     const units = offer.quantity != null && offer.quantity > 0 ? offer.quantity : 1;
     const total = Number(offer.price);
@@ -1076,6 +1080,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
     setEditOfferKind(offer.kind === 'sale' ? 'sale' : 'rent');
     setEditOfferHandover(offer.handover === 'delivery' ? 'delivery' : 'pickup');
     setEditOfferDelivery(offer.delivery === 'online' ? 'online' : 'onsite');
+    setEditOfferDescription(offer.description ?? '');
   };
 
   const handleSaveOffer = (offerId: string) => {
@@ -1102,6 +1107,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
               category === 'services' && serviceListing?.serviceType === 'both'
                 ? editOfferDelivery
                 : undefined,
+              editOfferDescription.trim(),
             )
             .then((listing) => {
               applyListing(listing);
@@ -1485,6 +1491,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                         ) : null}
                       </View>
                     ) : null}
+                    {offer.description && editingOfferId !== offer.id ? (
+                      <AppText style={styles.myOfferDescription}>{offer.description}</AppText>
+                    ) : null}
                     {(supplierBuyer || respondingToBuyer) &&
                     offer.status === 'active' &&
                     editingOfferId === offer.id ? (
@@ -1600,6 +1609,20 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                             }
                             placeholderTextColor={palette.muted}
                             style={styles.myOfferPriceInput}
+                          />
+                        </View>
+                        <View style={styles.myOfferDescriptionField}>
+                          <AppText weight="semibold" style={styles.myOfferDescriptionLabel}>
+                            {t('rfq.offerDescription')}
+                          </AppText>
+                          <TextInput
+                            value={editOfferDescription}
+                            onChangeText={setEditOfferDescription}
+                            placeholder={t('rfq.offerDescriptionPlaceholder')}
+                            placeholderTextColor={palette.muted}
+                            multiline
+                            maxLength={200}
+                            style={styles.myOfferDescriptionInput}
                           />
                         </View>
                         {category === 'services' ? null : (
@@ -1795,6 +1818,9 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
                           </AppText>
                         ) : null}
                       </View>
+                    ) : null}
+                    {offer.description ? (
+                      <AppText style={styles.myOfferDescription}>{offer.description}</AppText>
                     ) : null}
                     <View style={styles.myOfferActions}>
                       <Button
@@ -2121,6 +2147,7 @@ export function CompleteListingDetailScreen({ navigation, route }: Props): React
           hasOffer={!showMyOfferCards && hasSentOffer}
           leading={isAuction && Boolean(rfq?.isLeading)}
           showInput={showOfferInput}
+          showDescription={!isAuction}
           awaitingConfirm={!showMyOfferCards && awaitingConfirm}
           sendInline={supplierBuyer}
           submitting={offerSubmitting}
@@ -2422,6 +2449,21 @@ const styles = StyleSheet.create({
   },
   myOfferPrice: { flex: 1, fontSize: 22, color: palette.charcoal },
   myOfferPerUnit: { fontSize: 16, color: palette.muted },
+  myOfferDescription: { fontSize: 13, lineHeight: 18, color: palette.muted },
+  myOfferDescriptionField: { gap: 4 },
+  myOfferDescriptionLabel: { fontSize: 13, color: palette.charcoal },
+  myOfferDescriptionInput: {
+    minHeight: 72,
+    borderWidth: 1,
+    borderColor: palette.softGold,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: palette.pureWhite,
+    fontSize: 15,
+    color: palette.charcoal,
+    textAlignVertical: 'top',
+  },
   myOfferActions: { flexDirection: 'row', gap: spacing.sm },
   myOfferMessageActions: { marginTop: spacing.sm },
   myOfferAction: {

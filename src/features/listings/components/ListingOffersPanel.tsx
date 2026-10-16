@@ -241,6 +241,9 @@ export function ListingOffersPanel({
                   {priceLabel}
                 </AppText>
               ) : null}
+              {offer.description ? (
+                <AppText style={styles.description}>{offer.description}</AppText>
+              ) : null}
               {confirmationOfferId && offer.id === confirmationOfferId ? (
                 <View style={styles.actions}>
                   <Button
@@ -404,6 +407,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   statusBadgeText: { fontSize: 11, color: palette.charcoal },
+  description: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: palette.muted,
+  },
   price: {
     fontSize: 18,
     color: palette.charcoal,

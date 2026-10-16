@@ -103,6 +103,7 @@ export const listingsApi = {
     fulfillment?: 'rent' | 'sale',
     delivery?: 'onsite' | 'online',
     handover?: 'pickup' | 'delivery',
+    description?: string,
   ): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers`, {
       method: 'POST',
@@ -112,6 +113,7 @@ export const listingsApi = {
         ...(fulfillment ? { fulfillment } : {}),
         ...(delivery ? { delivery } : {}),
         ...(handover ? { handover } : {}),
+        ...(description ? { description } : {}),
       },
     });
   },
@@ -152,6 +154,7 @@ export const listingsApi = {
     fulfillment?: 'rent' | 'sale',
     handover?: 'pickup' | 'delivery',
     delivery?: 'onsite' | 'online',
+    description?: string,
   ): Promise<ListingDto> {
     return apiFetch(`/listings/${id}/offers/${offerId}`, {
       method: 'PATCH',
@@ -161,6 +164,7 @@ export const listingsApi = {
         ...(fulfillment ? { fulfillment } : {}),
         ...(handover ? { handover } : {}),
         ...(delivery ? { delivery } : {}),
+        description: description ?? '',
       },
     });
   },

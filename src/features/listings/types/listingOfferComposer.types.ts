@@ -20,6 +20,8 @@ export type ListingOfferComposerProps = {
   hasOffer: boolean;
   leading?: boolean;
   showInput: boolean;
+  /** Auction bids stay amount-only. */
+  showDescription?: boolean;
   awaitingConfirm: boolean;
   submitting: boolean;
   /** Units, price, and send share one row. Message actions stay on the line below. */
@@ -41,6 +43,7 @@ export type ListingOfferComposerProps = {
     units?: number,
     fulfillment?: 'rent' | 'sale' | 'onsite' | 'online',
     handover?: 'pickup' | 'delivery',
+    description?: string,
   ) => void;
   onConfirm: () => void;
   onDecline: () => void;
